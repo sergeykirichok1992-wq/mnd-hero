@@ -279,6 +279,50 @@ body{
 }
 #vstatus b{color:var(--gold)}
 :focus-visible{outline:2px solid var(--moon); outline-offset:3px}
+
+/* ---------- второй экран: круговая галерея (порт CircularGallery) ---------- */
+/* Соответствие классам Tailwind из оригинала:
+   rounded-lg=8px, shadow-2xl, border-border, bg-card/30, backdrop-blur-lg=16px,
+   p-4=16px, text-xl=20px, text-sm=14px, text-xs=12px, mt-2=8px */
+#gal{position:relative; z-index:10; background:var(--ink); border-top:1px solid var(--line); height:500vh}
+.gal-sticky{position:sticky; top:0; height:100vh; overflow:hidden;
+  display:flex; flex-direction:column; align-items:center; justify-content:center}
+.gal-head{position:absolute; top:64px; left:0; right:0; z-index:10; text-align:center;
+  padding:0 18px; pointer-events:none}
+.gal-head h2{font-family:"Unbounded",sans-serif; font-weight:700;
+  font-size:clamp(24px,4vw,36px); line-height:1.1; margin:0 0 6px; color:#fff}
+.gal-head p{margin:0; color:var(--dim); font-size:15px}
+.gal-scene{position:relative; width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center; perspective:2000px}
+.gal-ring{position:relative; width:100%; height:100%;
+  transform-style:preserve-3d; will-change:transform}
+.gal-item{position:absolute; left:50%; top:50%; transition:opacity .3s linear;
+  /* без этого видна изнанка дальних карточек — текст читается зеркально */
+  backface-visibility:hidden; -webkit-backface-visibility:hidden}
+.gal-card{position:relative; width:100%; height:100%; border-radius:8px; overflow:hidden;
+  border:1px solid var(--line); background:rgba(8,13,27,.30);
+  backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 25px 50px -12px rgba(0,0,0,.55)}
+.gal-card>img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block}
+.gal-cap{position:absolute; left:0; bottom:0; width:100%; padding:16px; color:#fff;
+  background:linear-gradient(to top, rgba(0,0,0,.8), transparent)}
+.gal-cap h3{margin:0; font-size:20px; line-height:1.25; font-weight:700}
+.gal-cap em{font-size:14px; font-style:italic; opacity:.8}
+.gal-cap span{display:block; font-size:12px; margin-top:8px; opacity:.7}
+@media (prefers-reduced-motion:reduce){ .gal-item{transition:none} }
+@media (max-width:820px){
+  /* 500vh на телефоне — это 4200 px пролистывания ради одного блока */
+  #gal{height:300vh}
+  .gal-head{top:calc(58px + env(safe-area-inset-top))}
+  .gal-head h2{font-size:23px}
+  .gal-head p{font-size:13px}
+  /* размытие подложки не видно: карточку целиком закрывает фото. Лишняя нагрузка на телефон */
+  .gal-card{backdrop-filter:none; -webkit-backdrop-filter:none}
+  .gal-cap{padding:12px}
+  .gal-cap h3{font-size:16px}
+  .gal-cap em{font-size:12px}
+  .gal-cap span{font-size:11px; margin-top:6px}
+}
 </style>
 </head>
 <body>
@@ -323,6 +367,20 @@ body{
     </div>
     <div id="vstatus"></div>
     <div class="hint" id="hint">Крути вниз<i></i></div>
+  </div>
+</section>
+
+
+<!-- ===== второй экран: круговая галерея ===== -->
+<section id="gal">
+  <div class="gal-sticky">
+    <div class="gal-head">
+      <h2>Animal Gallery</h2>
+      <p>Scroll to rotate the gallery</p>
+    </div>
+    <div class="gal-scene" id="galScene" role="region" aria-label="Circular 3D Gallery">
+      <div class="gal-ring" id="galRing"></div>
+    </div>
   </div>
 </section>
 
@@ -856,5 +914,145 @@ body{
 })();
 </script>
 
+
+<script>
+/* ===== CircularGallery — порт React-компонента на чистый JS =====
+   Математика вращения, размеры карточек и формула прозрачности
+   перенесены из circular-gallery.tsx без изменений.            */
+(function(){
+  // настройки = значения по умолчанию из React-компонента
+  // Размеры считаются от ширины экрана. На широком мониторе получаются ровно
+  // исходные 300x400 при радиусе 600 — то есть на компьютере всё как в оригинале.
+  // Радиус держим вдвое больше ширины карточки: при 10 карточках соседние не налезают.
+  function calcCfg(){
+    var cardW = Math.max(170, Math.min(300, window.innerWidth * 0.54));
+    return {
+      radius: cardW * 2,
+      cardW: Math.round(cardW),
+      cardH: Math.round(cardW * 4 / 3),
+      autoRotateSpeed: 0.02,
+      // 'section' — поворот считается по своей секции. В оригинале было 'page'
+      // (по всей странице), из-за чего на нашем сайте кольцо приезжало уже
+      // повёрнутым на четверть и полный оборот не успевал завершиться.
+      scrollScope: 'section'
+    };
+  }
+  var CFG = window.GAL_CFG = calcCfg();
+
+  var DATA = [
+    {common:'Lion', binomial:'Panthera leo', photo:{url:'https://images.unsplash.com/photo-1583499871880-de841d1ace2a?w=900&auto=format&fit=crop&q=80', text:'lion couple kissing on a brown rock', pos:'47% 35%', by:'Clément Roy'}},
+    {common:'Asiatic elephant', binomial:'Elephas maximus', photo:{url:'https://images.unsplash.com/photo-1571406761758-9a3eed5338ef?w=900&auto=format&fit=crop&q=80', text:'herd of Sri Lankan elephants walking away from a river', pos:'75% 65%', by:'Alex Azabache'}},
+    {common:'Red-tailed black cockatoo', binomial:'Calyptorhynchus banksii', photo:{url:'https://images.unsplash.com/photo-1619664208054-41eefeab29e9?w=900&auto=format&fit=crop&q=80', text:'close-up of a black cockatoo', pos:'53% 43%', by:'David Clode'}},
+    {common:'Dromedary', binomial:'Camelus dromedarius', photo:{url:'https://images.unsplash.com/photo-1662841238473-f4b137e123cb?w=900&auto=format&fit=crop&q=80', text:'camel and her new born calf walking in the Sahara desert', pos:'65% 65%', by:'Moaz Tobok'}},
+    {common:'Polar bear', binomial:'Ursus maritimus', photo:{url:'https://images.unsplash.com/photo-1589648751789-c8ecb7a88bd5?w=900&auto=format&fit=crop&q=80', text:'polar bear on the snow, by the water, raised on the hind legs, front paws together', pos:'50% 25%', by:'Hans-Jurgen Mager'}},
+    {common:'Giant panda', binomial:'Ailuropoda melanoleuca', photo:{url:'https://images.unsplash.com/photo-1659540181281-1d89d6112832?w=900&auto=format&fit=crop&q=80', text:'giant panda hanging from a tree branch', pos:'47%', by:'Jiachen Lin'}},
+    {common:"Grévy's zebra", binomial:'Equus grevyi', photo:{url:'https://images.unsplash.com/photo-1526095179574-86e545346ae6?w=900&auto=format&fit=crop&q=80', text:'zebra standing on wheat field, looking back towards the camera', pos:'65% 35%', by:'Jeff Griffith'}},
+    {common:'Cheetah', binomial:'Acinonyx jubatus', photo:{url:'https://images.unsplash.com/photo-1541707519942-08fd2f6480ba?w=900&auto=format&fit=crop&q=80', text:'cheetah sitting in the grass under a blue sky', by:'Mike Bird'}},
+    {common:'King penguin', binomial:'Aptenodytes patagonicus', photo:{url:'https://images.unsplash.com/photo-1595792419466-23cec2476fa6?w=900&auto=format&fit=crop&q=80', text:'king penguin with a fluffy brown chick on grey rocks', pos:'35%', by:'Martin Wettstein'}},
+    {common:'Red panda', binomial:'Ailurus fulgens', photo:{url:'https://images.unsplash.com/photo-1689799513565-44d2bc09d75b?w=900&auto=format&fit=crop&q=80', text:'a red panda in a tree', by:'Niels Baars'}}
+  ];
+
+  var sec = document.getElementById('gal');
+  var ring = document.getElementById('galRing');
+  if(!sec || !ring) return;
+
+  // scrollRot — угол от прокрутки, spin — накрученное автоповоротом. Держим врозь:
+  // в оригинале прокрутка перезаписывала общий угол, и накрученное за простой
+  // рывком отскакивало при первом касании.
+  var scrollRot = 0, spin = 0, isScrolling = false, scrollTimer = null, nodes = [];
+
+  function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  // сборка карточек (эквивалент items.map в React)
+  function build(){
+    ring.innerHTML = '';
+    nodes = [];
+    var anglePerItem = 360 / DATA.length;
+    for(var i=0;i<DATA.length;i++){
+      var item = DATA[i];
+      var itemAngle = i * anglePerItem;
+
+      var el = document.createElement('div');
+      el.className = 'gal-item';
+      el.setAttribute('role','group');
+      el.setAttribute('aria-label', item.common);
+      el.style.width = CFG.cardW + 'px';
+      el.style.height = CFG.cardH + 'px';
+      el.style.marginLeft = (-CFG.cardW/2) + 'px';
+      el.style.marginTop  = (-CFG.cardH/2) + 'px';
+      el.style.transform = 'rotateY('+itemAngle+'deg) translateZ('+CFG.radius+'px)';
+
+      el.innerHTML =
+        '<div class="gal-card">' +
+          '<img src="'+item.photo.url+'" alt="'+esc(item.photo.text)+'" loading="lazy" decoding="async" ' +
+               'style="object-position:'+(item.photo.pos || 'center')+'">' +
+          '<div class="gal-cap">' +
+            '<h3>'+esc(item.common)+'</h3>' +
+            '<em>'+esc(item.binomial)+'</em>' +
+            '<span>Photo by: '+esc(item.photo.by)+'</span>' +
+          '</div>' +
+        '</div>';
+
+      ring.appendChild(el);
+      nodes.push({el:el, angle:itemAngle});
+    }
+  }
+
+  // прокрутка задаёт поворот — формула из оригинала
+  function onScroll(){
+    isScrolling = true;
+    if(scrollTimer) clearTimeout(scrollTimer);
+
+    var progress;
+    if(CFG.scrollScope === 'section'){
+      // поворот считается только по своей секции, а не по всей странице
+      var total = sec.offsetHeight - window.innerHeight;
+      progress = total > 0 ? Math.min(1, Math.max(0, -sec.getBoundingClientRect().top / total)) : 0;
+    } else {
+      var scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+      progress = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
+    }
+    scrollRot = progress * 360;
+
+    scrollTimer = setTimeout(function(){ isScrolling = false; }, 150);
+  }
+  window.addEventListener('scroll', onScroll, {passive:true});
+
+  // автоповорот, когда не крутят — и отрисовка кадра
+  function frame(){
+    if(!isScrolling) spin += CFG.autoRotateSpeed;
+
+    var rotation = scrollRot + spin;
+    ring.style.transform = 'rotateY('+rotation+'deg)';
+
+    var totalRotation = rotation % 360;
+    for(var i=0;i<nodes.length;i++){
+      var relativeAngle = (nodes[i].angle + totalRotation + 360) % 360;
+      var normalizedAngle = Math.abs(relativeAngle > 180 ? 360 - relativeAngle : relativeAngle);
+      nodes[i].el.style.opacity = Math.max(0.3, 1 - (normalizedAngle / 180));
+    }
+    requestAnimationFrame(frame);
+  }
+
+  build();
+  onScroll();
+  requestAnimationFrame(frame);
+
+  // поворот телефона / смена размера окна — пересобираем под новую ширину
+  var rzTimer = null;
+  window.addEventListener('resize', function(){
+    if(rzTimer) clearTimeout(rzTimer);
+    rzTimer = setTimeout(function(){
+      var n = calcCfg();
+      if(n.cardW === CFG.cardW) return;
+      CFG.radius = n.radius; CFG.cardW = n.cardW; CFG.cardH = n.cardH;
+      build(); onScroll();
+    }, 200);
+  }, {passive:true});
+
+  // чтобы можно было менять настройки на лету и пересобирать
+  window.GAL_REBUILD = function(){ build(); onScroll(); };
+})();
+</script>
 </body>
 </html>
