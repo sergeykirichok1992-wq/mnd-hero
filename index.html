@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Первый экран Звёздной смены</title>
 <meta name="theme-color" content="#04070F">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Экскурсия-шоу «Звёздная смена». Сезон 2026/2027, Нижний Новгород. Демо первого экрана сайта.">
@@ -15,8 +17,6 @@
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://sergeykirichok1992-wq.github.io/mnd-hero/">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
-<title>Первый экран Звёздной смены</title>
 <link rel="preload" as="image" href="poster.webp" fetchpriority="high">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -103,6 +103,13 @@ body{
   mix-blend-mode:screen; opacity:0; filter:blur(5px)}
 #logoFx{z-index:8; width:100%; height:100%; display:block; pointer-events:none;
   mix-blend-mode:screen; opacity:0; filter:blur(1.5px)}
+/* дым из-под садящегося острова: задний уходит ЗА логотип, передний стелется ПЕРЕД кромкой */
+#smokeBack,#smokeFront{
+  width:100%; height:100%; display:block; pointer-events:none;
+  mix-blend-mode:screen; opacity:0;
+}
+#smokeBack{z-index:6; filter:blur(5px)}
+#smokeFront{z-index:9; filter:blur(2px)}
 #v{transform-origin:50% 50%}
 #glow{
   z-index:6; pointer-events:none; inset:auto;
@@ -291,8 +298,10 @@ body{
     <canvas id="snowBack" style="z-index:4"></canvas>
     <canvas id="beams" style="z-index:5"></canvas>
     <div id="glow"></div>
+    <canvas id="smokeBack"></canvas>
     <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Звёздная смена" src="logo.webp">
     <canvas id="logoFx"></canvas>
+    <canvas id="smokeFront"></canvas>
     <canvas id="logoLight"></canvas>
     <canvas id="snowFront"></canvas>
     <canvas id="beamsFront"></canvas>
@@ -344,9 +353,15 @@ body{
   var ctxL=cvL.getContext('2d'), ctxLF=cvLF.getContext('2d');
   var cvLL=document.getElementById('logoLight'), ctxLL=cvLL.getContext('2d');
   var cvFX=document.getElementById('logoFx'), ctxFX=cvFX.getContext('2d');
+  var cvSB=document.getElementById('smokeBack'), ctxSB=cvSB.getContext('2d');
+  var cvSF=document.getElementById('smokeFront'), ctxSF=cvSF.getContext('2d');
   var ctxB=cvB.getContext('2d'), ctxF=cvF.getContext('2d');
   var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var dur=7.2, ready=false, cur=0, W=0, Hh=0;
+  // пока предыдущая перемотка не закончилась, новую не просим:
+  // иначе на слабом декодере seek'и встают в очередь и кадр застывает навсегда
+  var seekBusy=false, seekAt=0;
+  var FORCE=null;   // отладка: window.__freeze(p) фиксирует прокрутку для съёмки кадров
   // на телефоне перемотка видео пальцем идёт рывками — там ролик играет сам
   var TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 820;
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
@@ -387,7 +402,7 @@ body{
     ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,6.2832); ctx.fill();
   }
 
-  function paintLogoFx(t, k){
+  function paintLogoFx(t, k, thrust){
     ctxFX.clearRect(0,0,LW,LH);
     if(k<=0.01 || !logo.complete || !logo.naturalWidth) return;
     var st=cvFX.getBoundingClientRect(), lr=logo.getBoundingClientRect();
@@ -412,7 +427,8 @@ body{
     for(var e=0;e<ENGINES.length;e++){
       var E=ENGINES[e];
       var pu=0.62+0.38*Math.sin(t*1.9+e*1.7);
-      blob(ctxFX, x0+E[0]*w, y0+E[1]*h, E[2]*w*(0.9+0.22*pu), [128,196,255], 0.34*pu*k);
+      var th=thrust||1;
+      blob(ctxFX, x0+E[0]*w, y0+E[1]*h, E[2]*w*(0.9+0.22*pu)*(1+0.55*(th-1)), [128,196,255], 0.34*pu*k*th);
     }
 
     // гирлянды по краю острова
@@ -521,6 +537,113 @@ body{
     ctx.globalAlpha=1;
   }
 
+  /* ---- дым из-под садящегося острова ---- */
+  // клуб пара: три октавы решётчатого шума под мягкой круглой маской.
+  // считается один раз при первом появлении, дальше только вращаем, растим и гасим —
+  // рисование остаётся одним drawImage на частицу
+  function makePuff(seed, size, col){
+    var r=seeded(seed), oct=[3,6,12], amp=[0.55,0.30,0.15], G=[];
+    for(var o=0;o<oct.length;o++){
+      var n=oct[o], g=new Float32Array((n+1)*(n+1));
+      for(var i=0;i<g.length;i++) g[i]=r();
+      G.push({n:n,g:g});
+    }
+    function nz(gr,u,v){
+      var n=gr.n,g=gr.g, fx=u*n, fy=v*n, x0=fx|0, y0=fy|0;
+      if(x0>n-1)x0=n-1; if(y0>n-1)y0=n-1;
+      var tx=fx-x0, ty=fy-y0;
+      tx=tx*tx*(3-2*tx); ty=ty*ty*(3-2*ty);
+      var a=g[y0*(n+1)+x0], b=g[y0*(n+1)+x0+1], c=g[(y0+1)*(n+1)+x0], d=g[(y0+1)*(n+1)+x0+1];
+      return (a+(b-a)*tx)*(1-ty)+(c+(d-c)*tx)*ty;
+    }
+    var cv=document.createElement('canvas'); cv.width=cv.height=size;
+    var cx=cv.getContext('2d'), im=cx.createImageData(size,size), D=im.data;
+    for(var y=0;y<size;y++) for(var x=0;x<size;x++){
+      var u=x/size, v=y/size, f=0;
+      for(var o2=0;o2<G.length;o2++) f+=amp[o2]*nz(G[o2],u,v);
+      var dx=u-0.5, dy=v-0.5, d2=Math.sqrt(dx*dx+dy*dy)*2;
+      var mask=d2>=1?0:Math.pow(1-d2*d2,1.7);
+      var a=(f-0.33)*2.4; a=a<0?0:a>1?1:a;
+      var i4=(y*size+x)*4;
+      D[i4]=col[0]; D[i4+1]=col[1]; D[i4+2]=col[2]; D[i4+3]=Math.round(255*a*mask);
+    }
+    cx.putImageData(im,0,0);
+    return cv;
+  }
+  var PUFF=[];
+  function puffs(){
+    if(!PUFF.length) PUFF=[ makePuff(13,128,[172,210,255]), makePuff(71,128,[198,226,255]),
+                            makePuff(29,128,[156,198,252]), makePuff(53,128,[216,234,255]) ];
+    return PUFF;
+  }
+
+  // частицы живут в координатах слоя, а не логотипа: остров опускается, а выдох остаётся
+  // в воздухе — именно это отставание читается как посадка на тяге, а не как облачко-наклейка
+  var SMOKE_ON=false;              // дым выключен — включить: true
+  var SMOKE=[], SMOKE_MAX=140, emitAcc=0;
+  function emit(front,x,y,sp,pw){
+    if(SMOKE.length>=SMOKE_MAX) return;
+    var r=Math.random;
+    SMOKE.push({front:front, x:x, y:y,
+      vx:(r()-0.5)*sp*(front?0.60:0.40), vy:sp*(front?0.95:0.62)*(0.55+r()*0.9)*(pw||1),
+      r0:sp*(front?0.034:0.055)*(0.7+r()*0.8), grow:2.0+r()*1.6,
+      life:0, ttl:(front?1.15:2.0)*(0.75+r()*0.6),
+      rot:r()*6.283, vr:(r()-0.5)*1.2,
+      a:(front?0.44:0.34)*(0.65+r()*0.7), s:(r()*4)|0});
+  }
+  function stepSmoke(dt,k,geo,dpNow){
+    if(k>0.002 && geo && geo.w>0){
+      puffs();
+      var bump=Math.exp(-Math.pow((dpNow-0.90)/0.075,2));   // хлопок при касании
+      var pw=1+0.9*bump;
+      emitAcc += dt*k*(95+150*bump);
+      var guard=0;
+      while(emitAcc>=1 && guard++<60){
+        emitAcc-=1;
+        var front=Math.random()<0.45, ex, ey;
+        if(Math.random()<0.68){                       // из дюз
+          var E=ENGINES[(Math.random()*ENGINES.length)|0];
+          ex=geo.x+E[0]*geo.w; ey=geo.y+E[1]*geo.h;
+        } else {                                      // вдоль нижней кромки скалы
+          var u=0.16+Math.random()*0.68;
+          ex=geo.x+u*geo.w;
+          ey=geo.y+(0.66+Math.sin(u*Math.PI)*0.11+Math.random()*0.06)*geo.h;
+        }
+        emit(front,ex,ey,geo.w,pw);
+      }
+    }
+    for(var i=SMOKE.length-1;i>=0;i--){
+      var s2=SMOKE[i];
+      s2.life+=dt;
+      if(s2.life>=s2.ttl){ SMOKE.splice(i,1); continue; }
+      s2.x+=s2.vx*dt; s2.y+=s2.vy*dt;
+      s2.vx*=(1-0.9*dt); s2.vy*=(1-2.4*dt);          // струя быстро гаснет и превращается в клуб
+      s2.vy+=(geo?geo.w:LW)*0.020*dt;                // и клуб медленно оседает
+      s2.rot+=s2.vr*dt;
+    }
+  }
+  function paintSmoke(ctx,front,k){
+    ctx.clearRect(0,0,LW,LH);
+    if(k<=0.004 || !SMOKE.length) return;
+    var P=puffs();
+    ctx.globalCompositeOperation='lighter';
+    for(var i=0;i<SMOKE.length;i++){
+      var s3=SMOKE[i];
+      if(s3.front!==front) continue;
+      var u=s3.life/s3.ttl;
+      var a=s3.a*k*Math.sin(Math.pow(u,0.5)*Math.PI);   // мягко разгорается и мягко тает
+      if(s3.y>LH*0.80) a*=cl(1-(s3.y-LH*0.80)/(LH*0.14));   // у города дым обязан растаять
+      if(a<=0.004) continue;
+      var rad=s3.r0*(1+(s3.grow-1)*Math.pow(u,0.7)), d=rad*2;
+      ctx.globalAlpha=a>1?1:a;
+      ctx.save(); ctx.translate(s3.x,s3.y); ctx.rotate(s3.rot);
+      ctx.drawImage(P[s3.s],-d/2,-d/2,d,d);
+      ctx.restore();
+    }
+    ctx.globalAlpha=1;
+    ctx.globalCompositeOperation='source-over';
+  }
+
   function ensureSize(){
     var w=cvB.clientWidth||window.innerWidth, h=cvB.clientHeight||window.innerHeight;
     if(w!==W||h!==Hh){
@@ -533,6 +656,7 @@ body{
       cvL.width=LW; cvL.height=LH; cvLF.width=LW; cvLF.height=LH;
       cvLL.width=LW; cvLL.height=LH;
       cvFX.width=LW; cvFX.height=LH;
+      cvSB.width=LW; cvSB.height=LH; cvSF.width=LW; cvSF.height=LH;
     }
   }
   ensureSize();
@@ -540,9 +664,14 @@ body{
   v.addEventListener('loadedmetadata', function(){
     if(v.duration && isFinite(v.duration)) dur=v.duration; ready=true;
   });
+  v.addEventListener('seeking', function(){ seekBusy=true; seekAt=performance.now(); });
+  v.addEventListener('seeked',  function(){ seekBusy=false; });
+  // ВАЖНО: canplay прилетает после КАЖДОЙ перемотки. Сбрасывать время можно только один раз,
+  // иначе ролик бесконечно откатывается в начало и первый экран замирает на стоп-кадре.
+  var primed=false;
   v.addEventListener('canplay', function(){
     if(stat) stat.style.display='none';
-    if(!TOUCH){ try{ v.pause(); v.currentTime=0; }catch(e){} }
+    if(!TOUCH && !primed){ primed=true; try{ v.pause(); v.currentTime=0; }catch(e){} }
   });
 
 
@@ -551,16 +680,13 @@ body{
     if(!keep) setTimeout(function(){ stat.style.display='none'; }, 2200); }
 
   (function loadVideo(){
-    // Ролик качаем целиком и отдаём плееру из памяти.
-    // Прямая ссылка на файл не годится: перемотка прокруткой по сетевому
-    // источнику залипает на первом кадре — проверено в браузере.
-    function fail(m){ say('Видео не открылось.<br><b>'+m+'</b>', true); }
-    v.addEventListener('error', function(){ fail('код '+((v.error&&v.error.code)||'?')); });
-
     function start(url){
       v.src = url; v.load();
       if(TOUCH){ var pr=v.play(); if(pr&&pr.then) pr.then(function(){started=true;}).catch(function(){ say('Коснись экрана, чтобы запустить', true); }); }
     }
+    v.addEventListener('error', function(){
+      say('Видео не открылось.<br><b>код '+((v.error&&v.error.code)||'?')+'</b>', true);
+    });
 
     // На телефоне перемотки прокруткой нет — ролик просто играет,
     // и там файл по ссылке лучше: Safari умеет докачивать его кусками.
@@ -581,12 +707,8 @@ body{
           return pump();
         });
       })();
-    }).then(function(b){
-      start(URL.createObjectURL(b));
-    }).catch(function(err){
-      say('Ролик грузится напрямую…');
-      start('hero.mp4');
-    });
+    }).then(function(b){ start(URL.createObjectURL(b)); })
+      .catch(function(){ say('Ролик грузится напрямую…'); start('hero.mp4'); });
   })();
 
   var VIDEO_END=0.80;                 // на этой доле прокрутки ролик доигран, дальше — задержка
@@ -607,12 +729,25 @@ body{
     setTimeout(kick, 350);
   }
 
+  var PAUSED=false;
+  window.__freeze = function(x){ FORCE = x; };            // отладка: зафиксировать долю прокрутки
+  window.__smokeCount = function(){ return SMOKE.length; };   // отладка
+  window.__pause  = function(b){ PAUSED = !!b; lastNow=0; }; // отладка: снять нагрузку с CPU, чтобы декодер успел перемотать
+
   function frame(now){
+    if(PAUSED){ requestAnimationFrame(frame); return; }
     ensureSize();
     var dt = lastNow ? Math.min(0.1,(now-lastNow)/1000) : 0; lastNow = now;
     var p;
 
-    if (TOUCH){
+    // предохранитель: если 'seeked' потерялся, через полсекунды разрешаем новую перемотку
+    if(seekBusy && now-seekAt>500) seekBusy=false;
+
+    if (FORCE!=null){
+      p = FORCE;                                   // отладка: без сглаживания, кадр в кадр
+      cur = cl(p/VIDEO_END)*dur;
+      if(ready && !seekBusy && Math.abs(v.currentTime-cur)>0.012){ try{ v.currentTime=cur; }catch(e){} }
+    } else if (TOUCH){
       // прогресс ведёт сам ролик, а после его конца ещё 1,2 с на «задержку» логотипа
       var vp = ready && dur ? cl(v.currentTime/dur) : 0;
       if (vp > 0.985 || v.ended) tailP = cl(tailP + dt/1.2);
@@ -622,29 +757,44 @@ body{
       p = total>0 ? cl(-hero.getBoundingClientRect().top/total) : 0;
       var target=cl(p/VIDEO_END)*dur;
       cur = reduce ? target : cur+(target-cur)*0.17;
-      if(ready && Math.abs(v.currentTime-cur)>0.012){ try{ v.currentTime=cur; }catch(e){} }
+      if(ready && !seekBusy && Math.abs(v.currentTime-cur)>0.012){ try{ v.currentTime=cur; }catch(e){} }
     }
 
-    var lp=ez(p,0.60,0.74,2.4);
+    // ---- логотип выезжает сверху навстречу восходящей луне ----
+    // прозрачностью он больше не «проявляется»: вводим её, пока остров ещё за верхним краем,
+    // а на экран он въезжает уже плотным — так объект читается как вещь, а не как призрак
+    // LEAD — на сколько секунд ролика раньше начинается спуск. Одна секунда ролика
+    // это VIDEO_END/dur долей прокрутки; правится одним числом.
+    var LEAD = 1.0 * (VIDEO_END/dur);
+    var DROP_A=0.545-LEAD, DROP_B=0.790-LEAD;
+    var dp   = cl((p-DROP_A)/(DROP_B-DROP_A));
+    var fall = 1-Math.pow(1-dp,2.6);                // резкий сход и долгое торможение
+    // затухающие колебания в конце: тяжёлый остров оседает на подушке, а не втыкается
+    var sq   = dp>0.60 ? (dp-0.60)/0.40 : -1;
+    var spring = sq<0 ? 0 : 2.2*Math.exp(-4.2*sq)*Math.sin(sq*Math.PI*3);
+    var lp = cl(dp/0.035);                          // ввод прозрачности — ещё за кадром
     logo.style.opacity=lp;
     var tt=(now-t0)/1000;
     // наезд идёт сам по себе, по времени: прокрутку можно остановить, логотип продолжит расти
-    logoT = cl(logoT + (lp>0.5 ? (dt||0)/15 : -(dt||0)/2.5));
+    logoT = cl(logoT + (fall>0.88 ? (dt||0)/15 : -(dt||0)/2.5));
     var grow   = 0.075*(1-Math.pow(1-logoT,2));
-    var breath = 0.007*Math.sin(tt*0.52)*lp;        // дышит, даже когда прокрутка стоит
-    var float  = 0.85*Math.sin(tt*0.38+1.3)*lp;     // остров слегка парит
-    logo.style.transform='translate(-50%,'+(-50+float)+'%) scale('+(1.085-0.085*lp+grow+breath)+')';
+    var breath = 0.007*Math.sin(tt*0.52)*fall;      // дышит, даже когда прокрутка стоит
+    var float  = 0.85*Math.sin(tt*0.38+1.3)*fall;   // остров слегка парит
+    var dyVh   = -96*(1-fall) + spring;             // -96vh — заведомо выше верхнего края кадра
+    var dySgn  = dyVh<0 ? ' - ' : ' + ';
+    logo.style.transform='translate(-50%, calc('+(-50+float).toFixed(3)+'%'+dySgn+Math.abs(dyVh).toFixed(3)+'vh)) scale('
+      +(1.055-0.055*fall+grow+breath).toFixed(4)+')';
 
-    glow.style.opacity = ez(p,0.56,0.66)*(1-0.74*ez(p,0.73,0.88));
+    glow.style.opacity = ez(p,0.56-LEAD,0.66-LEAD)*(1-0.74*ez(p,0.73-LEAD,0.88-LEAD));
 
-    var bk=ez(p,0.544,0.72,1.7);               // лучи включаются за полсекунды до логотипа
+    var bk=ez(p,0.544-LEAD,0.72-LEAD,1.7);     // лучи включаются за полсекунды до логотипа
     cvL.style.opacity=bk; cvLF.style.opacity=bk;
     var sk=ez(p,0.48,0.64,1.6);
     var t = reduce ? 3 : (now-t0)/1000;
     paint(ctxB, BACK,  t, sk);
     paint(ctxF, FRONT, t, sk);
     // кулисы выезжают из-за края с лёгким перелётом и покачиваются, как тяжёлая ткань
-    var craw = cl((p-0.60)/0.26);
+    var craw = cl((p-(0.60-LEAD))/0.26);       // кулисы едут с той же секундой опережения
     var ce = 1-Math.pow(1-craw,3);                      // строго снаружи внутрь, без отката
     var coff = (1-ce)*100;
     var camp = 0.95*(0.26+0.74*(1-craw));               // качается сильнее, пока едет
@@ -656,7 +806,23 @@ body{
 
     // логотип оживает вместе со своим появлением
     cvFX.style.opacity=lp;
-    paintLogoFx(t, lp);
+    paintLogoFx(t, lp, 1+2.2*(1-fall));
+
+    // ---- дым из-под острова ----
+    var geo=null;
+    if(dp>0 && logo.complete && logo.naturalWidth){
+      var stS=cvSB.getBoundingClientRect(), lrS=logo.getBoundingClientRect();
+      if(stS.width && stS.height){
+        var gx=LW/stS.width, gy=LH/stS.height;
+        geo={x:(lrS.left-stS.left)*gx, y:(lrS.top-stS.top)*gy, w:lrS.width*gx, h:lrS.height*gy};
+      }
+    }
+    // разгорается со сходом, пик у касания, дальше тонкий остаточный пар
+    var sK = SMOKE_ON ? ez(dp,0.04,0.50,1.15)*(1-0.80*ez(p,0.80,1.00,1.1)) : 0;
+    stepSmoke(dt, sK, geo, dp);
+    cvSB.style.opacity=1; cvSF.style.opacity=1;
+    paintSmoke(ctxSB, false, sK);
+    paintSmoke(ctxSF, true,  sK);
 
     if(bk>0.01){
       paintBeams(ctxL,  t, 1, 1);
@@ -678,15 +844,17 @@ body{
     poster.style.opacity = TOUCH ? (started ? 0 : 1) : (1 - cl(p/0.006));
     // тексты уже на экране при загрузке и тают к моменту, когда логотип встал целиком
     introT = cl(introT + (dt||0)/0.85);
-    var so = introT * (1 - ez(p,0.54,0.735,2));
+    var so = introT * (1 - ez(p,0.495-LEAD,0.600-LEAD,1.7));
     sideL.style.opacity=so; sideR.style.opacity=so;
     hint.style.opacity= TOUCH ? 0 : cl(1-p*12);
-    if(TOUCH ? window.scrollY>24 : p>0.05) nav.classList.add('solid'); else nav.classList.remove('solid');
+    // плашка шапки только ЗА первым экраном: иначе она перерезает въезжающий остров
+    if(TOUCH ? window.scrollY>24 : p>0.985) nav.classList.add('solid'); else nav.classList.remove('solid');
 
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
 })();
 </script>
+
 </body>
 </html>
