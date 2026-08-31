@@ -70,6 +70,13 @@ body{
   border:1px dashed var(--line); border-radius:2px; padding:5px 9px; white-space:nowrap;
 }
 @media(max-width:880px){ .navlinks,.demoflag{display:none} }
+/* на телефоне шапка не помещалась: кнопка уезжала за правый край */
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
 
 /* ---------- первый экран ---------- */
 #hero{height:330vh; position:relative}
