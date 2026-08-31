@@ -100,6 +100,7 @@ body{
 }
 #beams{z-index:5; filter:blur(13px)}
 #beamsFront{z-index:12; filter:blur(26px)}
+@media (max-width:819px){ #beams{filter:blur(8px)} #beamsFront{filter:blur(16px)} }
 #logoLight{z-index:10; width:100%; height:100%; display:block; pointer-events:none;
   mix-blend-mode:screen; opacity:0; filter:blur(5px)}
 #logoFx{z-index:8; width:100%; height:100%; display:block; pointer-events:none;
@@ -388,7 +389,14 @@ body{
   // прожекторы: основание внизу у города, целятся вверх к логотипу и качаются
   // маятник: пары ходят навстречу друг другу, скорости чуть разные —
   // поэтому рисунок медленно расходится и никогда не повторяется
-  var BEAMS=[
+  // На телефоне лучи короче и тише: они упираются в 51 % высоты кадра — это ровно
+  // верх таблички «ЗВЁЗДНАЯ СМЕНА», выше свет не заходит и надпись не глушит.
+  var BEAMS = TOUCH ? [
+    {x:0.13, aim:0.34, len:0.49, w:0.095, sp:1.500, sw:0.10, ph:0.00, a:0.46},
+    {x:0.33, aim:0.44, len:0.45, w:0.070, sp:2.050, sw:0.07, ph:1.57, a:0.36},
+    {x:0.67, aim:0.56, len:0.45, w:0.070, sp:1.980, sw:0.07, ph:4.71, a:0.36},
+    {x:0.87, aim:0.66, len:0.49, w:0.095, sp:1.580, sw:0.10, ph:3.14, a:0.46}
+  ] : [
     {x:0.11, aim:0.42, len:1.06, w:0.105, sp:1.500, sw:0.42, ph:0.00, a:0.30},
     {x:0.29, aim:0.47, len:0.98, w:0.075, sp:2.050, sw:0.32, ph:1.57, a:0.23},
     {x:0.71, aim:0.53, len:0.98, w:0.075, sp:1.980, sw:0.32, ph:4.71, a:0.23},
@@ -801,7 +809,7 @@ body{
   }
 
   if (BAKED){
-    var off = [logo, glow, curL, curR, cvL, cvLF, cvLL, cvFX, cvSB, cvSF];
+    var off = [logo, glow, curL, curR, cvLL, cvFX, cvSB, cvSF];   // лучи оставляем, они светят на остров
     for (var oi=0; oi<off.length; oi++) if(off[oi]) off[oi].style.display='none';
   }
 
@@ -904,7 +912,12 @@ body{
       paintSmoke(ctxSF, true,  sK);
     }
 
-    if(BAKED){ /* прожекторы и подсветка логотипа уже внутри ролика */ }
+    if(BAKED){
+      // прокрутки нет — разгораем лучи по времени, один раз, и дальше они просто качаются
+      var bkm = cl(((now-t0)/1000 - 0.5)/1.4);
+      cvL.style.opacity=bkm; cvLF.style.opacity=bkm;
+      if(bkm>0.01){ paintBeams(ctxL, t, 1, 1); paintBeams(ctxLF, t, 1, 0.22); }
+    }
     else if(bk>0.01){
       paintBeams(ctxL,  t, 1, 1);
       paintBeams(ctxLF, t, 1, 0.22);
