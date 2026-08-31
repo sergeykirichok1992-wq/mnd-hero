@@ -17,7 +17,8 @@
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://sergeykirichok1992-wq.github.io/mnd-hero/">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preload" as="image" href="poster.webp" fetchpriority="high">
+<link rel="preload" as="image" href="poster.webp" fetchpriority="high" media="(min-width: 820px)">
+<link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600&family=Oswald:wght@300;500;700&family=Prata&display=swap">
@@ -261,6 +262,14 @@ body{
   .facts li + li::before{content:" · "; color:rgba(227,179,78,.7)}
 }
 @media (prefers-reduced-motion:reduce){ .years .fill,.city,.season{animation:none} }
+@media (max-width:819px){
+  .curtain{display:none}                    /* на телефоне кулис нет — и файл бархата не грузится */
+  /* низ кадра занят огнями набережной, и белый текст на них терялся — кладём мягкую подложку */
+  .vig::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:34vh; pointer-events:none;
+    background:linear-gradient(to top, rgba(3,6,14,.90) 0%, rgba(3,6,14,.62) 34%, rgba(3,6,14,.22) 66%, transparent 100%);
+  }
+}
 .curtain{
   position:absolute; inset:auto; top:0; width:50%; aspect-ratio:1359/768;
   z-index:20; pointer-events:none; opacity:0; will-change:transform,opacity;
@@ -293,13 +302,13 @@ body{
 <section id="hero">
   <div class="stage">
     <video id="v" playsinline muted preload="auto" disablepictureinpicture ></video>
-    <img id="poster" alt="" src="poster.webp">
+    <img id="poster" alt="">
     <div class="vig" style="z-index:3"></div>
     <canvas id="snowBack" style="z-index:4"></canvas>
     <canvas id="beams" style="z-index:5"></canvas>
     <div id="glow"></div>
     <canvas id="smokeBack"></canvas>
-    <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Звёздная смена" src="logo.webp">
+    <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Звёздная смена">
     <canvas id="logoFx"></canvas>
     <canvas id="smokeFront"></canvas>
     <canvas id="logoLight"></canvas>
@@ -364,6 +373,11 @@ body{
   var FORCE=null;   // отладка: window.__freeze(p) фиксирует прокрутку для съёмки кадров
   // на телефоне перемотка видео пальцем идёт рывками — там ролик играет сам
   var TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 820;
+  // На телефоне идёт отдельный вертикальный ролик, в который логотип уже вклеен.
+  // Значит все слои, которые на десктопе рисуют и оживляют логотип, там не нужны.
+  var BAKED = TOUCH;
+  poster.src = TOUCH ? 'poster-mob.webp' : 'poster.webp';
+  if(!BAKED) logo.src = 'logo.webp';   // на телефоне логотип уже в ролике — файл не качаем
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
   var DPR=Math.min(2, window.devicePixelRatio||1);
   var LW=2, LH=2;
@@ -691,7 +705,8 @@ body{
     // На телефоне перемотки прокруткой нет — ролик просто играет,
     // и там файл по ссылке лучше: Safari умеет докачивать его кусками.
     // На десктопе качаем целиком в память: перемотка идёт без рывков.
-    if(TOUCH || !window.fetch || !window.ReadableStream){ start('hero.mp4'); return; }
+    if(TOUCH){ v.loop = true; start('hero-mob.mp4'); return; }   // вертикальный ролик, крутится петлёй
+    if(!window.fetch || !window.ReadableStream){ start('hero.mp4'); return; }
 
     say('Загружаем ролик… <b>0\u00a0%</b>', true);
     fetch('hero.mp4').then(function(r){
@@ -727,6 +742,11 @@ body{
     document.addEventListener('touchstart', kick, {once:true, passive:true});
     document.addEventListener('click', kick, {once:true});
     setTimeout(kick, 350);
+  }
+
+  if (BAKED){
+    var off = [logo, glow, curL, curR, cvL, cvLF, cvLL, cvFX, cvSB, cvSF];
+    for (var oi=0; oi<off.length; oi++) if(off[oi]) off[oi].style.display='none';
   }
 
   var PAUSED=false;
@@ -785,7 +805,7 @@ body{
     logo.style.transform='translate(-50%, calc('+(-50+float).toFixed(3)+'%'+dySgn+Math.abs(dyVh).toFixed(3)+'vh)) scale('
       +(1.055-0.055*fall+grow+breath).toFixed(4)+')';
 
-    glow.style.opacity = ez(p,0.56-LEAD,0.66-LEAD)*(1-0.74*ez(p,0.73-LEAD,0.88-LEAD));
+    if(!BAKED) glow.style.opacity = ez(p,0.56-LEAD,0.66-LEAD)*(1-0.74*ez(p,0.73-LEAD,0.88-LEAD));
 
     var bk=ez(p,0.544-LEAD,0.72-LEAD,1.7);     // лучи включаются за полсекунды до логотипа
     cvL.style.opacity=bk; cvLF.style.opacity=bk;
@@ -793,24 +813,26 @@ body{
     var t = reduce ? 3 : (now-t0)/1000;
     paint(ctxB, BACK,  t, sk);
     paint(ctxF, FRONT, t, sk);
-    // кулисы выезжают из-за края с лёгким перелётом и покачиваются, как тяжёлая ткань
-    var craw = cl((p-(0.60-LEAD))/0.26);       // кулисы едут с той же секундой опережения
-    var ce = 1-Math.pow(1-craw,3);                      // строго снаружи внутрь, без отката
-    var coff = (1-ce)*100;
-    var camp = 0.95*(0.26+0.74*(1-craw));               // качается сильнее, пока едет
-    var sw1 = camp*Math.sin(t*2.35);
-    var sw2 = camp*Math.sin(t*2.05+1.9);
-    curL.style.opacity=craw; curR.style.opacity=craw;
-    curL.style.transform='translateX('+(-coff)+'%) rotate('+(-sw1)+'deg)';
-    curR.style.transform='translateX('+( coff)+'%) rotate('+( sw2)+'deg)';
+    if(!BAKED){
+      // кулисы выезжают из-за края с лёгким перелётом и покачиваются, как тяжёлая ткань
+      var craw = cl((p-(0.60-LEAD))/0.26);     // кулисы едут с той же секундой опережения
+      var ce = 1-Math.pow(1-craw,3);           // строго снаружи внутрь, без отката
+      var coff = (1-ce)*100;
+      var camp = 0.95*(0.26+0.74*(1-craw));    // качается сильнее, пока едет
+      var sw1 = camp*Math.sin(t*2.35);
+      var sw2 = camp*Math.sin(t*2.05+1.9);
+      curL.style.opacity=craw; curR.style.opacity=craw;
+      curL.style.transform='translateX('+(-coff)+'%) rotate('+(-sw1)+'deg)';
+      curR.style.transform='translateX('+( coff)+'%) rotate('+( sw2)+'deg)';
 
-    // логотип оживает вместе со своим появлением
-    cvFX.style.opacity=lp;
-    paintLogoFx(t, lp, 1+2.2*(1-fall));
+      // логотип оживает вместе со своим появлением
+      cvFX.style.opacity=lp;
+      paintLogoFx(t, lp, 1+2.2*(1-fall));
+    }
 
     // ---- дым из-под острова ----
     var geo=null;
-    if(dp>0 && logo.complete && logo.naturalWidth){
+    if(!BAKED && dp>0 && logo.complete && logo.naturalWidth){
       var stS=cvSB.getBoundingClientRect(), lrS=logo.getBoundingClientRect();
       if(stS.width && stS.height){
         var gx=LW/stS.width, gy=LH/stS.height;
@@ -818,13 +840,16 @@ body{
       }
     }
     // разгорается со сходом, пик у касания, дальше тонкий остаточный пар
-    var sK = SMOKE_ON ? ez(dp,0.04,0.50,1.15)*(1-0.80*ez(p,0.80,1.00,1.1)) : 0;
-    stepSmoke(dt, sK, geo, dp);
-    cvSB.style.opacity=1; cvSF.style.opacity=1;
-    paintSmoke(ctxSB, false, sK);
-    paintSmoke(ctxSF, true,  sK);
+    var sK = (SMOKE_ON && !BAKED) ? ez(dp,0.04,0.50,1.15)*(1-0.80*ez(p,0.80,1.00,1.1)) : 0;
+    if(!BAKED){
+      stepSmoke(dt, sK, geo, dp);
+      cvSB.style.opacity=1; cvSF.style.opacity=1;
+      paintSmoke(ctxSB, false, sK);
+      paintSmoke(ctxSF, true,  sK);
+    }
 
-    if(bk>0.01){
+    if(BAKED){ /* прожекторы и подсветка логотипа уже внутри ролика */ }
+    else if(bk>0.01){
       paintBeams(ctxL,  t, 1, 1);
       paintBeams(ctxLF, t, 1, 0.22);
       // подсветка самого логотипа — только там, где по нему проходит луч
@@ -844,7 +869,7 @@ body{
     poster.style.opacity = TOUCH ? (started ? 0 : 1) : (1 - cl(p/0.006));
     // тексты уже на экране при загрузке и тают к моменту, когда логотип встал целиком
     introT = cl(introT + (dt||0)/0.85);
-    var so = introT * (1 - ez(p,0.495-LEAD,0.600-LEAD,1.7));
+    var so = introT * (BAKED ? 1 : (1 - ez(p,0.495-LEAD,0.600-LEAD,1.7)));
     sideL.style.opacity=so; sideR.style.opacity=so;
     hint.style.opacity= TOUCH ? 0 : cl(1-p*12);
     // плашка шапки только ЗА первым экраном: иначе она перерезает въезжающий остров
