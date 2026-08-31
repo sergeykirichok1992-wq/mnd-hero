@@ -246,21 +246,26 @@ body{
 .facts li + li{color:rgba(196,210,234,.72)}
 
 @media (max-aspect-ratio:1/1), (max-width:820px){
-  .side{
-    top:auto; bottom:calc(16px + env(safe-area-inset-bottom)); transform:none;
-    left:0; right:0; width:100%; text-align:center;
-  }
-  .side.left{bottom:calc(96px + env(safe-area-inset-bottom))}
-  .side.left, .side.right{padding:0 16px}
-  .kicker{margin-bottom:6px}
-  .season{display:inline; margin:0; font-size:12px; letter-spacing:.3em}
-  .years{display:inline; font-size:26px; line-height:1}
-  .years .fill,.years .outline{display:inline}
-  .years .outline{-webkit-text-stroke-width:1px}
-  .city{font-size:17px; letter-spacing:.04em}
-  .rule{margin:8px auto}
-  .facts li{display:inline; font-size:12.5px}
-  .facts li + li::before{content:" · "; color:rgba(227,179,78,.7)}
+  /* Оба блока стартуют с одной линии: слева сезон, справа город.
+     Правый растянут на всю ширину, чтобы даты и возраст встали по центру экрана,
+     а город с адресом остались прижаты вправо. */
+  .side{ top:72vh; bottom:auto; transform:none; }   /* ниже дюз: на 63vh текст лежал на сосульках */
+  .side.left { left:0; right:auto; width:auto; text-align:left;  padding:0 18px; }
+  .side.right{ left:0; right:0;   width:100%;  text-align:right; padding:0 18px; }
+
+  .season{ display:block; margin:0 0 5px; font-size:12px; letter-spacing:.30em }
+  .years { display:block; font-size:31px; line-height:1 }
+  .years .fill, .years .outline{ display:inline }
+  .years .outline{ -webkit-text-stroke-width:1px }
+  .kicker{ margin-top:8px; font-size:10px; letter-spacing:.26em }
+
+  .city{ display:block; font-size:20px; letter-spacing:.04em; line-height:1.12 }
+  .rule{ display:none }
+  .facts li{ display:block; font-size:13px; line-height:1.5 }
+  .facts li:nth-child(1){ text-align:right; margin-top:7px }        /* адрес — под городом */
+  .facts li:nth-child(2){ text-align:center; margin-top:26px }      /* даты — по центру */
+  .facts li:nth-child(3){ text-align:center; margin-top:4px }       /* возраст — ещё ниже */
+  .facts li + li::before{ content:none }
 }
 @media (prefers-reduced-motion:reduce){ .years .fill,.city,.season{animation:none} }
 @media (max-width:819px){
