@@ -301,7 +301,7 @@ body{
 
 <section id="hero">
   <div class="stage">
-    <video id="v" playsinline muted preload="auto" disablepictureinpicture ></video>
+    <video id="v" playsinline webkit-playsinline muted autoplay preload="auto" disablepictureinpicture></video>
     <img id="poster" alt="">
     <div class="vig" style="z-index:3"></div>
     <canvas id="snowBack" style="z-index:4"></canvas>
@@ -376,6 +376,9 @@ body{
   // На телефоне идёт отдельный вертикальный ролик, в который логотип уже вклеен.
   // Значит все слои, которые на десктопе рисуют и оживляют логотип, там не нужны.
   var BAKED = TOUCH;
+  // autoplay нужен только телефону. На десктопе ролик ведёт прокрутка, поэтому снимаем сразу —
+  // до того, как у видео появится источник, так что ничего само не поедет.
+  if(!TOUCH){ v.autoplay = false; v.removeAttribute('autoplay'); }
   poster.src = TOUCH ? 'poster-mob.webp' : 'poster.webp';
   if(!BAKED) logo.src = 'logo.webp';   // на телефоне логотип уже в ролике — файл не качаем
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
@@ -744,6 +747,35 @@ body{
       .catch(function(){ say('Ролик грузится напрямую…'); start('hero.mp4'); });
   })();
 
+  // ?debug — маленькая плашка с тем, что реально происходит с воспроизведением.
+  // Нужна, чтобы причину было видно с телефона, а не угадывать её отсюда.
+  if(/[?&]debug/.test(location.search)){
+    var dbg=document.createElement('div');
+    dbg.style.cssText='position:fixed;left:8px;top:64px;z-index:99;background:rgba(0,0,0,.82);'+
+      'color:#cfe3ff;font:11px/1.45 ui-monospace,Menlo,monospace;padding:8px 10px;border-radius:6px;'+
+      'max-width:82vw;white-space:pre-wrap;pointer-events:none';
+    document.body.appendChild(dbg);
+    var lastErr='—';
+    tryPlay=function(){ if(started||!TOUCH) return;
+      var pr=v.play();
+      if(pr&&pr.then) pr.then(function(){started=true;lastErr='ok';})
+                        .catch(function(e){ lastErr=(e&&e.name||'?')+': '+(e&&e.message||''); if(++playTries<20) setTimeout(tryPlay,300); });
+      else started=true; };
+    setInterval(function(){
+      dbg.textContent =
+        'TOUCH '+TOUCH+'  BAKED '+BAKED+'\n'+
+        'src '+((v.currentSrc||'—').split('/').pop())+'\n'+
+        'readyState '+v.readyState+'  networkState '+v.networkState+'\n'+
+        'paused '+v.paused+'  muted '+v.muted+'  autoplay '+v.autoplay+'\n'+
+        'playsinline '+v.hasAttribute('playsinline')+'  loop '+v.loop+'\n'+
+        'currentTime '+v.currentTime.toFixed(2)+' / '+(v.duration||0).toFixed(2)+'\n'+
+        'started '+started+'  попыток '+playTries+'\n'+
+        'ошибка play(): '+lastErr+'\n'+
+        'video.error '+(v.error?v.error.code:'нет')+'\n'+
+        'размер '+v.videoWidth+'x'+v.videoHeight+'  экран '+innerWidth+'x'+innerHeight;
+    }, 400);
+  }
+
   var VIDEO_END=0.80;                 // на этой доле прокрутки ролик доигран, дальше — задержка
   var t0=performance.now();
 
@@ -885,10 +917,12 @@ body{
     }
     // кадр дышит: очень медленный наплыв, чтобы фон не выглядел мёртвым
     var br=0.006+0.006*Math.sin(t*0.42);
-    v.style.transform='scale('+(1+br*ez(p,0.68,0.92))+')';
+    if(!BAKED) v.style.transform='scale('+(1+br*ez(p,0.68,0.92))+')';
     // размытие фона под логотипом: мягче прежнего и на секунду позже
     var bl=(2.1*ez(p,0.71,0.90,1.6)).toFixed(2);
-    v.style.filter='saturate(1.14) contrast(1.07) brightness(1.04) blur('+bl+'px)';
+    // на телефоне размытие не трогаем: ролик там идёт целиком и мазался бы под конец каждого круга
+    if(!BAKED) v.style.filter='saturate(1.14) contrast(1.07) brightness(1.04) blur('+bl+'px)';
+    else v.style.filter='saturate(1.06) contrast(1.03)';
 
     if(TOUCH && !started && v.currentTime > 0.05 && !v.paused) started = true;
     poster.style.opacity = TOUCH ? (started ? 0 : 1) : (1 - cl(p/0.006));
