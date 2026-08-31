@@ -693,10 +693,28 @@ body{
   function say(msg, keep){ if(!stat) return; stat.style.display='block'; stat.innerHTML=msg;
     if(!keep) setTimeout(function(){ stat.style.display='none'; }, 2200); }
 
+  // Safari на айфоне отклоняет первый play(), если данных ещё нет, и второй попытки не было —
+  // ролик просыпался только от касания. Поэтому пробуем настойчиво и на каждом удобном событии.
+  var playTries = 0;
+  function tryPlay(){
+    if(started || !TOUCH) return;
+    var pr = v.play();
+    if(pr && pr.then) pr.then(function(){ started = true; })
+                        .catch(function(){ if(++playTries < 20) setTimeout(tryPlay, 300); });
+    else started = true;
+  }
+
   (function loadVideo(){
     function start(url){
+      if(TOUCH){
+        // весь набор, который айфон требует для запуска без касания
+        v.muted = true; v.defaultMuted = true; v.autoplay = true;
+        v.setAttribute('autoplay','');
+        v.setAttribute('playsinline','');
+        v.setAttribute('webkit-playsinline','');
+      }
       v.src = url; v.load();
-      if(TOUCH){ var pr=v.play(); if(pr&&pr.then) pr.then(function(){started=true;}).catch(function(){ say('Коснись экрана, чтобы запустить', true); }); }
+      if(TOUCH) tryPlay();
     }
     v.addEventListener('error', function(){
       say('Видео не открылось.<br><b>код '+((v.error&&v.error.code)||'?')+'</b>', true);
@@ -739,9 +757,15 @@ body{
       else started=true;
     }
     v.addEventListener('playing', function(){ started=true; if(stat) stat.style.display='none'; });
+    // каждое из этих событий — новый шанс запуститься без участия человека
+    ['loadedmetadata','loadeddata','canplay','canplaythrough'].forEach(function(e){
+      v.addEventListener(e, tryPlay);
+    });
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden) tryPlay(); });
+    window.addEventListener('pageshow', tryPlay);
     document.addEventListener('touchstart', kick, {once:true, passive:true});
     document.addEventListener('click', kick, {once:true});
-    setTimeout(kick, 350);
+    setTimeout(tryPlay, 200); setTimeout(tryPlay, 700); setTimeout(tryPlay, 1600);
   }
 
   if (BAKED){
@@ -866,6 +890,7 @@ body{
     var bl=(2.1*ez(p,0.71,0.90,1.6)).toFixed(2);
     v.style.filter='saturate(1.14) contrast(1.07) brightness(1.04) blur('+bl+'px)';
 
+    if(TOUCH && !started && v.currentTime > 0.05 && !v.paused) started = true;
     poster.style.opacity = TOUCH ? (started ? 0 : 1) : (1 - cl(p/0.006));
     // тексты уже на экране при загрузке и тают к моменту, когда логотип встал целиком
     introT = cl(introT + (dt||0)/0.85);
