@@ -505,7 +505,10 @@ body{
 .wl-btn.ghost{background:transparent; color:rgba(255,255,255,.7)}
 .wl-btn.ghost:hover{background:transparent; color:#fff; text-decoration:underline}
 /* сцена: высокий контейнер задаёт длину прокрутки, липкий блок держит стену в кадре */
-.wl-scroll{position:relative; z-index:2; height:350vh; perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
+/* длина прокрутки экрана. Было 350vh — на телефоне это 2110 px, два-три смаха.
+   Стало 220vh: 1013 px, один смах, и стена успевает встать полностью */
+.wl-scroll{position:relative; z-index:2; height:220vh; perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
+@media (min-width:768px){.wl-scroll{height:260vh}}
 .wl-sticky{position:sticky; top:0; height:100svh; overflow:hidden;
   perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
 .wl-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; height:100%;
@@ -1470,45 +1473,84 @@ body{
 
 <script>
 /* Четвёртый экран: стена полароидов встаёт из наклона по прокрутке.
-   Считаем один прогресс 0..1 по положению высокого контейнера и раздаём его
-   в transform сетки и колонок. Всё в requestAnimationFrame, чтобы на кадр
-   приходился один пересчёт, а не по одному на каждое событие прокрутки. */
+
+   Почему не «прочитал скролл — сразу нарисовал»: колесо мыши шлёт рывки по 100 px,
+   и стена дёргается ступеньками. Поэтому положение прокрутки — это ЦЕЛЬ, а картинка
+   догоняет её каждый кадр с затуханием. Вход рваный, движение гладкое.
+
+   Заодно это лечит iOS: во время инерционной прокрутки Safari может не слать события
+   scroll, а свой кадровый цикл читает положение сам и не зависит от них.
+
+   Цикл работает только пока секция рядом с экраном — дальше засыпает и не ест батарею. */
 (function(){
   var scr = document.getElementById('wlScroll');
   var grid = document.getElementById('wlGrid');
   if (!scr || !grid) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-  var cols = [].slice.call(grid.children);
-  var data = cols.map(function(c){
+  var cols = [].slice.call(grid.children).map(function(c){
     return { el:c, y0:parseFloat(c.getAttribute('data-y0')), y1:parseFloat(c.getAttribute('data-y1')) };
   });
-  var queued = 0;
+
+  var shown = -1;          // что нарисовано сейчас
+  var awake = false;       // крутится ли кадровый цикл
+  var last = 0;
 
   function clamp(v){ return v < 0 ? 0 : v > 1 ? 1 : v; }
   function seg(p, a, b){ return clamp((p - a) / (b - a)); }
+  function ease(t){ return t * t * (3 - 2 * t); }   // мягкий вход и выход
 
-  function draw(){
-    queued = 0;
+  function target(){
     var total = scr.offsetHeight - window.innerHeight;
-    if (total <= 0) return;
-    var p = clamp(-scr.getBoundingClientRect().top / total);
+    if (total <= 0) return 0;
+    return clamp(-scr.getBoundingClientRect().top / total);
+  }
 
-    var rotX = 75 - 75 * seg(p, 0, 0.5);      // стена поднимается
-    var sc   = 1.2 - 0.2 * seg(p, 0.5, 0.9);  // и чуть отъезжает
-    grid.style.transform = 'rotateX(' + rotX.toFixed(2) + 'deg) scale(' + sc.toFixed(4) + ')';
+  function paint(p){
+    var rotX = 75 * (1 - ease(seg(p, 0, 0.42)));
+    var sc   = 1.2 - 0.2 * ease(seg(p, 0.38, 0.72));
+    grid.style.transform = 'rotateX(' + rotX.toFixed(3) + 'deg) scale(' + sc.toFixed(4) + ')';
 
-    var t = seg(p, 0.5, 1);
-    for (var i = 0; i < data.length; i++){
-      var d = data[i];
-      d.el.style.transform = 'translateY(' + (d.y0 + (d.y1 - d.y0) * t).toFixed(2) + '%)';
+    var t = ease(seg(p, 0.42, 0.88));
+    for (var i = 0; i < cols.length; i++){
+      var c = cols[i];
+      c.el.style.transform = 'translateY(' + (c.y0 + (c.y1 - c.y0) * t).toFixed(3) + '%)';
     }
   }
-  function onScroll(){ if (!queued) queued = requestAnimationFrame(draw); }
 
-  addEventListener('scroll', onScroll, {passive:true});
-  addEventListener('resize', onScroll);
-  draw();
+  function frame(now){
+    if (!awake) return;
+    var dt = last ? Math.min(now - last, 64) : 16.7;
+    last = now;
+
+    var want = target();
+    if (shown < 0) shown = want;
+    // затухание, не зависящее от частоты кадров: на 120 Гц догоняет за то же время, что на 60
+    var k = 1 - Math.pow(1 - 0.18, dt / 16.7);
+    shown += (want - shown) * k;
+    if (Math.abs(want - shown) < 0.0004) shown = want;
+
+    paint(shown);
+    requestAnimationFrame(frame);
+  }
+
+  function wake(){
+    if (awake) return;
+    awake = true; last = 0;
+    requestAnimationFrame(frame);
+  }
+  function sleep(){ awake = false; }
+
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(function(items){
+      items[0].isIntersecting ? wake() : sleep();
+    }, {rootMargin: '200px 0px'}).observe(scr);
+  } else {
+    wake();
+  }
+
+  addEventListener('resize', function(){ shown = -1; }, {passive:true});
+  paint(target());
 })();
 </script>
 
