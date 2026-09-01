@@ -24,7 +24,7 @@
 <link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600&family=Oswald:wght@300;500;700&family=Prata&family=M+PLUS+Rounded+1c:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600&family=Oswald:wght@300;500;700&family=Prata&family=M+PLUS+Rounded+1c:wght@500;700&family=Playfair+Display:wght@700&display=swap">
 <style>
 :root{
   --ink:#04070F; --ink2:#080D1B; --line:#18223B;
@@ -335,6 +335,60 @@ body{
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:500;
   font-size:clamp(17px,2.1vw,30px); color:#333;
 }
+/* ---------- цифры прошлого сезона ---------- */
+/* Золото здесь живёт на БЕЛОМ, поэтому база градиента взята глубже, чем на первом
+   экране, а бегущий блик — светлее базы: сделай наоборот, и в момент прохода блика
+   цифра пропала бы в фоне. Свечение даёт два слоя: тёплая лужица света под цифрой
+   (::before у .ls-numbox) и drop-shadow по контуру глифов внутри анимации блика. */
+.ls-stats{
+  display:grid; grid-template-columns:repeat(4,1fr);
+  gap:clamp(20px,2.8vw,44px) clamp(16px,2.4vw,36px);
+  max-width:1150px; margin:clamp(28px,3.8vw,56px) auto 0;
+}
+.ls-stat{min-width:0; text-align:center}
+/* обёртка облегает цифру (inline-block), поэтому лужица света считается от ширины
+   самой цифры: у «6» она узкая, у «40 000» широкая. От блока во всю колонку
+   над короткими цифрами висело бы пятно шире их самих */
+.ls-numbox{position:relative; display:inline-block}
+.ls-numbox::before{
+  content:''; position:absolute; left:50%; top:50%; width:142%; height:132%;
+  transform:translate(-50%,-50%); pointer-events:none;
+  background:radial-gradient(closest-side, rgba(232,168,58,.30), rgba(232,168,58,.11) 54%, rgba(232,168,58,0) 78%);
+  filter:blur(8px);
+}
+.ls-num{
+  position:relative; z-index:1; display:inline-block; white-space:nowrap;
+  font-family:"Playfair Display","Prata",Georgia,serif; font-weight:700;
+  font-size:clamp(40px,6vw,88px); line-height:1.06; letter-spacing:.005em;
+  background:
+    linear-gradient(102deg, rgba(255,244,214,0) 36%, rgba(255,249,230,.92) 49%, rgba(255,244,214,0) 62%),
+    linear-gradient(168deg,#F4CE84 0%,#E9B255 20%,#D89534 44%,#C4801F 60%,#E0A94D 80%,#F6D9A2 100%);
+  background-size:250% 100%, 100% 100%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent; -webkit-text-fill-color:transparent;
+  animation:sheenNum 9s linear 1.2s infinite;
+}
+@keyframes sheenNum{
+  0%  {background-position:-160% 0, 0 0; filter:drop-shadow(0 3px 10px rgba(198,132,26,.18))}
+  9%  {                                  filter:drop-shadow(0 3px 22px rgba(233,175,70,.55))}
+  24% {background-position:250% 0, 0 0;  filter:drop-shadow(0 3px 10px rgba(198,132,26,.18))}
+  100%{background-position:250% 0, 0 0;  filter:drop-shadow(0 3px 10px rgba(198,132,26,.18))}
+}
+.ls-cap{
+  margin:clamp(8px,1vw,16px) auto 0; max-width:15.5em;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:500;
+  font-size:clamp(13px,1.18vw,17px); line-height:1.5; color:#3A3A3F; text-wrap:balance;
+}
+@media (max-width:820px){
+  .ls-stats{grid-template-columns:repeat(2,1fr); gap:clamp(22px,6vw,34px) clamp(12px,4vw,24px)}
+  .ls-num{font-size:clamp(38px,11vw,64px)}
+  .ls-cap{font-size:clamp(12px,3.4vw,15px); max-width:14em}
+}
+@media (prefers-reduced-motion:reduce){
+  .ls-num{animation:none; background-position:250% 0, 0 0;
+    filter:drop-shadow(0 3px 12px rgba(198,132,26,.22))}
+}
 /* ---------- слайдер-коллаж ---------- */
 .ls-slider{position:relative}
 /* тени и вырастающие карточки не должны резаться рамкой окна — окно дышит запасом */
@@ -472,6 +526,69 @@ body{
 }
 /* пока карты нет, пустой контейнер не должен добавлять секции высоту */
 .ct-map:empty{display:none}
+/* ---------- карта России: гирлянды разгораются под курсором ----------
+   Два одинаковых кадра друг на друге: снизу карта с погашенными огнями,
+   сверху та же карта, где огни разлились сиянием. Верхний слой добавляется
+   режимом lighten (берётся более светлое из двух), а не простым проявлением:
+   при обычном кроссфейде чёткие лампочки тонули в размытом сиянии и карта
+   выглядела расфокусированной. */
+.ct-map{margin:clamp(28px,4vw,60px) auto 0; max-width:1120px}
+/* на телефоне карта широкая и от этого мелкая — выпускаем её на всю ширину экрана,
+   за поля секции, иначе ёлки в городах превращаются в точки */
+@media (max-width:820px){
+  .ct-map{max-width:none; margin-left:calc(-1*clamp(18px,4vw,44px)); margin-right:calc(-1*clamp(18px,4vw,44px))}
+}
+.map{position:relative; isolation:isolate;   /* isolation — чтобы lighten смешивался
+       только со своей картой, а не с фотоколлажем секции */
+  --lit:0; --mx:50%; --my:50%}
+.map img{display:block; width:100%; height:auto}
+/* мышь ловит только сама коробка: если события начнут перехватывать картинки-дети,
+   pointerleave будет срабатывать посреди карты и свет станет дёргаться */
+.map > *{pointer-events:none}
+/* на тач-экранах карте вообще не нужны указательные события: палец должен листать
+   страницу, а не «наводиться» */
+@media (hover:none){ .map{pointer-events:none} }
+/* зарево за картой: на тёмном фоне именно оно читается как «страна засветилась».
+   Радиальный градиент, а не тень-фильтр: тень пришлось бы пересчитывать каждый кадр,
+   а прозрачность градиента браузер меняет даром */
+.map::before{
+  content:''; position:absolute; left:-6%; right:-6%; top:-14%; bottom:-14%; z-index:-1;
+  background:radial-gradient(52% 58% at 50% 50%, rgba(255,206,130,.42), rgba(255,190,110,.16) 45%, transparent 72%);
+  opacity:var(--lit); pointer-events:none;
+}
+/* в покое карта холодная и приглушённая — иначе разгораться некуда:
+   снег и так белый, и включённый свет на нём почти не виден.
+   Затемнение вырезано маской по самой карте, иначе multiply положил бы
+   серый прямоугольник и на прозрачные углы вокруг страны */
+.map-dim{
+  position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply;
+  background:#93A3C9; opacity:calc((1 - var(--lit))*.3);
+  -webkit-mask-image:url(map.webp); mask-image:url(map.webp);
+  -webkit-mask-size:100% 100%; mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+}
+.map-lit{position:absolute; inset:0; pointer-events:none; mix-blend-mode:lighten}
+/* общий разлив света по всей стране */
+.map-lit.wide{opacity:calc(var(--lit)*.45)}
+/* пятно под курсором: горит сильнее общего и ходит за мышью.
+   Эллипс 26%/60% вместо круга не случайно: у circle в CSS проценты запрещены,
+   а карта широкая — эти два числа дают на ней ровный круг */
+.map-lit.spot{opacity:calc(var(--lit)*.85);
+  -webkit-mask-image:radial-gradient(26% 60% at var(--mx) var(--my), #000 0%, rgba(0,0,0,.5) 46%, transparent 76%);
+          mask-image:radial-gradient(26% 60% at var(--mx) var(--my), #000 0%, rgba(0,0,0,.5) 46%, transparent 76%);
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat}
+/* на тач-экранах наведения нет: пятно не нужно, а свет включается сам,
+   когда карта доезжает до экрана, и медленно дышит — иначе эффекта никто не увидит */
+.map.touchlit .map-lit.spot{display:none}
+.map.touchlit.inview .map-lit.wide{animation:mapBreath 7s ease-in-out infinite}
+@keyframes mapBreath{0%,100%{opacity:.2} 50%{opacity:.5}}
+/* «меньше движения»: никакой беготни света, только мягкое включение по наведению */
+@media (prefers-reduced-motion:reduce){
+  .map-lit.spot{display:none}
+  .map-lit.wide{opacity:0; transition:opacity .4s ease; animation:none !important}
+  .map.lit .map-lit.wide{opacity:.45}
+  .map.touchlit .map-lit.wide{opacity:.3}
+}
 
 /* ---------- стена полароидов: 24 кадра встают из наклона по прокрутке ---------- */
 /* сцена: высокий контейнер задаёт длину прокрутки, липкий блок держит стену в кадре */
@@ -588,6 +705,24 @@ body{
 <section class="ls" id="lastseason" aria-labelledby="lsTitle">
   <div class="ls-body">
     <h2 class="ls-title rv" id="lsTitle"><span class="ls-squeeze"><em class="r">Грандиозное новогоднее мероприятие для</em> <em class="b">школьников, аналогов которому нет в&nbsp;России!</em></span></h2>
+    <div class="ls-stats" id="lsStats">
+      <div class="ls-stat rv">
+        <span class="ls-numbox"><span class="ls-num" data-to="40000">40&nbsp;000</span></span>
+        <p class="ls-cap">детей посетили наше мероприятие в&nbsp;прошлом сезоне в&nbsp;5 городах России</p>
+      </div>
+      <div class="ls-stat rv">
+        <span class="ls-numbox"><span class="ls-num" data-to="6">6</span></span>
+        <p class="ls-cap">год мы создаем сказку для детей и&nbsp;родителей. До&nbsp;250&nbsp;000 детей побывали у&nbsp;нас с&nbsp;2018 года</p>
+      </div>
+      <div class="ls-stat rv">
+        <span class="ls-numbox"><span class="ls-num" data-to="3000">3&nbsp;000</span></span>
+        <p class="ls-cap">килограмм карамели мы&nbsp;произвели в&nbsp;своем цеху прошлой осенью</p>
+      </div>
+      <div class="ls-stat rv">
+        <span class="ls-numbox"><span class="ls-num" data-to="150">150</span></span>
+        <p class="ls-cap">человек работают над проектом каждый год</p>
+      </div>
+    </div>
     <p class="ls-sub rv">Как это было в прошлом году:</p>
   </div>
     <div class="wl-scroll" id="wlScroll">
@@ -645,7 +780,21 @@ body{
       </h2>
       <p class="ct-sub rv">Мы организовываем свои мероприятия в нескольких городах, не привлекая партнёров по франшизе</p>
       <!-- карта России ляжет сюда отдельной правкой -->
-      <div class="ct-map" id="ctMap"></div>
+      <div class="ct-map rv" id="ctMap">
+        <figure class="map" id="map">
+          <img class="map-base" src="map.webp" srcset="map-mob.webp 1000w, map.webp 1559w"
+               sizes="(max-width:820px) 72vw, min(1040px, 74vw)" width="1559" height="668"
+               alt="Карта России: ёлки стоят в городах, где проходит экскурсия-шоу"
+               loading="lazy" decoding="async">
+          <span class="map-dim" aria-hidden="true"></span>
+          <img class="map-lit wide" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow.webp 1559w"
+               sizes="(max-width:820px) 72vw, min(1040px, 74vw)" width="1559" height="668"
+               alt="" aria-hidden="true" loading="lazy" decoding="async">
+          <img class="map-lit spot" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow.webp 1559w"
+               sizes="(max-width:820px) 72vw, min(1040px, 74vw)" width="1559" height="668"
+               alt="" aria-hidden="true" loading="lazy" decoding="async">
+        </figure>
+      </div>
     </div>
   </div>
 </section>
@@ -1356,6 +1505,34 @@ body{
     rv.forEach(function(el){ io.observe(el); });
   }
 
+  /* цифры набегают, когда доходят до экрана. Готовые значения лежат в разметке —
+     при выключенном JS и при prefers-reduced-motion они просто стоят на месте */
+  var nums = Array.prototype.slice.call(document.querySelectorAll('#lsStats .ls-num[data-to]'));
+  if (nums.length && !reduce && 'IntersectionObserver' in window){
+    var group = function(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0'); };
+    var count = function(el, delay){
+      var to = parseInt(el.getAttribute('data-to'), 10);
+      if (!(to > 0)) return;
+      el.textContent = '0';
+      var t0 = 0, dur = 1150;
+      var step = function(t){
+        if (!t0) t0 = t;
+        var p = Math.min(1, (t - t0) / dur);
+        el.textContent = group(Math.round(to * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) requestAnimationFrame(step);
+      };
+      setTimeout(function(){ requestAnimationFrame(step); }, delay);
+    };
+    var nio = new IntersectionObserver(function(items){
+      items.forEach(function(it){
+        if (!it.isIntersecting) return;
+        nio.unobserve(it.target);
+        count(it.target, nums.indexOf(it.target) * 120);
+      });
+    }, {threshold: 0.4});
+    nums.forEach(function(el){ nio.observe(el); });
+  }
+
   /* коллаж третьего экрана грузится только когда секция подошла к экрану:
      на старте канал занят роликом первого экрана */
   var cities = document.getElementById('cities');
@@ -1455,6 +1632,82 @@ body{
 
   addEventListener('resize', function(){ shown = -1; }, {passive:true});
   paint(target());
+})();
+
+/* ==================== КАРТА РОССИИ: свет идёт за курсором ====================
+   Наведение обязано срабатывать по силуэту страны, а не по прямоугольнику картинки:
+   у PNG с прозрачными углами мышь ловится всей рамкой, и карта загоралась бы,
+   когда курсор просто проходит мимо. Прочитать альфу картинки через canvas нельзя:
+   страницу открывают и как локальный файл, а там canvas «портится» и getImageData
+   запрещён. Поэтому силуэт заранее упакован в биты — сетка 240x103, единица суша.
+   Это 4 КБ текста и одна проверка бита на каждое движение мыши. */
+(function(){
+  var wrap = document.getElementById('map');
+  if (!wrap) return;
+
+  var MW = 240, MH = 103;
+  var MASK = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//sAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///vAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////wAAAAAAAAAAAPwAAAAAAAAAAAAAAAAAAAAAH////wAAAAAAAAAAAf4AAAAAAAAAAAAAAAAAAAAAH////wAAAAAAAAAAAf4AAAAAAAAAAAAAAAAAAAAAP////wAAAAAAAAAAD/4AAAAAAAAAAAAAAAAAAABwf////AAAAAAAAAAAH/4AAAAAAAAAAAAAAAAAAAD4f////AAAAAAAAAAAf/8AAAAAAAAABwAAAAAAAAH//////gAAAAAAAAAB//8AAAAAAAAABxAAAAAAAgP//////gAAAAAAAAAH//8AAAAAAAAAD/wAAAAAH////////gAAAAAAAAAH//8AAAAAAAAAD/4AAAAAf////////gAAAAAAAAAf//8AAAAAAAAAP/8AAAAB/////////wAAAAAAAAAf/f8AAAAAAAAH//8AAAAB/////////wAAAAAAABO/8f8AAAAAAAA///8AAAAB/////////wAAAAAAAD//4P8AAAAAAAB///8AD8AB/////////wAAAAAADz//zP8DAAAAwAD///8AD+AB/////////wAAAAAAf7//zn47gAADwB3///4AD+A//////////AAAAAAA/////nx7gAAH8H/////Pv+B//////////AAAAAAB//////74AAAP+H////n///z////////7/AAAAAAD///////z+AAf+n/////////////////5+AAAAAAH/////////Ag//3/////////////////98AAAAAAH/////////xw/9//////////////////98AAAAAAD/////////94////////////////////58AAAAAAH//////////9///////////////////+A+AAAAAAP//////////////////////////////8A+AAAAAAf//////////+///////////////////8A/4AAAAAf///////////+//////////////////8A/8AAAAA////////////+//////////////////8Af+AAAAA////////////+//////////////////+Af+AAAAE///////////////////////////////+Af/gAAAP////////////9///////////////////gf/wAAAf////////////////////////////////gf/4AAAf////////////////////////////////gf/4AAAP////////////////////////////////Af/wAAAH///////////////////////////////uAP/4AAAH///////////////////////////////MAH/8AAAP//////////////////////////////8AAH/8AAAP//////////////////////////////8AAD/8MAAP//////////////////////////////4AAB/8cAAP//////////////////////////////gAAAf+cAAP//////////////////////////////AAAAP+cAAP/////////////////////////////8AAAAD/eAAH/////////////////////////////4AAAAA/+AAD/////////////////////////////4AAAAAf+AAD/////////////////////////////4AAAAAH/gAD/////////////////////////////wAAAAAB/wAB/////////////////////////////wAAAAAAfwAB/////////////////////////////wAAAAAAfwAD/////////////////////////////gAAAAAAXwDP/////////////////////////////gAAAAAAD4X//////////////////////////////gAYAAAAB4///////////////////////////////gAcAAAAAf///////////////////////////////APeAAAAAf///////////////////////////////AfvAAAAAf///////////////////////////////Mf/wAAAAf//////////////////////////////////8AAAAf//////////////////////////////////+AAAAP///+/////////////////////////////9/gAAAf///4cH///////////////////////////8/wAAAf///wAB///////////////////////////+fwAAAP///wAB///////////////////////////+PwAAAP///gAA////////////////////////////PgAAAH///wAA///P////////////////////////ngAAAD///wAAf//A////////////////////////hwAAAD///wAAf/2AAH//////////////////////x+AAAB///wAAA/gAAB//////////////////////w/AAAA///gAAAfgAAB//////////////////////wfAAAA//HAAAAPgAAB//////////////////////wPAAAA/+AAAAAHgAAAf//////////////wB/////wOAAAAf+AAAAAAAAAAP//////////////gA/////wGAAAAH+AAAAAAAAAAHv/////////////gAf////wAAAAAD8AAAAAAAAAAAH/////////////wAP////wAAAAAD4AAAAAAAAAAAH/////////////wAH//7/4AAAAAD4AAAAAAAAAAAD/////////////wAD//z/4AAAAABwAAAAAAAAAAAD/////////////gAAAfj/4AAAAABwAAAAAAAAAAAD/////////////gAAAPB/4AAAAABwAAAAAAAAAAAB/////////////gAAAAB/4AAAAAAAAAAAAAAAAAAB/////////////gAAAAB/wAAAAAAAAAAAAAAAAAAB/////////////gAAAAB/wAAAAAAAAAAAAAAAAAAA//////v//////AAAAAB/wAAAAAAAAAAAAAAAAAAA//////B/////gAAAAAP/wAAAAAAAAAAAAAAAAAAAH/////AP///wAAAAAAP/wAAAAAAAAAAAAAAAAAAAAf////AP///gAAAAAAf/wAAAAAAAAAAAAAAAAAAAAP////AH///AAAAAAAf/gAAAAAAAAAAAAAAAAAAAAP/8H/AAAf+AAAAAAAP/gAAAAAAAAAAAAAAAAAAAAH/gD/AAAHwAAAAAAAP/AAAAAAAAAAAAAAAAAAAAAB/AAAAAAAAAAAAAAAH+AAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAA';
+  var bits = atob(MASK);
+  function onLand(u, v){
+    if (u < 0 || u > 1 || v < 0 || v > 1) return false;
+    var x = Math.min(MW - 1, (u * MW) | 0), y = Math.min(MH - 1, (v * MH) | 0), i = y * MW + x;
+    return (bits.charCodeAt(i >> 3) & (128 >> (i & 7))) !== 0;
+  }
+  function setLight(lit, x, y){
+    wrap.style.setProperty('--lit', lit.toFixed(3));
+    wrap.style.setProperty('--mx', (x * 100).toFixed(2) + '%');
+    wrap.style.setProperty('--my', (y * 100).toFixed(2) + '%');
+  }
+
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)');
+  var slow = window.matchMedia('(prefers-reduced-motion:reduce)');
+
+  /* телефон и планшет: мыши нет, свет включается сам при подходе к экрану */
+  if (!fine.matches){
+    wrap.classList.add('touchlit');
+    if ('IntersectionObserver' in window){
+      var io = new IntersectionObserver(function(items){
+        wrap.classList.toggle('inview', items[0].isIntersecting);
+      }, {threshold: 0.25});
+      io.observe(wrap);
+    } else {
+      wrap.classList.add('inview');
+    }
+    return;
+  }
+
+  /* режим «меньше движения»: свет не бегает, просто мягко включается */
+  if (slow.matches){
+    wrap.addEventListener('pointermove', function(e){
+      var r = wrap.getBoundingClientRect();
+      wrap.classList.toggle('lit', onLand((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height));
+    }, {passive: true});
+    wrap.addEventListener('pointerleave', function(){ wrap.classList.remove('lit'); });
+    return;
+  }
+
+  var lit = 0, target = 0, x = 0.5, y = 0.5, tx = 0.5, ty = 0.5, raf = 0;
+  function frame(){
+    /* разгорается быстрее, чем гаснет: гирлянда должна «остывать», а не выключаться рубильником */
+    lit += (target - lit) * (target > lit ? 0.13 : 0.05);
+    /* свет догоняет курсор с ленцой — так пятно кажется тяжёлым и живым */
+    x += (tx - x) * 0.16;
+    y += (ty - y) * 0.16;
+    setLight(lit, x, y);
+    if (lit > 0.003 || target > 0) raf = requestAnimationFrame(frame);
+    else { raf = 0; setLight(0, x, y); }   /* погасло — кадры больше не тратим */
+  }
+  function kick(){ if (!raf) raf = requestAnimationFrame(frame); }
+
+  wrap.addEventListener('pointermove', function(e){
+    if (e.pointerType === 'touch') return;   /* палец не наводит, он листает страницу */
+    var r = wrap.getBoundingClientRect();
+    var u = (e.clientX - r.left) / r.width, v = (e.clientY - r.top) / r.height;
+    tx = u; ty = v;
+    target = onLand(u, v) ? 1 : 0;
+    kick();
+  }, {passive: true});
+  wrap.addEventListener('pointerleave', function(){ target = 0; kick(); });
 })();
 </script>
 
