@@ -17,11 +17,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://sergeykirichok1992-wq.github.io/mnd-hero/">
 <meta name="twitter:card" content="summary_large_image">
+<noscript><style>.rv{opacity:1 !important; transform:none !important}</style></noscript>
 <link rel="preload" as="image" href="poster.webp" fetchpriority="high" media="(min-width: 820px)">
 <link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600&family=Oswald:wght@300;500;700&family=Prata&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600&family=Oswald:wght@300;500;700&family=Prata&family=M+PLUS+Rounded+1c:wght@500;700&display=swap">
 <style>
 :root{
   --ink:#04070F; --ink2:#080D1B; --line:#18223B;
@@ -296,6 +297,120 @@ body{
 }
 #vstatus b{color:var(--gold)}
 :focus-visible{outline:2px solid var(--moon); outline-offset:3px}
+
+/* ==================== ВТОРОЙ ЭКРАН: «Как это было в прошлом году» ==================== */
+/* Повтор второго экрана старого сайта: сугробы, красно-синий заголовок, лента полароидов */
+/* сугробы наезжают на низ последнего кадра первого экрана — шва между экранами нет.
+   z-index выше всех слоёв сцены (их максимум 20), но ниже шапки (30) */
+.ls-snowband{position:relative; z-index:25; margin-top:-14vh; pointer-events:none}
+.ls{position:relative; background:#fff; color:#333; z-index:25}
+/* наезд отменяется и по ширине, и по классу .touch (его ставит JS): на тач-устройствах
+   ролик играет сам, и снег закрывал бы живое видео — в т.ч. на iPad шире 820px */
+@media (max-width:820px){ .ls-snowband{margin-top:0} }
+.touch .ls-snowband{margin-top:0}
+/* фокус на белой секции: голубая рамка шапки здесь не видна */
+.ls :focus-visible{outline-color:#2F3192}
+.ls ::selection{background:#2F3192; color:#fff}
+/* сугробы: ночь первого экрана оседает в белое поле */
+.ls-snow{display:block; width:100%; height:clamp(84px,13vw,190px)}
+.ls-snow svg{display:block; width:100%; height:100%}
+.ls-body{max-width:1240px; margin:0 auto; padding:clamp(30px,4.2vw,64px) clamp(18px,4vw,44px) clamp(64px,7vw,110px)}
+.ls-title{
+  margin:0 auto; text-align:center;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(24px,3.6vw,50px); line-height:1.24; letter-spacing:.01em;
+  text-transform:uppercase; text-wrap:balance;
+}
+/* лёгкое сжатие по горизонтали — как узкий фирменный шрифт старого сайта */
+.ls-squeeze{display:inline-block; transform:scaleX(.84); transform-origin:50% 50%; max-width:119%; margin:0 -9.5%}
+.ls-title em{font-style:normal}
+.ls-title .r{color:#9D0A0F}
+.ls-title .b{color:#2F3192}
+.ls-sub{
+  margin:clamp(26px,3.4vw,54px) 0 clamp(24px,3vw,44px); text-align:center;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:500;
+  font-size:clamp(17px,2.1vw,30px); color:#333;
+}
+/* ---------- слайдер-коллаж ---------- */
+.ls-slider{position:relative}
+/* тени и вырастающие карточки не должны резаться рамкой окна — окно дышит запасом */
+.ls-window{overflow:hidden; padding:26px 20px; margin:-26px -20px}
+/* зазор между страницами больше запаса окна — сосед не выглядывает из-за края */
+.ls-pages{display:flex; gap:64px; transition:transform .6s cubic-bezier(.25,.8,.25,1)}
+.ls-page{flex:0 0 100%; min-width:0; display:grid; grid-template-columns:repeat(4,1fr);
+  gap:clamp(14px,1.8vw,26px); aspect-ratio:2.95}
+.ls-col{display:flex; flex-direction:column; gap:clamp(14px,1.8vw,26px); min-height:0}
+.ph{
+  margin:0; flex:1 1 0; min-height:0; display:flex; position:relative;
+  background:#fff; padding:clamp(5px,.6vw,9px); border-radius:4px;
+  box-shadow:0 12px 28px -12px rgba(23,36,74,.35), 0 2px 6px rgba(23,36,74,.12);
+  transform:rotate(var(--tilt,0deg));
+  transition:transform .38s cubic-bezier(.2,.7,.2,1), opacity .38s ease, filter .38s ease;
+}
+/* тень наведения лежит на ::after и включается прозрачностью: сама box-shadow не
+   анимируется — это дорогой репейнт на каждый кадр */
+.ph::after{
+  content:''; position:absolute; inset:0; border-radius:4px; z-index:-1;
+  box-shadow:0 26px 54px -18px rgba(23,36,74,.5), 0 0 38px -6px rgba(127,168,217,.55);
+  opacity:0; transition:opacity .38s ease;
+}
+.ph img{width:100%; height:100%; min-height:0; object-fit:cover; border-radius:2px; display:block}
+/* наведение: карточка оживает — выпрямляется, растёт и подсвечивается, соседи чуть отходят в тень */
+@media (hover:hover) and (pointer:fine){
+  .ph:hover{transform:rotate(0deg) translateY(-8px) scale(1.055); z-index:5}
+  .ph:hover::after{opacity:1}
+  .ls-page:hover .ph:not(:hover){opacity:.82; filter:saturate(.85)}
+}
+/* ---------- стрелки ---------- */
+.ls-arr{
+  position:absolute; top:50%; z-index:6; width:clamp(44px,3.8vw,56px); height:clamp(44px,3.8vw,56px);
+  transform:translateY(-50%); border:0; border-radius:50%; cursor:pointer; padding:0;
+  background:#fff; color:#2F3192; display:grid; place-items:center;
+  box-shadow:0 6px 22px rgba(23,36,74,.22), 0 1px 4px rgba(23,36,74,.14);
+  transition:background .25s ease, color .25s ease, transform .25s ease, box-shadow .25s ease;
+}
+.ls-arr svg{width:38%; height:38%; display:block}
+.ls-arr.prev{left:clamp(-74px,-4.6vw,-16px)}
+.ls-arr.next{right:clamp(-74px,-4.6vw,-16px)}
+.ls-arr:hover,.ls-arr:focus-visible{background:#2F3192; color:#fff; transform:translateY(calc(-50% - 2px));
+  box-shadow:0 10px 28px rgba(47,49,146,.35)}
+.ls-arr:active{transform:translateY(-50%) scale(.96)}
+@media (max-width:1330px){
+  .ls-arr.prev{left:-8px} .ls-arr.next{right:-8px}
+}
+/* ---------- точки ---------- */
+/* мишень точки 26px, сам кружок рисует ::after */
+.ls-dots{display:flex; justify-content:center; gap:4px; margin-top:clamp(16px,2vw,28px)}
+.ls-dots button{position:relative; width:26px; height:26px; border-radius:50%; border:0; padding:0;
+  cursor:pointer; background:transparent}
+.ls-dots button::after{content:''; position:absolute; inset:8px; border-radius:50%;
+  background:#7386AD; transition:background .25s ease, inset .25s ease}
+.ls-dots button[aria-current="true"]::after{background:#2F3192; inset:6px}
+/* ---------- появление при прокрутке ---------- */
+.rv{opacity:0; transform:translateY(26px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1; transform:none}
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1; transform:none; transition:none}
+  .ls-pages{transition:none}
+  .ph,.ph::after{transition:none}
+}
+/* ---------- телефон: одна лента, листается пальцем ---------- */
+@media (max-width:820px){
+  .ls-arr,.ls-dots{display:none}
+  .ls-window{overflow:visible; padding:0; margin:0}
+  .ls-page,.ls-col{display:contents}
+  .ls-pages{
+    overflow-x:auto; gap:14px; padding:10px 18px 30px;
+    margin:0 calc(-1*clamp(18px,4vw,44px));
+    scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
+    transform:none !important; transition:none;
+    scrollbar-width:none;
+  }
+  .ls-pages::-webkit-scrollbar{display:none}
+  /* max-height — телефон в ландшафте: карточка не должна быть выше экрана */
+  .ph{flex:none; height:58vw; max-height:72svh; scroll-snap-align:center}
+  .ph img{width:auto; height:100%}
+}
 </style>
 </head>
 <body>
@@ -338,8 +453,87 @@ body{
         <li>Детям 4+</li>
       </ul>
     </div>
-    <div id="vstatus"></div>
     <div class="hint" id="hint">Крути вниз<i></i></div>
+  </div>
+</section>
+<!-- плашка статуса видео живёт вне сцены: sticky-сцена запирает z-index своих детей,
+     и внутри неё плашку перекрывала бы белая секция ниже -->
+<div id="vstatus"></div>
+
+<div class="ls-snowband" aria-hidden="true">
+  <div class="ls-snow">
+    <svg viewBox="0 0 1440 190" preserveAspectRatio="none">
+      <path fill="#C7D8EA" d="M0,88 C110,34 260,36 400,72 C520,102 640,44 780,52 C920,60 1010,96 1130,84 C1250,72 1330,46 1440,64 L1440,190 L0,190 Z"/>
+      <path fill="#E4EEF7" d="M0,120 C150,70 300,78 450,104 C600,130 720,78 880,88 C1040,98 1150,124 1270,112 C1350,104 1400,98 1440,104 L1440,190 L0,190 Z"/>
+      <path fill="#FFFFFF" d="M0,152 C160,104 320,116 470,134 C620,152 760,108 910,116 C1060,124 1200,148 1440,132 L1440,190 L0,190 Z"/>
+    </svg>
+  </div>
+</div>
+
+<section class="ls" id="lastseason" aria-labelledby="lsTitle">
+  <div class="ls-body">
+    <h2 class="ls-title rv" id="lsTitle"><span class="ls-squeeze"><em class="r">Грандиозное новогоднее мероприятие для</em> <em class="b">школьников, аналогов которому нет в&nbsp;России!</em></span></h2>
+    <p class="ls-sub rv">Как это было в прошлом году:</p>
+    <div class="ls-slider rv" id="lsSlider">
+      <button class="ls-arr prev" type="button" aria-label="Предыдущие фотографии">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 4l-8 8 8 8" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="ls-window">
+        <div class="ls-pages" id="lsPages">
+          <div class="ls-page">
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:-1.5deg"><img src="photos/g03.jpg" width="298" height="202" alt="Общая фотография класса с Дедом Морозом в избе" loading="lazy" decoding="async"></figure>
+              <figure class="ph" style="--tilt:1.2deg"><img src="photos/g13.jpg" width="330" height="216" alt="Карамельный мастер-класс: дети раскатывают карамель" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:.9deg"><img src="photos/g01.jpg" width="325" height="422" alt="Девочки в колпаках карамельщиков с готовыми леденцами" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:1.6deg"><img src="photos/g04.jpg" width="311" height="194" alt="Шоу рисования светом на стене избы" loading="lazy" decoding="async"></figure>
+              <figure class="ph" style="--tilt:-1.1deg"><img src="photos/g05.jpg" width="309" height="181" alt="Дед Мороз за столом с детьми" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:-.8deg"><img src="photos/g09.jpg" width="330" height="436" alt="Изба Министерства новогодних дел ночью в подсветке" loading="lazy" decoding="async"></figure>
+            </div>
+          </div>
+          <div class="ls-page">
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:1.3deg"><img src="photos/g10.jpg" width="312" height="206" alt="Готовый леденец ручной работы" loading="lazy" decoding="async"></figure>
+              <figure class="ph" style="--tilt:-1.4deg"><img src="photos/g06.jpg" width="324" height="197" alt="Дети на улице перед началом программы" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:-.9deg"><img src="photos/g12.jpg" width="330" height="442" alt="Дед Мороз у пульта управления новогодними делами" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:-1.6deg"><img src="photos/g07.jpg" width="323" height="188" alt="Финальная дискотека со светящимися палочками" loading="lazy" decoding="async"></figure>
+              <figure class="ph" style="--tilt:1.1deg"><img src="photos/g08.jpg" width="318" height="181" alt="Мальчик у интерактивного пульта" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:1deg"><img src="photos/g11.jpg" width="313" height="420" alt="Двое детей в колпаках карамельщиков" loading="lazy" decoding="async"></figure>
+            </div>
+          </div>
+          <div class="ls-page">
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:-1.2deg"><img src="photos/g17.jpg" width="327" height="204" alt="Дети поднимают леденцы вверх" loading="lazy" decoding="async"></figure>
+              <figure class="ph" style="--tilt:1.5deg"><img src="photos/g14.jpg" width="340" height="213" alt="Дети с леденцами и ведущий программы" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:1.1deg"><img src="photos/g15.jpg" width="310" height="440" alt="Девочка с леденцами-сердечками" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:-1deg"><img src="photos/g16.jpg" width="333" height="446" alt="Проекция на стене избы" loading="lazy" decoding="async"></figure>
+            </div>
+            <div class="ls-col">
+              <figure class="ph" style="--tilt:1.4deg"><img src="photos/g18.jpg" width="323" height="436" alt="Камин и ёлка в избе" loading="lazy" decoding="async"></figure>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="ls-arr next" type="button" aria-label="Следующие фотографии">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 4l8 8-8 8" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="ls-dots" id="lsDots"></div>
+    </div>
   </div>
 </section>
 
@@ -381,6 +575,8 @@ body{
   var FORCE=null;   // отладка: window.__freeze(p) фиксирует прокрутку для съёмки кадров
   // на телефоне перемотка видео пальцем идёт рывками — там ролик играет сам
   var TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 820;
+  // класс для CSS: на тач-устройствах сугробы второго экрана не наезжают на играющий ролик
+  if (TOUCH) document.documentElement.classList.add('touch');
   // На телефоне идёт отдельный вертикальный ролик, в который логотип уже вклеен.
   // Значит все слои, которые на десктопе рисуют и оживляют логотип, там не нужны.
   var BAKED = TOUCH;
@@ -821,12 +1017,20 @@ body{
   }
 
   var PAUSED=false;
+  // сцена ушла из вьюпорта (человек читает второй экран и ниже) — кадры не рисуем,
+  // иначе канвасы со снегом и лучами продолжают жечь процессор под белой секцией
+  var stageLive=true;
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(e){ stageLive=e[0].isIntersecting; })
+      .observe(document.querySelector('.stage'));
+  }
   window.__freeze = function(x){ FORCE = x; };            // отладка: зафиксировать долю прокрутки
   window.__smokeCount = function(){ return SMOKE.length; };   // отладка
   window.__pause  = function(b){ PAUSED = !!b; lastNow=0; }; // отладка: снять нагрузку с CPU, чтобы декодер успел перемотать
 
   function frame(now){
     if(PAUSED){ requestAnimationFrame(frame); return; }
+    if(!stageLive){ lastNow=now; requestAnimationFrame(frame); return; }
     ensureSize();
     var dt = lastNow ? Math.min(0.1,(now-lastNow)/1000) : 0; lastNow = now;
     var p;
@@ -957,6 +1161,77 @@ body{
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* ---------- второй экран: слайдер и появление при прокрутке ---------- */
+(function(){
+  'use strict';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var pages = document.getElementById('lsPages');
+  var slider = document.getElementById('lsSlider');
+  if (!pages || !slider) return;
+
+  var N = pages.children.length, idx = 0;
+  var dotsBox = document.getElementById('lsDots'), dots = [];
+  for (var i = 0; i < N; i++){
+    var d = document.createElement('button');
+    d.type = 'button';
+    d.setAttribute('aria-label', 'Страница фотографий ' + (i+1) + ' из ' + N);
+    (function(k){ d.addEventListener('click', function(){ go(k); }); })(i);
+    dotsBox.appendChild(d); dots.push(d);
+  }
+  // на телефоне слайдер превращается в скролл-ленту: страницы «раскрываются», сдвиг не нужен,
+  // а сам контейнер должен быть фокусируем, чтобы ленту можно было листать с клавиатуры
+  var mobile = window.matchMedia('(max-width: 820px)');
+  function mobileMode(){ return mobile.matches; }
+  function syncMode(){
+    if (mobileMode()){
+      pages.setAttribute('tabindex', '0');
+      pages.setAttribute('role', 'region');
+      pages.setAttribute('aria-label', 'Фотографии прошлого сезона, лента листается');
+      for (var k = 0; k < N; k++) pages.children[k].removeAttribute('aria-hidden');
+    } else {
+      pages.removeAttribute('tabindex');
+      pages.removeAttribute('role');
+      pages.removeAttribute('aria-label');
+      for (var k2 = 0; k2 < N; k2++)
+        pages.children[k2].setAttribute('aria-hidden', k2 === idx ? 'false' : 'true');
+    }
+  }
+  function go(i){
+    idx = ((i % N) + N) % N;
+    // сдвиг в пикселях по реальной позиции слайда: работает при любом зазоре между страницами
+    pages.style.transform = 'translateX(' + (-pages.children[idx].offsetLeft) + 'px)';
+    for (var k = 0; k < N; k++){
+      if (k === idx) dots[k].setAttribute('aria-current', 'true');
+      else dots[k].removeAttribute('aria-current');
+      if (!mobileMode()) pages.children[k].setAttribute('aria-hidden', k === idx ? 'false' : 'true');
+    }
+  }
+  if (mobile.addEventListener) mobile.addEventListener('change', syncMode);
+  syncMode();
+  window.addEventListener('resize', function(){ go(idx); }, {passive:true});
+  slider.querySelector('.ls-arr.prev').addEventListener('click', function(){ go(idx - 1); });
+  slider.querySelector('.ls-arr.next').addEventListener('click', function(){ go(idx + 1); });
+  go(0);
+
+  /* заголовок, подзаголовок и лента всплывают по мере прокрутки */
+  var rv = Array.prototype.slice.call(document.querySelectorAll('#lastseason .rv'));
+  if (reduce || !('IntersectionObserver' in window)){
+    rv.forEach(function(el){ el.classList.add('in'); });
+  } else {
+    rv.forEach(function(el, i){ el.style.transitionDelay = (i * 120) + 'ms'; });
+    var io = new IntersectionObserver(function(items){
+      items.forEach(function(it){
+        if (!it.isIntersecting) return;
+        it.target.classList.add('in');
+        io.unobserve(it.target);
+      });
+    }, {threshold: 0.18});
+    rv.forEach(function(el){ io.observe(el); });
+  }
 })();
 </script>
 
