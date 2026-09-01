@@ -470,6 +470,86 @@ body{
 }
 /* пока карты нет, пустой контейнер не должен добавлять секции высоту */
 .ct-map:empty{display:none}
+
+/* ==================== ЧЕТВЁРТЫЙ ЭКРАН: стена полароидов ====================
+   Стена лежит плашмя и встаёт при прокрутке. Всё держится на transform:
+   ни ширины, ни отступы в анимации не участвуют, поэтому браузер не пересчитывает
+   раскладку на каждом кадре. */
+.wl{position:relative;
+  background:
+    radial-gradient(1200px 620px at 18% -8%, rgba(176,16,47,.38), transparent 62%),
+    radial-gradient(1000px 560px at 86% 6%, rgba(30,58,138,.45), transparent 66%),
+    linear-gradient(180deg,#0c1122 0%,#0a0e1b 55%,#06070d 100%);
+}
+/* зарево прячем в свою коробку: размытие в 96px иначе вылезет на соседние экраны.
+   Коробка не предок липкого блока, поэтому overflow ему не мешает */
+.wl-glowwrap{position:absolute; inset:0; z-index:1; overflow:hidden; pointer-events:none}
+.wl-glow{position:absolute; left:0; top:0; width:100%; height:65vh; opacity:.6;
+  filter:blur(96px); mix-blend-mode:screen;
+  background:linear-gradient(to right,#7a1f10,#b0102f 45%,#1e3a8a)}
+/* зерно: снимает «пластиковость» градиента */
+.wl-grain{position:absolute; inset:0; z-index:5; pointer-events:none; opacity:.07; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wl-head{position:relative; z-index:9; text-align:center; padding:clamp(44px,5.5vw,88px) 20px 0; margin-bottom:-48px}
+.wl-head h2{margin:0; font-family:"Prata",Georgia,serif; font-weight:400; color:#fff;
+  font-size:clamp(26px,3.6vw,50px); line-height:1.16; text-wrap:balance}
+.wl-head h2 i{font-style:normal; color:#f0c987}
+.wl-head p{margin:16px auto 0; max-width:34em; color:rgba(255,255,255,.6);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14px,1.5vw,18px); line-height:1.45}
+.wl-cta{margin-top:22px; display:flex; gap:8px; justify-content:center; align-items:center; flex-wrap:wrap}
+.wl-btn{border:0; cursor:pointer; border-radius:8px; padding:0 18px; height:44px;
+  font-family:"Golos Text",Arial,sans-serif; font-weight:500; font-size:15px;
+  background:#b0102f; color:#fff8f2; display:inline-flex; align-items:center; gap:8px;
+  transition:background .2s ease}
+.wl-btn:hover{background:#c41235}
+.wl-btn.ghost{background:transparent; color:rgba(255,255,255,.7)}
+.wl-btn.ghost:hover{background:transparent; color:#fff; text-decoration:underline}
+/* сцена: высокий контейнер задаёт длину прокрутки, липкий блок держит стену в кадре */
+.wl-scroll{position:relative; z-index:2; height:350vh; perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
+.wl-sticky{position:sticky; top:0; height:100svh; overflow:hidden;
+  perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
+.wl-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; height:100%;
+  transform-style:preserve-3d; will-change:transform; transform:rotateX(75deg) scale(1.2)}
+.wl-col{display:flex; flex-direction:column; gap:8px; will-change:transform}
+.wl-col.up{margin-top:-8px}
+.wl-col.down{margin-top:-18%}
+@media (min-width:768px){
+  .wl-grid{grid-template-columns:repeat(6,1fr); gap:10px}
+  .wl-col{gap:10px}
+}
+/* карточка: костяная бумага, ступенчатый торец, лёгкая тень рамки на снимке */
+.wl-ph{--e:2px; margin:0; position:relative; border-radius:2px; padding:5% 5% 15%;
+  background:linear-gradient(180deg,#efe8d9 0%,#eae2d2 55%,#e3dbc9 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.40),
+    inset 1px 0 0 rgba(255,255,255,.42),
+    inset -1px 0 0 rgba(92,74,48,.18),
+    0 1px 0 #d5c9ae,
+    0 calc(var(--e) - 1px) 0 #b9ab8d,
+    0 var(--e) 0 #93866c,
+    0 4px 10px rgba(0,0,0,.55);
+  transform:rotate(var(--tilt,0deg));
+}
+@media (min-width:640px){.wl-ph{--e:3px}}
+@media (min-width:768px){.wl-ph{--e:2px}}
+@media (min-width:1280px){.wl-ph{--e:3px}}
+/* окно в паспарту: срез нарисован по бумаге, поэтому виден и на чёрных ночных кадрах */
+.wl-win{position:relative;
+  box-shadow:0 -1px 0 rgba(78,60,38,.30), -1px 0 0 rgba(78,60,38,.16),
+             1px 0 0 rgba(78,60,38,.14), 0 1px 0 rgba(255,255,255,.62)}
+.wl-win img{display:block; width:100%; height:auto; aspect-ratio:3/4; object-fit:cover}
+/* тень кромки на снимке отдельным слоем: inset на самой картинке браузер рисует под ней */
+.wl-win::after{content:''; position:absolute; inset:0; pointer-events:none;
+  box-shadow:
+    inset 0 calc(var(--e) * .9) calc(var(--e) * 1.6) calc(var(--e) * -.6) rgba(26,18,8,.34),
+    inset 1px 0 0 rgba(26,18,8,.12),
+    inset -1px 0 0 rgba(26,18,8,.12),
+    inset 0 -1px 0 rgba(26,18,8,.10)}
+@media (prefers-reduced-motion: reduce){
+  .wl-scroll{height:auto}
+  .wl-sticky{position:static; height:auto; padding:40px 0}
+  .wl-grid{transform:none}
+}
 </style>
 </head>
 <body>
@@ -610,6 +690,62 @@ body{
       <div class="ct-map" id="ctMap"></div>
     </div>
   </div>
+</section>
+
+<!-- ==================== ЧЕТВЁРТЫЙ ЭКРАН: стена полароидов ==================== -->
+<section class="wl" id="wall" aria-labelledby="wlTitle">
+  <div class="wl-glowwrap"><div class="wl-glow"></div></div>
+  <div class="wl-head">
+    <h2 id="wlTitle">Как это было <i>в прошлом</i><br>новогоднем сезоне</h2>
+    <p>Резиденция, письма Деду Морозу, мастерские и финальная дискотека.<br>Кадры прошлого сезона - без постановки.</p>
+    <div class="wl-cta">
+      <button type="button" class="wl-btn">Выбрать дату</button>
+      <button type="button" class="wl-btn ghost">О программе</button>
+    </div>
+  </div>
+  <div class="wl-scroll" id="wlScroll">
+    <div class="wl-sticky">
+      <div class="wl-grid" id="wlGrid">
+        <div class="wl-col up" data-y0="-10" data-y1="2">
+          <figure class="wl-ph" style="--tilt:-1.4deg"><div class="wl-win"><img src="wall/01.webp" alt="Резиденция вечером: дом в гирляндах и снегу" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:0.9deg"><div class="wl-win"><img src="wall/13.webp" alt="Дерево в новогодних огнях" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:-0.6deg"><div class="wl-win"><img src="wall/02.webp" alt="Стена писем при свечах" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:1.3deg"><div class="wl-win"><img src="wall/14.webp" alt="Ёлка под крышей резиденции" loading="lazy" decoding="async"></div></figure>
+        </div>
+        <div class="wl-col down" data-y0="15" data-y1="5">
+          <figure class="wl-ph" style="--tilt:-1.1deg"><div class="wl-win"><img src="wall/05.webp" alt="Дед Мороз в своём кабинете" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:0.5deg"><div class="wl-win"><img src="wall/15.webp" alt="Дверь с табличкой «Дед Мороз»" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:1.6deg"><div class="wl-win"><img src="wall/06.webp" alt="Вывеска Министерства Новогодних Дел" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:-0.9deg"><div class="wl-win"><img src="wall/16.webp" alt="Пульт управления новогодними делами" loading="lazy" decoding="async"></div></figure>
+        </div>
+        <div class="wl-col up" data-y0="-8" data-y1="3">
+          <figure class="wl-ph" style="--tilt:-1.4deg"><div class="wl-win"><img src="wall/09.webp" alt="Заснеженный двор со снеговиком" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:0.9deg"><div class="wl-win"><img src="wall/17.webp" alt="Расписные игрушки на мольбертах" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:-0.6deg"><div class="wl-win"><img src="wall/10.webp" alt="Ёлка у камина" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:1.3deg"><div class="wl-win"><img src="wall/18.webp" alt="Витражное окно резиденции" loading="lazy" decoding="async"></div></figure>
+        </div>
+        <div class="wl-col down" data-y0="12" data-y1="4">
+          <figure class="wl-ph" style="--tilt:-1.1deg"><div class="wl-win"><img src="wall/03.webp" alt="Карамельная ёлка с подарками" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:0.5deg"><div class="wl-win"><img src="wall/19.webp" alt="Печатная машинка и часы на столе" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:1.6deg"><div class="wl-win"><img src="wall/04.webp" alt="Хранитель времени во дворе резиденции" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:-0.9deg"><div class="wl-win"><img src="wall/20.webp" alt="Стол с какао и маленькой ёлкой" loading="lazy" decoding="async"></div></figure>
+        </div>
+        <div class="wl-col up" data-y0="-10" data-y1="2">
+          <figure class="wl-ph" style="--tilt:-1.4deg"><div class="wl-win"><img src="wall/07.webp" alt="Финальная дискотека" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:0.9deg"><div class="wl-win"><img src="wall/21.webp" alt="Полка с игрушками и артефактами" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:-0.6deg"><div class="wl-win"><img src="wall/08.webp" alt="Кабинет с печатной машинкой и картами" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:1.3deg"><div class="wl-win"><img src="wall/22.webp" alt="Рабочий стол Министерства" loading="lazy" decoding="async"></div></figure>
+        </div>
+        <div class="wl-col down" data-y0="15" data-y1="5">
+          <figure class="wl-ph" style="--tilt:-1.1deg"><div class="wl-win"><img src="wall/11.webp" alt="Полки с артефактами Министерства" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:0.5deg"><div class="wl-win"><img src="wall/23.webp" alt="Пряничные ёлочки из мастерской" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:1.6deg"><div class="wl-win"><img src="wall/12.webp" alt="Шар «Министерство Новогодних Дел» на ёлке" loading="lazy" decoding="async"></div></figure>
+          <figure class="wl-ph" style="--tilt:-0.9deg"><div class="wl-win"><img src="wall/24.webp" alt="Дед Мороз у ёлки" loading="lazy" decoding="async"></div></figure>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="wl-grain"></div>
 </section>
 
 <section class="next" id="next">
@@ -1328,6 +1464,51 @@ body{
       bgio.observe(cities);
     }
   }
+})();
+</script>
+
+
+<script>
+/* Четвёртый экран: стена полароидов встаёт из наклона по прокрутке.
+   Считаем один прогресс 0..1 по положению высокого контейнера и раздаём его
+   в transform сетки и колонок. Всё в requestAnimationFrame, чтобы на кадр
+   приходился один пересчёт, а не по одному на каждое событие прокрутки. */
+(function(){
+  var scr = document.getElementById('wlScroll');
+  var grid = document.getElementById('wlGrid');
+  if (!scr || !grid) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var cols = [].slice.call(grid.children);
+  var data = cols.map(function(c){
+    return { el:c, y0:parseFloat(c.getAttribute('data-y0')), y1:parseFloat(c.getAttribute('data-y1')) };
+  });
+  var queued = 0;
+
+  function clamp(v){ return v < 0 ? 0 : v > 1 ? 1 : v; }
+  function seg(p, a, b){ return clamp((p - a) / (b - a)); }
+
+  function draw(){
+    queued = 0;
+    var total = scr.offsetHeight - window.innerHeight;
+    if (total <= 0) return;
+    var p = clamp(-scr.getBoundingClientRect().top / total);
+
+    var rotX = 75 - 75 * seg(p, 0, 0.5);      // стена поднимается
+    var sc   = 1.2 - 0.2 * seg(p, 0.5, 0.9);  // и чуть отъезжает
+    grid.style.transform = 'rotateX(' + rotX.toFixed(2) + 'deg) scale(' + sc.toFixed(4) + ')';
+
+    var t = seg(p, 0.5, 1);
+    for (var i = 0; i < data.length; i++){
+      var d = data[i];
+      d.el.style.transform = 'translateY(' + (d.y0 + (d.y1 - d.y0) * t).toFixed(2) + '%)';
+    }
+  }
+  function onScroll(){ if (!queued) queued = requestAnimationFrame(draw); }
+
+  addEventListener('scroll', onScroll, {passive:true});
+  addEventListener('resize', onScroll);
+  draw();
 })();
 </script>
 
