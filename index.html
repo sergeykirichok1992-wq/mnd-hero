@@ -24,7 +24,7 @@
 <link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600&family=Oswald:wght@300;500;700&family=Prata&family=M+PLUS+Rounded+1c:wght@500;700&family=Playfair+Display:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600&family=Oswald:wght@300;500;700&family=Prata&family=M+PLUS+Rounded+1c:wght@500;700&display=swap">
 <style>
 :root{
   --ink:#04070F; --ink2:#080D1B; --line:#18223B;
@@ -358,8 +358,8 @@ body{
 }
 .ls-num{
   position:relative; z-index:1; display:inline-block; white-space:nowrap;
-  font-family:"Playfair Display","Prata",Georgia,serif; font-weight:700;
-  font-size:clamp(40px,6vw,88px); line-height:1.06; letter-spacing:.005em;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(38px,5.5vw,80px); line-height:1.08; letter-spacing:-.012em;
   background:
     linear-gradient(102deg, rgba(255,244,214,0) 36%, rgba(255,249,230,.92) 49%, rgba(255,244,214,0) 62%),
     linear-gradient(168deg,#F4CE84 0%,#E9B255 20%,#D89534 44%,#C4801F 60%,#E0A94D 80%,#F6D9A2 100%);
@@ -382,7 +382,7 @@ body{
 }
 @media (max-width:820px){
   .ls-stats{grid-template-columns:repeat(2,1fr); gap:clamp(22px,6vw,34px) clamp(12px,4vw,24px)}
-  .ls-num{font-size:clamp(38px,11vw,64px)}
+  .ls-num{font-size:clamp(34px,10vw,58px)}
   .ls-cap{font-size:clamp(12px,3.4vw,15px); max-width:14em}
 }
 @media (prefers-reduced-motion:reduce){
@@ -536,9 +536,11 @@ body{
 /* на телефоне карта широкая и от этого мелкая — выпускаем её на всю ширину экрана,
    за поля секции, иначе ёлки в городах превращаются в точки */
 @media (max-width:820px){
-  .ct-map{max-width:none; margin-left:calc(-1*clamp(18px,4vw,44px)); margin-right:calc(-1*clamp(18px,4vw,44px))}
+  .ct-map{max-width:none; margin-left:calc(-1*clamp(18px,4vw,44px)); margin-right:calc(-1*clamp(18px,4vw,44px));
+    padding:0 8px}   /* ёлка Калининграда стоит у самого края кадра — не режем её о край экрана */
 }
-.map{position:relative; isolation:isolate;   /* isolation — чтобы lighten смешивался
+.map{position:relative; margin:0;            /* у figure свои поля по 40px, они тут лишние */
+  isolation:isolate;                        /* isolation — чтобы lighten смешивался
        только со своей картой, а не с фотоколлажем секции */
   --lit:0; --mx:50%; --my:50%}
 .map img{display:block; width:100%; height:auto}
@@ -562,10 +564,19 @@ body{
    серый прямоугольник и на прозрачные углы вокруг страны */
 .map-dim{
   position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply;
-  background:#93A3C9; opacity:calc((1 - var(--lit))*.3);
-  -webkit-mask-image:url(map.webp); mask-image:url(map.webp);
+  background:#93A3C9; opacity:0;
   -webkit-mask-size:100% 100%; mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+}
+/* маска — это отдельная загрузка той же картинки, и браузер тянет её сразу,
+   как только элемент появился в вёрстке. Поэтому вешаем её тем же классом .bgon,
+   которым включается фон секции: до подхода к экрану ничего не качается */
+.ct.bgon .map-dim{
+  opacity:calc((1 - var(--lit))*.3);
+  -webkit-mask-image:url(map.webp); mask-image:url(map.webp);
+}
+@media (max-width:820px){
+  .ct.bgon .map-dim{-webkit-mask-image:url(map-mob.webp); mask-image:url(map-mob.webp)}
 }
 .map-lit{position:absolute; inset:0; pointer-events:none; mix-blend-mode:lighten}
 /* общий разлив света по всей стране */
@@ -580,14 +591,22 @@ body{
 /* на тач-экранах наведения нет: пятно не нужно, а свет включается сам,
    когда карта доезжает до экрана, и медленно дышит — иначе эффекта никто не увидит */
 .map.touchlit .map-lit.spot{display:none}
+/* три слоя дышат одним ритмом: свет прибывает, синева и зарево идут за ним.
+   Одной анимацией переменной --lit это не сделать: её интерполяцию нужно
+   объявлять через @property, а он есть не везде */
 .map.touchlit.inview .map-lit.wide{animation:mapBreath 7s ease-in-out infinite}
+.ct.bgon .map.touchlit.inview .map-dim{animation:mapDimBreath 7s ease-in-out infinite}
+.map.touchlit.inview::before{animation:mapHaloBreath 7s ease-in-out infinite}
 @keyframes mapBreath{0%,100%{opacity:.2} 50%{opacity:.5}}
+@keyframes mapDimBreath{0%,100%{opacity:.3} 50%{opacity:.08}}
+@keyframes mapHaloBreath{0%,100%{opacity:.12} 50%{opacity:.55}}
 /* «меньше движения»: никакой беготни света, только мягкое включение по наведению */
 @media (prefers-reduced-motion:reduce){
   .map-lit.spot{display:none}
-  .map-lit.wide{opacity:0; transition:opacity .4s ease; animation:none !important}
+  .map-lit.wide{opacity:0; transition:opacity .4s ease}
   .map.lit .map-lit.wide{opacity:.45}
   .map.touchlit .map-lit.wide{opacity:.3}
+  .map-lit.wide, .map-dim, .map::before{animation:none !important}
 }
 
 /* ---------- стена полароидов: 24 кадра встают из наклона по прокрутке ---------- */
@@ -782,16 +801,16 @@ body{
       <!-- карта России ляжет сюда отдельной правкой -->
       <div class="ct-map rv" id="ctMap">
         <figure class="map" id="map">
-          <img class="map-base" src="map.webp" srcset="map-mob.webp 1000w, map.webp 1559w"
-               sizes="(max-width:820px) 72vw, min(1040px, 74vw)" width="1559" height="668"
+          <img class="map-base" src="map.webp" srcset="map-mob.webp 1000w, map-mid.webp 1200w, map.webp 1559w"
+               sizes="(max-width:820px) 96vw, min(1120px, 78vw)" width="1559" height="668"
                alt="Карта России: ёлки стоят в городах, где проходит экскурсия-шоу"
                loading="lazy" decoding="async">
           <span class="map-dim" aria-hidden="true"></span>
-          <img class="map-lit wide" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow.webp 1559w"
-               sizes="(max-width:820px) 72vw, min(1040px, 74vw)" width="1559" height="668"
+          <img class="map-lit wide" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow-mid.webp 1200w, map-glow.webp 1559w"
+               sizes="(max-width:820px) 96vw, min(1120px, 78vw)" width="1559" height="668"
                alt="" aria-hidden="true" loading="lazy" decoding="async">
-          <img class="map-lit spot" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow.webp 1559w"
-               sizes="(max-width:820px) 72vw, min(1040px, 74vw)" width="1559" height="668"
+          <img class="map-lit spot" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow-mid.webp 1200w, map-glow.webp 1559w"
+               sizes="(max-width:820px) 96vw, min(1120px, 78vw)" width="1559" height="668"
                alt="" aria-hidden="true" loading="lazy" decoding="async">
         </figure>
       </div>
