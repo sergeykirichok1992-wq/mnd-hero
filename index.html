@@ -30,6 +30,11 @@
   --ink:#04070F; --ink2:#080D1B; --line:#18223B;
   --text:#DCE4F3; --dim:#8695B3; --faint:#5A6784;
   --gold:#E3B34E; --moon:#7FA8D9;
+  /* Набор заголовков секций. Один на все экраны: эталон снят с квиза,
+     менять размер/цвет заголовков — только здесь, а не в каждой секции */
+  --h2-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif;
+  --h2-weight:700; --h2-size:clamp(28px,4.4vw,78px);
+  --h2-lh:1.1; --h2-ls:.005em; --h2-color:#fff;
   /* размеры логотипа, пересчитанные из кадра 1920x1080 при object-fit:cover */
   --logo-w: max(52.2vw, 92.8vh);
   --logo-top: 48%;
@@ -151,8 +156,12 @@ body{
 .next{position:relative; z-index:10; background:var(--ink); padding:96px 30px 120px; border-top:1px solid var(--line)}
 .inner{max-width:1080px; margin:0 auto}
 .eyebrow{font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin:0 0 18px}
-.next h2{font-family:"Unbounded",sans-serif; font-weight:300; font-size:clamp(26px,4vw,40px); line-height:1.12; margin:0 0 18px; text-wrap:balance}
-.next h2 b{font-weight:700; color:#fff}
+.next h2{
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
+  color:var(--h2-color);
+  text-transform:uppercase; margin:0 0 18px; text-wrap:balance}
+.next h2 b{font-weight:inherit; color:inherit}
 .next p.lede{color:var(--dim); font-size:17px; max-width:58ch; margin:0 0 52px}
 .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
 @media(max-width:800px){.cards{grid-template-columns:1fr}}
@@ -416,15 +425,17 @@ body{
 .ls-body{max-width:1240px; margin:0 auto; padding:clamp(64px,8vw,124px) clamp(18px,4vw,44px) clamp(14px,2vw,30px)}
 .ls-title{
   margin:0 auto; text-align:center;
-  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(24px,3.6vw,50px); line-height:1.24; letter-spacing:.01em;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
+  color:var(--h2-color);
   text-transform:uppercase; text-wrap:balance;
 }
-/* лёгкое сжатие по горизонтали — как узкий фирменный шрифт старого сайта */
-.ls-squeeze{display:inline-block; transform:scaleX(.84); transform-origin:50% 50%; max-width:119%; margin:0 -9.5%}
+/* сжатие по горизонтали убрано: с ним буквы были уже, чем на квизе,
+   и «тот же шрифт» переставал читаться как тот же */
+.ls-squeeze{display:inline-block}
 .ls-title em{font-style:normal}
-.ls-title .r{color:#F0554C}   /* фирменный #9D0A0F на тёмно-синем уходит в бурое пятно */
-.ls-title .b{color:#A9C7F2}   /* #2F3192 на ночном фоне просто исчезает */
+/* цвет один на все заголовки сайта, поэтому красный и синий больше не задаются */
+.ls-title .r, .ls-title .b{color:inherit}
 .ls-sub{
   margin:clamp(26px,3.4vw,54px) 0 clamp(24px,3vw,44px); text-align:center;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:500;
@@ -614,12 +625,16 @@ body{
   padding:clamp(64px,9vw,122px) clamp(16px,3vw,56px) clamp(56px,8vw,106px);
 }
 .ct-title{
-  margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(23px,3.4vw,48px); line-height:1.14; text-transform:uppercase;
-  text-wrap:balance; text-shadow:0 2px 20px rgba(0,0,0,.5);
+  margin:0;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
+  color:var(--h2-color);
+  text-transform:uppercase; text-wrap:balance;
+  /* фон тут — фотоплитка, без тени заголовок тонет на светлых кадрах */
+  text-shadow:0 2px 20px rgba(0,0,0,.5);
 }
 .ct-title .ln{display:block}
-.ct-title .hl{color:#FDC68C}
+.ct-title .hl{color:inherit}
 /* подзаголовок на старом сайте набран не заголовочным шрифтом и идёт одной строкой —
    поэтому основной Golos Text и никакого ограничения по ширине */
 .ct-sub{
@@ -842,12 +857,17 @@ body{
   display:flex; flex-direction:column; justify-content:center; align-items:center;
   text-align:center; color:#fff}
 .fr-title{
-  margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  line-height:1.12; text-transform:uppercase; text-wrap:balance;
-  /* размеры даны ДО уменьшения накладки, поэтому крупнее «на глаз»: на экране
-     их ещё умножит --k. Рамка стала меньше — текст заполняет её плотнее */
+  margin:0;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
+  color:var(--h2-color);
+  text-transform:uppercase; text-wrap:balance;
+  /* Размер задаётся ДО уменьшения накладки: на экране его ещё умножит --k.
+     Поэтому делим на --k — в кадре буквы выходят ровно как на квизе.
+     Второй предел, 6.6cqw, страхует рамку: на низком широком окне картинка
+     ужимается сильнее текста, и без него строки полезли бы на карамель */
   font-size:clamp(20px,3.9vw,58px);   /* запасной размер для старых браузеров */
-  font-size:4cqw;                     /* основной: доля ширины картинки */
+  font-size:min(calc(var(--h2-size) / var(--k)), 6.6cqw);
   text-shadow:0 2px 18px rgba(0,0,0,.65)}
 .fr-lede{
   margin:1.05em 0 0; font-weight:400; line-height:1.42; color:#E8EFFF;
@@ -982,9 +1002,11 @@ body{
 .qz-left{position:sticky; top:clamp(84px,13vh,150px)}
 .qz-eyebrow{margin:0 0 clamp(14px,1.6vw,22px); font-size:clamp(11px,.86vw,13px);
   letter-spacing:.24em; text-transform:uppercase; color:#8FA3C8}
-.qz-h{margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(28px,3.7vw,62px); line-height:1.14; letter-spacing:.005em;
-  text-transform:uppercase; text-wrap:balance; color:#fff}
+.qz-h{margin:0;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
+  color:var(--h2-color);
+  text-transform:uppercase; text-wrap:balance}
 .qz-h em{font-style:normal; color:#A9C7F2}
 .qz-h b{font-weight:700; color:#E3B34E}
 .qz-lede{margin:clamp(18px,2vw,30px) 0 0; max-width:34ch;
