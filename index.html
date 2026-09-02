@@ -309,293 +309,42 @@ body{
 #vstatus b{color:var(--gold)}
 :focus-visible{outline:2px solid var(--moon); outline-offset:3px}
 
-/* ==================== ВТОРОЙ ЭКРАН: «Как это было в прошлом году» ==================== */
-/* Второй экран: ночное небо, заголовок, цифры сезона, стена полароидов */
-/* Сугробы отсюда убраны. Они были мостиком из тёмной сцены в БЕЛОЕ поле: без них
-   на стыке стояла жёсткая граница ночь/белизна. Второй экран стал тёмным, мостик
-   потерял работу — и молочная полоса на стыке двух ночей читалась заплаткой.
-   Теперь ночь просто продолжается: z-index секции по-прежнему выше слоёв сцены
-   (их максимум 20) и ниже шапки (30) */
-/* база нарочно плоская: любой заметный градиент на четыре экрана высоты даст полосу.
-   Зерно одной картинкой — без него длинные мягкие переходы на тёмно-синем идут
-   ступеньками: глаз в тенях ловит разницу в один уровень. Шум обесцвечен, цветная
-   крупа на почти одноцветном фоне читается грязью */
-.ls{position:relative; background:#0A1129; color:#C9D6EE; z-index:25;
-  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
-/* секция снова тёмная — лунная рамка шапки здесь видна лучше собственной */
-.ls :focus-visible{outline-color:var(--moon)}
-.ls ::selection{background:rgba(127,168,217,.34); color:#fff}
-/* ---------- ночное небо второго экрана ----------
-   ГЛАВНОЕ РЕШЕНИЕ. Свет НЕ лежит в фоне секции. Секция высотой почти в четыре экрана:
-   любое пятно, положенное в background у .ls, растянется на всю её длину, и человек
-   увидит в окне четверть одного пятна — не небо, а медленно ползущую полосу. Поэтому
-   свет живёт в липком окне ростом ровно в экран: что бы ни прокручивали, в кадре
-   всегда целая композиция из четырёх пятен. Небо стоит на месте, потому что оно
-   бесконечно далеко; движение даёт стена полароидов, которая едет перед ним.
+/* ==================== ВТОРОЙ ЭКРАН: белое поле (заготовка) ====================
+   Ночное небо, цифры сезона и стена полароидов сняты 02.09.2026: экран собираем
+   заново. Прежний код целиком лежит в истории (коммит bbd0a0c), фотографии стены
+   остались в папке wall/ — вернуть можно без потерь.
 
-   Слои внутри .ls (у неё свой стакан: position:relative + z-index:25):
-     -3 небо   -2 два шва   -1 зерно   поток — весь контент.
-   Отрицательные z-index рисуются НАД фоном .ls и ПОД контентом, поэтому .ls-body
-   трогать не нужно. Не вешать на .ls-body z-index: она станет отдельным стаканом,
-   и свечение под цифрами (mix-blend-mode:screen) перестанет видеть небо */
-/* тонкая золотая полоса ровно на стыке экранов: верхний край второго экрана
-   совпадает с нижним краем липкой сцены, поэтому линия садится точно в шов.
-   Гаснет к краям: сплошная от края до края читается рамкой окна, затухающая —
-   отблеском. Свечение через drop-shadow, а не box-shadow: тень идёт по реальной
-   прозрачности градиента, иначе ореол светился бы и там, где линии уже нет */
-.ls::before{
-  content:''; position:absolute; z-index:2; left:0; right:0; top:0; height:1px;
-  pointer-events:none;
-  background:linear-gradient(90deg, rgba(227,179,78,0) 0%, rgba(227,179,78,.16) 10%,
-    rgba(245,214,140,.92) 50%, rgba(227,179,78,.16) 90%, rgba(227,179,78,0) 100%);
-  filter:drop-shadow(0 0 7px rgba(227,179,78,.5));
+   СТЫК ЭКРАНОВ ДЕРЖИТ СУГРОБ. Одна картинка с прозрачным верхом: она стоит верхним
+   краем белого экрана и вылезает вверх на высоту гребней, поэтому нижний край первого
+   экрана прикрыт снегом. Низ картинки — чистый белый (255,255,255), ровно тот же,
+   что у секции, шва между ними нет. Отдельная золотая полоса на стыке больше не нужна:
+   её работу — обозначить границу — теперь делает снег.
+
+   z-index:25 — выше слоёв сцены первого экрана (у них максимум 20) и ниже шапки (30).
+   Без него белое поле уехало бы ПОД липкую сцену, а снег стал бы не виден. */
+.wt{position:relative; z-index:25; height:1080px; background:#fff}
+/* Высоту снега в пикселях задавать НЕЛЬЗЯ: при ширине окна 1440 картинка выходит
+   445 px, а контейнер в 360 срежет верхушки сугробов ровной линией — она отлично
+   видна. Поэтому только пропорции исходной нарезки (3400x1050). */
+.wt-snow{
+  position:absolute; left:0; right:0; top:0; z-index:2; pointer-events:none;
+  aspect-ratio:3400/1050;
+  /* насколько снег заезжает на первый экран: 30 % своей высоты, из них верхние 13 %
+     прозрачны — над стыком остаются одни гребни, «немножечко» нижнего края сцены */
+  transform:translateY(-30%);
+  background:url(snow-1500.webp) center bottom/100% 100% no-repeat;
 }
-.ls-sky{position:absolute; inset:0; z-index:-3; pointer-events:none}
-/* overflow:hidden сюда нельзя — убьёт прилипание ребёнка */
-.ls-sky-win{position:sticky; top:0; height:100svh; overflow:hidden}
-/* мягкость даёт растяжка стопов самого градиента, а не filter:blur — размытие такой
-   площади на телефоне стоит дорого, широкий градиент рисуется даром */
-.ls-sky i{position:absolute; display:block; border-radius:50%;
-  animation-timing-function:ease-in-out; animation-iteration-count:infinite; will-change:transform}
-/* 1. Луна за облаком: самое крупное холодное пятно из-за левого верхнего угла */
-.ls-sky i:nth-child(1){left:-24vw; top:-26vh; width:88vw; height:88vh;
-  background:radial-gradient(closest-side, rgba(127,168,217,.19) 0%, rgba(116,155,205,.13) 34%,
-    rgba(96,132,186,.06) 62%, rgba(84,118,170,.02) 82%, rgba(80,112,164,0) 100%);
-  animation-name:lsDrift1; animation-duration:71s; animation-delay:-11s}
-/* 2. Тёплый отсвет резиденции справа. Держим на пределе слышимости: чуть громче —
-   и тёплое поверх синего даст серо-бурую зону вместо температурного контраста */
-.ls-sky i:nth-child(2){left:58vw; top:34vh; width:66vw; height:62vh;
-  background:radial-gradient(closest-side, rgba(255,186,110,.12) 0%, rgba(236,170,104,.07) 38%,
-    rgba(206,148,92,.022) 68%, rgba(190,138,88,0) 100%);
-  animation-name:lsDrift2; animation-duration:53s; animation-delay:-27s}
-/* 3. Провал темноты: пятно, которое СЪЕДАЕТ свет. Без него неровность идёт только
-   в одну сторону и небо выглядит подсвеченным изнутри */
-.ls-sky i:nth-child(3){left:-20vw; top:40vh; width:84vw; height:76vh;
-  background:radial-gradient(closest-side, rgba(3,6,18,.62) 0%, rgba(4,7,20,.42) 36%,
-    rgba(5,9,24,.17) 66%, rgba(6,10,26,0) 100%);
-  animation-name:lsDrift3; animation-duration:89s; animation-delay:-41s}
-/* 4. Холодная искра: другая температура, чем у луны, и вдвое мельче — иначе два синих
-   пятна читаются как одно размазанное */
-.ls-sky i:nth-child(4){left:56vw; top:-8vh; width:46vw; height:44vh;
-  background:radial-gradient(closest-side, rgba(178,206,244,.15) 0%, rgba(152,186,232,.08) 40%,
-    rgba(128,164,214,.025) 70%, rgba(120,155,205,0) 100%);
-  animation-name:lsDrift4; animation-duration:37s; animation-delay:-6s}
-/* Периоды 71, 53, 89 и 37 секунд взаимно простые, поэтому вся картинка целиком
-   повторится примерно раз в четыре года. Пути замкнутые (0% = 100%), чтобы пятно не
-   дёргалось в точке разворота. Анимируется только transform — браузер двигает готовые
-   слои на видеокарте и ничего не перерисовывает */
-@keyframes lsDrift1{0%,100%{transform:translate3d(0,0,0) scale(1)}
-  28%{transform:translate3d(4.5vw,3vh,0) scale(1.05)}
-  55%{transform:translate3d(7.5vw,-2vh,0) scale(1.01)}
-  80%{transform:translate3d(2.5vw,-4vh,0) scale(1.06)}}
-@keyframes lsDrift2{0%,100%{transform:translate3d(0,0,0) scale(1)}
-  33%{transform:translate3d(-3.5vw,-5vh,0) scale(1.08)}
-  66%{transform:translate3d(-6vw,3.5vh,0) scale(1.03)}}
-@keyframes lsDrift3{0%,100%{transform:translate3d(0,0,0) scale(1.03)}
-  30%{transform:translate3d(5vw,-3vh,0) scale(1)}
-  62%{transform:translate3d(-3vw,-6vh,0) scale(1.07)}
-  84%{transform:translate3d(2vw,1.5vh,0) scale(1.02)}}
-@keyframes lsDrift4{0%,100%{transform:translate3d(0,0,0) scale(1)}
-  25%{transform:translate3d(-4vw,4vh,0) scale(1.09)}
-  50%{transform:translate3d(-7vw,1vh,0) scale(1.02)}
-  75%{transform:translate3d(-2.5vw,5.5vh,0) scale(1.06)}}
-/* класс вешает JS, когда секция ушла из кадра: анимация встаёт и слои отдают память.
-   Стена из 24 полароидов и так грузит кадр. Если JS не отработал — небо просто дышит
-   всегда, ничего не ломается */
-.ls.skysleep .ls-sky i{animation-play-state:paused; will-change:auto}
-/* зерно — плитка, а не растяжка, поэтому ловушка с четырьмя экранами тут не работает.
-   Лежит НАД пятнами и швами, ПОД контентом: полароиды и текст зерном не трогаются */
-.ls-grain{position:absolute; inset:0; z-index:-1; pointer-events:none;
-  opacity:.05; background:var(--grain) 0 0/140px 140px repeat}
-/* ШОВ СНИЗУ: разводим по светлоте ВНИЗ, а не вверх. Плёнка третьего экрана поверх
-   фотоколлажа даёт примерно #262A2E, наш низ — #04081A: третий экран открывается
-   заметно светлее, шов читается как горизонт, экраны не сливаются. Заодно последний
-   экран стены стоит на почти чёрном, и светлые полароиды получают максимальный
-   контраст — финал забирает стена, а не фон */
-.ls::after{content:''; position:absolute; z-index:-2; left:0; right:0; bottom:0;
-  height:120svh; pointer-events:none;
-  background:
-    radial-gradient(140% 22% at 50% 58%, rgba(140,178,228,.06), rgba(140,178,228,0) 72%),
-    linear-gradient(180deg, rgba(6,10,26,0) 0%, rgba(6,10,26,.30) 30%, rgba(6,10,26,.62) 52%,
-      rgba(5,9,22,.86) 72%, rgba(4,8,20,.97) 88%, #04081A 100%)}
-/* нижний отступ был рассчитан на слайдер; стена идёт сразу за подзаголовком,
-   поэтому воздуха снизу нужно меньше */
-/* секция начинается сразу за последним кадром сцены, поэтому воздух над заголовком
-   отбивает его от неба, а не от снега */
-.ls-body{max-width:1240px; margin:0 auto; padding:clamp(64px,8vw,124px) clamp(18px,4vw,44px) clamp(14px,2vw,30px)}
-.ls-title{
-  margin:0 auto; text-align:center;
-  font-family:var(--h2-family); font-weight:var(--h2-weight);
-  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
-  color:var(--h2-color);
-  text-transform:uppercase; text-wrap:balance;
-}
-/* сжатие по горизонтали убрано: с ним буквы были уже, чем на квизе,
-   и «тот же шрифт» переставал читаться как тот же */
-.ls-squeeze{display:inline-block}
-.ls-title em{font-style:normal}
-/* цвет один на все заголовки сайта, поэтому красный и синий больше не задаются */
-.ls-title .r, .ls-title .b{color:inherit}
-.ls-sub{
-  margin:clamp(26px,3.4vw,54px) 0 clamp(24px,3vw,44px); text-align:center;
-  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:500;
-  font-size:clamp(17px,2.1vw,30px); color:#B7C6E2;
-}
-/* ---------- цифры прошлого сезона ---------- */
-/* Золото на ночном фоне — рампа и блик те же, что у .years .fill на первом экране:
-   светлая по краям, с тёмной полкой-фаской в середине. На белом всё было наоборот
-   (база глубже, блик светлее базы), см. историю правок: на светлом фоне светлое золото
-   пропадает, на тёмном та же глубина читается ржавчиной. Свечение двумя слоями:
-   тёплая лужица света под цифрой и drop-shadow по контуру глифов внутри блика. */
-/* цифры переехали под стену с фотографиями, за сугроб: сверху их подпирает снег,
-   поэтому воздуха нужно меньше, чем когда они стояли под заголовком */
-.ls-after{padding-top:clamp(6px,1.4vw,22px); padding-bottom:clamp(48px,6vw,96px)}
-.ls-after .ls-stats{margin-top:0}
-.ls-stats{
-  display:grid; grid-template-columns:repeat(4,1fr);
-  gap:clamp(20px,2.8vw,44px) clamp(16px,2.4vw,36px);
-  max-width:1150px; margin:clamp(28px,3.8vw,56px) auto 0;
-}
-.ls-stat{min-width:0; text-align:center}
-/* обёртка облегает цифру (inline-block), поэтому лужица света считается от ширины
-   самой цифры: у «6» она узкая, у «40 000» широкая. От блока во всю колонку
-   над короткими цифрами висело бы пятно шире их самих */
-.ls-numbox{position:relative; display:inline-block}
-.ls-num{
-  position:relative; z-index:1; display:inline-block; white-space:nowrap;
-  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(38px,5.5vw,80px); line-height:1.08; letter-spacing:-.012em;
-  background:
-    linear-gradient(102deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.92) 48%, rgba(255,255,255,0) 62%),
-    linear-gradient(166deg,#FFFAE8 0%,#F3D68C 24%,#D3A244 46%,#9C7028 60%,#EBCE86 80%,#FFFBF0 100%);
-  background-size:250% 100%, 100% 100%;
-  background-repeat:no-repeat;
-  -webkit-background-clip:text; background-clip:text;
-  color:transparent; -webkit-text-fill-color:transparent;
-  animation:sheenGold 9s linear 1.2s infinite;
-}
-.ls-cap{
-  margin:clamp(8px,1vw,16px) auto 0; max-width:15.5em;
-  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:500;
-  font-size:clamp(13px,1.18vw,17px); line-height:1.5; color:#93A4C4; text-wrap:balance;
-}
-@media (max-width:820px){
-  .ls-stats{grid-template-columns:repeat(2,1fr); gap:clamp(22px,6vw,34px) clamp(12px,4vw,24px)}
-  .ls-num{font-size:clamp(34px,10vw,58px)}
-  .ls-cap{font-size:clamp(12px,3.4vw,15px); max-width:14em}
-  /* на узком экране vw-ширины сжимаются вдвое — пятна надо разводить шире,
-     иначе они собираются в одну кляксу по центру */
-  .ls-sky i:nth-child(1){left:-34vw; top:-22vh; width:110vw; height:74vh}
-  .ls-sky i:nth-child(2){left:40vw;  top:40vh;  width:90vw;  height:56vh}
-  .ls-sky i:nth-child(3){left:-30vw; top:46vh;  width:112vw; height:66vh}
-  .ls-sky i:nth-child(4){display:none}   /* четвёртый слой на слабом телефоне лишний */
-  .ls::after{height:100svh}
-  .ls-grain{opacity:.045}
-}
-@media (prefers-reduced-motion:reduce){
-  /* страховка: блик должен стоять уведённым за правый край, иначе поперёк цифр
-     застынет белая полоса */
-  .ls-num{animation:none; background-position:250% 0, 0 0;
-    filter:drop-shadow(0 0 14px rgba(227,179,78,.30))}
-  .ls-sky i, .ls.skysleep .ls-sky i{animation:none; will-change:auto}
-}
-/* ---------- слайдер-коллаж ---------- */
-.ls-slider{position:relative}
-/* тени и вырастающие карточки не должны резаться рамкой окна — окно дышит запасом */
-.ls-window{overflow:hidden; padding:26px 20px; margin:-26px -20px}
-/* зазор между страницами больше запаса окна — сосед не выглядывает из-за края */
-.ls-pages{display:flex; gap:64px; transition:transform .6s cubic-bezier(.25,.8,.25,1)}
-.ls-page{flex:0 0 100%; min-width:0; display:grid; grid-template-columns:repeat(4,1fr);
-  gap:clamp(14px,1.8vw,26px); aspect-ratio:2.95}
-.ls-col{display:flex; flex-direction:column; gap:clamp(14px,1.8vw,26px); min-height:0}
-.ph{
-  --pad:clamp(6px,.7vw,11px);
-  margin:0; flex:1 1 0; min-height:0; display:flex; position:relative;
-  padding:var(--pad); border-radius:5px;
-  /* паспарту фотобумаги: тёплый белый со светом сверху и тенью к нижнему краю */
-  background:linear-gradient(158deg,#FFFDF8 0%,#FBF6EC 48%,#F2E9D8 100%);
-  /* объём: четыре сплошные тени без размытия рисуют торец карточки (~1 мм),
-     дальше мягкая тень на фоне, а inset-линии дают блик верхней кромки и тень нижней */
-  box-shadow:
-    0 1px 0 #EFE6D5, 0 2px 0 #E5D9C4, 0 3px 0 #D9CBB2, 0 4px 1px #CEBFA3,
-    0 16px 32px -14px rgba(23,36,74,.36), 0 4px 9px rgba(23,36,74,.13),
-    inset 0 1px 0 rgba(255,255,255,.95), inset 0 -1px 0 rgba(150,128,92,.22);
-  transform:rotate(var(--tilt,0deg));
-  transition:transform .38s cubic-bezier(.2,.7,.2,1), opacity .38s ease, filter .38s ease;
-}
-/* рамка отбрасывает тень на снимок и отделена от него волосяным золотым кантом.
-   Отдельный слой нужен потому, что inset-тень на самой картинке не рисуется */
-.ph::before{
-  content:''; position:absolute; inset:var(--pad); border-radius:2px; z-index:2; pointer-events:none;
-  box-shadow:
-    inset 0 3px 6px -2px rgba(60,44,20,.45),
-    inset 0 -2px 5px -3px rgba(60,44,20,.30),
-    inset 0 0 0 1px rgba(186,146,74,.34);
-}
-/* тень наведения лежит на ::after и включается прозрачностью: сама box-shadow не
-   анимируется — это дорогой репейнт на каждый кадр */
-.ph::after{
-  content:''; position:absolute; inset:0; border-radius:5px; z-index:-1;
-  box-shadow:0 26px 54px -18px rgba(23,36,74,.5), 0 0 38px -6px rgba(127,168,217,.55);
-  opacity:0; transition:opacity .38s ease;
-}
-.ph img{width:100%; height:100%; min-height:0; object-fit:cover; border-radius:2px; display:block}
-/* наведение: карточка оживает — выпрямляется, растёт и подсвечивается, соседи чуть отходят в тень */
-@media (hover:hover) and (pointer:fine){
-  .ph:hover{transform:rotate(0deg) translateY(-8px) scale(1.055); z-index:5}
-  .ph:hover::after{opacity:1}
-  .ls-page:hover .ph:not(:hover){opacity:.82; filter:saturate(.85)}
-}
-/* ---------- стрелки ---------- */
-.ls-arr{
-  position:absolute; top:50%; z-index:6; width:clamp(44px,3.8vw,56px); height:clamp(44px,3.8vw,56px);
-  transform:translateY(-50%); border:0; border-radius:50%; cursor:pointer; padding:0;
-  background:#fff; color:#2F3192; display:grid; place-items:center;
-  box-shadow:0 6px 22px rgba(23,36,74,.22), 0 1px 4px rgba(23,36,74,.14);
-  transition:background .25s ease, color .25s ease, transform .25s ease, box-shadow .25s ease;
-}
-.ls-arr svg{width:38%; height:38%; display:block}
-.ls-arr.prev{left:clamp(-74px,-4.6vw,-16px)}
-.ls-arr.next{right:clamp(-74px,-4.6vw,-16px)}
-.ls-arr:hover,.ls-arr:focus-visible{background:#2F3192; color:#fff; transform:translateY(calc(-50% - 2px));
-  box-shadow:0 10px 28px rgba(47,49,146,.35)}
-.ls-arr:active{transform:translateY(-50%) scale(.96)}
-@media (max-width:1330px){
-  .ls-arr.prev{left:-8px} .ls-arr.next{right:-8px}
-}
-/* ---------- точки ---------- */
-/* мишень точки 26px, сам кружок рисует ::after */
-.ls-dots{display:flex; justify-content:center; gap:4px; margin-top:clamp(16px,2vw,28px)}
-.ls-dots button{position:relative; width:26px; height:26px; border-radius:50%; border:0; padding:0;
-  cursor:pointer; background:transparent}
-.ls-dots button::after{content:''; position:absolute; inset:8px; border-radius:50%;
-  background:#7386AD; transition:background .25s ease, inset .25s ease}
-.ls-dots button[aria-current="true"]::after{background:#2F3192; inset:6px}
+@media (min-width:900px){ .wt-snow{background-image:url(snow-2400.webp)} }
+/* на телефоне снимок во всю ширину даёт полоску в 120 px — расширяем за края,
+   иначе сугробы перестают быть сугробами. Заезд на первый экран там же чуть больше:
+   полоса в 35 px читается линией, а не снегом */
+@media (max-width:760px){ .wt-snow{left:-46%; right:-46%; transform:translateY(-34%)} }
 /* ---------- появление при прокрутке ---------- */
 .rv{opacity:0; transform:translateY(26px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1; transform:none}
 @media (prefers-reduced-motion:reduce){
   .ct{background-attachment:scroll}
   .rv{opacity:1; transform:none; transition:none}
-  .ls-pages{transition:none}
-  .ph,.ph::after{transition:none}
-}
-/* ---------- телефон: одна лента, листается пальцем ---------- */
-@media (max-width:820px){
-  .ls-arr,.ls-dots{display:none}
-  .ls-window{overflow:visible; padding:0; margin:0}
-  .ls-page,.ls-col{display:contents}
-  .ls-pages{
-    overflow-x:auto; gap:14px; padding:10px 18px 30px;
-    margin:0 calc(-1*clamp(18px,4vw,44px));
-    scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch;
-    transform:none !important; transition:none;
-    scrollbar-width:none;
-  }
-  .ls-pages::-webkit-scrollbar{display:none}
-  /* max-height — телефон в ландшафте: карточка не должна быть выше экрана */
-  .ph{flex:none; height:58vw; max-height:72svh; scroll-snap-align:center}
-  .ph img{width:auto; height:100%}
 }
 /* ==================== ТРЕТИЙ ЭКРАН: шесть городов ==================== */
 /* Повтор третьего экрана старого сайта: коллаж из фотографий мероприятий во всю
@@ -896,75 +645,6 @@ body{
     font-size:clamp(14.5px,3.9vw,18px); text-align:center}
 }
 
-/* ---------- стена полароидов: 24 кадра встают из наклона по прокрутке ---------- */
-/* сцена: высокий контейнер задаёт длину прокрутки, липкий блок держит стену в кадре */
-/* длина прокрутки экрана. Было 350vh — на телефоне это 2110 px, два-три смаха.
-   Стало 220vh: 1013 px, один смах, и стена успевает встать полностью */
-.wl-scroll{position:relative; z-index:2; height:220vh; perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
-@media (min-width:768px){.wl-scroll{height:260vh}}
-/* Липкий блок НЕ 3D-контекст: перспектива живёт во внутренней сцене. Иначе всё,
-   что положено поверх стены, попадает в ту же трёхмерную сцену, и наклонённые
-   карточки местами вылезают перед накладкой. */
-.wl-sticky{position:sticky; top:0; height:100svh; overflow:hidden}
-.wl-stage{position:absolute; inset:0;
-  perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
-
-/* Мягкая тень на переходе к следующему экрану: ложится снизу на нижний ряд карточек
-   и растворяет жёсткий край стены. Набирает силу к концу прокрутки — пока стену
-   рассматривают, она не притемнена. */
-.wl-fade{position:absolute; left:0; right:0; bottom:0; height:46%; z-index:3;
-  pointer-events:none; opacity:0; will-change:opacity;
-  background:linear-gradient(to top,
-    rgba(4,7,20,.92) 0%, rgba(5,8,22,.78) 22%, rgba(6,10,26,.46) 52%,
-    rgba(7,11,28,.18) 76%, rgba(8,12,30,0) 100%)}
-@media (prefers-reduced-motion: reduce){ .wl-fade{opacity:1} }
-.wl-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; height:100%;
-  transform-style:preserve-3d; will-change:transform; transform:rotateX(75deg) scale(1.2)}
-.wl-col{display:flex; flex-direction:column; gap:8px; will-change:transform}
-.wl-col.up{margin-top:-8px}
-.wl-col.down{margin-top:-18%}
-@media (min-width:768px){
-  .wl-grid{grid-template-columns:repeat(6,1fr); gap:10px}
-  .wl-col{gap:10px}
-}
-/* карточка: костяная бумага, ступенчатый торец, лёгкая тень рамки на снимке */
-/* карточка на ночном небе: бумага та же, торец ступеньками, а мягкая тень ЧЁРНАЯ.
-   Раньше она была синеватая под белый фон — на тёмном такая тень не видна вовсе,
-   и карточки выглядят вырезанными ножницами */
-.wl-ph{--e:2px; margin:0; position:relative; border-radius:3px; padding:5% 5% 15%;
-  background:linear-gradient(158deg,#FFFDF8 0%,#FBF6EC 48%,#F2E9D8 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.95),
-    inset 1px 0 0 rgba(255,255,255,.55),
-    inset -1px 0 0 rgba(150,128,92,.16),
-    0 1px 0 #EFE6D5,
-    0 calc(var(--e) - 1px) 0 #E0D3BB,
-    0 var(--e) 0 #CEBFA3,
-    0 18px 40px -12px rgba(0,0,0,.66),
-    0 4px 10px rgba(0,0,0,.42);
-  transform:rotate(var(--tilt,0deg));
-}
-@media (min-width:640px){.wl-ph{--e:3px}}
-@media (min-width:768px){.wl-ph{--e:2px}}
-@media (min-width:1280px){.wl-ph{--e:3px}}
-/* окно в паспарту: срез нарисован по бумаге, поэтому виден и на чёрных ночных кадрах */
-.wl-win{position:relative; border-radius:2px;
-  box-shadow:0 -1px 0 rgba(78,60,38,.26), -1px 0 0 rgba(78,60,38,.14),
-             1px 0 0 rgba(78,60,38,.12), 0 1px 0 rgba(255,255,255,.85)}
-.wl-win img{display:block; width:100%; height:auto; aspect-ratio:3/4; object-fit:cover; border-radius:2px}
-/* тень кромки на снимке отдельным слоем: inset на самой картинке браузер рисует под ней */
-.wl-win::after{content:''; position:absolute; inset:0; pointer-events:none;
-  box-shadow:
-    inset 0 calc(var(--e) * .9) calc(var(--e) * 1.6) calc(var(--e) * -.6) rgba(60,44,20,.38),
-    inset 1px 0 0 rgba(60,44,20,.13),
-    inset -1px 0 0 rgba(60,44,20,.13),
-    inset 0 -1px 0 rgba(60,44,20,.11)}
-@media (prefers-reduced-motion: reduce){
-  .wl-scroll{height:auto}
-  .wl-sticky{position:static; height:auto; padding:40px 0}
-  .wl-grid{transform:none}
-}
-
 /* ==================== ЧЕТВЁРТЫЙ ЭКРАН: расчёт для класса (квиз) ====================
    Одна колонка по центру, во всю ширину экрана: заголовок, доводы и бланк стоят
    друг под другом и выровнены по середине. Двухколоночный вариант (текст слева,
@@ -1249,80 +929,11 @@ body{
      и внутри неё плашку перекрывала бы секция ниже -->
 <div id="vstatus"></div>
 
-<section class="ls" id="lastseason" aria-labelledby="lsTitle">
-  <div class="ls-sky" aria-hidden="true">
-    <div class="ls-sky-win" id="lsSky"><i></i><i></i><i></i><i></i></div>
-  </div>
-  <div class="ls-grain" aria-hidden="true"></div>
-  <div class="ls-body">
-    <h2 class="ls-title rv" id="lsTitle"><span class="ls-squeeze"><em class="r">Грандиозное новогоднее мероприятие для</em> <em class="b">школьников, аналогов которому нет в&nbsp;России!</em></span></h2>
-    <p class="ls-sub rv">Как это было в прошлом году:</p>
-  </div>
-    <div class="wl-scroll" id="wlScroll">
-      <div class="wl-sticky">
-        <div class="wl-stage">
-        <div class="wl-grid" id="wlGrid">
-          <div class="wl-col up" data-y0="-10" data-y1="2">
-            <figure class="wl-ph" style="--tilt:-1.4deg"><div class="wl-win"><img src="wall/01.webp" alt="Резиденция вечером: дом в гирляндах и снегу" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:0.9deg"><div class="wl-win"><img src="wall/13.webp" alt="Дерево в новогодних огнях" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:-0.6deg"><div class="wl-win"><img src="wall/02.webp" alt="Стена писем при свечах" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:1.3deg"><div class="wl-win"><img src="wall/14.webp" alt="Ёлка под крышей резиденции" loading="lazy" decoding="async"></div></figure>
-          </div>
-          <div class="wl-col down" data-y0="15" data-y1="5">
-            <figure class="wl-ph" style="--tilt:-1.1deg"><div class="wl-win"><img src="wall/05.webp" alt="Дед Мороз в своём кабинете" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:0.5deg"><div class="wl-win"><img src="wall/15.webp" alt="Дверь с табличкой «Дед Мороз»" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:1.6deg"><div class="wl-win"><img src="wall/06.webp" alt="Вывеска Министерства Новогодних Дел" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:-0.9deg"><div class="wl-win"><img src="wall/16.webp" alt="Пульт управления новогодними делами" loading="lazy" decoding="async"></div></figure>
-          </div>
-          <div class="wl-col up" data-y0="-8" data-y1="3">
-            <figure class="wl-ph" style="--tilt:-1.4deg"><div class="wl-win"><img src="wall/09.webp" alt="Заснеженный двор со снеговиком" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:0.9deg"><div class="wl-win"><img src="wall/17.webp" alt="Расписные игрушки на мольбертах" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:-0.6deg"><div class="wl-win"><img src="wall/10.webp" alt="Ёлка у камина" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:1.3deg"><div class="wl-win"><img src="wall/18.webp" alt="Витражное окно резиденции" loading="lazy" decoding="async"></div></figure>
-          </div>
-          <div class="wl-col down" data-y0="12" data-y1="4">
-            <figure class="wl-ph" style="--tilt:-1.1deg"><div class="wl-win"><img src="wall/03.webp" alt="Карамельная ёлка с подарками" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:0.5deg"><div class="wl-win"><img src="wall/19.webp" alt="Печатная машинка и часы на столе" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:1.6deg"><div class="wl-win"><img src="wall/04.webp" alt="Хранитель времени во дворе резиденции" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:-0.9deg"><div class="wl-win"><img src="wall/20.webp" alt="Стол с какао и маленькой ёлкой" loading="lazy" decoding="async"></div></figure>
-          </div>
-          <div class="wl-col up" data-y0="-10" data-y1="2">
-            <figure class="wl-ph" style="--tilt:-1.4deg"><div class="wl-win"><img src="wall/07.webp" alt="Финальная дискотека" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:0.9deg"><div class="wl-win"><img src="wall/21.webp" alt="Полка с игрушками и артефактами" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:-0.6deg"><div class="wl-win"><img src="wall/08.webp" alt="Кабинет с печатной машинкой и картами" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:1.3deg"><div class="wl-win"><img src="wall/22.webp" alt="Рабочий стол Министерства" loading="lazy" decoding="async"></div></figure>
-          </div>
-          <div class="wl-col down" data-y0="15" data-y1="5">
-            <figure class="wl-ph" style="--tilt:-1.1deg"><div class="wl-win"><img src="wall/11.webp" alt="Полки с артефактами Министерства" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:0.5deg"><div class="wl-win"><img src="wall/23.webp" alt="Пряничные ёлочки из мастерской" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:1.6deg"><div class="wl-win"><img src="wall/12.webp" alt="Шар «Министерство Новогодних Дел» на ёлке" loading="lazy" decoding="async"></div></figure>
-            <figure class="wl-ph" style="--tilt:-0.9deg"><div class="wl-win"><img src="wall/24.webp" alt="Дед Мороз у ёлки" loading="lazy" decoding="async"></div></figure>
-          </div>
-        </div>
-        </div>
-        <div class="wl-fade" id="wlFade" aria-hidden="true"></div>
-      </div>
-    </div>
-  <div class="ls-body ls-after">
-    <div class="ls-stats" id="lsStats">
-      <div class="ls-stat rv">
-        <span class="ls-numbox"><span class="ls-num" data-to="40000">40&nbsp;000</span></span>
-        <p class="ls-cap">детей посетили наше мероприятие в&nbsp;прошлом сезоне в&nbsp;5 городах России</p>
-      </div>
-      <div class="ls-stat rv">
-        <span class="ls-numbox"><span class="ls-num" data-to="6">6</span></span>
-        <p class="ls-cap">год мы создаем сказку для детей и&nbsp;родителей. До&nbsp;250&nbsp;000 детей побывали у&nbsp;нас с&nbsp;2018 года</p>
-      </div>
-      <div class="ls-stat rv">
-        <span class="ls-numbox"><span class="ls-num" data-to="3000">3&nbsp;000</span></span>
-        <p class="ls-cap">килограмм карамели мы&nbsp;произвели в&nbsp;своем цеху прошлой осенью</p>
-      </div>
-      <div class="ls-stat rv">
-        <span class="ls-numbox"><span class="ls-num" data-to="150">150</span></span>
-        <p class="ls-cap">человек работают над проектом каждый год</p>
-      </div>
-    </div>
-  </div>
+<!-- ==================== ВТОРОЙ ЭКРАН: белое поле (заготовка) ====================
+     Пока пустой: 1080 px белого. Сверху его накрывает сугроб — он же прикрывает
+     нижний край первого экрана и служит переходом между экранами -->
+<section class="wt" id="white">
+  <div class="wt-snow" aria-hidden="true"></div>
 </section>
 
 <!-- ==================== ТРЕТИЙ ЭКРАН: шесть городов ==================== -->
@@ -2214,67 +1825,15 @@ body{
 </script>
 
 <script>
-/* ---------- второй экран: слайдер и появление при прокрутке ---------- */
+/* ---------- появление блоков при прокрутке ---------- */
 (function(){
   'use strict';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var pages = document.getElementById('lsPages');
-  var slider = document.getElementById('lsSlider');
-  // слайдер убран со второго экрана, но код появления блоков ниже нужен всегда,
-  // поэтому здесь не выходим из функции, а просто пропускаем настройку ленты
-  var hasSlider = !!(pages && slider);
-  if (hasSlider) {
 
-  var N = 0, idx = 0;
-  if (hasSlider) N = pages.children.length;
-  var dotsBox = document.getElementById('lsDots'), dots = [];
-  for (var i = 0; i < N; i++){
-    var d = document.createElement('button');
-    d.type = 'button';
-    d.setAttribute('aria-label', 'Страница фотографий ' + (i+1) + ' из ' + N);
-    (function(k){ d.addEventListener('click', function(){ go(k); }); })(i);
-    dotsBox.appendChild(d); dots.push(d);
-  }
-  // на телефоне слайдер превращается в скролл-ленту: страницы «раскрываются», сдвиг не нужен,
-  // а сам контейнер должен быть фокусируем, чтобы ленту можно было листать с клавиатуры
-  var mobile = window.matchMedia('(max-width: 820px)');
-  function mobileMode(){ return mobile.matches; }
-  function syncMode(){
-    if (mobileMode()){
-      pages.setAttribute('tabindex', '0');
-      pages.setAttribute('role', 'region');
-      pages.setAttribute('aria-label', 'Фотографии прошлого сезона, лента листается');
-      for (var k = 0; k < N; k++) pages.children[k].removeAttribute('aria-hidden');
-    } else {
-      pages.removeAttribute('tabindex');
-      pages.removeAttribute('role');
-      pages.removeAttribute('aria-label');
-      for (var k2 = 0; k2 < N; k2++)
-        pages.children[k2].setAttribute('aria-hidden', k2 === idx ? 'false' : 'true');
-    }
-  }
-  function go(i){
-    idx = ((i % N) + N) % N;
-    // сдвиг в пикселях по реальной позиции слайда: работает при любом зазоре между страницами
-    pages.style.transform = 'translateX(' + (-pages.children[idx].offsetLeft) + 'px)';
-    for (var k = 0; k < N; k++){
-      if (k === idx) dots[k].setAttribute('aria-current', 'true');
-      else dots[k].removeAttribute('aria-current');
-      if (!mobileMode()) pages.children[k].setAttribute('aria-hidden', k === idx ? 'false' : 'true');
-    }
-  }
-  if (mobile.addEventListener) mobile.addEventListener('change', syncMode);
-  syncMode();
-  window.addEventListener('resize', function(){ go(idx); }, {passive:true});
-  slider.querySelector('.ls-arr.prev').addEventListener('click', function(){ go(idx - 1); });
-  slider.querySelector('.ls-arr.next').addEventListener('click', function(){ go(idx + 1); });
-  go(0);
-  }
-
-  /* заголовок, подзаголовок и лента всплывают по мере прокрутки.
-     Каскад считается внутри своей секции, иначе третий экран ждал бы очереди второго */
+  /* заголовки и блоки всплывают по мере прокрутки.
+     Каскад считается внутри своей секции, иначе четвёртый экран ждал бы очереди третьего */
   var rv = [];
-  ['#lastseason', '#cities', '#quiz', '#frame'].forEach(function(sel){
+  ['#cities', '#quiz', '#frame'].forEach(function(sel){
     var group = Array.prototype.slice.call(document.querySelectorAll(sel + ' .rv'));
     group.forEach(function(el, i){ el.style.transitionDelay = (i * 120) + 'ms'; });
     rv = rv.concat(group);
@@ -2290,44 +1849,6 @@ body{
       });
     }, {threshold: 0.18});
     rv.forEach(function(el){ io.observe(el); });
-  }
-
-  /* цифры набегают, когда доходят до экрана. Готовые значения лежат в разметке —
-     при выключенном JS и при prefers-reduced-motion они просто стоят на месте */
-  var nums = Array.prototype.slice.call(document.querySelectorAll('#lsStats .ls-num[data-to]'));
-  if (nums.length && !reduce && 'IntersectionObserver' in window){
-    var group = function(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u00A0'); };
-    var count = function(el, delay){
-      var to = parseInt(el.getAttribute('data-to'), 10);
-      if (!(to > 0)) return;
-      el.textContent = '0';
-      var t0 = 0, dur = 1150;
-      var step = function(t){
-        if (!t0) t0 = t;
-        var p = Math.min(1, (t - t0) / dur);
-        el.textContent = group(Math.round(to * (1 - Math.pow(1 - p, 3))));
-        if (p < 1) requestAnimationFrame(step);
-      };
-      setTimeout(function(){ requestAnimationFrame(step); }, delay);
-    };
-    var nio = new IntersectionObserver(function(items){
-      items.forEach(function(it){
-        if (!it.isIntersecting) return;
-        nio.unobserve(it.target);
-        count(it.target, nums.indexOf(it.target) * 120);
-      });
-    }, {threshold: 0.4});
-    nums.forEach(function(el){ nio.observe(el); });
-  }
-
-  /* небо второго экрана засыпает, когда секция ушла из кадра: стена из 24 полароидов
-     и так грузит кадр, второй такой нагрузки за экраном не нужно.
-     Не отработает — небо просто дышит всегда, ничего не ломается */
-  var lsec = document.getElementById('lastseason');
-  if (lsec && 'IntersectionObserver' in window){
-    new IntersectionObserver(function(items){
-      lsec.classList.toggle('skysleep', !items[0].isIntersecting);
-    }, {rootMargin: '20% 0px'}).observe(lsec);
   }
 
   /* коллаж третьего экрана грузится только когда секция подошла к экрану:
@@ -2350,90 +1871,6 @@ body{
 
 
 <script>
-/* Четвёртый экран: стена полароидов встаёт из наклона по прокрутке.
-
-   Почему не «прочитал скролл — сразу нарисовал»: колесо мыши шлёт рывки по 100 px,
-   и стена дёргается ступеньками. Поэтому положение прокрутки — это ЦЕЛЬ, а картинка
-   догоняет её каждый кадр с затуханием. Вход рваный, движение гладкое.
-
-   Заодно это лечит iOS: во время инерционной прокрутки Safari может не слать события
-   scroll, а свой кадровый цикл читает положение сам и не зависит от них.
-
-   Цикл работает только пока секция рядом с экраном — дальше засыпает и не ест батарею. */
-(function(){
-  var scr = document.getElementById('wlScroll');
-  var grid = document.getElementById('wlGrid');
-  if (!scr || !grid) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  var fade = document.getElementById('wlFade');
-  var cols = [].slice.call(grid.children).map(function(c){
-    return { el:c, y0:parseFloat(c.getAttribute('data-y0')), y1:parseFloat(c.getAttribute('data-y1')) };
-  });
-
-  var shown = -1;          // что нарисовано сейчас
-  var awake = false;       // крутится ли кадровый цикл
-  var last = 0;
-
-  function clamp(v){ return v < 0 ? 0 : v > 1 ? 1 : v; }
-  function seg(p, a, b){ return clamp((p - a) / (b - a)); }
-  function ease(t){ return t * t * (3 - 2 * t); }   // мягкий вход и выход
-
-  function target(){
-    var total = scr.offsetHeight - window.innerHeight;
-    if (total <= 0) return 0;
-    return clamp(-scr.getBoundingClientRect().top / total);
-  }
-
-  function paint(p){
-    var rotX = 75 * (1 - ease(seg(p, 0, 0.42)));
-    var sc   = 1.2 - 0.2 * ease(seg(p, 0.38, 0.72));
-    grid.style.transform = 'rotateX(' + rotX.toFixed(3) + 'deg) scale(' + sc.toFixed(4) + ')';
-
-    var t = ease(seg(p, 0.42, 0.88));
-    for (var i = 0; i < cols.length; i++){
-      var c = cols[i];
-      c.el.style.transform = 'translateY(' + (c.y0 + (c.y1 - c.y0) * t).toFixed(3) + '%)';
-  
-    if (fade) fade.style.opacity = ease(seg(p, 0.5, 0.92)).toFixed(3);
-  }
-  }
-
-  function frame(now){
-    if (!awake) return;
-    var dt = last ? Math.min(now - last, 64) : 16.7;
-    last = now;
-
-    var want = target();
-    if (shown < 0) shown = want;
-    // затухание, не зависящее от частоты кадров: на 120 Гц догоняет за то же время, что на 60
-    var k = 1 - Math.pow(1 - 0.18, dt / 16.7);
-    shown += (want - shown) * k;
-    if (Math.abs(want - shown) < 0.0004) shown = want;
-
-    paint(shown);
-    requestAnimationFrame(frame);
-  }
-
-  function wake(){
-    if (awake) return;
-    awake = true; last = 0;
-    requestAnimationFrame(frame);
-  }
-  function sleep(){ awake = false; }
-
-  if ('IntersectionObserver' in window){
-    new IntersectionObserver(function(items){
-      items[0].isIntersecting ? wake() : sleep();
-    }, {rootMargin: '200px 0px'}).observe(scr);
-  } else {
-    wake();
-  }
-
-  addEventListener('resize', function(){ shown = -1; }, {passive:true});
-  paint(target());
-})();
-
 /* ==================== КАРТА РОССИИ: свет идёт за курсором ====================
    Наведение обязано срабатывать по силуэту страны, а не по прямоугольнику картинки:
    у PNG с прозрачными углами мышь ловится всей рамкой, и карта загоралась бы,
