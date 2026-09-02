@@ -349,12 +349,18 @@ body{
    Лента фотографий, которая едет вбок: пальцем, трекпадом или мышью с зажатой
    кнопкой. Наведение показывает подпись, нажатие открывает кадр крупно.
 
-   Плитка стоит в ДВА РЯДА, размеров три: большой 2x2, высокий 1x2 и мелкий 1x1
-   парами. Набор выбран не на глаз: только эти три при grid-auto-flow:column
-   закрывают колонку без дырок, поэтому раскладка предсказуема и обходится без
-   dense - а он переставляет карточки местами и ломает каскад появления.
-   Широкой карточки 2x1 в наборе нет как раз поэтому: под ней остаётся пустая
-   клетка, которую нечем закрыть.
+   Плитка стоит в ТРИ РЯДА. Размеров пять: 2x2, 2x1, 1x3, 1x2 и мелкий 1x1.
+   Набор собран не на глаз - раскладка держится на порядке карточек в разметке.
+   При grid-auto-flow:column курсор идёт сверху вниз по колонке и никогда не
+   возвращается назад, поэтому каждая крупная карточка обязана быть ЗАКРЫТА
+   следующими за ней мелкими, иначе под ней остаётся дырка:
+     2x2 + два 1x1        -> ровно две колонки
+     2x1 + четыре 1x1     -> ровно две колонки
+     1x3                  -> одна колонка
+     1x2 + 1x1 (в любом порядке) -> одна колонка
+     три 1x1              -> одна колонка
+   Порядок в разметке менять нельзя, не пересчитав эти связки. dense не включаем:
+   он затыкает дырки сам, но переставляет карточки местами и ломает каскад появления.
 
    Углы везде острые, скруглений в этом блоке нет ни у карточек, ни у лайтбокса. */
 /* z-index:3 обязателен: слой снега лежит на 2, и его непрозрачный белый низ
@@ -370,30 +376,40 @@ body{
 .bn-sub{margin:clamp(14px,1.6vw,24px) auto 0; max-width:56ch;
   font-size:clamp(15px,1.16vw,20px); line-height:1.5; color:#5C6880}
 
-/* окно ленты во всю ширину экрана. Нативная прокрутка вбок, а не transform:
-   так лента едет пальцем, трекпадом, колесом с shift и стрелками - даром и правильно.
-   Полосу прокрутки прячем: под лентой она смотрится мусором, о том что можно
+/* Лента НЕ во всю ширину экрана: её окно встаёт в тот же контейнер, что и заголовок,
+   и фотографии обрезаются по его краю, а не по краю монитора. На широком экране это
+   около 105 px от края, примерно три сантиметра - как раз столько и просили.
+   Поля держит обёртка, а не сам .bn-vp: у прокручиваемого блока содержимое видно
+   и в его собственных полях, лента въезжала бы в них и обрезалась не там, где надо.
+
+   Прокрутка нативная, а не transform: так лента едет пальцем, трекпадом, колесом
+   с shift и стрелками - даром и правильно. Полосу прокрутки прячем, о том что можно
    тянуть, сказано в подзаголовке.
    Вертикальные поля у дорожки - место для тени при наведении: окно режет по высоте */
-.bn-vp{position:relative; z-index:3; margin-top:clamp(6px,1vw,22px); overflow-x:auto; overflow-y:hidden;
+.bn-wrap{position:relative; z-index:3; width:min(94vw,1720px);
+  margin:clamp(6px,1vw,22px) auto 0; padding:0 clamp(16px,3vw,56px)}
+.bn-vp{overflow-x:auto; overflow-y:hidden;
   overscroll-behavior-x:contain; cursor:grab;
   scrollbar-width:none; -ms-overflow-style:none}
 .bn-vp::-webkit-scrollbar{display:none}
 .bn-vp.drag, .bn-vp.drag *{cursor:grabbing}
 .bn-grid{
-  --bn-row:clamp(140px,15vw,268px);
-  --bn-col:clamp(150px,14.6vw,250px);
+  /* колонка шире ряда: карточек в кадр помещается меньше, каждая крупнее.
+     Три ряда по 205 px на экране 1680 дают ленту в 645 px высотой */
+  --bn-row:clamp(118px,12.2vw,212px);
+  --bn-col:clamp(168px,17.4vw,300px);
   --bn-gap:clamp(8px,.9vw,16px);
   display:grid; grid-auto-flow:column;
-  grid-template-rows:repeat(2,var(--bn-row));
+  grid-template-rows:repeat(3,var(--bn-row));
   grid-auto-columns:var(--bn-col);
   gap:var(--bn-gap); width:max-content;
-  /* левое поле ставит первую карточку на одну линию с заголовком; на широком экране
-     линия та же, что у контейнера min(94vw,1720px) */
-  padding:24px max(clamp(16px,3vw,56px), calc((100vw - 1720px)/2));
+  /* горизонтальных полей нет: край ленты и есть край контейнера */
+  padding-block:20px;
   user-select:none; -webkit-user-select:none;
 }
 .bn-big{grid-row:span 2; grid-column:span 2}
+.bn-wide{grid-column:span 2}
+.bn-vtall{grid-row:span 3}
 .bn-tall{grid-row:span 2}
 
 .bn-c{
@@ -1070,128 +1086,130 @@ body{
     <p class="bn-sub rv">Тяните ленту вбок, нажмите на фотографию - откроется крупно</p>
   </div>
 
-  <div class="bn-vp" id="bnVp">
-    <div class="bn-grid" id="bnGrid">
-    <button type="button" class="bn-c bn-big" data-t="Резиденция" data-d="Главный зал за час до смены">
-      <img src="wall/01.webp" alt="Резиденция" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Резиденция</b><i>Главный зал за час до смены</i></span>
-    </button>
-    <button type="button" class="bn-c bn-tall" data-t="Первый снег" data-d="Гости заходят в министерство">
-      <img src="wall/02.webp" alt="Первый снег" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Первый снег</b><i>Гости заходят в министерство</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Пульт погоды" data-d="Снегопад включают дети">
-      <img src="wall/03.webp" alt="Пульт погоды" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Пульт погоды</b><i>Снегопад включают дети</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Цех подарков" data-d="Конвейер не останавливается">
-      <img src="wall/04.webp" alt="Цех подарков" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Цех подарков</b><i>Конвейер не останавливается</i></span>
-    </button>
-    <button type="button" class="bn-c bn-tall" data-t="Хранилище писем" data-d="Доходит каждое">
-      <img src="wall/05.webp" alt="Хранилище писем" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Хранилище писем</b><i>Доходит каждое</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Звёздный час" data-d="Финал программы">
-      <img src="wall/06.webp" alt="Звёздный час" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Звёздный час</b><i>Финал программы</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Снежный патруль" data-d="Отряд на построении">
-      <img src="wall/07.webp" alt="Снежный патруль" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Снежный патруль</b><i>Отряд на построении</i></span>
-    </button>
-    <button type="button" class="bn-c bn-big" data-t="Мастерская" data-d="Здесь собирают чудеса">
-      <img src="wall/08.webp" alt="Мастерская" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Мастерская</b><i>Здесь собирают чудеса</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Ледяная почта" data-d="Отправка в один конец">
-      <img src="wall/09.webp" alt="Ледяная почта" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Ледяная почта</b><i>Отправка в один конец</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Смена началась" data-d="Табло переключилось на декабрь">
-      <img src="wall/10.webp" alt="Смена началась" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Смена началась</b><i>Табло переключилось на декабрь</i></span>
-    </button>
-    <button type="button" class="bn-c bn-tall" data-t="Гирлянды" data-d="Проверка света перед показом">
-      <img src="wall/11.webp" alt="Гирлянды" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Гирлянды</b><i>Проверка света перед показом</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Большой зал" data-d="Полторы тысячи мест">
-      <img src="wall/12.webp" alt="Большой зал" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Большой зал</b><i>Полторы тысячи мест</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Оркестр" data-d="Живой звук на сцене">
-      <img src="wall/13.webp" alt="Оркестр" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Оркестр</b><i>Живой звук на сцене</i></span>
-    </button>
-    <button type="button" class="bn-c bn-big" data-t="Дед Мороз" data-d="Выход к детям">
-      <img src="wall/14.webp" alt="Дед Мороз" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Дед Мороз</b><i>Выход к детям</i></span>
-    </button>
-    <button type="button" class="bn-c bn-tall" data-t="Снегурочка" data-d="Встреча гостей">
-      <img src="wall/15.webp" alt="Снегурочка" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Снегурочка</b><i>Встреча гостей</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Хоровод" data-d="Момент, который снимают все">
-      <img src="wall/16.webp" alt="Хоровод" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Хоровод</b><i>Момент, который снимают все</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Подарки" data-d="Выдача в конце программы">
-      <img src="wall/17.webp" alt="Подарки" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Подарки</b><i>Выдача в конце программы</i></span>
-    </button>
-    <button type="button" class="bn-c bn-tall" data-t="Классы" data-d="Школы приезжают целиком">
-      <img src="wall/18.webp" alt="Классы" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Классы</b><i>Школы приезжают целиком</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Фотозона" data-d="Очередь не кончается">
-      <img src="wall/19.webp" alt="Фотозона" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Фотозона</b><i>Очередь не кончается</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Закулисье" data-d="За пять минут до выхода">
-      <img src="wall/20.webp" alt="Закулисье" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Закулисье</b><i>За пять минут до выхода</i></span>
-    </button>
-    <button type="button" class="bn-c bn-big" data-t="Костюмерная" data-d="Двести костюмов на смену">
-      <img src="wall/21.webp" alt="Костюмерная" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Костюмерная</b><i>Двести костюмов на смену</i></span>
-    </button>
-    <button type="button" class="bn-c bn-tall" data-t="Репетиция" data-d="Утро перед первым показом">
-      <img src="wall/22.webp" alt="Репетиция" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Репетиция</b><i>Утро перед первым показом</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="Финал" data-d="Конфетти и аплодисменты">
-      <img src="wall/23.webp" alt="Финал" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>Финал</b><i>Конфетти и аплодисменты</i></span>
-    </button>
-    <button type="button" class="bn-c" data-t="До встречи" data-d="Следующий сезон уже готовится">
-      <img src="wall/24.webp" alt="До встречи" width="720" height="960" loading="lazy" decoding="async" draggable="false">
-      <span class="bn-veil" aria-hidden="true"></span>
-      <span class="bn-cap"><b>До встречи</b><i>Следующий сезон уже готовится</i></span>
-    </button>
+  <div class="bn-wrap">
+    <div class="bn-vp" id="bnVp">
+      <div class="bn-grid" id="bnGrid">
+      <button type="button" class="bn-c bn-big" data-t="Резиденция" data-d="Главный зал за час до смены">
+        <img src="wall/01.webp" alt="Резиденция" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Резиденция</b><i>Главный зал за час до смены</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Первый снег" data-d="Гости заходят в министерство">
+        <img src="wall/02.webp" alt="Первый снег" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Первый снег</b><i>Гости заходят в министерство</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Пульт погоды" data-d="Снегопад включают дети">
+        <img src="wall/03.webp" alt="Пульт погоды" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Пульт погоды</b><i>Снегопад включают дети</i></span>
+      </button>
+      <button type="button" class="bn-c bn-tall" data-t="Цех подарков" data-d="Конвейер не останавливается">
+        <img src="wall/04.webp" alt="Цех подарков" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Цех подарков</b><i>Конвейер не останавливается</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Хранилище писем" data-d="Доходит каждое">
+        <img src="wall/05.webp" alt="Хранилище писем" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Хранилище писем</b><i>Доходит каждое</i></span>
+      </button>
+      <button type="button" class="bn-c bn-vtall" data-t="Звёздный час" data-d="Финал программы">
+        <img src="wall/06.webp" alt="Звёздный час" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Звёздный час</b><i>Финал программы</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Снежный патруль" data-d="Отряд на построении">
+        <img src="wall/07.webp" alt="Снежный патруль" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Снежный патруль</b><i>Отряд на построении</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Мастерская" data-d="Здесь собирают чудеса">
+        <img src="wall/08.webp" alt="Мастерская" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Мастерская</b><i>Здесь собирают чудеса</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Ледяная почта" data-d="Отправка в один конец">
+        <img src="wall/09.webp" alt="Ледяная почта" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Ледяная почта</b><i>Отправка в один конец</i></span>
+      </button>
+      <button type="button" class="bn-c bn-big" data-t="Смена началась" data-d="Табло переключилось на декабрь">
+        <img src="wall/10.webp" alt="Смена началась" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Смена началась</b><i>Табло переключилось на декабрь</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Гирлянды" data-d="Проверка света перед показом">
+        <img src="wall/11.webp" alt="Гирлянды" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Гирлянды</b><i>Проверка света перед показом</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Большой зал" data-d="Полторы тысячи мест">
+        <img src="wall/12.webp" alt="Большой зал" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Большой зал</b><i>Полторы тысячи мест</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Оркестр" data-d="Живой звук на сцене">
+        <img src="wall/13.webp" alt="Оркестр" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Оркестр</b><i>Живой звук на сцене</i></span>
+      </button>
+      <button type="button" class="bn-c bn-tall" data-t="Дед Мороз" data-d="Выход к детям">
+        <img src="wall/14.webp" alt="Дед Мороз" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Дед Мороз</b><i>Выход к детям</i></span>
+      </button>
+      <button type="button" class="bn-c bn-wide" data-t="Снегурочка" data-d="Встреча гостей">
+        <img src="wall/15.webp" alt="Снегурочка" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Снегурочка</b><i>Встреча гостей</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Хоровод" data-d="Момент, который снимают все">
+        <img src="wall/16.webp" alt="Хоровод" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Хоровод</b><i>Момент, который снимают все</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Подарки" data-d="Выдача в конце программы">
+        <img src="wall/17.webp" alt="Подарки" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Подарки</b><i>Выдача в конце программы</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Классы" data-d="Школы приезжают целиком">
+        <img src="wall/18.webp" alt="Классы" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Классы</b><i>Школы приезжают целиком</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Фотозона" data-d="Очередь не кончается">
+        <img src="wall/19.webp" alt="Фотозона" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Фотозона</b><i>Очередь не кончается</i></span>
+      </button>
+      <button type="button" class="bn-c bn-tall" data-t="Закулисье" data-d="За пять минут до выхода">
+        <img src="wall/20.webp" alt="Закулисье" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Закулисье</b><i>За пять минут до выхода</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Костюмерная" data-d="Двести костюмов на смену">
+        <img src="wall/21.webp" alt="Костюмерная" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Костюмерная</b><i>Двести костюмов на смену</i></span>
+      </button>
+      <button type="button" class="bn-c bn-vtall" data-t="Репетиция" data-d="Утро перед первым показом">
+        <img src="wall/22.webp" alt="Репетиция" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Репетиция</b><i>Утро перед первым показом</i></span>
+      </button>
+      <button type="button" class="bn-c" data-t="Финал" data-d="Конфетти и аплодисменты">
+        <img src="wall/23.webp" alt="Финал" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>Финал</b><i>Конфетти и аплодисменты</i></span>
+      </button>
+      <button type="button" class="bn-c bn-tall" data-t="До встречи" data-d="Следующий сезон уже готовится">
+        <img src="wall/24.webp" alt="До встречи" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+        <span class="bn-veil" aria-hidden="true"></span>
+        <span class="bn-cap"><b>До встречи</b><i>Следующий сезон уже готовится</i></span>
+      </button>
+      </div>
     </div>
   </div>
 </section>
