@@ -740,7 +740,7 @@ body{
    серый прямоугольник и на прозрачные углы вокруг страны */
 .map-dim{
   position:absolute; inset:0; pointer-events:none; mix-blend-mode:multiply;
-  background:#93A3C9; opacity:0;
+  background:#7C8CB4; opacity:0;
   -webkit-mask-size:100% 100%; mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
 }
@@ -753,7 +753,7 @@ body{
    Теперь плёнка лежит всегда, а пятно света пробивает её сверху режимом lighten —
    только там, где курсор. На телефоне плёнку по-прежнему качает анимация дыхания */
 .ct.bgon .map-dim{
-  opacity:.3;
+  opacity:.58;
   -webkit-mask-image:url(map-mask.webp); mask-image:url(map-mask.webp);
 }
 .map-lit{position:absolute; inset:0; pointer-events:none; mix-blend-mode:lighten}
@@ -766,8 +766,11 @@ body{
    а карта широкая — эти два числа дают на ней ровный круг */
 /* пятно под курсором: размытый круг 5 см в поперечнике — размер задан в сантиметрах,
    чтобы он оставался одинаковым и на ноутбуке, и на большом мониторе.
-   Это единственный источник света на карте, поэтому он идёт в полную силу */
-.map-lit.spot{opacity:var(--lit);
+   Это единственный источник света на карте, поэтому он идёт в полную силу.
+   Режим НЕ lighten, а обычный: пятно не подмешивает свет, а прямо открывает окно
+   в зажжённую копию карты поверх приглушённой. Кадры совпадают пиксель-в-пиксель,
+   поэтому шва не видно, а разница «выключено — включено» становится честной */
+.map-lit.spot{opacity:var(--lit); mix-blend-mode:normal;
   -webkit-mask-image:radial-gradient(circle 2.5cm at var(--mx) var(--my), #000 0%, rgba(0,0,0,.62) 56%, transparent 100%);
           mask-image:radial-gradient(circle 2.5cm at var(--mx) var(--my), #000 0%, rgba(0,0,0,.62) 56%, transparent 100%);
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat}
@@ -781,18 +784,82 @@ body{
 .ct.bgon .map.touchlit.inview .map-dim{animation:mapDimBreath 7s ease-in-out infinite}
 .map.touchlit.inview .map-frame::before{animation:mapHaloBreath 7s ease-in-out infinite}
 @keyframes mapBreath{0%,100%{opacity:.2} 50%{opacity:.5}}
-@keyframes mapDimBreath{0%,100%{opacity:.3} 50%{opacity:.08}}
+@keyframes mapDimBreath{0%,100%{opacity:.5} 50%{opacity:.12}}
 @keyframes mapHaloBreath{0%,100%{opacity:.12} 50%{opacity:.55}}
 /* «меньше движения»: никакой беготни света, только мягкое включение по наведению */
 @media (prefers-reduced-motion:reduce){
   .map-lit.spot{display:none}
-  /* пятно за курсором тут выключено, поэтому зарево снова общее */
+  /* пятна за курсором тут нет, поэтому плёнка снова отпускается на наведение,
+     иначе карта осталась бы приглушённой навсегда */
+  .ct.bgon .map.lit .map-dim{opacity:.18; transition:opacity .4s ease}
+  /* и зарево снова общее */
   .map-frame::before{
     background:radial-gradient(52% 58% at 50% 50%, rgba(255,206,130,.42), rgba(255,190,110,.16) 45%, transparent 72%)}
   .map-lit.wide{opacity:0; transition:opacity .4s ease}
   .map.lit .map-lit.wide{opacity:.45}
   .map.touchlit .map-lit.wide{opacity:.3}
   .map-lit.wide, .map-dim, .map-frame::before{animation:none !important}
+}
+
+/* ==================== ПЯТЫЙ ЭКРАН: Дед Мороз, мальчик и рамка ====================
+   Два слоя одного кадра 2688x1520: ночной фон и вырезанные персонажи с карамельной
+   рамкой. Текст внутри рамки живёт разметкой, а не запечён в картинку — правится
+   одной строкой, читается поиском и остаётся резким на любом экране.
+   Размер шрифта считается в cqw — долях ширины самой картинки. Поэтому текст
+   ужимается вместе с рамкой и не вылезает из неё ни на каком экране. */
+.fr{position:relative; z-index:25; display:flex; justify-content:center;
+  /* цвет краёв самого кадра (#0A111C слева, #070D19 справа): боковые поля
+     на широких мониторах не читаются как поля */
+  background:#060C18; overflow:hidden}
+/* сцена не растёт выше экрана: иначе на большом мониторе верх и низ кадра уезжают за край */
+.fr-box{position:relative; width:100%; max-width:calc(100svh * 2688 / 1520); container-type:inline-size;
+  --k:.667}                        /* во сколько раз накладка меньше кадра: 1/1,5 */
+.fr-stage{position:relative; aspect-ratio:2688/1520}
+.fr-stage img,.fr-art>img{position:absolute; inset:0; display:block; width:100%; height:100%}
+/* Персонажи с рамкой уменьшаются вместе: рука Деда Мороза лежит на карамельной планке,
+   врозь он либо повиснет в воздухе, либо оторвётся от рамки.
+   Точка отсчёта — центр кадра: накладка ужимается к середине и стоит по центру
+   по высоте, воздух остаётся поровну сверху и снизу.
+   Текст сидит в той же обёртке, поэтому едет и ужимается вместе с рамкой. */
+.fr-art{position:absolute; inset:0; transform:scale(var(--k)); transform-origin:50% 50%}
+/* окно рамки замерено по картинке: 38,4–91,7 % ширины и 33,0–82,6 % высоты.
+   Текст стоит внутри с запасом, чтобы строки не липли к карамели */
+.fr-text{position:absolute; left:40.6%; width:49.6%; top:36.2%; height:43.6%;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center; color:#fff}
+.fr-title{
+  margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  line-height:1.12; text-transform:uppercase; text-wrap:balance;
+  /* размеры даны ДО уменьшения накладки, поэтому крупнее «на глаз»: на экране
+     их ещё умножит --k. Рамка стала меньше — текст заполняет её плотнее */
+  font-size:clamp(20px,3.9vw,58px);   /* запасной размер для старых браузеров */
+  font-size:4cqw;                     /* основной: доля ширины картинки */
+  text-shadow:0 2px 18px rgba(0,0,0,.65)}
+.fr-lede{
+  margin:1.05em 0 0; font-weight:400; line-height:1.42; color:#E8EFFF;
+  font-size:clamp(14px,1.95vw,29px);
+  font-size:2cqw;
+  text-shadow:0 2px 14px rgba(0,0,0,.72)}
+/* Порог тут свой, 1024 px, а не общие для сайта 820: размер текста считается от
+   ширины картинки, и уже на 900 px абзац внутри рамки падает до 12 px. Ниже порога
+   кадр остаётся картинкой: в рамке живёт только заголовок, абзац уходит под неё. */
+@media (max-width:1023px){
+  .fr{display:block; padding-bottom:clamp(26px,7vw,44px)}
+  .fr-box{max-width:none}
+  /* на телефоне кадр и так узкий — не уменьшаем. Обёртки исчезают из раскладки:
+     картинка ложится на фон, заголовок встаёт в рамку, абзац уходит в поток под кадр */
+  .fr-art{display:contents}
+  /* обёртки не стало — картинка считает края от .fr-box, а он теперь выше кадра
+     на высоту абзаца. Поэтому низ отпускаем: высота берётся из пропорций самой картинки */
+  .fr-art>img{inset:0 0 auto 0; height:auto}
+  .fr-text{display:contents}          /* обёртка исчезает, дети встают сами */
+  /* абзац ушёл в поток и сделал бокс выше сцены, поэтому проценты по вертикали
+     уехали бы вниз. Считаем от ширины кадра: высота сцены — ровно 56,55 % ширины */
+  .fr-title{position:absolute; left:40.6%; width:49.6%; top:20.47cqw; height:24.65cqw;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-size:clamp(20px,5.2cqw,34px); text-shadow:0 1px 10px rgba(0,0,0,.7)}
+  .fr-lede{margin:0; padding:clamp(16px,5vw,30px) clamp(18px,6vw,34px) 0;
+    font-size:clamp(14.5px,3.9vw,18px); text-align:center}
 }
 
 /* ---------- стена полароидов: 24 кадра встают из наклона по прокрутке ---------- */
@@ -1255,8 +1322,6 @@ body{
   </div>
 </section>
 
-<!-- ==================== ПЯТЫЙ ЭКРАН: рамка для текста ==================== -->
-
 <!-- ==================== ЧЕТВЁРТЫЙ ЭКРАН: расчёт для класса (квиз) ==================== -->
 <section class="qz" id="quiz" aria-labelledby="qzTitle">
   <div class="qz-sky" aria-hidden="true"><i></i><i></i></div>
@@ -1428,6 +1493,27 @@ body{
         </div>
       </div>
     </form>
+  </div>
+</section>
+
+<!-- ==================== ПЯТЫЙ ЭКРАН: рамка для текста ==================== -->
+<section class="fr" id="frame" aria-labelledby="frTitle">
+  <div class="fr-box">
+    <div class="fr-stage">
+      <img class="fr-bg" src="frame-bg.webp" srcset="frame-bg-mob.webp 1100w, frame-bg.webp 1920w"
+           sizes="100vw" width="1920" height="1086" alt="" aria-hidden="true"
+           loading="lazy" decoding="async">
+    </div>
+    <div class="fr-art">
+      <img src="frame-art.webp" srcset="frame-art-mob.webp 1100w, frame-art.webp 1920w"
+           sizes="100vw" width="1920" height="1086"
+           alt="Дед Мороз с посохом и мальчик на стремянке стоят у карамельной рамки"
+           loading="lazy" decoding="async">
+      <div class="fr-text">
+        <h2 class="fr-title rv" id="frTitle">Место для текста</h2>
+        <p class="fr-lede rv">Здесь встанут две-четыре строки. Пришли текст - поставлю в рамку и подгоню размер под него.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -2119,7 +2205,7 @@ body{
   /* заголовок, подзаголовок и лента всплывают по мере прокрутки.
      Каскад считается внутри своей секции, иначе третий экран ждал бы очереди второго */
   var rv = [];
-  ['#lastseason', '#cities', '#quiz'].forEach(function(sel){
+  ['#lastseason', '#cities', '#quiz', '#frame'].forEach(function(sel){
     var group = Array.prototype.slice.call(document.querySelectorAll(sel + ' .rv'));
     group.forEach(function(el, i){ el.style.transitionDelay = (i * 120) + 'ms'; });
     rv = rv.concat(group);
