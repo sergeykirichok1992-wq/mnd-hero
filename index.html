@@ -1051,15 +1051,15 @@ body{
    от дорогой к дешёвой, внутри каждой - чипы дат по месяцам, внизу цена «сейчас»
    и следующее повышение, под всем - примечание про сборную группу.
 
-   МАТЕРИАЛ ДРУГОЙ. Выше на странице уже лежит кремовая бумага - бланк квиза.
-   Второй такой же лист читался бы его близнецом и выселил бы ночь с самого
-   длинного экрана страницы. Поэтому здесь не бумага, а ведомость, отпечатанная
-   золотом по ночному: те же волосяные линейки и леттерхед, но тёмные.
+   ЧЕТЫРЕ ОТДЕЛЬНЫЕ КАРТОЧКИ НА НОЧНОМ ФОНЕ. Между ними виден фон, но зазор
+   маленький - карточки читаются как один ряд, а не как четыре разбросанных плитки.
+   Светлая бумага против тёмной секции даёт контраст, скруглённые углы и тень
+   отрывают карточку от фона.
 
-   ОДИН ЛИСТ, А НЕ ЧЕТЫРЕ КАРТОЧКИ. У старого прайса карточки заканчивались каждая
-   на своей высоте (6 дат против 14) и цены висели на разных уровнях - сравнить их
-   взглядом было нельзя. Здесь четыре графы сидят в одной сетке, и все четыре цены
-   стоят на общей нижней строке, как «итого» в ведомости.
+   ЦЕНЫ ВСЁ РАВНО НА ОДНОЙ ЛИНИИ. Сетка растягивает карточки ряда в общую высоту,
+   а блок цены прижат к низу через margin-top:auto. Поэтому 1890 / 1690 / 1590 / 1490
+   читаются одним движением глаза - у старого прайса цены висели на разной высоте,
+   потому что в VIP четырнадцать дат, а в «Специальных» шесть.
 
    z-index:25 - как у .wt/.ct/.qz/.fr. Без него секцию накроет липкая сцена
    первого экрана (её слои доходят до 20). */
@@ -1069,14 +1069,12 @@ body{
      оба стыка гасим цветом, светлой полосы-перехода нет */
   background:linear-gradient(180deg,#060C18 0%,#080F22 22%,#050A16 66%,#04070F 100%);
   color:#C9D6EE;
-  --pr-hair:rgba(127,168,217,.14);     /* холодная линейка: делит графы */
-  --pr-gold:rgba(227,179,78,.22);      /* золотая линейка: делит разделы документа */
-  --pr-red:#E4776B;                    /* выходные и будущая цена. На тёмном #9D0A0F не читается */
-  --pr-pad-x:clamp(14px,1.6vw,34px);   /* поля полноширинных полос: леттерхед, подвал */
-  --pr-cell-x:clamp(12px,1.15vw,24px); /* поля ячейки графы */
+  --pr-red:#E4776B;                    /* повышение цены на тёмном фоне */
+  --pr-pad:clamp(13px,1.15vw,23px);    /* внутренние поля карточки */
 }
-/* фокус на тёмном - лунный, как у .qz; синий Министерства виден только на бумаге */
+/* фокус на тёмном - лунный, как у .qz; синий Министерства остаётся внутри карточек */
 .pr :focus-visible{outline:2px solid var(--moon); outline-offset:2px}
+.pr-card :focus-visible{outline-color:rgba(47,49,146,.65)}
 .pr .vh{position:absolute; width:1px; height:1px; margin:-1px; padding:0;
   overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
 
@@ -1101,170 +1099,140 @@ body{
   font-family:var(--h2-family); font-weight:var(--h2-weight);
   font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
   color:var(--h2-color); text-transform:uppercase; text-wrap:balance}
-.pr-lede{margin:clamp(16px,1.8vw,28px) auto clamp(28px,3.4vw,56px); max-width:60ch;
+.pr-lede{margin:clamp(16px,1.8vw,28px) auto 0; max-width:60ch;
   font-size:clamp(15px,1.16vw,21px); line-height:1.5; color:#B7C6E2}
 
-/* ---------- сам лист ведомости ---------- */
-.pr-sheet{position:relative; text-align:left; border-radius:3px; overflow:hidden;
-  border:1px solid var(--pr-gold);
-  background:linear-gradient(180deg,rgba(127,168,217,.06) 0%,rgba(127,168,217,.018) 38%,rgba(127,168,217,0) 100%),#070D1C;
-  box-shadow:
-    inset 0 1px 0 rgba(227,179,78,.16),
-    0 30px 64px -30px rgba(0,0,0,.92),
-    0 4px 14px rgba(0,0,0,.4)}
+/* срок действия цены - единственная строка про повышение вне карточек.
+   Стоит один раз: в таблице заголовок пишут один раз, а не четыре */
+.pr-valid{margin:clamp(14px,1.4vw,22px) auto clamp(24px,2.6vw,44px);
+  font-size:clamp(11px,.78vw,13px); letter-spacing:.18em; text-transform:uppercase;
+  font-weight:600; color:var(--gold)}
 
-/* леттерхед. У квиза шапка бланка стоит по центру - там это заголовок формы.
-   Здесь разнос по краям: слева кто выдал, справа до какого числа действует */
-.pr-stamp{display:flex; justify-content:space-between; align-items:baseline;
-  gap:clamp(10px,1.6vw,28px); flex-wrap:wrap;
-  padding:clamp(12px,1.15vw,20px) var(--pr-pad-x);
-  border-bottom:1px solid var(--pr-hair);
-  font-size:clamp(10px,.74vw,12px); letter-spacing:.2em; text-transform:uppercase;
-  color:#8496B4; font-weight:600}
-.pr-valid{white-space:nowrap; color:var(--gold)}
-
-/* ---------- переключатель города ----------
-   Город стоит графой самого документа, а не фильтром сбоку: мимо него нельзя
-   пройти к цифрам. Вторая строка - минимальная цена города: видно, что Ставрополь
-   дешевле, ещё до нажатия. Нативный <select> прятал бы ровно это. */
-/* строка-замена переключателя, когда скрипт выключен */
-.pr-nojs{display:none; border-bottom:1px solid var(--pr-hair)}
-.pr-cities-wrap{position:relative}
-.pr-cities{display:grid; grid-template-columns:repeat(5,minmax(0,1fr));
-  border-bottom:1px solid var(--pr-hair)}
-.pr-city{padding:clamp(12px,1.1vw,19px) clamp(8px,.8vw,16px);
-  border:0; border-right:1px solid var(--pr-hair); background:transparent;
-  cursor:pointer; text-align:center; color:#93A5C2; font:inherit;
-  transition:background .18s ease, color .18s ease, box-shadow .18s ease}
-.pr-city:last-child{border-right:0}
-.pr-city b{display:block; font-weight:600; font-size:clamp(13px,.98vw,16.5px); line-height:1.2}
-.pr-city em{display:block; font-style:normal; margin-top:4px; font-weight:500;
-  font-size:clamp(11px,.74vw,13px); color:#7A8AA6}
-@media (hover:hover) and (pointer:fine){
-  .pr-city:hover{background:rgba(227,179,78,.07); color:#EDF3FF}
-}
-.pr-city.on{color:#fff;
-  background:linear-gradient(180deg,rgba(227,179,78,.17),rgba(227,179,78,.05));
-  box-shadow:inset 0 -3px 0 var(--gold)}
-.pr-city.on b{font-weight:700}
-.pr-city.on em{color:var(--gold)}
-
-/* двойная линейка - подпись документа. У квиза эту роль играет золотая рамка
-   по периметру бумаги; повторять её значило бы сделать клон бланка */
-.pr-dbl{height:5px; border-top:2px solid rgba(227,179,78,.55);
-  border-bottom:1px solid rgba(227,179,78,.24)}
-
-/* ---------- сводка цен (узкие экраны) ----------
-   Главный ход листа - четыре цены на одной строке - живёт только пока графы стоят
-   в ряд. Как только они встают друг под друга, сравнение теряется. Поэтому ниже
-   980px под шапкой появляется короткий «рельс» из тех же четырёх цен. */
+/* ---------- сводка цен (телефон) ----------
+   Пока карточки стоят в ряд, четыре цены сравниваются взглядом. Как только они
+   встают друг под друга, сравнение теряется - на телефоне его возвращает
+   короткая сводка над карточками. */
 .pr-rail{display:none}
 
-/* ---------- тело: четыре графы ----------
-   grid-auto-flow:column при двух строках заполняет сетку по столбцам, поэтому
-   .pr-col и .pr-sum одной категории встают друг под другом, а все четыре .pr-sum
-   садятся на общую вторую строку. display:contents вынимает пару в сетку -
-   тот же приём уже работает в .fr-art на узких экранах. */
-.pr-cols{display:grid; grid-auto-flow:column; grid-template-rows:auto auto;
-  grid-auto-columns:minmax(0,1fr)}
-.pr-cat-block{display:contents}
-.pr-col{padding:clamp(16px,1.5vw,28px) var(--pr-cell-x) clamp(14px,1.3vw,24px);
-  border-right:1px solid var(--pr-hair)}
-.pr-cat-block:last-child .pr-col,.pr-cat-block:last-child .pr-sum{border-right:0}
-/* золотая карточка старого прайса стала золотой графой */
-.pr-cat-block[data-cat="vip"] .pr-col{
-  background:linear-gradient(180deg,rgba(227,179,78,.085),rgba(227,179,78,.02))}
+/* ---------- четыре карточки ----------
+   Появление при прокрутке висит на КАЖДОЙ карточке, а не на их общей обёртке.
+   Обёртка на телефоне вырастает до двух тысяч пикселей, а наблюдателю нужно
+   18 % площади цели - человек успевал увидеть пустое место там, где должны быть
+   карточки. Карточка в 500 px набирает эти 18 % сразу, как только выезжает. */
+.pr-cols{display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:clamp(10px,.9vw,18px); text-align:left}
+.pr-card{display:flex; flex-direction:column; overflow:hidden;
+  border-radius:clamp(14px,1.15vw,22px);
+  color:var(--c-ink);
+  background:linear-gradient(180deg,var(--c-top),var(--c-bot));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 26px 48px -26px rgba(0,0,0,.9),
+    0 5px 16px rgba(0,0,0,.32);
+  /* набор чернил по умолчанию, каждая карточка перебивает свой */
+  --c-ink:#16213F; --c-mute:#6C7A93; --c-line:rgba(22,33,63,.13);
+  --c-chip:rgba(255,255,255,.66); --c-rule:rgba(22,33,63,.2);
+  --c-top:#F4F7FB; --c-bot:#E7EEF7}
+.pr-card[data-cat="vip"]{--c-top:#FCEFCB; --c-bot:#F3DEA8;
+  --c-mute:#8A7648; --c-line:rgba(120,86,20,.2); --c-rule:rgba(120,86,20,.3);
+  --c-chip:rgba(255,255,255,.6);
+  box-shadow:
+    inset 0 0 0 1px rgba(211,162,68,.55),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 26px 48px -26px rgba(0,0,0,.9),
+    0 5px 16px rgba(0,0,0,.32)}
+.pr-card[data-cat="premium"]{--c-top:#FBEAE4; --c-bot:#F3D9D1;
+  --c-mute:#8B7167; --c-line:rgba(120,60,45,.17); --c-rule:rgba(120,60,45,.26)}
+.pr-card[data-cat="standard"]{--c-top:#E9F0F9; --c-bot:#DAE6F4}
 
-/* голова графы: название узким прописным с разрядкой - это голова столбца
-   в ведомости, а не заголовок карточки. Справа счётчик дат: отвечает на вопрос
-   «а много ли таких дней» и заодно объясняет, почему VIP дороже */
-.pr-cat{display:flex; align-items:baseline; justify-content:space-between; gap:8px;
-  padding-bottom:clamp(9px,.85vw,14px); border-bottom:1px solid var(--pr-hair)}
-.pr-cat b{display:inline-flex; align-items:center; gap:.4em;
+/* голова карточки по центру, как на прайсе прошлого сезона.
+   Под названием счётчик дат: отвечает на вопрос «а много ли таких дней»
+   и заодно объясняет, почему VIP дороже */
+.pr-cat{text-align:center; padding:clamp(14px,1.2vw,21px) var(--pr-pad) clamp(11px,.95vw,16px);
+  border-bottom:1px solid var(--c-line)}
+.pr-cat b{display:flex; align-items:center; justify-content:center; gap:.4em;
   font-family:"Oswald",Arial,sans-serif; font-weight:500;
-  font-size:clamp(16px,1.4vw,27px); text-transform:uppercase; letter-spacing:.1em;
-  line-height:1; color:#EDF3FF}
-.pr-cat svg{width:.7em; height:.7em; flex:0 0 auto; color:var(--gold)}
-.pr-cat i{font-style:normal; font-size:clamp(10px,.74vw,12px); letter-spacing:.14em;
-  text-transform:uppercase; color:#6E7E9B; font-weight:600; white-space:nowrap}
-.pr-cat-block[data-cat="vip"] .pr-cat b{color:#F5E3B4}
+  font-size:clamp(14px,1.12vw,21px); text-transform:uppercase; letter-spacing:.05em;
+  line-height:1.15; color:var(--c-ink); text-wrap:balance}
+.pr-cat svg{width:.78em; height:.78em; flex:0 0 auto; color:#C9922C}
+.pr-cat i{display:block; margin-top:6px; font-style:normal;
+  font-size:clamp(10px,.7vw,11.5px); letter-spacing:.14em; text-transform:uppercase;
+  color:var(--c-mute); font-weight:600}
 
 /* месяц - не «Январь:», а заголовок с выносной линейкой: двоеточие не нужно,
-   его работу делает линия до правого края графы */
+   его работу делает линия до правого края карточки */
+.pr-dates{padding:0 var(--pr-pad) clamp(12px,1vw,18px)}
 .pr-mon{display:flex; align-items:center; gap:9px;
-  margin:clamp(13px,1.15vw,21px) 0 clamp(7px,.6vw,11px);
-  font-size:clamp(10px,.72vw,12px); letter-spacing:.18em; text-transform:uppercase;
-  font-weight:700; color:#7B8BA8}
-.pr-mon::after{content:''; flex:1; height:1px; background:var(--pr-hair)}
-.pr-mgroup:first-child .pr-mon{margin-top:clamp(11px,.9vw,16px)}
+  margin:clamp(12px,1.05vw,18px) 0 clamp(7px,.6vw,11px);
+  font-size:clamp(10px,.7vw,11.5px); letter-spacing:.18em; text-transform:uppercase;
+  font-weight:700; color:var(--c-mute)}
+.pr-mon::after{content:''; flex:1; height:1px; background:var(--c-line)}
 
 /* чип даты. Иконки календаря нет - вместо неё информация: день недели прижат
    к правому краю, суббота и воскресенье красные. В «Специальных» красного нет
-   вовсе, в VIP его семь - экран сам, без единого слова, показывает, за что доплата */
+   вовсе, в VIP его семь - карточки сами показывают, за что доплата */
 .pr-days{list-style:none; margin:0; padding:0; display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(5px,.42vw,8px)}
-.pr-day{display:flex; align-items:baseline; gap:6px; white-space:nowrap;
-  padding:clamp(6px,.55vw,10px) clamp(7px,.6vw,11px);
-  border:1px solid rgba(127,168,217,.15); border-radius:2px;
-  background:rgba(127,168,217,.05); color:#C3D0E6;
+  grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(5px,.4vw,7px)}
+.pr-day{display:flex; align-items:baseline; gap:5px; white-space:nowrap;
+  padding:clamp(6px,.5vw,9px) clamp(7px,.6vw,11px);
+  border:1px solid var(--c-line); border-radius:8px;
+  background:var(--c-chip); color:var(--c-ink);
   transition:border-color .18s ease, background .18s ease}
 .pr-day b{font-family:"Oswald",Arial,sans-serif; font-weight:500;
-  font-size:clamp(14px,1.1vw,19px); color:#F0F5FF; font-variant-numeric:tabular-nums}
-.pr-day span{font-size:clamp(11px,.8vw,13.5px); font-weight:500; color:#93A5C2}
-.pr-day em{font-style:normal; margin-left:auto; font-size:clamp(10px,.72vw,12.5px);
-  color:#7A8AA6}
-.pr-day.we em{color:var(--pr-red); font-weight:600}
+  font-size:clamp(13.5px,1.05vw,18px); font-variant-numeric:tabular-nums}
+.pr-day span{font-size:clamp(10.5px,.76vw,13px); font-weight:500; color:var(--c-mute)}
+.pr-day em{font-style:normal; margin-left:auto;
+  font-size:clamp(10px,.7vw,12px); color:var(--c-mute)}
+.pr-day.we em{color:#9D0A0F; font-weight:600}
 @media (hover:hover) and (pointer:fine){
   /* бумага не пружинит: меняются только цвет рамки и подложка, без сдвига */
-  .pr-day:hover{border-color:rgba(227,179,78,.42); background:rgba(227,179,78,.07)}
+  .pr-day:hover{border-color:var(--c-rule); background:#fff}
 }
 
-/* ---------- строка цен ----------
-   Цена набрана белым и подчёркнута золотой чертой, а цвет отдан ТОЛЬКО будущему
-   повышению. На старом прайсе выделена цветом была текущая цена; здесь первым
-   читается «сколько платить», вторым «сколько будет». */
-.pr-sum{padding:clamp(15px,1.4vw,27px) var(--pr-cell-x) clamp(17px,1.55vw,29px);
-  border-top:1px solid var(--pr-gold); border-right:1px solid var(--pr-hair);
-  background:rgba(227,179,78,.045);
-  display:flex; flex-direction:column; align-items:flex-start}
-.pr-cat-block[data-cat="vip"] .pr-sum{background:rgba(227,179,78,.115)}
-.pr-now-l{font-size:clamp(10px,.7vw,11.5px); letter-spacing:.2em; text-transform:uppercase;
-  font-weight:600; color:#7E8FAC; margin-bottom:clamp(6px,.5vw,10px)}
+/* ---------- цена ----------
+   Прижата к низу карточки: сетка растягивает карточки ряда в общую высоту,
+   поэтому все четыре цены встают на одну линию.
+   Блок нарочно короткий - число, знак рубля и одна строка про повышение.
+   Цена набрана чернилами и подчёркнута золотой чертой, а цвет отдан ТОЛЬКО
+   будущему повышению: первым читается «сколько платить», вторым «сколько будет». */
+.pr-sum{margin-top:auto;
+  padding:clamp(11px,.95vw,17px) var(--pr-pad) clamp(13px,1.1vw,19px);
+  border-top:1px solid var(--c-rule); background:rgba(255,255,255,.4)}
+.pr-now-l{margin:0 0 3px; font-size:clamp(9.5px,.66vw,11px); letter-spacing:.2em;
+  text-transform:uppercase; font-weight:600; color:var(--c-mute)}
 .pr-now{display:inline-flex; align-items:baseline;
-  padding-bottom:clamp(6px,.5vw,10px); border-bottom:2px solid rgba(227,179,78,.5);
+  padding-bottom:clamp(4px,.35vw,7px); border-bottom:2px solid rgba(201,146,44,.55);
   font-family:"Oswald",Arial,sans-serif; font-weight:700;
-  font-size:clamp(32px,3.25vw,58px); line-height:.9; color:#fff;
+  font-size:clamp(26px,2.25vw,42px); line-height:.95; color:var(--c-ink);
   font-variant-numeric:tabular-nums}
 .pr-now i{font-style:normal}
-.pr-now s{text-decoration:none; font-size:.4em; font-weight:500;
-  color:var(--gold); margin-left:.16em}
-.pr-cat-block[data-cat="vip"] .pr-now{border-bottom-color:rgba(227,179,78,.9)}
-.pr-next{margin:clamp(10px,.9vw,16px) 0 0; width:100%;
-  padding-top:clamp(9px,.75vw,14px); border-top:1px dashed rgba(127,168,217,.2);
-  display:flex; align-items:baseline; justify-content:space-between; gap:10px;
-  font-size:clamp(11.5px,.86vw,14.5px); color:#8496B4}
+.pr-now s{text-decoration:none; font-size:.42em; font-weight:500;
+  color:#9C7028; margin-left:.16em}
+.pr-card[data-cat="vip"] .pr-now{border-bottom-color:rgba(201,146,44,.95)}
+.pr-next{display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+  margin:clamp(8px,.7vw,13px) 0 0; padding-top:clamp(7px,.6vw,11px);
+  border-top:1px dashed var(--c-line);
+  font-size:clamp(11px,.8vw,13.5px); color:var(--c-mute)}
 .pr-next b{display:inline-flex; align-items:center; gap:.3em;
   font-family:"Oswald",Arial,sans-serif; font-weight:700;
-  font-size:clamp(15px,1.18vw,21px); color:var(--pr-red);
+  font-size:clamp(14px,1.05vw,18px); color:#9D0A0F;
   font-variant-numeric:tabular-nums}
 .pr-next svg{width:.55em; height:.55em; flex:0 0 auto}
 .pr-next.final{justify-content:flex-start}
 
-/* ---------- подвал ---------- */
-.pr-foot{padding:clamp(14px,1.2vw,23px) var(--pr-pad-x);
-  border-top:1px solid var(--pr-gold);
-  display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
-  gap:clamp(10px,1.4vw,30px); align-items:center;
-  font-size:clamp(12.5px,.92vw,15.5px); line-height:1.5; color:#8FA0BC}
+/* ---------- подвал и действие ----------
+   Примечания живут на ночном фоне: это не часть карточки, а сноска ко всем четырём */
+.pr-foot{margin:clamp(20px,2.2vw,38px) auto 0; display:grid; gap:8px;
+  max-width:112ch; font-size:clamp(12.5px,.92vw,15.5px); line-height:1.5; color:#93A4C0}
 .pr-foot p{margin:0}
 .pr-foot b{font-family:"Oswald",Arial,sans-serif; font-weight:700; color:#fff}
-.pr-off{text-align:right; color:#7A8AA6}
+.pr-off{color:#7A8AA6}
 
 /* у этого сайта лист всегда заканчивается действием: человек увидел цену -
    ему есть куда нажать. Кнопка ведёт в квиз выше, к расчёту на весь класс */
-.pr-act{margin:clamp(26px,3vw,52px) auto 0}
+.pr-act{margin:clamp(24px,2.6vw,46px) auto 0}
 .pr-btn{display:inline-block; padding:clamp(15px,1.35vw,21px) clamp(26px,2.6vw,48px);
-  border-radius:3px; text-decoration:none;
+  border-radius:999px; text-decoration:none;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
   font-size:clamp(14px,1.06vw,19px); letter-spacing:.02em; text-transform:uppercase;
   color:#231705; text-wrap:balance;
@@ -1285,73 +1253,41 @@ body{
   animation:prSet .28s cubic-bezier(.2,.7,.2,1) both; animation-delay:var(--d,0ms)}
 
 /* ---------- узкие экраны ----------
-   Блок категории физически цел: .pr-cat-block содержит и даты, и цену, а
-   перестроение идёт только сменой раскладки сетки. Поэтому цена никогда
-   не отрывается от своей графы. */
+   Карточка целая сама по себе, поэтому перестроение - это только смена числа
+   колонок. Цена не может оторваться от своих дат ни на какой ширине. */
 @media (max-width:1180px){
-  .pr-cols{grid-auto-flow:row; grid-template-rows:none; grid-auto-columns:auto;
-    grid-template-columns:repeat(2,minmax(0,1fr))}
-  .pr-cat-block{display:flex; flex-direction:column;
-    border-right:1px solid var(--pr-hair); border-bottom:1px solid var(--pr-hair)}
-  .pr-cat-block:nth-child(2n){border-right:0}
-  .pr-cat-block:nth-child(n+3){border-bottom:0}
-  .pr-col{border-right:0}
-  /* margin-top:auto возвращает выравнивание: в каждом ряду обе цены снова
-     стоят на одной линии, сравнение сохраняется попарно */
-  .pr-sum{border-right:0; margin-top:auto}
-}
-@media (max-width:980px){
-  .pr-rail{display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
-    border-bottom:1px solid var(--pr-hair)}
-  .pr-rail div{padding:clamp(9px,1.4vw,13px) 6px; text-align:center;
-    border-right:1px solid var(--pr-hair)}
-  .pr-rail div:last-child{border-right:0}
-  .pr-rail div[data-cat="vip"]{background:rgba(227,179,78,.09)}
-  .pr-rail i{display:block; font-style:normal; font-size:10px; letter-spacing:.12em;
-    text-transform:uppercase; font-weight:600; color:#7E90AD}
-  .pr-rail b{display:block; margin-top:4px; font-family:"Oswald",Arial,sans-serif;
-    font-weight:700; font-size:clamp(17px,2.4vw,23px); color:#fff;
-    font-variant-numeric:tabular-nums}
-  .pr-rail div[data-cat="vip"] b{color:#F5E3B4}
+  .pr-cols{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:760px){
-  .pr-cols{grid-template-columns:minmax(0,1fr)}
-  .pr-cat-block{border-right:0}
-  .pr-cat-block:nth-child(n+3){border-bottom:1px solid var(--pr-hair)}
-  .pr-cat-block:last-child{border-bottom:0}
-  /* цена ложится в строку, а не в башню: слева «сейчас», справа повышение */
-  .pr-sum{flex-direction:row; align-items:flex-end; justify-content:space-between;
+  .pr-cols{grid-template-columns:minmax(0,1fr); gap:12px}
+  /* сводка цен появляется ровно там, где карточки перестали стоять рядом */
+  .pr-rail{display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px; margin:0 auto clamp(16px,4vw,24px); text-align:left}
+  .pr-rail div{display:flex; align-items:baseline; justify-content:space-between;
+    gap:8px; padding:10px 14px; border-radius:12px;
+    border:1px solid rgba(227,179,78,.22); background:rgba(127,168,217,.06)}
+  .pr-rail i{font-style:normal; font-size:10.5px; letter-spacing:.1em;
+    text-transform:uppercase; font-weight:600; color:#8FA0BC}
+  .pr-rail b{font-family:"Oswald",Arial,sans-serif; font-weight:700;
+    font-size:17px; color:#fff; font-variant-numeric:tabular-nums}
+  .pr-rail div[data-cat="vip"]{border-color:rgba(227,179,78,.5);
+    background:rgba(227,179,78,.12)}
+  .pr-rail div[data-cat="vip"] b{color:#F5E3B4}
+  /* цена ложится в строку: башня из подписи, числа и повышения съедала бы экран */
+  .pr-sum{display:flex; align-items:flex-end; justify-content:space-between;
     gap:14px; flex-wrap:wrap}
-  .pr-now{font-size:clamp(30px,8.2vw,44px)}
-  .pr-next{margin-top:0; padding-top:0; border-top:0; width:auto;
-    flex-direction:column; align-items:flex-end; text-align:right; gap:2px}
+  .pr-now-l{width:100%; margin-bottom:0}
+  .pr-next{margin-top:0; padding-top:0; border-top:0;
+    flex-direction:column; align-items:flex-end; text-align:right; gap:1px}
   .pr-next.final{align-items:flex-start; text-align:left}
-  /* пять граф по 65px нечитаемы - переключатель становится лентой с прокруткой.
-     Полосу прокрутки прячем тем же приёмом, что в ленте полароидов .bn-vp */
-  .pr-cities{display:flex; overflow-x:auto; scroll-snap-type:x proximity;
-    overscroll-behavior-x:contain; scrollbar-width:none; -ms-overflow-style:none;
-    -webkit-overflow-scrolling:touch}
-  .pr-cities::-webkit-scrollbar{display:none}
-  .pr-city{flex:0 0 auto; min-width:max-content; scroll-snap-align:center;
-    padding:12px 16px}
-  .pr-cities-wrap::after{content:''; position:absolute; right:0; top:0; bottom:0;
-    width:34px; pointer-events:none;
-    background:linear-gradient(90deg,rgba(7,13,28,0),#070D1C)}
-}
-@media (max-width:560px){
-  .pr-rail{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .pr-rail div:nth-child(2n){border-right:0}
-  .pr-rail div:nth-child(-n+2){border-bottom:1px solid var(--pr-hair)}
 }
 @media (max-width:520px){
-  .pr-stamp{flex-direction:column; align-items:flex-start; gap:6px; letter-spacing:.14em}
-  .pr-foot{grid-template-columns:minmax(0,1fr); gap:10px}
-  .pr-off{text-align:left}
+  .pr-rail{grid-template-columns:minmax(0,1fr)}
   .pr-btn{display:block; width:100%}
 }
 @media (prefers-reduced-motion:reduce){
   .pr-now,.pr-next b{animation:none}
-  .pr-day,.pr-city,.pr-btn{transition:none}
+  .pr-day,.pr-btn{transition:none}
 }
 
 /* ==================== ЭКРАН «ЧТО ЖЕ В ПРОГРАММЕ»  ====================
@@ -2263,183 +2199,144 @@ body{
   <div class="pr-grain" aria-hidden="true"></div>
 
   <div class="pr-body">
-    <p class="pr-eyebrow rv">Сезон 2026 / 2027</p>
+    <p class="pr-eyebrow rv">Нижний Новгород · сезон 2026 / 2027</p>
     <h2 class="pr-h rv" id="prTitle">Таблица цен</h2>
-    <p class="pr-lede rv">Цена зависит от даты, а не от программы: чем ближе к Новому году, тем дороже. Даты во всех городах одинаковые - отличается только цена.</p>
+    <p class="pr-lede rv">Цена зависит от даты, а не от программы: чем ближе к Новому году, тем дороже. Чем раньше забронируете - тем дешевле билет.</p>
 
-    <div class="pr-sheet rv">
-      <div class="pr-stamp">
-        <span>Министерство новогодних дел · тарифная ведомость</span>
-        <span class="pr-valid" id="prValid">Цена действует до 30 сентября</span>
-      </div>
+    <p class="pr-valid" id="prValid">Цена действует до 30 сентября</p>
 
-      <!-- город: без скрипта переключатель не переключает, поэтому он прячется,
-           а на его место встаёт строка про Нижний Новгород - его цены и стоят в разметке -->
-      <noscript><style>.pr-cities-wrap{display:none}.pr-nojs{display:block}</style></noscript>
-      <div class="pr-cities-wrap">
-        <div class="pr-cities" role="radiogroup" aria-label="Город">
-          <button class="pr-city on" type="button" role="radio" aria-checked="true" tabindex="0" data-city="nizhny"><b>Нижний Новгород</b><em>от 1490 ₽</em></button>
-          <button class="pr-city" type="button" role="radio" aria-checked="false" tabindex="-1" data-city="kazan"><b>Казань</b><em>от 1490 ₽</em></button>
-          <button class="pr-city" type="button" role="radio" aria-checked="false" tabindex="-1" data-city="tyumen"><b>Тюмень</b><em>от 1390 ₽</em></button>
-          <button class="pr-city" type="button" role="radio" aria-checked="false" tabindex="-1" data-city="stavropol"><b>Ставрополь</b><em>от 1290 ₽</em></button>
-          <button class="pr-city" type="button" role="radio" aria-checked="false" tabindex="-1" data-city="crimea"><b>Крым</b><em>от 1390 ₽</em></button>
+    <!-- сводка для телефона: там карточки встают друг под друга и сравнить цены нечем -->
+    <div class="pr-rail" aria-hidden="true">
+      <div data-cat="vip"><i>VIP</i><b>1890 ₽</b></div>
+      <div data-cat="premium"><i>Премиум</i><b>1690 ₽</b></div>
+      <div data-cat="standard"><i>Стандарт</i><b>1590 ₽</b></div>
+      <div data-cat="special"><i>Специальные</i><b>1490 ₽</b></div>
+    </div>
+
+    <div class="pr-cols">
+      <article class="pr-card rv" data-cat="vip">
+        <div class="pr-cat"><b><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#qzStar"/></svg>Даты «VIP»</b><i>14 дат</i></div>
+        <div class="pr-dates">
+          <p class="pr-mon">Декабрь</p>
+          <ul class="pr-days" aria-label="Даты категории VIP, декабрь">
+            <li class="pr-day we" aria-label="12 декабря, суббота"><b>12</b><span>дек</span><em>сб</em></li>
+            <li class="pr-day we" aria-label="13 декабря, воскресенье"><b>13</b><span>дек</span><em>вс</em></li>
+            <li class="pr-day" aria-label="18 декабря, пятница"><b>18</b><span>дек</span><em>пт</em></li>
+            <li class="pr-day we" aria-label="19 декабря, суббота"><b>19</b><span>дек</span><em>сб</em></li>
+            <li class="pr-day we" aria-label="20 декабря, воскресенье"><b>20</b><span>дек</span><em>вс</em></li>
+            <li class="pr-day" aria-label="24 декабря, четверг"><b>24</b><span>дек</span><em>чт</em></li>
+            <li class="pr-day" aria-label="25 декабря, пятница"><b>25</b><span>дек</span><em>пт</em></li>
+            <li class="pr-day we" aria-label="26 декабря, суббота"><b>26</b><span>дек</span><em>сб</em></li>
+            <li class="pr-day we" aria-label="27 декабря, воскресенье"><b>27</b><span>дек</span><em>вс</em></li>
+            <li class="pr-day" aria-label="28 декабря, понедельник"><b>28</b><span>дек</span><em>пн</em></li>
+            <li class="pr-day" aria-label="29 декабря, вторник"><b>29</b><span>дек</span><em>вт</em></li>
+          </ul>
+          <p class="pr-mon">Январь</p>
+          <ul class="pr-days" aria-label="Даты категории VIP, январь">
+            <li class="pr-day we" aria-label="3 января, воскресенье"><b>3</b><span>янв</span><em>вс</em></li>
+            <li class="pr-day" aria-label="4 января, понедельник"><b>4</b><span>янв</span><em>пн</em></li>
+            <li class="pr-day" aria-label="5 января, вторник"><b>5</b><span>янв</span><em>вт</em></li>
+          </ul>
         </div>
-      </div>
-      <p class="pr-nojs pr-stamp">Цены указаны для Нижнего Новгорода</p>
-
-      <div class="pr-dbl" aria-hidden="true"></div>
-
-      <!-- сводка для узких экранов: те же четыре цены одной строкой -->
-      <div class="pr-rail" aria-hidden="true">
-        <div data-cat="vip"><i>VIP</i><b>1890 ₽</b></div>
-        <div data-cat="premium"><i>Премиум</i><b>1690 ₽</b></div>
-        <div data-cat="standard"><i>Стандарт</i><b>1590 ₽</b></div>
-        <div data-cat="special"><i>Специальные</i><b>1490 ₽</b></div>
-      </div>
-
-      <div class="pr-cols">
-        <div class="pr-cat-block" data-cat="vip">
-          <div class="pr-col">
-            <div class="pr-cat"><b><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#qzStar"/></svg>VIP</b><i>14 дат</i></div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Декабрь</p>
-              <ul class="pr-days" aria-label="Даты категории VIP, декабрь">
-                <li class="pr-day we" aria-label="12 декабря, суббота"><b>12</b><span>дек</span><em>сб</em></li>
-                <li class="pr-day we" aria-label="13 декабря, воскресенье"><b>13</b><span>дек</span><em>вс</em></li>
-                <li class="pr-day" aria-label="18 декабря, пятница"><b>18</b><span>дек</span><em>пт</em></li>
-                <li class="pr-day we" aria-label="19 декабря, суббота"><b>19</b><span>дек</span><em>сб</em></li>
-                <li class="pr-day we" aria-label="20 декабря, воскресенье"><b>20</b><span>дек</span><em>вс</em></li>
-                <li class="pr-day" aria-label="24 декабря, четверг"><b>24</b><span>дек</span><em>чт</em></li>
-                <li class="pr-day" aria-label="25 декабря, пятница"><b>25</b><span>дек</span><em>пт</em></li>
-                <li class="pr-day we" aria-label="26 декабря, суббота"><b>26</b><span>дек</span><em>сб</em></li>
-                <li class="pr-day we" aria-label="27 декабря, воскресенье"><b>27</b><span>дек</span><em>вс</em></li>
-                <li class="pr-day" aria-label="28 декабря, понедельник"><b>28</b><span>дек</span><em>пн</em></li>
-                <li class="pr-day" aria-label="29 декабря, вторник"><b>29</b><span>дек</span><em>вт</em></li>
-              </ul>
-            </div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Январь</p>
-              <ul class="pr-days" aria-label="Даты категории VIP, январь">
-                <li class="pr-day we" aria-label="3 января, воскресенье"><b>3</b><span>янв</span><em>вс</em></li>
-                <li class="pr-day" aria-label="4 января, понедельник"><b>4</b><span>янв</span><em>пн</em></li>
-                <li class="pr-day" aria-label="5 января, вторник"><b>5</b><span>янв</span><em>вт</em></li>
-              </ul>
-            </div>
-          </div>
-          <div class="pr-sum">
-            <p class="pr-now-l">Сейчас</p>
-            <span class="pr-now"><i>1890</i><s>₽</s></span>
-            <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1990</i> ₽</b></p>
-          </div>
+        <div class="pr-sum">
+          <p class="pr-now-l">Сейчас</p>
+          <span class="pr-now"><i>1890</i><s>₽</s></span>
+          <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1990</i> ₽</b></p>
         </div>
-        <div class="pr-cat-block" data-cat="premium">
-          <div class="pr-col">
-            <div class="pr-cat"><b>Премиум</b><i>12 дат</i></div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Декабрь</p>
-              <ul class="pr-days" aria-label="Даты категории Премиум, декабрь">
-                <li class="pr-day we" aria-label="5 декабря, суббота"><b>5</b><span>дек</span><em>сб</em></li>
-                <li class="pr-day we" aria-label="6 декабря, воскресенье"><b>6</b><span>дек</span><em>вс</em></li>
-                <li class="pr-day" aria-label="11 декабря, пятница"><b>11</b><span>дек</span><em>пт</em></li>
-                <li class="pr-day" aria-label="15 декабря, вторник"><b>15</b><span>дек</span><em>вт</em></li>
-                <li class="pr-day" aria-label="16 декабря, среда"><b>16</b><span>дек</span><em>ср</em></li>
-                <li class="pr-day" aria-label="17 декабря, четверг"><b>17</b><span>дек</span><em>чт</em></li>
-                <li class="pr-day" aria-label="21 декабря, понедельник"><b>21</b><span>дек</span><em>пн</em></li>
-                <li class="pr-day" aria-label="22 декабря, вторник"><b>22</b><span>дек</span><em>вт</em></li>
-                <li class="pr-day" aria-label="23 декабря, среда"><b>23</b><span>дек</span><em>ср</em></li>
-                <li class="pr-day" aria-label="30 декабря, среда"><b>30</b><span>дек</span><em>ср</em></li>
-              </ul>
-            </div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Январь</p>
-              <ul class="pr-days" aria-label="Даты категории Премиум, январь">
-                <li class="pr-day we" aria-label="9 января, суббота"><b>9</b><span>янв</span><em>сб</em></li>
-                <li class="pr-day we" aria-label="10 января, воскресенье"><b>10</b><span>янв</span><em>вс</em></li>
-              </ul>
-            </div>
-          </div>
-          <div class="pr-sum">
-            <p class="pr-now-l">Сейчас</p>
-            <span class="pr-now"><i>1690</i><s>₽</s></span>
-            <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1790</i> ₽</b></p>
-          </div>
+      </article>
+      <article class="pr-card rv" data-cat="premium">
+        <div class="pr-cat"><b>Даты «Премиум»</b><i>12 дат</i></div>
+        <div class="pr-dates">
+          <p class="pr-mon">Декабрь</p>
+          <ul class="pr-days" aria-label="Даты категории Премиум, декабрь">
+            <li class="pr-day we" aria-label="5 декабря, суббота"><b>5</b><span>дек</span><em>сб</em></li>
+            <li class="pr-day we" aria-label="6 декабря, воскресенье"><b>6</b><span>дек</span><em>вс</em></li>
+            <li class="pr-day" aria-label="11 декабря, пятница"><b>11</b><span>дек</span><em>пт</em></li>
+            <li class="pr-day" aria-label="15 декабря, вторник"><b>15</b><span>дек</span><em>вт</em></li>
+            <li class="pr-day" aria-label="16 декабря, среда"><b>16</b><span>дек</span><em>ср</em></li>
+            <li class="pr-day" aria-label="17 декабря, четверг"><b>17</b><span>дек</span><em>чт</em></li>
+            <li class="pr-day" aria-label="21 декабря, понедельник"><b>21</b><span>дек</span><em>пн</em></li>
+            <li class="pr-day" aria-label="22 декабря, вторник"><b>22</b><span>дек</span><em>вт</em></li>
+            <li class="pr-day" aria-label="23 декабря, среда"><b>23</b><span>дек</span><em>ср</em></li>
+            <li class="pr-day" aria-label="30 декабря, среда"><b>30</b><span>дек</span><em>ср</em></li>
+          </ul>
+          <p class="pr-mon">Январь</p>
+          <ul class="pr-days" aria-label="Даты категории Премиум, январь">
+            <li class="pr-day we" aria-label="9 января, суббота"><b>9</b><span>янв</span><em>сб</em></li>
+            <li class="pr-day we" aria-label="10 января, воскресенье"><b>10</b><span>янв</span><em>вс</em></li>
+          </ul>
         </div>
-        <div class="pr-cat-block" data-cat="standard">
-          <div class="pr-col">
-            <div class="pr-cat"><b>Стандарт</b><i>10 дат</i></div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Ноябрь</p>
-              <ul class="pr-days" aria-label="Даты категории Стандарт, ноябрь">
-                <li class="pr-day we" aria-label="28 ноября, суббота"><b>28</b><span>ноя</span><em>сб</em></li>
-                <li class="pr-day we" aria-label="29 ноября, воскресенье"><b>29</b><span>ноя</span><em>вс</em></li>
-              </ul>
-            </div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Декабрь</p>
-              <ul class="pr-days" aria-label="Даты категории Стандарт, декабрь">
-                <li class="pr-day" aria-label="7 декабря, понедельник"><b>7</b><span>дек</span><em>пн</em></li>
-                <li class="pr-day" aria-label="8 декабря, вторник"><b>8</b><span>дек</span><em>вт</em></li>
-                <li class="pr-day" aria-label="9 декабря, среда"><b>9</b><span>дек</span><em>ср</em></li>
-                <li class="pr-day" aria-label="10 декабря, четверг"><b>10</b><span>дек</span><em>чт</em></li>
-                <li class="pr-day" aria-label="14 декабря, понедельник"><b>14</b><span>дек</span><em>пн</em></li>
-              </ul>
-            </div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Январь</p>
-              <ul class="pr-days" aria-label="Даты категории Стандарт, январь">
-                <li class="pr-day" aria-label="6 января, среда"><b>6</b><span>янв</span><em>ср</em></li>
-                <li class="pr-day" aria-label="7 января, четверг"><b>7</b><span>янв</span><em>чт</em></li>
-                <li class="pr-day" aria-label="8 января, пятница"><b>8</b><span>янв</span><em>пт</em></li>
-              </ul>
-            </div>
-          </div>
-          <div class="pr-sum">
-            <p class="pr-now-l">Сейчас</p>
-            <span class="pr-now"><i>1590</i><s>₽</s></span>
-            <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1690</i> ₽</b></p>
-          </div>
+        <div class="pr-sum">
+          <p class="pr-now-l">Сейчас</p>
+          <span class="pr-now"><i>1690</i><s>₽</s></span>
+          <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1790</i> ₽</b></p>
         </div>
-        <div class="pr-cat-block" data-cat="special">
-          <div class="pr-col">
-            <div class="pr-cat"><b>Специальные</b><i>6 дат</i></div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Ноябрь</p>
-              <ul class="pr-days" aria-label="Даты категории Специальные, ноябрь">
-                <li class="pr-day" aria-label="27 ноября, пятница"><b>27</b><span>ноя</span><em>пт</em></li>
-                <li class="pr-day" aria-label="30 ноября, понедельник"><b>30</b><span>ноя</span><em>пн</em></li>
-              </ul>
-            </div>
-            <div class="pr-mgroup">
-              <p class="pr-mon">Декабрь</p>
-              <ul class="pr-days" aria-label="Даты категории Специальные, декабрь">
-                <li class="pr-day" aria-label="1 декабря, вторник"><b>1</b><span>дек</span><em>вт</em></li>
-                <li class="pr-day" aria-label="2 декабря, среда"><b>2</b><span>дек</span><em>ср</em></li>
-                <li class="pr-day" aria-label="3 декабря, четверг"><b>3</b><span>дек</span><em>чт</em></li>
-                <li class="pr-day" aria-label="4 декабря, пятница"><b>4</b><span>дек</span><em>пт</em></li>
-              </ul>
-            </div>
-          </div>
-          <div class="pr-sum">
-            <p class="pr-now-l">Сейчас</p>
-            <span class="pr-now"><i>1490</i><s>₽</s></span>
-            <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1590</i> ₽</b></p>
-          </div>
+      </article>
+      <article class="pr-card rv" data-cat="standard">
+        <div class="pr-cat"><b>Даты «Стандарт»</b><i>10 дат</i></div>
+        <div class="pr-dates">
+          <p class="pr-mon">Ноябрь</p>
+          <ul class="pr-days" aria-label="Даты категории Стандарт, ноябрь">
+            <li class="pr-day we" aria-label="28 ноября, суббота"><b>28</b><span>ноя</span><em>сб</em></li>
+            <li class="pr-day we" aria-label="29 ноября, воскресенье"><b>29</b><span>ноя</span><em>вс</em></li>
+          </ul>
+          <p class="pr-mon">Декабрь</p>
+          <ul class="pr-days" aria-label="Даты категории Стандарт, декабрь">
+            <li class="pr-day" aria-label="7 декабря, понедельник"><b>7</b><span>дек</span><em>пн</em></li>
+            <li class="pr-day" aria-label="8 декабря, вторник"><b>8</b><span>дек</span><em>вт</em></li>
+            <li class="pr-day" aria-label="9 декабря, среда"><b>9</b><span>дек</span><em>ср</em></li>
+            <li class="pr-day" aria-label="10 декабря, четверг"><b>10</b><span>дек</span><em>чт</em></li>
+            <li class="pr-day" aria-label="14 декабря, понедельник"><b>14</b><span>дек</span><em>пн</em></li>
+          </ul>
+          <p class="pr-mon">Январь</p>
+          <ul class="pr-days" aria-label="Даты категории Стандарт, январь">
+            <li class="pr-day" aria-label="6 января, среда"><b>6</b><span>янв</span><em>ср</em></li>
+            <li class="pr-day" aria-label="7 января, четверг"><b>7</b><span>янв</span><em>чт</em></li>
+            <li class="pr-day" aria-label="8 января, пятница"><b>8</b><span>янв</span><em>пт</em></li>
+          </ul>
         </div>
-      </div>
+        <div class="pr-sum">
+          <p class="pr-now-l">Сейчас</p>
+          <span class="pr-now"><i>1590</i><s>₽</s></span>
+          <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1690</i> ₽</b></p>
+        </div>
+      </article>
+      <article class="pr-card rv" data-cat="special">
+        <div class="pr-cat"><b>Даты «Специальные»</b><i>6 дат</i></div>
+        <div class="pr-dates">
+          <p class="pr-mon">Ноябрь</p>
+          <ul class="pr-days" aria-label="Даты категории Специальные, ноябрь">
+            <li class="pr-day" aria-label="27 ноября, пятница"><b>27</b><span>ноя</span><em>пт</em></li>
+            <li class="pr-day" aria-label="30 ноября, понедельник"><b>30</b><span>ноя</span><em>пн</em></li>
+          </ul>
+          <p class="pr-mon">Декабрь</p>
+          <ul class="pr-days" aria-label="Даты категории Специальные, декабрь">
+            <li class="pr-day" aria-label="1 декабря, вторник"><b>1</b><span>дек</span><em>вт</em></li>
+            <li class="pr-day" aria-label="2 декабря, среда"><b>2</b><span>дек</span><em>ср</em></li>
+            <li class="pr-day" aria-label="3 декабря, четверг"><b>3</b><span>дек</span><em>чт</em></li>
+            <li class="pr-day" aria-label="4 декабря, пятница"><b>4</b><span>дек</span><em>пт</em></li>
+          </ul>
+        </div>
+        <div class="pr-sum">
+          <p class="pr-now-l">Сейчас</p>
+          <span class="pr-now"><i>1490</i><s>₽</s></span>
+          <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1590</i> ₽</b></p>
+        </div>
+      </article>
+    </div>
 
-      <div class="pr-foot">
-        <p>Цены указаны для организованных групп: класс или садик приходит одним составом, от 20 детей. Для сборной группы детский билет на <b>300 ₽</b> дороже - взрослый билет стоит одинаково для любых групп.</p>
-        <p class="pr-off">Не работаем 31 декабря, 1 и 2 января</p>
-      </div>
+    <div class="pr-foot">
+      <p>Цены указаны для организованных групп: класс или садик приходит одним составом, от 20 детей. Для сборной группы детский билет на <b>300 ₽</b> дороже - взрослый билет стоит одинаково для любых групп.</p>
+      <p class="pr-off">Не работаем 31 декабря, 1 и 2 января</p>
     </div>
 
     <div class="pr-act rv">
       <a class="pr-btn" href="#quiz">Рассчитать стоимость для класса</a>
       <p class="pr-fine">Взрослый билет считаем отдельно - назовём цену в ответе на заявку.</p>
     </div>
-    <p class="vh" id="prLive" aria-live="polite"></p>
   </div>
 </section>
+
 
 
 <section class="next" id="next">
@@ -3517,149 +3414,65 @@ body{
 </script>
 
 <script>
-/* ==================== ЭКРАН ЦЕН: город и ступени повышения ====================
-   Две задачи. Первая: переключить город - меняются ровно восемь чисел, даты
-   и вся геометрия листа неподвижны. Вторая: цена сама считает, на какой ступени
-   она сейчас стоит.
+/* ==================== ЭКРАН ЦЕН: ступени повышения ====================
+   Цена растёт на 100 руб каждого 1 числа: 1 октября, 1 ноября, 1 декабря.
+   Больше повышений в сезоне нет.
 
-   Ступени +100 руб приходятся на 1 октября, 1 ноября и 1 декабря. В разметке
-   лежит сентябрьская цена Нижнего Новгорода - без скрипта и для поисковика виден
-   готовый документ, а не пустой лист. Скрипт прибавляет пройденные ступени, поэтому
+   В разметке лежит сентябрьская цена - без скрипта и для поисковика виден готовый
+   прайс, а не пустые карточки. Скрипт прибавляет пройденные ступени, поэтому
    1 октября страница не протухнет: сама покажет «сейчас 1990, с 1 ноября 2090».
-   После 1 декабря повышений больше нет - строка «с 1 ...» заменяется на
-   «Финальная цена сезона», иначе сайт пообещает несуществующее повышение. */
+   После 1 декабря строка «с 1 ...» заменяется на «Финальная цена сезона» -
+   иначе сайт пообещает повышение, которого не будет.
+
+   Оговорка: расчёт идёт по часам посетителя, их можно перевести. Для витрины это
+   допустимо - обязывающий расчёт человек всё равно получает через квиз. */
 (function(){
   'use strict';
   var sec = document.getElementById('prices');
   if (!sec) return;
 
-  /* базовая (сентябрьская) цена, порядок как в разметке: VIP, Премиум, Стандарт, Специальные */
-  var CITY = {
-    nizhny:    {n:'Нижнего Новгорода', p:[1890,1690,1590,1490]},
-    kazan:     {n:'Казани',            p:[1890,1690,1590,1490]},
-    tyumen:    {n:'Тюмени',            p:[1890,1690,1590,1390]},
-    stavropol: {n:'Ставрополя',        p:[1690,1490,1390,1290]},
-    crimea:    {n:'Крыма',             p:[1790,1590,1490,1390]}
-  };
   var STEPS = [
     {k:20261001, from:'с 1 октября', till:'до 30 сентября'},
     {k:20261101, from:'с 1 ноября',  till:'до 31 октября'},
     {k:20261201, from:'с 1 декабря', till:'до 30 ноября'}
   ];
   var UP = 100;
-  function has(k){ return Object.prototype.hasOwnProperty.call(CITY, k); }
 
   var t = new Date();
   var today = t.getFullYear() * 10000 + (t.getMonth() + 1) * 100 + t.getDate();
   var passed = 0, i;
   for (i = 0; i < STEPS.length; i++){ if (today >= STEPS[i].k) passed++; }
   var next = STEPS[passed] || null;
+  if (!passed) return;                 /* сентябрь: в разметке уже верные цены */
 
-  var cities = sec.querySelectorAll('.pr-city');
-  var sums   = sec.querySelectorAll('.pr-sum');
-  var rails  = sec.querySelectorAll('.pr-rail b');
-  var valid  = document.getElementById('prValid');
-  var live   = document.getElementById('prLive');
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var sums  = sec.querySelectorAll('.pr-sum');
+  var rails = sec.querySelectorAll('.pr-rail b');
+  var valid = document.getElementById('prValid');
 
   if (valid) valid.textContent = next ? ('Цена действует ' + next.till)
                                       : 'Действует последняя цена сезона';
 
-  function paint(key, animate){
-    /* ключ приходит из адресной строки. Просто CITY[key] тут нельзя: ?city=constructor
-       достанет свойство прототипа, и вместо цен в графах встанет NaN */
-    if (!has(key)) return;
-    var c = CITY[key];
-    for (var i = 0; i < sums.length; i++){
-      var cur   = c.p[i] + UP * passed;
-      var cell  = sums[i];
-      var nowEl = cell.querySelector('.pr-now i');
-      var line  = cell.querySelector('.pr-next');
-      if (nowEl) nowEl.textContent = cur;
-      if (line){
-        var when = line.querySelector('.pr-when');
-        var box  = line.querySelector('b');
-        if (next){
-          line.classList.remove('final');
-          if (when) when.textContent = next.from;
-          if (box){ box.hidden = false; box.querySelector('i').textContent = cur + UP; }
-        } else {
-          line.classList.add('final');
-          if (when) when.textContent = 'Финальная цена сезона';
-          if (box) box.hidden = true;
-        }
-      }
-      if (rails[i]) rails[i].textContent = cur + ' ₽';
-      /* цифры пропечатываются волной слева направо. Класс снимаем, форсируем
-         перерисовку и ставим заново - иначе повторный щелчок анимацию не перезапустит */
-      if (animate && !reduce){
-        cell.classList.remove('set');
-        void cell.offsetWidth;
-        cell.style.setProperty('--d', (i * 45) + 'ms');
-        cell.classList.add('set');
-      }
-    }
-    /* «от 1490 руб» под названием города - тоже цена, и она тоже растёт */
-    for (i = 0; i < cities.length; i++){
-      var slug = cities[i].getAttribute('data-city');
-      var em = cities[i].querySelector('em');
-      if (!em || !CITY[slug]) continue;
-      em.textContent = 'от ' + (Math.min.apply(null, CITY[slug].p) + UP * passed) + ' ₽';
+  for (i = 0; i < sums.length; i++){
+    var cell  = sums[i];
+    var nowEl = cell.querySelector('.pr-now i');
+    if (!nowEl) continue;
+    var cur = parseInt(nowEl.textContent, 10) + UP * passed;
+    nowEl.textContent = cur;
+    if (rails[i]) rails[i].textContent = cur + ' ₽';
+
+    var line = cell.querySelector('.pr-next');
+    if (!line) continue;
+    var when = line.querySelector('.pr-when');
+    var box  = line.querySelector('b');
+    if (next){
+      if (when) when.textContent = next.from;
+      if (box) box.querySelector('i').textContent = cur + UP;
+    } else {
+      line.classList.add('final');
+      if (when) when.textContent = 'Финальная цена сезона';
+      if (box) box.hidden = true;
     }
   }
-
-  /* активный город подводится под глаз сдвигом самой ленты. scrollIntoView здесь
-     нельзя: на загрузке страницы он утащил бы человека вниз, к секции цен */
-  function center(btn){
-    var box = btn.parentNode;
-    if (!box || box.scrollWidth <= box.clientWidth) return;
-    box.scrollLeft = btn.offsetLeft - (box.clientWidth - btn.offsetWidth) / 2;
-  }
-
-  function select(key, opts){
-    if (!has(key)) return;
-    opts = opts || {};
-    for (var i = 0; i < cities.length; i++){
-      var on = cities[i].getAttribute('data-city') === key;
-      cities[i].classList.toggle('on', on);
-      cities[i].setAttribute('aria-checked', on ? 'true' : 'false');
-      cities[i].tabIndex = on ? 0 : -1;
-      if (on){
-        center(cities[i]);
-        if (opts.focus) cities[i].focus();
-      }
-    }
-    paint(key, !opts.silent);
-    if (!opts.silent){
-      if (live) live.textContent = 'Цены для ' + CITY[key].n;
-      /* менеджер может отправить школе ссылку сразу на её город */
-      try { history.replaceState(null, '', '?city=' + key + location.hash); } catch (e){}
-    }
-  }
-
-  for (i = 0; i < cities.length; i++){
-    cities[i].addEventListener('click', function(){
-      select(this.getAttribute('data-city'), {});
-    });
-  }
-  /* стрелками ходим по группе, как положено радиокнопкам */
-  sec.addEventListener('keydown', function(e){
-    var el = e.target;
-    if (!el || !el.classList || !el.classList.contains('pr-city')) return;
-    var idx = Array.prototype.indexOf.call(cities, el), n = cities.length, to = -1;
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = (idx + 1) % n;
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = (idx - 1 + n) % n;
-    else if (e.key === 'Home') to = 0;
-    else if (e.key === 'End') to = n - 1;
-    else return;
-    e.preventDefault();
-    select(cities[to].getAttribute('data-city'), {focus:true});
-  });
-
-  var start = 'nizhny';
-  var m = /[?&]city=([a-z]+)/.exec(location.search || '');
-  if (m && has(m[1])) start = m[1];
-  select(start, {silent:true});
 })();
 </script>
 
