@@ -32,7 +32,10 @@
   --gold:#E3B34E; --moon:#7FA8D9;
   /* Набор заголовков секций. Один на все экраны: эталон снят с квиза,
      менять размер/цвет заголовков — только здесь, а не в каждой секции */
-  --h2-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif;
+  /* Athelas стоит в macOS и iOS (кириллица в ней есть), в вебе её нет:
+     на Windows и Android заголовки падают на PT Serif - ближайшая книжная
+     антиква из подключённых, набор в тех же пропорциях */
+  --h2-family:Athelas,"PT Serif","Times New Roman",Georgia,serif;
   --h2-weight:700; --h2-size:clamp(22.4px,3.52vw,62.4px);   /* на 20% меньше исходного 28/4.4/78 */
   --h2-lh:1.1; --h2-ls:.005em; --h2-color:#fff;
   /* размеры логотипа, пересчитанные из кадра 1920x1080 при object-fit:cover */
@@ -167,7 +170,7 @@ body{
 @media(max-width:800px){.cards{grid-template-columns:1fr}}
 .card{border:1px solid var(--line); border-radius:4px; padding:26px;
   background:linear-gradient(180deg,rgba(127,168,217,.05),transparent 60%),var(--ink2)}
-.card h3{font-family:"Unbounded",sans-serif; font-weight:500; font-size:16px; margin:0 0 10px}
+.card h3{font-family:var(--h2-family); font-weight:var(--h2-weight); font-size:16px; margin:0 0 10px}
 .card p{color:var(--dim); font-size:14.5px; margin:0; line-height:1.6}
 .stub{margin-top:44px; padding:14px 18px; border-left:2px solid var(--line); color:var(--faint); font-size:13.5px}
 
@@ -386,7 +389,7 @@ body{
    Ширина 1320 px держит перенос в две строки на большом мониторе: без неё
    заголовок вытягивается в одну длинную строку и теряет вид со скрина */
 #white .bn-title{max-width:min(1320px,100%); margin-inline:auto;
-  font-family:"PT Serif","Times New Roman",Times,serif; font-weight:400;
+  font-family:var(--h2-family); font-weight:400;
   font-size:clamp(24px,2.9vw,56px); line-height:1.22; letter-spacing:0; color:#111}
 #white .bn-sub{margin-top:clamp(26px,3.4vw,58px); max-width:44ch;
   font-size:clamp(15px,1.35vw,24px); line-height:1.45; color:#2E3340}
@@ -899,7 +902,7 @@ body{
 .qz-step{padding-top:clamp(18px,2vw,32px)}
 .qz-step[hidden]{display:none}
 .qz-q{margin:0 auto; max-width:34ch;
-  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
   font-size:clamp(20px,2.05vw,38px); line-height:1.2; color:var(--qz-ink); text-wrap:balance}
 .qz-note{margin:10px auto 0; max-width:66ch;
   font-size:clamp(13px,1vw,16px); line-height:1.45; color:var(--qz-mute)}
@@ -1002,7 +1005,7 @@ body{
   transform:rotate(-9deg)}
 .qz-seal svg{width:52%; height:52%}
 .qz-done h3{margin:0 auto; max-width:24ch;
-  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
   font-size:clamp(21px,2vw,36px); color:var(--qz-ink); text-transform:uppercase}
 .qz-done p{margin:12px auto 0; max-width:52ch; font-size:clamp(14px,1.02vw,17px); line-height:1.5; color:#4A4534}
 .qz-vk{display:inline-flex; align-items:center; gap:9px; margin-top:clamp(18px,1.8vw,28px);
