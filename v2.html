@@ -335,6 +335,12 @@ body{
   src:url(cr-roboto-light.woff) format("woff")}
 @font-face{font-family:"CR Roboto"; font-style:normal; font-weight:400; font-display:swap;
   src:url(cr-roboto.woff) format("woff")}
+/* настоящий жирный Blogger Sans - только для подписей городов на карте.
+   Отдельным именем, чтобы не задеть "CR Blogger": там жирный обязан
+   оставаться дорисованным, как на старом сайте. Файл уже лежит в репозитории,
+   его использует первый экран. */
+@font-face{font-family:"CR Blogger Bold"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff")}
 
 /* ---------- каркас, общий для обоих экранов ----------
    Вёрстка широкая, почти во весь экран: контейнер min(94vw,1720px) с полями
@@ -499,28 +505,34 @@ body{
 /* невидимая толстая копия ловит мышь: в нить 1,7 px курсором не попасть */
 .cr-lines .hit{stroke:transparent; stroke-width:16; stroke-opacity:1; pointer-events:stroke; cursor:pointer}
 
+/* Шрифт подписей - Blogger Sans, тот же, что у старого сайта.
+   Раньше стоял Golos Text, и кегль подбирался по ШИРИНЕ строки. Ширина сходилась,
+   а буквы выходили на 20-25 % ниже эталонных: Golos шире в пересчёте на кегль.
+   Теперь размер задан по ВЫСОТЕ БУКВ, замеренной на картинке старого сайта
+   (в кадре 1750x975: название 32 px, год 23 px, приписка 27 px), - и сходятся
+   обе величины сразу, с точностью до 3-5 %. */
 .cr-city{
   position:absolute; left:var(--x); top:var(--y); transform:translateY(-50%);
   z-index:2; white-space:nowrap; cursor:default;
-  font-family:"Golos Text",Arial,sans-serif;
+  font-family:"CR Blogger",Arial,sans-serif;
   transition:transform .3s cubic-bezier(.2,.7,.2,1);
 }
 .cr-city:hover,.cr-city.on{transform:translateY(-50%) translateY(-2px)}
 .cr-city b{
-  display:block; font-weight:700; font-size:22.9px; font-size:2.10cqw; line-height:1.06;
-  color:#fff; letter-spacing:-.01em;
+  display:block; font-family:"CR Blogger Bold","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:29px; font-size:2.55cqw; line-height:1.06; color:#fff;
   text-shadow:0 2px 16px rgba(0,0,0,.8), 0 0 34px rgba(0,0,0,.55);
   transition:color .25s ease;
 }
 .cr-city em{
-  position:absolute; left:0; top:calc(100% + 8px); top:calc(100% + .75cqw);
-  font-style:normal; font-weight:500; font-size:14.6px; font-size:1.34cqw; line-height:1.2;
+  position:absolute; left:0; top:calc(100% + 7px); top:calc(100% + .62cqw);
+  font-style:normal; font-weight:400; font-size:18px; font-size:1.60cqw; line-height:1.2;
   color:rgba(255,255,255,.88); text-shadow:0 2px 12px rgba(0,0,0,.8);
 }
 /* приписка над названием — только у города с главным офисом */
 .cr-city i{
-  position:absolute; left:0; bottom:calc(100% + 7px); bottom:calc(100% + .66cqw);
-  font-style:normal; font-weight:600; font-size:14.1px; font-size:1.29cqw; line-height:1.2;
+  position:absolute; left:0; bottom:calc(100% + 6px); bottom:calc(100% + .55cqw);
+  font-style:normal; font-weight:600; font-size:18px; font-size:1.59cqw; line-height:1.2;
   color:#FDC68C; text-shadow:0 2px 12px rgba(0,0,0,.8);
 }
 /* огонёк слева от названия */
@@ -540,19 +552,55 @@ body{
   box-shadow:0 0 0 3px rgba(255,205,140,.45), 0 0 14px 4px rgba(255,196,116,.95);
   box-shadow:0 0 0 .22cqw rgba(255,205,140,.45), 0 0 1.35cqw .42cqw rgba(255,196,116,.95);
 }
-/* телефон: выноски не поместятся, подписи собираются в две колонки под картой */
+/* ---------- телефон: карта крупным планом, подписи вокруг неё ----------
+   Вся Россия на узком экране превращается в белую полоску, подписи рядом с ней
+   читать нечем. Поэтому кадр становится портретным (макет 1080x1260), карта
+   увеличивается до 215,7 % его ширины и сдвигается так, что видна европейская
+   часть — ровно та, где стоят все семь городов. Хвост страны уезжает за правый
+   край, его срезает overflow:hidden у секции: горизонтальной прокрутки от этого
+   не появляется, проверено на 320-767 px.
+   Подписи стоят долями кадра (--mx / --my в разметке), кегли — в долях его
+   ширины (cqw). Поэтому композиция одна и та же и на 320, и на 767 px.
+   Перед каждым cqw стоит пиксельное запасное значение — в браузере без единиц
+   контейнера подписи не пропадут. */
 @media (max-width:767px){
-  .cr-map{aspect-ratio:auto; padding-bottom:4px}
-  .cr-map-img{position:static; left:auto; top:auto; width:100%; margin:0 auto}
-  .cr-lines{display:none}
-  .cr-cities{position:static; display:grid; grid-template-columns:repeat(2,1fr); gap:18px 10px; padding:20px 6px 0}
-  /* relative, а не static: иначе огонёк и подписи начнут считаться от всего кадра */
-  .cr-city{position:relative; left:auto; top:auto; transform:none !important; text-align:center; padding-left:14px}
-  .cr-city b{font-size:17px}
-  .cr-city em{position:static; display:block; margin-top:4px; font-size:12.5px}
-  .cr-city i{position:static; display:block; margin-bottom:4px; font-size:11px}
-  .cr-city::before{right:auto; left:0; top:.72em; margin-top:0; width:6px; height:6px;
-    box-shadow:0 0 0 2px rgba(255,190,105,.32), 0 0 10px 3px rgba(255,186,96,.75)}
+  .cr-map{aspect-ratio:6/7}
+  .cr-map-img{left:11.2%; top:11.35%; width:215.7%; max-width:none}
+  .cr-lines{display:none}                       /* на крупной карте выноски не нужны */
+  .cr-city{left:var(--mx,var(--x)); top:var(--my,var(--y))}
+  .cr-city b{font-size:14px; font-size:max(13px, 3.7cqw)}
+  .cr-city em{
+    top:calc(100% + 6px); top:calc(100% + 1.5cqw);
+    font-size:9.5px; font-size:max(9.5px, 2.35cqw);
+  }
+  .cr-city i{
+    bottom:calc(100% + 5px); bottom:calc(100% + 1.3cqw);
+    font-size:9.5px; font-size:max(9.5px, 2.35cqw);
+  }
+  .cr-city::before{
+    right:calc(100% + 3px); right:calc(100% + .8cqw);
+    width:5px; height:5px; margin-top:-2.5px;
+    width:1.3cqw; height:1.3cqw; margin-top:-.65cqw;
+    box-shadow:0 0 0 1.5px rgba(255,190,105,.3), 0 0 9px 2px rgba(255,186,96,.7);
+    box-shadow:0 0 0 .18cqw rgba(255,190,105,.3), 0 0 2.6cqw .5cqw rgba(255,186,96,.7);
+  }
+  /* тёплое зарево вокруг огонька: на макете он не висит на голом фоне.
+     Размер задан от кадра, а не от длины названия, — иначе у «Крыма» пятно
+     вышло бы вдвое меньше, чем у «Екатеринбурга» */
+  .cr-city::after{
+    content:''; position:absolute; z-index:-1; pointer-events:none;
+    right:calc(100% - 24px); width:60px; top:50%; height:46px; margin-top:-23px;
+    right:calc(100% - 6.55cqw); width:16cqw; height:12cqw; margin-top:-6cqw;
+    background:radial-gradient(closest-side, rgba(255,178,92,.34), rgba(255,178,92,0) 100%);
+  }
+  /* главный офис: пунктирная рамка вокруг подписи и багровый отсвет под ней */
+  .cr-city[data-city="nizhny"]::after{
+    right:auto; margin-top:0; width:auto; height:auto;
+    left:-4.7cqw; right:-2.8cqw; top:-8.6cqw; bottom:-6.9cqw;
+    border:1px dashed rgba(255,255,255,.5); border-radius:26px;
+    border-width:max(1px, .19cqw); border-radius:3.7cqw;
+    background:radial-gradient(42% 50% at 13% 52%, rgba(226,66,74,.5), rgba(226,66,74,0) 74%);
+  }
 }
 @media (prefers-reduced-motion:reduce){
   .cr-city,.cr-lines path{transition:none}
@@ -722,7 +770,7 @@ body{
       <div class="cr-map" id="crMap">
         <img class="cr-map-img" src="map.webp"
              srcset="map-mob.webp 1000w, map-mid.webp 1200w, map.webp 1559w"
-             sizes="(max-width:767px) 100vw, (min-width:1830px) 1420px, 78vw"
+             sizes="(max-width:767px) 216vw, (min-width:1830px) 1420px, 78vw"
              width="1559" height="668" loading="lazy" decoding="async"
              alt="Карта России: ёлки стоят в семи городах, где проходит экскурсия-шоу">
 
@@ -746,13 +794,13 @@ body{
         </svg>
 
         <div class="cr-cities">
-          <span class="cr-city" data-city="yaroslavl" style="--x:13.371%;--y:10.000%"><b>Ярославль</b><em>С 2023 года</em></span>
-          <span class="cr-city" data-city="nizhny" style="--x:39.029%;--y:13.385%"><i>Главный офис тут</i><b>Нижний Новгород</b><em>С 2019 года</em></span>
-          <span class="cr-city" data-city="kazan" style="--x:69.714%;--y:10.821%"><b>Казань</b><em>С 2022 года</em></span>
-          <span class="cr-city" data-city="crimea" style="--x:4.400%;--y:32.564%"><b>Крым</b><em>С 2018 года</em></span>
-          <span class="cr-city" data-city="stavropol" style="--x:11.943%;--y:80.359%"><b>Ставрополь</b><em>С 2025 года</em></span>
-          <span class="cr-city" data-city="ekb" style="--x:35.029%;--y:86.821%"><b>Екатеринбург</b><em>Впервые!</em></span>
-          <span class="cr-city" data-city="tyumen" style="--x:60.686%;--y:87.641%"><b>Тюмень</b><em>Впервые!</em></span>
+          <span class="cr-city" data-city="yaroslavl" style="--x:13.371%;--y:10.000%;--mx:9.26%;--my:19.05%"><b>Ярославль</b><em>С 2023 года</em></span>
+          <span class="cr-city" data-city="nizhny" style="--x:39.029%;--y:13.385%;--mx:37.50%;--my:11.90%"><i>Главный офис тут</i><b>Нижний Новгород</b><em>С 2019 года</em></span>
+          <span class="cr-city" data-city="kazan" style="--x:69.714%;--y:10.821%;--mx:79.44%;--my:15.48%"><b>Казань</b><em>С 2022 года</em></span>
+          <span class="cr-city" data-city="crimea" style="--x:4.400%;--y:32.564%;--mx:6.67%;--my:35.32%"><b>Крым</b><em>С 2018 года</em></span>
+          <span class="cr-city" data-city="stavropol" style="--x:11.943%;--y:80.359%;--mx:10.37%;--my:85.63%"><b>Ставрополь</b><em>С 2025 года</em></span>
+          <span class="cr-city" data-city="ekb" style="--x:35.029%;--y:86.821%;--mx:45.37%;--my:80.56%"><b>Екатеринбург</b><em>Впервые!</em></span>
+          <span class="cr-city" data-city="tyumen" style="--x:60.686%;--y:87.641%;--mx:76.11%;--my:91.27%"><b>Тюмень</b><em>Впервые!</em></span>
         </div>
       </div>
     </div>
