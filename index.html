@@ -444,6 +444,10 @@ body{
    (база глубже, блик светлее базы), см. историю правок: на светлом фоне светлое золото
    пропадает, на тёмном та же глубина читается ржавчиной. Свечение двумя слоями:
    тёплая лужица света под цифрой и drop-shadow по контуру глифов внутри блика. */
+/* цифры переехали под стену с фотографиями, за сугроб: сверху их подпирает снег,
+   поэтому воздуха нужно меньше, чем когда они стояли под заголовком */
+.ls-after{padding-top:clamp(6px,1.4vw,22px); padding-bottom:clamp(48px,6vw,96px)}
+.ls-after .ls-stats{margin-top:0}
 .ls-stats{
   display:grid; grid-template-columns:repeat(4,1fr);
   gap:clamp(20px,2.8vw,44px) clamp(16px,2.4vw,36px);
@@ -454,15 +458,6 @@ body{
    самой цифры: у «6» она узкая, у «40 000» широкая. От блока во всю колонку
    над короткими цифрами висело бы пятно шире их самих */
 .ls-numbox{position:relative; display:inline-block}
-/* тёплая лужица на тёмном работает только через screen — тот же приём, что у зарева
-   #glow на первом экране. Обычная прозрачность поверх синего даёт не золото,
-   а серо-коричневое пятно: синий канал фона всё равно перебивает тёплый */
-.ls-numbox::before{
-  content:''; position:absolute; left:50%; top:50%; width:165%; height:150%;
-  transform:translate(-50%,-50%); pointer-events:none; mix-blend-mode:screen;
-  background:radial-gradient(closest-side, rgba(78,52,13,.92), rgba(52,34,9,.5) 52%, rgba(0,0,0,0) 78%);
-  filter:blur(10px);
-}
 .ls-num{
   position:relative; z-index:1; display:inline-block; white-space:nowrap;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
@@ -622,8 +617,9 @@ body{
 .ct-veil{background:rgba(0,0,0,.44); min-height:clamp(400px,64vh,760px); display:flex; align-items:center;
   overflow:hidden}
 .ct-inner{
-  width:100%; max-width:1240px; margin:0 auto; text-align:center;
-  padding:clamp(64px,9vw,122px) clamp(18px,4vw,44px) clamp(56px,8vw,106px);
+  /* широкая вёрстка: контент почти во весь экран, узкая колонка запрещена */
+  width:min(94vw,1720px); margin:0 auto; text-align:center;
+  padding:clamp(64px,9vw,122px) clamp(16px,3vw,56px) clamp(56px,8vw,106px);
 }
 .ct-title{
   margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
@@ -641,42 +637,70 @@ body{
 }
 /* пока карты нет, пустой контейнер не должен добавлять секции высоту */
 .ct-map:empty{display:none}
-/* ---------- города на карте: подпись сбоку, линия к точке ----------
-   Линии рисует SVG в своей системе координат 1000x428 (пропорция карты),
-   поэтому точки привязаны к рисунку, а не к пикселям экрана.
-   non-scaling-stroke — чтобы растягивание не делало линии разной толщины */
+/* ---------- города на карте: крупная подпись, цветное пятно, витая линия ----------
+   Линии рисует SVG в системе координат кадра 1000x428, но с overflow:visible —
+   подписи вынесены выше и ниже картинки, в поля .map, и линии дотягиваются туда */
 .map-lines{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible;
-  /* тень под линиями: без неё тонкая белая нить теряется и на снегу, и на светлом фото фона */
-  filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
-.map-lines path{fill:none; stroke:rgba(255,255,255,.62); stroke-width:1.4;
-  vector-effect:non-scaling-stroke; stroke-linecap:round; stroke-linejoin:round;
-  transition:stroke .28s ease}
-.map-lines path.on{stroke:#FFD79A}
+  filter:drop-shadow(0 1px 4px rgba(0,0,0,.75))}
+/* линия янтарная, а не белая: половину пути она идёт по белому снегу, где белая нить пропадает */
+.map-lines path{fill:none; stroke:#E8B267; stroke-width:1.7; stroke-opacity:.85;
+  vector-effect:non-scaling-stroke; stroke-linecap:round;
+  transition:stroke .28s ease, stroke-width .28s ease, stroke-opacity .28s ease}
+.map-lines path.on{stroke:#FFE0A8; stroke-width:2.6; stroke-opacity:1}
 /* точка города: огонёк у основания ёлки */
-.map-dot{position:absolute; left:var(--x); top:var(--y); width:9px; height:9px; margin:-4.5px 0 0 -4.5px;
+.map-dot{position:absolute; left:var(--x); top:var(--y); width:10px; height:10px; margin:-5px 0 0 -5px;
   border-radius:50%; background:#FFF3E0; pointer-events:none;
-  box-shadow:0 0 0 2.5px rgba(255,190,105,.35), 0 0 14px 4px rgba(255,186,96,.75)}
+  box-shadow:0 0 0 3px rgba(255,190,105,.3), 0 0 16px 5px rgba(255,186,96,.7)}
 .map-cities{position:absolute; inset:0; margin:0; pointer-events:none}
 .map-city{
-  position:absolute; left:var(--x); top:var(--y); pointer-events:auto;
-  font:600 clamp(12px,1.02vw,15px)/1.25 "Golos Text",Arial,sans-serif; color:#fff;
-  white-space:nowrap; text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 22px rgba(0,0,0,.5);
-  transition:color .25s ease;
+  position:absolute; left:var(--x); top:var(--y); z-index:2;   /* свой слой: иначе цветное
+    пятно под подписью уходит под саму карту и его не видно */
+  pointer-events:auto; cursor:default;
+  font-family:"Golos Text",Arial,sans-serif; text-align:center; white-space:nowrap;
+  transition:transform .32s cubic-bezier(.2,.7,.2,1);
 }
-.map-city.right{transform:translate(11px,-50%)}
-.map-city.left{transform:translate(calc(-100% - 11px),-50%)}
-/* главный город выделен цветом заголовка секции, над ним мелкая приписка */
-.map-city.main{color:#FDC68C}
-.map-city i{display:block; font-style:normal; font-weight:400; font-size:.72em;
-  letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.62); margin-bottom:2px}
-.map-city:hover{color:#FFE9C4; cursor:default}
-/* телефон: выноски не поместятся — подписи собираются в строку под картой */
+/* якорь подписи — та её сторона, куда приходит линия */
+.map-city.up{transform:translate(-50%,-100%)}
+.map-city.down{transform:translate(-50%,0)}
+.map-city.up:hover{transform:translate(-50%,-100%) translateY(-4px)}
+.map-city.down:hover{transform:translate(-50%,0) translateY(4px)}
+.map-city b{display:block; font-weight:700; font-size:clamp(19px,1.5vw,30px); line-height:1.06; color:#fff;
+  letter-spacing:-.01em; text-shadow:0 2px 16px rgba(0,0,0,.8), 0 0 34px rgba(0,0,0,.55);
+  transition:color .25s ease}
+.map-city em{display:block; margin-top:.34em; font-style:normal; font-weight:500;
+  font-size:clamp(12px,.82vw,16px); color:rgba(255,255,255,.82);
+  text-shadow:0 2px 12px rgba(0,0,0,.8)}
+/* приписка над названием — только у города с офисом */
+.map-city i{display:block; margin-bottom:.4em; font-style:normal; font-weight:600;
+  font-size:clamp(10px,.66vw,13px); letter-spacing:.14em; text-transform:uppercase; color:#FDC68C;
+  text-shadow:0 2px 12px rgba(0,0,0,.8)}
+/* цветное пятно за подписью: снизу тёмная дымка под текст, сверху цвет города.
+   Размытие делает из градиента именно пятно, а не плашку */
+.map-city::before{
+  content:''; position:absolute; z-index:-1; left:50%; top:50%;
+  width:calc(100% + 6.2em); height:calc(100% + 4.4em);
+  transform:translate(-50%,-50%) rotate(var(--rot,0deg));
+  /* два смещённых мазка + тёмная дымка под текст: получается неровное пятно краски,
+     а не аккуратная плашка. Размытие небольшое, иначе цвет растворяется в фоне */
+  background:
+    radial-gradient(44% 48% at 40% 42%, var(--spot), transparent 66%),
+    radial-gradient(40% 44% at 64% 60%, var(--spot), transparent 68%),
+    radial-gradient(64% 68% at 50% 52%, rgba(6,8,20,.8), transparent 74%);
+  filter:blur(11px); opacity:1; transition:opacity .3s ease, transform .35s ease;
+}
+.map-city:hover::before{transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(1.07)}
+.map-city:hover b{color:#FFE9C4}
+/* телефон: выноски не поместятся — подписи собираются в две колонки под картой */
 @media (max-width:820px){
   .map-lines,.map-dot{display:none}
-  .map-cities{position:static; display:flex; flex-wrap:wrap; justify-content:center;
-    gap:4px 14px; padding:14px 12px 0}
-  .map-city{position:static; transform:none !important; font-size:14px}
-  .map-city i{display:none}   /* в строке под картой приписка только мешает: главный город и так выделен цветом */
+  .map{padding:0}
+  .map-cities{position:static; display:grid; grid-template-columns:repeat(2,1fr);
+    gap:16px 10px; padding:22px 6px 0}
+  .map-city{position:static; transform:none !important; text-align:center}
+  .map-city b{font-size:17px}
+  .map-city em{font-size:12.5px}
+  .map-city i{font-size:10px; letter-spacing:.1em}
+  .map-city::before{width:calc(100% + 2.4em); height:calc(100% + 1.6em); filter:blur(11px)}
 }
 /* «меньше движения»: подписи и линии остаются, они статичные */
 
@@ -686,18 +710,21 @@ body{
    режимом lighten (берётся более светлое из двух), а не простым проявлением:
    при обычном кроссфейде чёткие лампочки тонули в размытом сиянии и карта
    выглядела расфокусированной. */
-.ct-map{margin:clamp(28px,4vw,60px) auto 0; max-width:1120px}
+.ct-map{margin:clamp(28px,4vw,60px) auto 0; width:100%}
 /* на телефоне карта широкая и от этого мелкая — выпускаем её на всю ширину экрана,
    за поля секции, иначе ёлки в городах превращаются в точки */
 @media (max-width:820px){
-  .ct-map{max-width:none; margin-left:calc(-1*clamp(18px,4vw,44px)); margin-right:calc(-1*clamp(18px,4vw,44px));
-    padding:0 8px}   /* ёлка Калининграда стоит у самого края кадра — не режем её о край экрана */
+  .ct-map{margin-left:calc(-1*clamp(16px,3vw,56px)); margin-right:calc(-1*clamp(16px,3vw,56px));
+    padding:0 8px}   /* крайняя ёлка стоит у самого края кадра — не режем её о край экрана */
 }
-.map{position:relative; margin:0;            /* у figure свои поля по 40px, они тут лишние */
-  isolation:isolate;                        /* isolation — чтобы lighten смешивался
-       только со своей картой, а не с фотоколлажем секции */
-  --lit:0; --mx:50%; --my:50%}
-.map img{display:block; width:100%; height:auto}
+/* у figure свои поля по 40px, они тут лишние. Вертикальные поля нужны другие:
+   в них выносятся подписи городов — над картой и под ней */
+.map{position:relative; margin:0; --lit:0; --mx:50%; --my:50%;
+  padding:clamp(74px,7vw,140px) 0}
+/* кадр карты: только картинка и слои света. isolation — чтобы режим lighten
+   смешивался со своей картой, а не с фотоколлажем секции */
+.map-frame{position:relative; isolation:isolate}
+.map-frame img{display:block; width:100%; height:auto}
 /* мышь ловит только сама коробка: если события начнут перехватывать картинки-дети,
    pointerleave будет срабатывать посреди карты и свет станет дёргаться */
 .map > *{pointer-events:none}
@@ -707,7 +734,7 @@ body{
 /* зарево за картой: на тёмном фоне именно оно читается как «страна засветилась».
    Радиальный градиент, а не тень-фильтр: тень пришлось бы пересчитывать каждый кадр,
    а прозрачность градиента браузер меняет даром */
-.map::before{
+.map-frame::before{
   content:''; position:absolute; left:-6%; right:-6%; top:-14%; bottom:-14%; z-index:-1;
   background:radial-gradient(52% 58% at 50% 50%, rgba(255,206,130,.42), rgba(255,190,110,.16) 45%, transparent 72%);
   opacity:var(--lit); pointer-events:none;
@@ -737,9 +764,11 @@ body{
 /* пятно под курсором: горит сильнее общего и ходит за мышью.
    Эллипс 26%/60% вместо круга не случайно: у circle в CSS проценты запрещены,
    а карта широкая — эти два числа дают на ней ровный круг */
-.map-lit.spot{opacity:calc(var(--lit)*.85);
-  -webkit-mask-image:radial-gradient(26% 60% at var(--mx) var(--my), #000 0%, rgba(0,0,0,.5) 46%, transparent 76%);
-          mask-image:radial-gradient(26% 60% at var(--mx) var(--my), #000 0%, rgba(0,0,0,.5) 46%, transparent 76%);
+/* пятно под курсором: размытый круг 3 см в поперечнике — размер задан в сантиметрах,
+   чтобы он оставался одинаковым и на ноутбуке, и на большом мониторе */
+.map-lit.spot{opacity:calc(var(--lit)*.9);
+  -webkit-mask-image:radial-gradient(circle 1.5cm at var(--mx) var(--my), #000 0%, rgba(0,0,0,.55) 52%, transparent 100%);
+          mask-image:radial-gradient(circle 1.5cm at var(--mx) var(--my), #000 0%, rgba(0,0,0,.55) 52%, transparent 100%);
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat}
 /* на тач-экранах наведения нет: пятно не нужно, а свет включается сам,
    когда карта доезжает до экрана, и медленно дышит — иначе эффекта никто не увидит */
@@ -749,7 +778,7 @@ body{
    объявлять через @property, а он есть не везде */
 .map.touchlit.inview .map-lit.wide{animation:mapBreath 7s ease-in-out infinite}
 .ct.bgon .map.touchlit.inview .map-dim{animation:mapDimBreath 7s ease-in-out infinite}
-.map.touchlit.inview::before{animation:mapHaloBreath 7s ease-in-out infinite}
+.map.touchlit.inview .map-frame::before{animation:mapHaloBreath 7s ease-in-out infinite}
 @keyframes mapBreath{0%,100%{opacity:.2} 50%{opacity:.5}}
 @keyframes mapDimBreath{0%,100%{opacity:.3} 50%{opacity:.08}}
 @keyframes mapHaloBreath{0%,100%{opacity:.12} 50%{opacity:.55}}
@@ -759,7 +788,67 @@ body{
   .map-lit.wide{opacity:0; transition:opacity .4s ease}
   .map.lit .map-lit.wide{opacity:.45}
   .map.touchlit .map-lit.wide{opacity:.3}
-  .map-lit.wide, .map-dim, .map::before{animation:none !important}
+  .map-lit.wide, .map-dim, .map-frame::before{animation:none !important}
+}
+
+/* ==================== ПЯТЫЙ ЭКРАН: Дед Мороз, мальчик и рамка ====================
+   Два слоя одного кадра 2688x1520: ночной фон и вырезанные персонажи с карамельной
+   рамкой. Текст внутри рамки живёт разметкой, а не запечён в картинку — правится
+   одной строкой, читается поиском и остаётся резким на любом экране.
+   Размер шрифта считается в cqw — долях ширины самой картинки. Поэтому текст
+   ужимается вместе с рамкой и не вылезает из неё ни на каком экране. */
+.fr{position:relative; z-index:25; display:flex; justify-content:center;
+  /* цвет краёв самого кадра (#0A111C слева, #070D19 справа): боковые поля
+     на широких мониторах не читаются как поля */
+  background:#060C18; overflow:hidden}
+/* сцена не растёт выше экрана: иначе на большом мониторе верх и низ кадра уезжают за край */
+.fr-box{position:relative; width:100%; max-width:calc(100svh * 2688 / 1520); container-type:inline-size;
+  --k:.667}                        /* во сколько раз накладка меньше кадра: 1/1,5 */
+.fr-stage{position:relative; aspect-ratio:2688/1520}
+.fr-stage img,.fr-art>img{position:absolute; inset:0; display:block; width:100%; height:100%}
+/* Персонажи с рамкой уменьшаются вместе: рука Деда Мороза лежит на карамельной планке,
+   врозь он либо повиснет в воздухе, либо оторвётся от рамки.
+   Точка отсчёта — низ по центру: ноги остаются на том же снегу, накладка ужимается вверх.
+   Текст сидит в той же обёртке, поэтому уезжает и ужимается вместе с рамкой. */
+.fr-art{position:absolute; inset:0; transform:scale(var(--k)); transform-origin:50% 100%}
+/* окно рамки замерено по картинке: 38,4–91,7 % ширины и 33,0–82,6 % высоты.
+   Текст стоит внутри с запасом, чтобы строки не липли к карамели */
+.fr-text{position:absolute; left:40.6%; width:49.6%; top:36.2%; height:43.6%;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center; color:#fff}
+.fr-title{
+  margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  line-height:1.12; text-transform:uppercase; text-wrap:balance;
+  /* размеры даны ДО уменьшения накладки, поэтому крупнее «на глаз»: на экране
+     их ещё умножит --k. Рамка стала меньше — текст заполняет её плотнее */
+  font-size:clamp(20px,3.9vw,58px);   /* запасной размер для старых браузеров */
+  font-size:4cqw;                     /* основной: доля ширины картинки */
+  text-shadow:0 2px 18px rgba(0,0,0,.65)}
+.fr-lede{
+  margin:1.05em 0 0; font-weight:400; line-height:1.42; color:#E8EFFF;
+  font-size:clamp(14px,1.95vw,29px);
+  font-size:2cqw;
+  text-shadow:0 2px 14px rgba(0,0,0,.72)}
+/* Порог тут свой, 1024 px, а не общие для сайта 820: размер текста считается от
+   ширины картинки, и уже на 900 px абзац внутри рамки падает до 12 px. Ниже порога
+   кадр остаётся картинкой: в рамке живёт только заголовок, абзац уходит под неё. */
+@media (max-width:1023px){
+  .fr{display:block; padding-bottom:clamp(26px,7vw,44px)}
+  .fr-box{max-width:none}
+  /* на телефоне кадр и так узкий — не уменьшаем. Обёртки исчезают из раскладки:
+     картинка ложится на фон, заголовок встаёт в рамку, абзац уходит в поток под кадр */
+  .fr-art{display:contents}
+  /* обёртки не стало — картинка считает края от .fr-box, а он теперь выше кадра
+     на высоту абзаца. Поэтому низ отпускаем: высота берётся из пропорций самой картинки */
+  .fr-art>img{inset:0 0 auto 0; height:auto}
+  .fr-text{display:contents}          /* обёртка исчезает, дети встают сами */
+  /* абзац ушёл в поток и сделал бокс выше сцены, поэтому проценты по вертикали
+     уехали бы вниз. Считаем от ширины кадра: высота сцены — ровно 56,55 % ширины */
+  .fr-title{position:absolute; left:40.6%; width:49.6%; top:20.47cqw; height:24.65cqw;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-size:clamp(20px,5.2cqw,34px); text-shadow:0 1px 10px rgba(0,0,0,.7)}
+  .fr-lede{margin:0; padding:clamp(16px,5vw,30px) clamp(18px,6vw,34px) 0;
+    font-size:clamp(14.5px,3.9vw,18px); text-align:center}
 }
 
 /* ---------- стена полароидов: 24 кадра встают из наклона по прокрутке ---------- */
@@ -768,8 +857,22 @@ body{
    Стало 220vh: 1013 px, один смах, и стена успевает встать полностью */
 .wl-scroll{position:relative; z-index:2; height:220vh; perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
 @media (min-width:768px){.wl-scroll{height:260vh}}
-.wl-sticky{position:sticky; top:0; height:100svh; overflow:hidden;
+/* Липкий блок НЕ 3D-контекст: перспектива живёт во внутренней сцене. Иначе всё,
+   что положено поверх стены, попадает в ту же трёхмерную сцену, и наклонённые
+   карточки местами вылезают перед накладкой. */
+.wl-sticky{position:sticky; top:0; height:100svh; overflow:hidden}
+.wl-stage{position:absolute; inset:0;
   perspective:1000px; perspective-origin:center top; transform-style:preserve-3d}
+
+/* Мягкая тень на переходе к следующему экрану: ложится снизу на нижний ряд карточек
+   и растворяет жёсткий край стены. Набирает силу к концу прокрутки — пока стену
+   рассматривают, она не притемнена. */
+.wl-fade{position:absolute; left:0; right:0; bottom:0; height:46%; z-index:3;
+  pointer-events:none; opacity:0; will-change:opacity;
+  background:linear-gradient(to top,
+    rgba(4,7,20,.92) 0%, rgba(5,8,22,.78) 22%, rgba(6,10,26,.46) 52%,
+    rgba(7,11,28,.18) 76%, rgba(8,12,30,0) 100%)}
+@media (prefers-reduced-motion: reduce){ .wl-fade{opacity:1} }
 .wl-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; height:100%;
   transform-style:preserve-3d; will-change:transform; transform:rotateX(75deg) scale(1.2)}
 .wl-col{display:flex; flex-direction:column; gap:8px; will-change:transform}
@@ -882,28 +985,11 @@ body{
   <div class="ls-grain" aria-hidden="true"></div>
   <div class="ls-body">
     <h2 class="ls-title rv" id="lsTitle"><span class="ls-squeeze"><em class="r">Грандиозное новогоднее мероприятие для</em> <em class="b">школьников, аналогов которому нет в&nbsp;России!</em></span></h2>
-    <div class="ls-stats" id="lsStats">
-      <div class="ls-stat rv">
-        <span class="ls-numbox"><span class="ls-num" data-to="40000">40&nbsp;000</span></span>
-        <p class="ls-cap">детей посетили наше мероприятие в&nbsp;прошлом сезоне в&nbsp;5 городах России</p>
-      </div>
-      <div class="ls-stat rv">
-        <span class="ls-numbox"><span class="ls-num" data-to="6">6</span></span>
-        <p class="ls-cap">год мы создаем сказку для детей и&nbsp;родителей. До&nbsp;250&nbsp;000 детей побывали у&nbsp;нас с&nbsp;2018 года</p>
-      </div>
-      <div class="ls-stat rv">
-        <span class="ls-numbox"><span class="ls-num" data-to="3000">3&nbsp;000</span></span>
-        <p class="ls-cap">килограмм карамели мы&nbsp;произвели в&nbsp;своем цеху прошлой осенью</p>
-      </div>
-      <div class="ls-stat rv">
-        <span class="ls-numbox"><span class="ls-num" data-to="150">150</span></span>
-        <p class="ls-cap">человек работают над проектом каждый год</p>
-      </div>
-    </div>
     <p class="ls-sub rv">Как это было в прошлом году:</p>
   </div>
     <div class="wl-scroll" id="wlScroll">
       <div class="wl-sticky">
+        <div class="wl-stage">
         <div class="wl-grid" id="wlGrid">
           <div class="wl-col up" data-y0="-10" data-y1="2">
             <figure class="wl-ph" style="--tilt:-1.4deg"><div class="wl-win"><img src="wall/01.webp" alt="Резиденция вечером: дом в гирляндах и снегу" loading="lazy" decoding="async"></div></figure>
@@ -942,8 +1028,30 @@ body{
             <figure class="wl-ph" style="--tilt:-0.9deg"><div class="wl-win"><img src="wall/24.webp" alt="Дед Мороз у ёлки" loading="lazy" decoding="async"></div></figure>
           </div>
         </div>
+        </div>
+        <div class="wl-fade" id="wlFade" aria-hidden="true"></div>
       </div>
     </div>
+  <div class="ls-body ls-after">
+    <div class="ls-stats" id="lsStats">
+      <div class="ls-stat rv">
+        <span class="ls-numbox"><span class="ls-num" data-to="40000">40&nbsp;000</span></span>
+        <p class="ls-cap">детей посетили наше мероприятие в&nbsp;прошлом сезоне в&nbsp;5 городах России</p>
+      </div>
+      <div class="ls-stat rv">
+        <span class="ls-numbox"><span class="ls-num" data-to="6">6</span></span>
+        <p class="ls-cap">год мы создаем сказку для детей и&nbsp;родителей. До&nbsp;250&nbsp;000 детей побывали у&nbsp;нас с&nbsp;2018 года</p>
+      </div>
+      <div class="ls-stat rv">
+        <span class="ls-numbox"><span class="ls-num" data-to="3000">3&nbsp;000</span></span>
+        <p class="ls-cap">килограмм карамели мы&nbsp;произвели в&nbsp;своем цеху прошлой осенью</p>
+      </div>
+      <div class="ls-stat rv">
+        <span class="ls-numbox"><span class="ls-num" data-to="150">150</span></span>
+        <p class="ls-cap">человек работают над проектом каждый год</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ==================== ТРЕТИЙ ЭКРАН: шесть городов ==================== -->
@@ -959,40 +1067,66 @@ body{
       <!-- карта России ляжет сюда отдельной правкой -->
       <div class="ct-map rv" id="ctMap">
         <figure class="map" id="map">
-          <img class="map-base" src="map.webp" srcset="map-mob.webp 1000w, map-mid.webp 1200w, map.webp 1559w"
-               sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
-               alt="Карта России: ёлки стоят в городах, где проходит экскурсия-шоу"
-               loading="lazy" decoding="async">
-          <span class="map-dim" aria-hidden="true"></span>
-          <img class="map-lit wide" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow-mid.webp 1200w, map-glow.webp 1559w"
-               sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
-               alt="" aria-hidden="true" loading="lazy" decoding="async">
-          <img class="map-lit spot" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow-mid.webp 1200w, map-glow.webp 1559w"
-               sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
-               alt="" aria-hidden="true" loading="lazy" decoding="async">
-          <svg class="map-lines" viewBox="0 0 1000 428" preserveAspectRatio="none" aria-hidden="true">
-          <path data-city="crimea" d="M79 311 V387 H50"/>
-          <path data-city="stavropol" d="M107 310 V398 H215"/>
-          <path data-city="kazan" d="M242 252 V409 H480"/>
-          <path data-city="yaroslavl" d="M187 197 V51 H110"/>
-          <path data-city="nizhny" d="M224 238 V24 H330"/>
-          <path data-city="tyumen" d="M302 268 V49 H620"/>
-          </svg>
-          <b class="map-dot" style="--x:7.9%;--y:72.7%"></b>
-          <b class="map-dot" style="--x:10.7%;--y:72.5%"></b>
-          <b class="map-dot" style="--x:24.2%;--y:58.8%"></b>
-          <b class="map-dot" style="--x:18.7%;--y:46.0%"></b>
-          <b class="map-dot" style="--x:22.4%;--y:55.7%"></b>
-          <b class="map-dot" style="--x:30.2%;--y:62.5%"></b>
-          <figcaption class="map-cities">
-          <span class="map-city right main" data-city="nizhny" data-x="0.224" data-y="0.557" style="--x:33.0%;--y:5.5%"><i>главный город</i>Нижний Новгород</span>
-          <span class="map-city right" data-city="kazan" data-x="0.242" data-y="0.588" style="--x:48.0%;--y:95.5%">Казань</span>
-          <span class="map-city left" data-city="yaroslavl" data-x="0.187" data-y="0.460" style="--x:11.0%;--y:12.0%">Ярославль</span>
-          <span class="map-city left" data-city="crimea" data-x="0.079" data-y="0.727" style="--x:5.0%;--y:90.5%">Крым</span>
-          <span class="map-city right" data-city="stavropol" data-x="0.107" data-y="0.725" style="--x:21.5%;--y:93.0%">Ставрополь</span>
-          <span class="map-city right" data-city="tyumen" data-x="0.302" data-y="0.625" style="--x:62.0%;--y:11.5%">Тюмень</span>
-          </figcaption>
+          <div class="map-frame">
+            <img class="map-base" src="map.webp" srcset="map-mob.webp 1000w, map-mid.webp 1200w, map.webp 1559w"
+                 sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
+                 alt="Карта России: ёлки стоят в городах, где проходит экскурсия-шоу"
+                 loading="lazy" decoding="async">
+            <span class="map-dim" aria-hidden="true"></span>
+            <img class="map-lit wide" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow-mid.webp 1200w, map-glow.webp 1559w"
+                 sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
+                 alt="" aria-hidden="true" loading="lazy" decoding="async">
+            <img class="map-lit spot" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow-mid.webp 1200w, map-glow.webp 1559w"
+                 sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
+                 alt="" aria-hidden="true" loading="lazy" decoding="async">
+            <svg class="map-lines" viewBox="0 0 1000 428" preserveAspectRatio="none" aria-hidden="true">
+              <path data-city="crimea" d="M11 243 C11 108 35 -4 45 -58"/>
+              <path data-city="yaroslavl" d="M181 188 C181 78 219 -13 235 -58"/>
+              <path data-city="nizhny" d="M210 224 C210 97 388 -7 465 -58"/>
+              <path data-city="kazan" d="M234 254 C234 114 571 -2 715 -58"/>
+              <path data-city="stavropol" d="M63 317 C63 393 71 455 75 486"/>
+              <path data-city="ekb" d="M299 263 C299 363 450 446 515 486"/>
+              <path data-city="tyumen" d="M336 283 C336 374 657 449 795 486"/>
+            </svg>
+              <b class="map-dot" style="--x:1.06%;--y:56.74%"></b>
+              <b class="map-dot" style="--x:18.09%;--y:44.01%"></b>
+              <b class="map-dot" style="--x:20.97%;--y:52.40%"></b>
+              <b class="map-dot" style="--x:23.44%;--y:59.43%"></b>
+              <b class="map-dot" style="--x:6.32%;--y:74.10%"></b>
+              <b class="map-dot" style="--x:29.92%;--y:61.38%"></b>
+              <b class="map-dot" style="--x:33.55%;--y:66.17%"></b>
+            <figcaption class="map-cities">
+                <span class="map-city up" data-city="crimea" data-x="0.0106" data-y="0.5674" style="--x:4.50%;--y:-13.50%;--spot:rgba(232,150,60,.8);--rot:-7deg"><b>Крым</b><em>С 2018 года</em></span>
+                <span class="map-city up" data-city="yaroslavl" data-x="0.1809" data-y="0.4401" style="--x:23.50%;--y:-13.50%;--spot:rgba(232,150,60,.8);--rot:6deg"><b>Ярославль</b><em>С 2023 года</em></span>
+                <span class="map-city up" data-city="nizhny" data-x="0.2097" data-y="0.5240" style="--x:46.50%;--y:-13.50%;--spot:rgba(255,186,84,.88);--rot:-4deg"><i>Главный офис тут</i><b>Нижний Новгород</b><em>С 2019 года</em></span>
+                <span class="map-city up" data-city="kazan" data-x="0.2344" data-y="0.5943" style="--x:71.50%;--y:-13.50%;--spot:rgba(232,150,60,.8);--rot:8deg"><b>Казань</b><em>С 2022 года</em></span>
+                <span class="map-city down" data-city="stavropol" data-x="0.0632" data-y="0.7410" style="--x:7.50%;--y:113.50%;--spot:rgba(232,150,60,.8);--rot:5deg"><b>Ставрополь</b><em>С 2025 года</em></span>
+                <span class="map-city down" data-city="ekb" data-x="0.2992" data-y="0.6138" style="--x:51.50%;--y:113.50%;--spot:rgba(208,44,42,.85);--rot:-6deg"><b>Екатеринбург</b><em>Впервые!</em></span>
+                <span class="map-city down" data-city="tyumen" data-x="0.3355" data-y="0.6617" style="--x:79.50%;--y:113.50%;--spot:rgba(208,44,42,.85);--rot:7deg"><b>Тюмень</b><em>Впервые!</em></span>
+            </figcaption>
+          </div>
         </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ПЯТЫЙ ЭКРАН: рамка для текста ==================== -->
+<section class="fr" id="frame" aria-labelledby="frTitle">
+  <div class="fr-box">
+    <div class="fr-stage">
+      <img class="fr-bg" src="frame-bg.webp" srcset="frame-bg-mob.webp 1100w, frame-bg.webp 1920w"
+           sizes="100vw" width="1920" height="1086" alt="" aria-hidden="true"
+           loading="lazy" decoding="async">
+    </div>
+    <div class="fr-art">
+      <img src="frame-art.webp" srcset="frame-art-mob.webp 1100w, frame-art.webp 1920w"
+           sizes="100vw" width="1920" height="1086"
+           alt="Дед Мороз с посохом и мальчик на стремянке стоят у карамельной рамки"
+           loading="lazy" decoding="async">
+      <div class="fr-text">
+        <h2 class="fr-title rv" id="frTitle">Место для текста</h2>
+        <p class="fr-lede rv">Здесь встанут две-четыре строки. Пришли текст - поставлю в рамку и подгоню размер под него.</p>
       </div>
     </div>
   </div>
@@ -1686,7 +1820,7 @@ body{
   /* заголовок, подзаголовок и лента всплывают по мере прокрутки.
      Каскад считается внутри своей секции, иначе третий экран ждал бы очереди второго */
   var rv = [];
-  ['#lastseason', '#cities'].forEach(function(sel){
+  ['#lastseason', '#cities', '#frame'].forEach(function(sel){
     var group = Array.prototype.slice.call(document.querySelectorAll(sel + ' .rv'));
     group.forEach(function(el, i){ el.style.transitionDelay = (i * 120) + 'ms'; });
     rv = rv.concat(group);
@@ -1778,6 +1912,7 @@ body{
   if (!scr || !grid) return;
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+  var fade = document.getElementById('wlFade');
   var cols = [].slice.call(grid.children).map(function(c){
     return { el:c, y0:parseFloat(c.getAttribute('data-y0')), y1:parseFloat(c.getAttribute('data-y1')) };
   });
@@ -1805,7 +1940,9 @@ body{
     for (var i = 0; i < cols.length; i++){
       var c = cols[i];
       c.el.style.transform = 'translateY(' + (c.y0 + (c.y1 - c.y0) * t).toFixed(3) + '%)';
-    }
+  
+    if (fade) fade.style.opacity = ease(seg(p, 0.5, 0.92)).toFixed(3);
+  }
   }
 
   function frame(now){
@@ -1853,6 +1990,10 @@ body{
 (function(){
   var wrap = document.getElementById('map');
   if (!wrap) return;
+  /* координаты считаем от кадра картинки, а не от контейнера: у него сверху и снизу
+     поля, в которых стоят подписи городов. Имя pic, а не frame: frame — это функция
+     кадра анимации ниже, и переменная её бы затенила */
+  var pic = wrap.querySelector('.map-frame') || wrap;
 
   var MW = 240, MH = 103;
   var MASK = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//sAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP//gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///gAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///vAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD////wAAAAAAAAAAAPwAAAAAAAAAAAAAAAAAAAAAH////wAAAAAAAAAAAf4AAAAAAAAAAAAAAAAAAAAAH////wAAAAAAAAAAAf4AAAAAAAAAAAAAAAAAAAAAP////wAAAAAAAAAAD/4AAAAAAAAAAAAAAAAAAABwf////AAAAAAAAAAAH/4AAAAAAAAAAAAAAAAAAAD4f////AAAAAAAAAAAf/8AAAAAAAAABwAAAAAAAAH//////gAAAAAAAAAB//8AAAAAAAAABxAAAAAAAgP//////gAAAAAAAAAH//8AAAAAAAAAD/wAAAAAH////////gAAAAAAAAAH//8AAAAAAAAAD/4AAAAAf////////gAAAAAAAAAf//8AAAAAAAAAP/8AAAAB/////////wAAAAAAAAAf/f8AAAAAAAAH//8AAAAB/////////wAAAAAAABO/8f8AAAAAAAA///8AAAAB/////////wAAAAAAAD//4P8AAAAAAAB///8AD8AB/////////wAAAAAADz//zP8DAAAAwAD///8AD+AB/////////wAAAAAAf7//zn47gAADwB3///4AD+A//////////AAAAAAA/////nx7gAAH8H/////Pv+B//////////AAAAAAB//////74AAAP+H////n///z////////7/AAAAAAD///////z+AAf+n/////////////////5+AAAAAAH/////////Ag//3/////////////////98AAAAAAH/////////xw/9//////////////////98AAAAAAD/////////94////////////////////58AAAAAAH//////////9///////////////////+A+AAAAAAP//////////////////////////////8A+AAAAAAf//////////+///////////////////8A/4AAAAAf///////////+//////////////////8A/8AAAAA////////////+//////////////////8Af+AAAAA////////////+//////////////////+Af+AAAAE///////////////////////////////+Af/gAAAP////////////9///////////////////gf/wAAAf////////////////////////////////gf/4AAAf////////////////////////////////gf/4AAAP////////////////////////////////Af/wAAAH///////////////////////////////uAP/4AAAH///////////////////////////////MAH/8AAAP//////////////////////////////8AAH/8AAAP//////////////////////////////8AAD/8MAAP//////////////////////////////4AAB/8cAAP//////////////////////////////gAAAf+cAAP//////////////////////////////AAAAP+cAAP/////////////////////////////8AAAAD/eAAH/////////////////////////////4AAAAA/+AAD/////////////////////////////4AAAAAf+AAD/////////////////////////////4AAAAAH/gAD/////////////////////////////wAAAAAB/wAB/////////////////////////////wAAAAAAfwAB/////////////////////////////wAAAAAAfwAD/////////////////////////////gAAAAAAXwDP/////////////////////////////gAAAAAAD4X//////////////////////////////gAYAAAAB4///////////////////////////////gAcAAAAAf///////////////////////////////APeAAAAAf///////////////////////////////AfvAAAAAf///////////////////////////////Mf/wAAAAf//////////////////////////////////8AAAAf//////////////////////////////////+AAAAP///+/////////////////////////////9/gAAAf///4cH///////////////////////////8/wAAAf///wAB///////////////////////////+fwAAAP///wAB///////////////////////////+PwAAAP///gAA////////////////////////////PgAAAH///wAA///P////////////////////////ngAAAD///wAAf//A////////////////////////hwAAAD///wAAf/2AAH//////////////////////x+AAAB///wAAA/gAAB//////////////////////w/AAAA///gAAAfgAAB//////////////////////wfAAAA//HAAAAPgAAB//////////////////////wPAAAA/+AAAAAHgAAAf//////////////wB/////wOAAAAf+AAAAAAAAAAP//////////////gA/////wGAAAAH+AAAAAAAAAAHv/////////////gAf////wAAAAAD8AAAAAAAAAAAH/////////////wAP////wAAAAAD4AAAAAAAAAAAH/////////////wAH//7/4AAAAAD4AAAAAAAAAAAD/////////////wAD//z/4AAAAABwAAAAAAAAAAAD/////////////gAAAfj/4AAAAABwAAAAAAAAAAAD/////////////gAAAPB/4AAAAABwAAAAAAAAAAAB/////////////gAAAAB/4AAAAAAAAAAAAAAAAAAB/////////////gAAAAB/wAAAAAAAAAAAAAAAAAAB/////////////gAAAAB/wAAAAAAAAAAAAAAAAAAA//////v//////AAAAAB/wAAAAAAAAAAAAAAAAAAA//////B/////gAAAAAP/wAAAAAAAAAAAAAAAAAAAH/////AP///wAAAAAAP/wAAAAAAAAAAAAAAAAAAAAf////AP///gAAAAAAf/wAAAAAAAAAAAAAAAAAAAAP////AH///AAAAAAAf/gAAAAAAAAAAAAAAAAAAAAP/8H/AAAf+AAAAAAAP/gAAAAAAAAAAAAAAAAAAAAH/gD/AAAHwAAAAAAAP/AAAAAAAAAAAAAAAAAAAAAB/AAAAAAAAAAAAAAAH+AAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAA';
@@ -1888,7 +2029,7 @@ body{
   /* режим «меньше движения»: свет не бегает, просто мягко включается */
   if (slow.matches){
     wrap.addEventListener('pointermove', function(e){
-      var r = wrap.getBoundingClientRect();
+      var r = pic.getBoundingClientRect();
       wrap.classList.toggle('lit', onLand((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height));
     }, {passive: true});
     wrap.addEventListener('pointerleave', function(){ wrap.classList.remove('lit'); });
@@ -1927,7 +2068,7 @@ body{
     /* движение по подписи всплывает сюда же, и карта гасила бы свет: подпись лежит
        за пределами силуэта, значит проверка «попал в сушу» отвечает «нет» */
     if (overCity) return;
-    var r = wrap.getBoundingClientRect();
+    var r = pic.getBoundingClientRect();
     var u = (e.clientX - r.left) / r.width, v = (e.clientY - r.top) / r.height;
     tx = u; ty = v;
     target = onLand(u, v) ? 1 : 0;
