@@ -696,7 +696,10 @@ body{
   .map{padding:0}
   .map-cities{position:static; display:grid; grid-template-columns:repeat(2,1fr);
     gap:16px 10px; padding:22px 6px 0}
-  .map-city{position:static; transform:none !important; text-align:center}
+  /* position:relative, а не static: пятно за подписью позиционируется от неё самой,
+     а у static-элемента оно начало бы считаться от всего кадра карты и разлилось бы
+     красной кляксой во весь экран */
+  .map-city{position:relative; left:auto; top:auto; transform:none !important; text-align:center}
   .map-city b{font-size:17px}
   .map-city em{font-size:12.5px}
   .map-city i{font-size:10px; letter-spacing:.1em}
