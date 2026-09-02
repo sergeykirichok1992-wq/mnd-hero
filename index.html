@@ -305,20 +305,123 @@ body{
 /* сугробы наезжают на низ последнего кадра первого экрана — шва между экранами нет.
    z-index выше всех слоёв сцены (их максимум 20), но ниже шапки (30) */
 .ls-snowband{position:relative; z-index:25; margin-top:-14vh; pointer-events:none}
-.ls{position:relative; background:#fff; color:#333; z-index:25}
+/* база нарочно плоская: любой заметный градиент на четыре экрана высоты даст полосу.
+   Зерно одной картинкой — без него длинные мягкие переходы на тёмно-синем идут
+   ступеньками: глаз в тенях ловит разницу в один уровень. Шум обесцвечен, цветная
+   крупа на почти одноцветном фоне читается грязью */
+.ls{position:relative; background:#0A1129; color:#C9D6EE; z-index:25;
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
 /* наезд отменяется и по ширине, и по классу .touch (его ставит JS): на тач-устройствах
    ролик играет сам, и снег закрывал бы живое видео — в т.ч. на iPad шире 820px */
 @media (max-width:820px){ .ls-snowband{margin-top:0} }
 .touch .ls-snowband{margin-top:0}
-/* фокус на белой секции: голубая рамка шапки здесь не видна */
-.ls :focus-visible{outline-color:#2F3192}
-.ls ::selection{background:#2F3192; color:#fff}
-/* сугробы: ночь первого экрана оседает в белое поле */
+/* секция снова тёмная — лунная рамка шапки здесь видна лучше собственной */
+.ls :focus-visible{outline-color:var(--moon)}
+.ls ::selection{background:rgba(127,168,217,.34); color:#fff}
+/* сугробы: ночь первого экрана оседает в ночной снег.
+   Чистый белый над тёмно-синим давал бы жёсткую ступеньку, да и снег ночью не белый —
+   он ловит луну и уходит в синюю тень. Цвет задан из CSS: свойство fill перебивает
+   одноимённый атрибут в теге, саму разметку SVG трогать не нужно.
+   Порядок путей: дальний гребень — средний — ближний, до дна кадра */
 .ls-snow{display:block; width:100%; height:clamp(84px,13vw,190px)}
 .ls-snow svg{display:block; width:100%; height:100%}
+.ls-snow svg path:nth-of-type(1){fill:#8FA9CE}
+.ls-snow svg path:nth-of-type(2){fill:#B9CDE6}
+.ls-snow svg path:nth-of-type(3){fill:#EAF2FB}
+
+/* ---------- ночное небо второго экрана ----------
+   ГЛАВНОЕ РЕШЕНИЕ. Свет НЕ лежит в фоне секции. Секция высотой почти в четыре экрана:
+   любое пятно, положенное в background у .ls, растянется на всю её длину, и человек
+   увидит в окне четверть одного пятна — не небо, а медленно ползущую полосу. Поэтому
+   свет живёт в липком окне ростом ровно в экран: что бы ни прокручивали, в кадре
+   всегда целая композиция из четырёх пятен. Небо стоит на месте, потому что оно
+   бесконечно далеко; движение даёт стена полароидов, которая едет перед ним.
+
+   Слои внутри .ls (у неё свой стакан: position:relative + z-index:25):
+     -3 небо   -2 два шва   -1 зерно   поток — весь контент.
+   Отрицательные z-index рисуются НАД фоном .ls и ПОД контентом, поэтому .ls-body
+   трогать не нужно. Не вешать на .ls-body z-index: она станет отдельным стаканом,
+   и свечение под цифрами (mix-blend-mode:screen) перестанет видеть небо */
+.ls-sky{position:absolute; inset:0; z-index:-3; pointer-events:none}
+/* overflow:hidden сюда нельзя — убьёт прилипание ребёнка */
+.ls-sky-win{position:sticky; top:0; height:100svh; overflow:hidden}
+/* мягкость даёт растяжка стопов самого градиента, а не filter:blur — размытие такой
+   площади на телефоне стоит дорого, широкий градиент рисуется даром */
+.ls-sky i{position:absolute; display:block; border-radius:50%;
+  animation-timing-function:ease-in-out; animation-iteration-count:infinite; will-change:transform}
+/* 1. Луна за облаком: самое крупное холодное пятно из-за левого верхнего угла */
+.ls-sky i:nth-child(1){left:-24vw; top:-26vh; width:88vw; height:88vh;
+  background:radial-gradient(closest-side, rgba(127,168,217,.19) 0%, rgba(116,155,205,.13) 34%,
+    rgba(96,132,186,.06) 62%, rgba(84,118,170,.02) 82%, rgba(80,112,164,0) 100%);
+  animation-name:lsDrift1; animation-duration:71s; animation-delay:-11s}
+/* 2. Тёплый отсвет резиденции справа. Держим на пределе слышимости: чуть громче —
+   и тёплое поверх синего даст серо-бурую зону вместо температурного контраста */
+.ls-sky i:nth-child(2){left:58vw; top:34vh; width:66vw; height:62vh;
+  background:radial-gradient(closest-side, rgba(255,186,110,.12) 0%, rgba(236,170,104,.07) 38%,
+    rgba(206,148,92,.022) 68%, rgba(190,138,88,0) 100%);
+  animation-name:lsDrift2; animation-duration:53s; animation-delay:-27s}
+/* 3. Провал темноты: пятно, которое СЪЕДАЕТ свет. Без него неровность идёт только
+   в одну сторону и небо выглядит подсвеченным изнутри */
+.ls-sky i:nth-child(3){left:-20vw; top:40vh; width:84vw; height:76vh;
+  background:radial-gradient(closest-side, rgba(3,6,18,.62) 0%, rgba(4,7,20,.42) 36%,
+    rgba(5,9,24,.17) 66%, rgba(6,10,26,0) 100%);
+  animation-name:lsDrift3; animation-duration:89s; animation-delay:-41s}
+/* 4. Холодная искра: другая температура, чем у луны, и вдвое мельче — иначе два синих
+   пятна читаются как одно размазанное */
+.ls-sky i:nth-child(4){left:56vw; top:-8vh; width:46vw; height:44vh;
+  background:radial-gradient(closest-side, rgba(178,206,244,.15) 0%, rgba(152,186,232,.08) 40%,
+    rgba(128,164,214,.025) 70%, rgba(120,155,205,0) 100%);
+  animation-name:lsDrift4; animation-duration:37s; animation-delay:-6s}
+/* Периоды 71, 53, 89 и 37 секунд взаимно простые, поэтому вся картинка целиком
+   повторится примерно раз в четыре года. Пути замкнутые (0% = 100%), чтобы пятно не
+   дёргалось в точке разворота. Анимируется только transform — браузер двигает готовые
+   слои на видеокарте и ничего не перерисовывает */
+@keyframes lsDrift1{0%,100%{transform:translate3d(0,0,0) scale(1)}
+  28%{transform:translate3d(4.5vw,3vh,0) scale(1.05)}
+  55%{transform:translate3d(7.5vw,-2vh,0) scale(1.01)}
+  80%{transform:translate3d(2.5vw,-4vh,0) scale(1.06)}}
+@keyframes lsDrift2{0%,100%{transform:translate3d(0,0,0) scale(1)}
+  33%{transform:translate3d(-3.5vw,-5vh,0) scale(1.08)}
+  66%{transform:translate3d(-6vw,3.5vh,0) scale(1.03)}}
+@keyframes lsDrift3{0%,100%{transform:translate3d(0,0,0) scale(1.03)}
+  30%{transform:translate3d(5vw,-3vh,0) scale(1)}
+  62%{transform:translate3d(-3vw,-6vh,0) scale(1.07)}
+  84%{transform:translate3d(2vw,1.5vh,0) scale(1.02)}}
+@keyframes lsDrift4{0%,100%{transform:translate3d(0,0,0) scale(1)}
+  25%{transform:translate3d(-4vw,4vh,0) scale(1.09)}
+  50%{transform:translate3d(-7vw,1vh,0) scale(1.02)}
+  75%{transform:translate3d(-2.5vw,5.5vh,0) scale(1.06)}}
+/* класс вешает JS, когда секция ушла из кадра: анимация встаёт и слои отдают память.
+   Стена из 24 полароидов и так грузит кадр. Если JS не отработал — небо просто дышит
+   всегда, ничего не ломается */
+.ls.skysleep .ls-sky i{animation-play-state:paused; will-change:auto}
+/* зерно — плитка, а не растяжка, поэтому ловушка с четырьмя экранами тут не работает.
+   Лежит НАД пятнами и швами, ПОД контентом: полароиды и текст зерном не трогаются */
+.ls-grain{position:absolute; inset:0; z-index:-1; pointer-events:none;
+  opacity:.05; background:var(--grain) 0 0/140px 140px repeat}
+/* ШОВ СВЕРХУ: полоса начинается ровно тем цветом, которым кончаются сугробы, и валится
+   в базу. Основное падение в первой половине: крутой переход бэндингом не идёт,
+   а пологий на тёмно-синем полосит */
+.ls::before{content:''; position:absolute; z-index:-2; left:0; right:0; top:0;
+  height:clamp(80px,11vh,180px); pointer-events:none;
+  background:linear-gradient(180deg, #EAF2FB 0%, #CFDEF0 13%, #92AACB 29%, #55709F 45%,
+    #2E4272 61%, #182747 78%, rgba(10,17,41,0) 100%)}
+/* ШОВ СНИЗУ: разводим по светлоте ВНИЗ, а не вверх. Плёнка третьего экрана поверх
+   фотоколлажа даёт примерно #262A2E, наш низ — #04081A: третий экран открывается
+   заметно светлее, шов читается как горизонт, экраны не сливаются. Заодно последний
+   экран стены стоит на почти чёрном, и светлые полароиды получают максимальный
+   контраст — финал забирает стена, а не фон */
+.ls::after{content:''; position:absolute; z-index:-2; left:0; right:0; bottom:0;
+  height:120svh; pointer-events:none;
+  background:
+    radial-gradient(140% 22% at 50% 58%, rgba(140,178,228,.06), rgba(140,178,228,0) 72%),
+    linear-gradient(180deg, rgba(6,10,26,0) 0%, rgba(6,10,26,.30) 30%, rgba(6,10,26,.62) 52%,
+      rgba(5,9,22,.86) 72%, rgba(4,8,20,.97) 88%, #04081A 100%)}
 /* нижний отступ был рассчитан на слайдер; стена идёт сразу за подзаголовком,
    поэтому воздуха снизу нужно меньше */
-.ls-body{max-width:1240px; margin:0 auto; padding:clamp(30px,4.2vw,64px) clamp(18px,4vw,44px) clamp(14px,2vw,30px)}
+/* воздуха между снегом и заголовком нужно больше, чем было на белом:
+   на тёмном заголовок иначе садится прямо в отсвет снега */
+.ls-body{max-width:1240px; margin:0 auto; padding:clamp(52px,7vw,104px) clamp(18px,4vw,44px) clamp(14px,2vw,30px)}
 .ls-title{
   margin:0 auto; text-align:center;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
@@ -328,18 +431,19 @@ body{
 /* лёгкое сжатие по горизонтали — как узкий фирменный шрифт старого сайта */
 .ls-squeeze{display:inline-block; transform:scaleX(.84); transform-origin:50% 50%; max-width:119%; margin:0 -9.5%}
 .ls-title em{font-style:normal}
-.ls-title .r{color:#9D0A0F}
-.ls-title .b{color:#2F3192}
+.ls-title .r{color:#F0554C}   /* фирменный #9D0A0F на тёмно-синем уходит в бурое пятно */
+.ls-title .b{color:#A9C7F2}   /* #2F3192 на ночном фоне просто исчезает */
 .ls-sub{
   margin:clamp(26px,3.4vw,54px) 0 clamp(24px,3vw,44px); text-align:center;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:500;
-  font-size:clamp(17px,2.1vw,30px); color:#333;
+  font-size:clamp(17px,2.1vw,30px); color:#B7C6E2;
 }
 /* ---------- цифры прошлого сезона ---------- */
-/* Золото здесь живёт на БЕЛОМ, поэтому база градиента взята глубже, чем на первом
-   экране, а бегущий блик — светлее базы: сделай наоборот, и в момент прохода блика
-   цифра пропала бы в фоне. Свечение даёт два слоя: тёплая лужица света под цифрой
-   (::before у .ls-numbox) и drop-shadow по контуру глифов внутри анимации блика. */
+/* Золото на ночном фоне — рампа и блик те же, что у .years .fill на первом экране:
+   светлая по краям, с тёмной полкой-фаской в середине. На белом всё было наоборот
+   (база глубже, блик светлее базы), см. историю правок: на светлом фоне светлое золото
+   пропадает, на тёмном та же глубина читается ржавчиной. Свечение двумя слоями:
+   тёплая лужица света под цифрой и drop-shadow по контуру глифов внутри блика. */
 .ls-stats{
   display:grid; grid-template-columns:repeat(4,1fr);
   gap:clamp(20px,2.8vw,44px) clamp(16px,2.4vw,36px);
@@ -350,44 +454,52 @@ body{
    самой цифры: у «6» она узкая, у «40 000» широкая. От блока во всю колонку
    над короткими цифрами висело бы пятно шире их самих */
 .ls-numbox{position:relative; display:inline-block}
+/* тёплая лужица на тёмном работает только через screen — тот же приём, что у зарева
+   #glow на первом экране. Обычная прозрачность поверх синего даёт не золото,
+   а серо-коричневое пятно: синий канал фона всё равно перебивает тёплый */
 .ls-numbox::before{
-  content:''; position:absolute; left:50%; top:50%; width:142%; height:132%;
-  transform:translate(-50%,-50%); pointer-events:none;
-  background:radial-gradient(closest-side, rgba(232,168,58,.30), rgba(232,168,58,.11) 54%, rgba(232,168,58,0) 78%);
-  filter:blur(8px);
+  content:''; position:absolute; left:50%; top:50%; width:165%; height:150%;
+  transform:translate(-50%,-50%); pointer-events:none; mix-blend-mode:screen;
+  background:radial-gradient(closest-side, rgba(78,52,13,.92), rgba(52,34,9,.5) 52%, rgba(0,0,0,0) 78%);
+  filter:blur(10px);
 }
 .ls-num{
   position:relative; z-index:1; display:inline-block; white-space:nowrap;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
   font-size:clamp(38px,5.5vw,80px); line-height:1.08; letter-spacing:-.012em;
   background:
-    linear-gradient(102deg, rgba(255,244,214,0) 36%, rgba(255,249,230,.92) 49%, rgba(255,244,214,0) 62%),
-    linear-gradient(168deg,#F4CE84 0%,#E9B255 20%,#D89534 44%,#C4801F 60%,#E0A94D 80%,#F6D9A2 100%);
+    linear-gradient(102deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.92) 48%, rgba(255,255,255,0) 62%),
+    linear-gradient(166deg,#FFFAE8 0%,#F3D68C 24%,#D3A244 46%,#9C7028 60%,#EBCE86 80%,#FFFBF0 100%);
   background-size:250% 100%, 100% 100%;
   background-repeat:no-repeat;
   -webkit-background-clip:text; background-clip:text;
   color:transparent; -webkit-text-fill-color:transparent;
-  animation:sheenNum 9s linear 1.2s infinite;
-}
-@keyframes sheenNum{
-  0%  {background-position:-160% 0, 0 0; filter:drop-shadow(0 3px 10px rgba(198,132,26,.18))}
-  9%  {                                  filter:drop-shadow(0 3px 22px rgba(233,175,70,.55))}
-  24% {background-position:250% 0, 0 0;  filter:drop-shadow(0 3px 10px rgba(198,132,26,.18))}
-  100%{background-position:250% 0, 0 0;  filter:drop-shadow(0 3px 10px rgba(198,132,26,.18))}
+  animation:sheenGold 9s linear 1.2s infinite;
 }
 .ls-cap{
   margin:clamp(8px,1vw,16px) auto 0; max-width:15.5em;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:500;
-  font-size:clamp(13px,1.18vw,17px); line-height:1.5; color:#3A3A3F; text-wrap:balance;
+  font-size:clamp(13px,1.18vw,17px); line-height:1.5; color:#93A4C4; text-wrap:balance;
 }
 @media (max-width:820px){
   .ls-stats{grid-template-columns:repeat(2,1fr); gap:clamp(22px,6vw,34px) clamp(12px,4vw,24px)}
   .ls-num{font-size:clamp(34px,10vw,58px)}
   .ls-cap{font-size:clamp(12px,3.4vw,15px); max-width:14em}
+  /* на узком экране vw-ширины сжимаются вдвое — пятна надо разводить шире,
+     иначе они собираются в одну кляксу по центру */
+  .ls-sky i:nth-child(1){left:-34vw; top:-22vh; width:110vw; height:74vh}
+  .ls-sky i:nth-child(2){left:40vw;  top:40vh;  width:90vw;  height:56vh}
+  .ls-sky i:nth-child(3){left:-30vw; top:46vh;  width:112vw; height:66vh}
+  .ls-sky i:nth-child(4){display:none}   /* четвёртый слой на слабом телефоне лишний */
+  .ls::after{height:100svh}
+  .ls-grain{opacity:.045}
 }
 @media (prefers-reduced-motion:reduce){
+  /* страховка: блик должен стоять уведённым за правый край, иначе поперёк цифр
+     застынет белая полоса */
   .ls-num{animation:none; background-position:250% 0, 0 0;
-    filter:drop-shadow(0 3px 12px rgba(198,132,26,.22))}
+    filter:drop-shadow(0 0 14px rgba(227,179,78,.30))}
+  .ls-sky i, .ls.skysleep .ls-sky i{animation:none; will-change:auto}
 }
 /* ---------- слайдер-коллаж ---------- */
 .ls-slider{position:relative}
@@ -505,7 +617,10 @@ body{
 }
 .touch .ct{background-attachment:scroll}
 /* плёнка ровно как на старом сайте: 44 % чёрного поверх коллажа */
-.ct-veil{background:rgba(0,0,0,.44); min-height:clamp(400px,64vh,760px); display:flex; align-items:center}
+/* overflow — из-за зарева карты: оно вылезает на 6 % за края и на узких экранах
+   утаскивало всю страницу вбок. Видимого ничего не режется, край зарева прозрачный */
+.ct-veil{background:rgba(0,0,0,.44); min-height:clamp(400px,64vh,760px); display:flex; align-items:center;
+  overflow:hidden}
 .ct-inner{
   width:100%; max-width:1240px; margin:0 auto; text-align:center;
   padding:clamp(64px,9vw,122px) clamp(18px,4vw,44px) clamp(56px,8vw,106px);
@@ -526,6 +641,45 @@ body{
 }
 /* пока карты нет, пустой контейнер не должен добавлять секции высоту */
 .ct-map:empty{display:none}
+/* ---------- города на карте: подпись сбоку, линия к точке ----------
+   Линии рисует SVG в своей системе координат 1000x428 (пропорция карты),
+   поэтому точки привязаны к рисунку, а не к пикселям экрана.
+   non-scaling-stroke — чтобы растягивание не делало линии разной толщины */
+.map-lines{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible;
+  /* тень под линиями: без неё тонкая белая нить теряется и на снегу, и на светлом фото фона */
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+.map-lines path{fill:none; stroke:rgba(255,255,255,.62); stroke-width:1.4;
+  vector-effect:non-scaling-stroke; stroke-linecap:round; stroke-linejoin:round;
+  transition:stroke .28s ease}
+.map-lines path.on{stroke:#FFD79A}
+/* точка города: огонёк у основания ёлки */
+.map-dot{position:absolute; left:var(--x); top:var(--y); width:9px; height:9px; margin:-4.5px 0 0 -4.5px;
+  border-radius:50%; background:#FFF3E0; pointer-events:none;
+  box-shadow:0 0 0 2.5px rgba(255,190,105,.35), 0 0 14px 4px rgba(255,186,96,.75)}
+.map-cities{position:absolute; inset:0; margin:0; pointer-events:none}
+.map-city{
+  position:absolute; left:var(--x); top:var(--y); pointer-events:auto;
+  font:600 clamp(12px,1.02vw,15px)/1.25 "Golos Text",Arial,sans-serif; color:#fff;
+  white-space:nowrap; text-shadow:0 2px 12px rgba(0,0,0,.7), 0 0 22px rgba(0,0,0,.5);
+  transition:color .25s ease;
+}
+.map-city.right{transform:translate(11px,-50%)}
+.map-city.left{transform:translate(calc(-100% - 11px),-50%)}
+/* главный город выделен цветом заголовка секции, над ним мелкая приписка */
+.map-city.main{color:#FDC68C}
+.map-city i{display:block; font-style:normal; font-weight:400; font-size:.72em;
+  letter-spacing:.06em; text-transform:uppercase; color:rgba(255,255,255,.62); margin-bottom:2px}
+.map-city:hover{color:#FFE9C4; cursor:default}
+/* телефон: выноски не поместятся — подписи собираются в строку под картой */
+@media (max-width:820px){
+  .map-lines,.map-dot{display:none}
+  .map-cities{position:static; display:flex; flex-wrap:wrap; justify-content:center;
+    gap:4px 14px; padding:14px 12px 0}
+  .map-city{position:static; transform:none !important; font-size:14px}
+  .map-city i{display:none}   /* в строке под картой приписка только мешает: главный город и так выделен цветом */
+}
+/* «меньше движения»: подписи и линии остаются, они статичные */
+
 /* ---------- карта России: гирлянды разгораются под курсором ----------
    Два одинаковых кадра друг на друге: снизу карта с погашенными огнями,
    сверху та же карта, где огни разлились сиянием. Верхний слой добавляется
@@ -568,15 +722,14 @@ body{
   -webkit-mask-size:100% 100%; mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
 }
-/* маска — это отдельная загрузка той же картинки, и браузер тянет её сразу,
-   как только элемент появился в вёрстке. Поэтому вешаем её тем же классом .bgon,
-   которым включается фон секции: до подхода к экрану ничего не качается */
+/* маску вырезаем отдельным силуэтом на 8 КБ, а не копией самой карты: маска —
+   это своя загрузка, и полноразмерная карта качалась бы вторым файлом. Разрешение
+   тут не важно, маска всё равно растягивается по элементу (mask-size:100% 100%).
+   Один адрес на все ширины: иначе при повороте телефона файл перекачивался бы
+   и плёнка на это время пропадала */
 .ct.bgon .map-dim{
   opacity:calc((1 - var(--lit))*.3);
-  -webkit-mask-image:url(map.webp); mask-image:url(map.webp);
-}
-@media (max-width:820px){
-  .ct.bgon .map-dim{-webkit-mask-image:url(map-mob.webp); mask-image:url(map-mob.webp)}
+  -webkit-mask-image:url(map-mask.webp); mask-image:url(map-mask.webp);
 }
 .map-lit{position:absolute; inset:0; pointer-events:none; mix-blend-mode:lighten}
 /* общий разлив света по всей стране */
@@ -627,8 +780,9 @@ body{
   .wl-col{gap:10px}
 }
 /* карточка: костяная бумага, ступенчатый торец, лёгкая тень рамки на снимке */
-/* карточка на белом: бумага та же, что у прежних снимков этого экрана,
-   торец ступеньками, а мягкая тень взята синеватая — на белом чёрная выглядит грязью */
+/* карточка на ночном небе: бумага та же, торец ступеньками, а мягкая тень ЧЁРНАЯ.
+   Раньше она была синеватая под белый фон — на тёмном такая тень не видна вовсе,
+   и карточки выглядят вырезанными ножницами */
 .wl-ph{--e:2px; margin:0; position:relative; border-radius:3px; padding:5% 5% 15%;
   background:linear-gradient(158deg,#FFFDF8 0%,#FBF6EC 48%,#F2E9D8 100%);
   box-shadow:
@@ -638,8 +792,8 @@ body{
     0 1px 0 #EFE6D5,
     0 calc(var(--e) - 1px) 0 #E0D3BB,
     0 var(--e) 0 #CEBFA3,
-    0 16px 32px -14px rgba(23,36,74,.36),
-    0 4px 9px rgba(23,36,74,.13);
+    0 18px 40px -12px rgba(0,0,0,.66),
+    0 4px 10px rgba(0,0,0,.42);
   transform:rotate(var(--tilt,0deg));
 }
 @media (min-width:640px){.wl-ph{--e:3px}}
@@ -722,6 +876,10 @@ body{
 </div>
 
 <section class="ls" id="lastseason" aria-labelledby="lsTitle">
+  <div class="ls-sky" aria-hidden="true">
+    <div class="ls-sky-win" id="lsSky"><i></i><i></i><i></i><i></i></div>
+  </div>
+  <div class="ls-grain" aria-hidden="true"></div>
   <div class="ls-body">
     <h2 class="ls-title rv" id="lsTitle"><span class="ls-squeeze"><em class="r">Грандиозное новогоднее мероприятие для</em> <em class="b">школьников, аналогов которому нет в&nbsp;России!</em></span></h2>
     <div class="ls-stats" id="lsStats">
@@ -802,16 +960,38 @@ body{
       <div class="ct-map rv" id="ctMap">
         <figure class="map" id="map">
           <img class="map-base" src="map.webp" srcset="map-mob.webp 1000w, map-mid.webp 1200w, map.webp 1559w"
-               sizes="(max-width:820px) 96vw, min(1120px, 78vw)" width="1559" height="668"
+               sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
                alt="Карта России: ёлки стоят в городах, где проходит экскурсия-шоу"
                loading="lazy" decoding="async">
           <span class="map-dim" aria-hidden="true"></span>
           <img class="map-lit wide" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow-mid.webp 1200w, map-glow.webp 1559w"
-               sizes="(max-width:820px) 96vw, min(1120px, 78vw)" width="1559" height="668"
+               sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
                alt="" aria-hidden="true" loading="lazy" decoding="async">
           <img class="map-lit spot" src="map-glow.webp" srcset="map-glow-mob.webp 1000w, map-glow-mid.webp 1200w, map-glow.webp 1559w"
-               sizes="(max-width:820px) 96vw, min(1120px, 78vw)" width="1559" height="668"
+               sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
                alt="" aria-hidden="true" loading="lazy" decoding="async">
+          <svg class="map-lines" viewBox="0 0 1000 428" preserveAspectRatio="none" aria-hidden="true">
+          <path data-city="crimea" d="M79 311 V387 H50"/>
+          <path data-city="stavropol" d="M107 310 V398 H215"/>
+          <path data-city="kazan" d="M242 252 V409 H480"/>
+          <path data-city="yaroslavl" d="M187 197 V51 H110"/>
+          <path data-city="nizhny" d="M224 238 V24 H330"/>
+          <path data-city="tyumen" d="M302 268 V49 H620"/>
+          </svg>
+          <b class="map-dot" style="--x:7.9%;--y:72.7%"></b>
+          <b class="map-dot" style="--x:10.7%;--y:72.5%"></b>
+          <b class="map-dot" style="--x:24.2%;--y:58.8%"></b>
+          <b class="map-dot" style="--x:18.7%;--y:46.0%"></b>
+          <b class="map-dot" style="--x:22.4%;--y:55.7%"></b>
+          <b class="map-dot" style="--x:30.2%;--y:62.5%"></b>
+          <figcaption class="map-cities">
+          <span class="map-city right main" data-city="nizhny" data-x="0.224" data-y="0.557" style="--x:33.0%;--y:5.5%"><i>главный город</i>Нижний Новгород</span>
+          <span class="map-city right" data-city="kazan" data-x="0.242" data-y="0.588" style="--x:48.0%;--y:95.5%">Казань</span>
+          <span class="map-city left" data-city="yaroslavl" data-x="0.187" data-y="0.460" style="--x:11.0%;--y:12.0%">Ярославль</span>
+          <span class="map-city left" data-city="crimea" data-x="0.079" data-y="0.727" style="--x:5.0%;--y:90.5%">Крым</span>
+          <span class="map-city right" data-city="stavropol" data-x="0.107" data-y="0.725" style="--x:21.5%;--y:93.0%">Ставрополь</span>
+          <span class="map-city right" data-city="tyumen" data-x="0.302" data-y="0.625" style="--x:62.0%;--y:11.5%">Тюмень</span>
+          </figcaption>
         </figure>
       </div>
     </div>
@@ -1552,6 +1732,16 @@ body{
     nums.forEach(function(el){ nio.observe(el); });
   }
 
+  /* небо второго экрана засыпает, когда секция ушла из кадра: стена из 24 полароидов
+     и так грузит кадр, второй такой нагрузки за экраном не нужно.
+     Не отработает — небо просто дышит всегда, ничего не ломается */
+  var lsec = document.getElementById('lastseason');
+  if (lsec && 'IntersectionObserver' in window){
+    new IntersectionObserver(function(items){
+      lsec.classList.toggle('skysleep', !items[0].isIntersecting);
+    }, {rootMargin: '20% 0px'}).observe(lsec);
+  }
+
   /* коллаж третьего экрана грузится только когда секция подошла к экрану:
      на старте канал занят роликом первого экрана */
   var cities = document.getElementById('cities');
@@ -1705,21 +1895,38 @@ body{
     return;
   }
 
-  var lit = 0, target = 0, x = 0.5, y = 0.5, tx = 0.5, ty = 0.5, raf = 0;
-  function frame(){
+  var lit = 0, target = 0, x = 0.5, y = 0.5, tx = 0.5, ty = 0.5, raf = 0, last = 0;
+  /* шаг сглаживания пересчитывается на реальную длину кадра: иначе на экране 120 Гц
+     свет разгорался бы ровно вдвое быстрее, чем на обычном 60 Гц */
+  function step(k, dt){ return 1 - Math.pow(1 - k, dt / 16.7); }
+  function frame(now){
+    var dt = last ? Math.min(now - last, 64) : 16.7;
+    last = now;
     /* разгорается быстрее, чем гаснет: гирлянда должна «остывать», а не выключаться рубильником */
-    lit += (target - lit) * (target > lit ? 0.13 : 0.05);
+    lit += (target - lit) * step(target > lit ? 0.13 : 0.05, dt);
     /* свет догоняет курсор с ленцой — так пятно кажется тяжёлым и живым */
-    x += (tx - x) * 0.16;
-    y += (ty - y) * 0.16;
+    var kp = step(0.16, dt);
+    x += (tx - x) * kp;
+    y += (ty - y) * kp;
     setLight(lit, x, y);
     if (lit > 0.003 || target > 0) raf = requestAnimationFrame(frame);
-    else { raf = 0; setLight(0, x, y); }   /* погасло — кадры больше не тратим */
+    else { raf = 0; last = 0; setLight(0, x, y); }   /* погасло — кадры больше не тратим */
   }
-  function kick(){ if (!raf) raf = requestAnimationFrame(frame); }
+  function kick(){
+    if (raf) return;
+    /* холодный старт: пятно зажигается там, где курсор сейчас, а не там, где мышь
+       была в прошлый заход — иначе свет вспыхивает посреди страны и только потом едет */
+    if (lit < 0.01){ x = tx; y = ty; }
+    last = 0;
+    raf = requestAnimationFrame(frame);
+  }
 
+  var overCity = false;   /* курсор на подписи города: свет ведёт подпись, а не карта */
   wrap.addEventListener('pointermove', function(e){
     if (e.pointerType === 'touch') return;   /* палец не наводит, он листает страницу */
+    /* движение по подписи всплывает сюда же, и карта гасила бы свет: подпись лежит
+       за пределами силуэта, значит проверка «попал в сушу» отвечает «нет» */
+    if (overCity) return;
     var r = wrap.getBoundingClientRect();
     var u = (e.clientX - r.left) / r.width, v = (e.clientY - r.top) / r.height;
     tx = u; ty = v;
@@ -1727,6 +1934,25 @@ body{
     kick();
   }, {passive: true});
   wrap.addEventListener('pointerleave', function(){ target = 0; kick(); });
+
+  /* наведение на подпись города: свет переезжает к его ёлке, линия выноски загорается.
+     Города видит и мышь на самой карте, и мышь на подписи — точка одна и та же */
+  Array.prototype.forEach.call(wrap.querySelectorAll('.map-city'), function(el){
+    var cx = parseFloat(el.getAttribute('data-x')), cy = parseFloat(el.getAttribute('data-y'));
+    var line = wrap.querySelector('.map-lines path[data-city="' + el.getAttribute('data-city') + '"]');
+    el.addEventListener('pointerenter', function(){
+      overCity = true;
+      tx = cx; ty = cy; target = 1;
+      if (line) line.classList.add('on');
+      kick();
+    });
+    el.addEventListener('pointerleave', function(){
+      overCity = false;
+      target = 0;
+      if (line) line.classList.remove('on');
+      kick();
+    });
+  });
 })();
 </script>
 
