@@ -21,14 +21,17 @@ body{margin:0; background:#04081A; color:#DCE4F3;
 @media (prefers-reduced-motion:reduce){ .rv{opacity:1; transform:none; transition:none} }
 
 /* ==================== ЧЕТВЁРТЫЙ ЭКРАН: расчёт для класса (квиз) ====================
-   Слева — обещание и три довода, справа — бумажный бланк заявки в Министерство.
-   Бумага тут не украшение: второй экран заканчивается стеной полароидов, костяная
+   Одна колонка по центру, во всю ширину экрана: заголовок, доводы и бланк стоят
+   друг под другом и выровнены по середине. Двухколоночный вариант (текст слева,
+   бланк справа) ужимал форму до половины кадра — на большом мониторе она читалась
+   как виджет сбоку, а не как главное действие экрана.
+   Бумага здесь не украшение: второй экран заканчивается стеной полароидов, костяная
    бумага уже в языке сайта, и бланк читается как её продолжение, а не как чужая форма.
    Все шаги лежат в разметке сразу, JS показывает один. Без JS и для поисковика
    видно весь текст квиза, а не пустая коробка. */
 .qz{
   position:relative; z-index:25; overflow:hidden;
-  /* Верх ровно в цвет низа второго экрана (#04081A), низ — в цвет кадра с рамкой
+  /* Верх ровно в цвет низа второго экрана (#04081A), низ — в цвет следующего кадра
      (#060C18). Оба стыка гасим цветом, а не светлой полосой-переходом */
   background:linear-gradient(180deg,#04081A 0%,#070E22 26%,#091132 58%,#070D1C 86%,#060C18 100%);
   color:#C9D6EE;
@@ -49,31 +52,33 @@ body{margin:0; background:#04081A; color:#DCE4F3;
 
 /* широкая вёрстка: контейнер почти во весь экран, узкая колонка тут запрещена */
 .qz-body{position:relative; z-index:1; width:min(94vw,1720px); margin-inline:auto;
-  padding:clamp(58px,7vw,120px) clamp(16px,3vw,56px) clamp(66px,8vw,132px);
-  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,720px);
-  gap:clamp(28px,4vw,84px); align-items:start}
-/* бланк длиннее текста слева, поэтому левая половина едет с прокруткой:
-   обещание и подарок держатся в кадре, пока человек отвечает */
-.qz-left{position:sticky; top:clamp(84px,13vh,150px)}
+  padding:clamp(54px,6.5vw,110px) clamp(16px,3vw,56px) clamp(62px,7.5vw,124px);
+  text-align:center}
+.qz-left{margin:0 auto clamp(30px,3.6vw,60px)}
 .qz-eyebrow{margin:0 0 clamp(14px,1.6vw,22px); font-size:clamp(11px,.86vw,13px);
   letter-spacing:.24em; text-transform:uppercase; color:#8FA3C8}
-.qz-h{margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(28px,3.7vw,62px); line-height:1.14; letter-spacing:.005em;
+.qz-h{margin:0 auto; max-width:22ch;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(28px,4.4vw,78px); line-height:1.1; letter-spacing:.005em;
   text-transform:uppercase; text-wrap:balance; color:#fff}
 .qz-h em{font-style:normal; color:#A9C7F2}
 .qz-h b{font-weight:700; color:#E3B34E}
-.qz-lede{margin:clamp(18px,2vw,30px) 0 0; max-width:34ch;
-  font-size:clamp(15px,1.16vw,20px); line-height:1.5; color:#B7C6E2}
-.qz-facts{list-style:none; margin:clamp(24px,2.8vw,42px) 0 0; padding:0; display:grid;
-  gap:clamp(12px,1.3vw,20px); max-width:32ch}
-.qz-facts li{position:relative; padding-left:34px; font-size:clamp(14px,1.02vw,17px);
+.qz-lede{margin:clamp(16px,1.8vw,28px) auto 0; max-width:56ch;
+  font-size:clamp(15px,1.16vw,21px); line-height:1.5; color:#B7C6E2}
+/* доводы встают в ряд под заголовком: звезда сверху, текст под ней — три равные
+   колонки держат середину экрана и не спорят с бланком за внимание */
+.qz-facts{list-style:none; margin:clamp(24px,2.8vw,44px) auto 0; padding:0; display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(16px,2vw,40px);
+  max-width:min(100%,1280px)}
+.qz-facts li{position:relative; padding-top:32px; font-size:clamp(13.5px,1vw,17px);
   line-height:1.45; color:#9FB2D2}
-.qz-facts li b{display:block; color:#EDF2FC; font-weight:600}
-.qz-facts svg{position:absolute; left:0; top:1px; width:20px; height:20px; color:#E3B34E}
+.qz-facts li b{display:block; margin-bottom:4px; color:#EDF2FC; font-weight:600}
+.qz-facts svg{position:absolute; left:50%; top:0; transform:translateX(-50%);
+  width:22px; height:22px; color:#E3B34E}
 
 /* ---------- бумажный бланк ---------- */
-.qz-paper{position:relative; border-radius:4px; color:var(--qz-ink);
-  padding:clamp(20px,2.1vw,34px) clamp(18px,2.4vw,42px) clamp(22px,2.4vw,38px);
+.qz-paper{position:relative; width:100%; border-radius:4px; color:var(--qz-ink);
+  padding:clamp(20px,2.1vw,38px) clamp(18px,2.6vw,60px) clamp(24px,2.6vw,44px);
   background:linear-gradient(158deg,#FFFDF8 0%,#FBF5E9 48%,#F2E9D6 100%);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.95),
@@ -82,40 +87,49 @@ body{margin:0; background:#04081A; color:#DCE4F3;
     0 6px 18px rgba(0,0,0,.34)}
 /* тонкая золотая линейка внутри — как на бланке-документе. Отдельным слоем, а не
    border: рамка должна отступать от края бумаги, а не резать её */
-.qz-paper::before{content:''; position:absolute; inset:clamp(7px,.7vw,11px); pointer-events:none;
+.qz-paper::before{content:''; position:absolute; inset:clamp(7px,.7vw,12px); pointer-events:none;
   border:1px solid rgba(156,112,40,.26); border-radius:2px}
 .qz-inner{position:relative}
-.qz-head{display:flex; align-items:baseline; justify-content:space-between; gap:14px;
+.qz-head{display:flex; align-items:baseline; justify-content:center;
+  gap:clamp(10px,1.6vw,28px); flex-wrap:wrap;
   padding-bottom:clamp(12px,1.2vw,18px); border-bottom:1px dashed rgba(22,33,63,.22);
   font-size:clamp(9.5px,.72vw,11.5px); letter-spacing:.2em; text-transform:uppercase;
   color:#9A8B6C; font-weight:600}
 .qz-head span:last-child{white-space:nowrap; color:var(--qz-gold)}
 
 /* прогресс: четыре деления — три вопроса и контакты. На обложке скрыт: пока человек
-   не начал, шкала только пугает объёмом */
-.qz-prog{display:flex; align-items:center; gap:12px; margin:clamp(14px,1.4vw,20px) 0 0}
+   не начал, шкала только пугает объёмом. Стоит по центру и не тянется на всю бумагу:
+   полоса во всю ширину широкого листа выглядит как линейка, а не как шкала шагов */
+.qz-prog{display:flex; flex-direction:column; align-items:center; gap:9px;
+  width:min(100%,520px); margin:clamp(14px,1.4vw,22px) auto 0}
 .qz-prog[hidden]{display:none}
-.qz-bar{display:flex; gap:5px; flex:1}
+.qz-bar{display:flex; gap:6px; width:100%}
 .qz-bar i{flex:1; height:3px; border-radius:2px; background:rgba(22,33,63,.14);
   transition:background .35s ease}
 .qz-bar i.on{background:linear-gradient(90deg,#D3A244,#F3D68C)}
 .qz-count{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--qz-mute);
   white-space:nowrap; font-weight:600}
 
-.qz-step{padding-top:clamp(18px,2vw,30px)}
+.qz-step{padding-top:clamp(18px,2vw,32px)}
 .qz-step[hidden]{display:none}
-.qz-q{margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(19px,1.72vw,30px); line-height:1.24; color:var(--qz-ink); text-wrap:balance}
-.qz-note{margin:8px 0 0; font-size:clamp(13px,.98vw,15px); line-height:1.45; color:var(--qz-mute)}
+.qz-q{margin:0 auto; max-width:34ch;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(20px,2.05vw,38px); line-height:1.2; color:var(--qz-ink); text-wrap:balance}
+.qz-note{margin:10px auto 0; max-width:66ch;
+  font-size:clamp(13px,1vw,16px); line-height:1.45; color:var(--qz-mute)}
 .qz-note b{color:#5E5644; font-weight:600}
 .qz-req{color:var(--qz-red)}
 
 /* ---------- варианты со звездой ---------- */
 /* Звезда вместо галочки: она же в иконке сайта и в названии «Звёздная смена».
-   Выбранный вариант не просто помечен — он загорается, как лампочка на пульте */
-.qz-opts{display:grid; gap:8px; margin:clamp(16px,1.7vw,26px) 0 0}
-.qz-opt{position:relative; display:flex; align-items:center; gap:13px; cursor:pointer;
-  padding:clamp(12px,1.1vw,16px) clamp(13px,1.2vw,18px); border-radius:3px;
+   Выбранный вариант не просто помечен — он загорается, как лампочка на пульте.
+   На широком листе плитки идут в два ряда: строка во весь лист заставляла бы
+   глаз идти от края до края ради трёх слов */
+.qz-opts{display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(8px,.9vw,14px); margin:clamp(16px,1.8vw,30px) auto 0; max-width:min(100%,1180px)}
+.qz-opt{position:relative; display:flex; align-items:center; justify-content:center;
+  gap:12px; cursor:pointer; text-align:center;
+  padding:clamp(13px,1.15vw,18px) clamp(14px,1.3vw,22px); border-radius:3px;
   border:1px solid rgba(22,33,63,.14); background:rgba(255,255,255,.55);
   font-size:clamp(14px,1.02vw,17px); line-height:1.35; color:#1D2A4A;
   transition:border-color .18s ease, background .18s ease, transform .12s ease}
@@ -123,7 +137,8 @@ body{margin:0; background:#04081A; color:#DCE4F3;
 .qz-opt:active{transform:translateY(1px)}
 .qz-opt input{position:absolute; opacity:0; width:1px; height:1px; pointer-events:none}
 .qz-opt:has(input:focus-visible){outline:2px solid rgba(47,49,146,.6); outline-offset:2px}
-.qz-star{flex:0 0 auto; width:22px; height:22px; color:rgba(22,33,63,.24); transition:color .2s ease, transform .25s cubic-bezier(.2,.8,.2,1)}
+.qz-star{flex:0 0 auto; width:22px; height:22px; color:rgba(22,33,63,.24);
+  transition:color .2s ease, transform .25s cubic-bezier(.2,.8,.2,1)}
 .qz-opt.on{border-color:#D3A244; background:linear-gradient(120deg,#FFF8E6,#FDF1D8);
   box-shadow:inset 0 0 0 1px rgba(211,162,68,.5), 0 6px 16px -10px rgba(156,112,40,.9)}
 .qz-opt.on .qz-star{color:#D3A244; transform:rotate(-18deg) scale(1.1)}
@@ -131,40 +146,47 @@ body{margin:0; background:#04081A; color:#DCE4F3;
 
 /* ---------- счётчики ---------- */
 .qz-nums{display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:clamp(14px,1.6vw,26px); margin:clamp(16px,1.7vw,26px) 0 0}
-.qz-num{border:1px solid rgba(22,33,63,.14); border-radius:3px; padding:clamp(12px,1.2vw,18px);
+  gap:clamp(14px,1.6vw,28px); margin:clamp(16px,1.8vw,30px) auto 0; max-width:760px}
+.qz-num{border:1px solid rgba(22,33,63,.14); border-radius:3px; padding:clamp(12px,1.2vw,20px);
   background:rgba(255,255,255,.55)}
-.qz-num > span{display:block; font-size:clamp(12.5px,.92vw,14.5px); color:var(--qz-mute); font-weight:600}
-.qz-ctl{display:flex; align-items:center; gap:6px; margin-top:10px}
-.qz-cbtn{width:clamp(38px,2.6vw,44px); height:clamp(38px,2.6vw,44px); flex:0 0 auto;
+.qz-num > span{display:block; font-size:clamp(12.5px,.92vw,15px); color:var(--qz-mute); font-weight:600}
+.qz-ctl{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:10px}
+.qz-cbtn{width:clamp(38px,2.6vw,46px); height:clamp(38px,2.6vw,46px); flex:0 0 auto;
   border-radius:50%; border:1px solid rgba(22,33,63,.18); background:#fff; cursor:pointer;
   color:var(--qz-ink); font:400 22px/1 "Golos Text",sans-serif;
   display:flex; align-items:center; justify-content:center;
   transition:background .18s ease, border-color .18s ease, color .18s ease}
 .qz-cbtn:hover{background:var(--qz-blue); border-color:var(--qz-blue); color:#fff}
 .qz-cbtn:disabled{opacity:.35; cursor:default; background:#fff; border-color:rgba(22,33,63,.18); color:var(--qz-ink)}
-.qz-cval{flex:1; min-width:0; width:100%; text-align:center; border:0; background:transparent;
+.qz-cval{flex:0 1 140px; min-width:0; text-align:center; border:0; background:transparent;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(26px,2.2vw,38px); color:var(--qz-ink); -moz-appearance:textfield}
+  font-size:clamp(26px,2.2vw,40px); color:var(--qz-ink); -moz-appearance:textfield}
 .qz-cval::-webkit-outer-spin-button,.qz-cval::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
 
 /* ---------- поля контактов ---------- */
-.qz-fields{display:grid; gap:12px; margin:clamp(16px,1.7vw,26px) 0 0}
+.qz-fields{display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(12px,1.4vw,24px); margin:clamp(16px,1.8vw,30px) auto 0; max-width:900px}
 .qz-fields label{display:block; font-size:12.5px; font-weight:600; letter-spacing:.04em;
-  text-transform:uppercase; color:var(--qz-mute); margin-bottom:6px}
-.qz-fields input{width:100%; padding:clamp(13px,1.1vw,16px) 15px; border-radius:3px;
+  text-transform:uppercase; color:var(--qz-mute); margin-bottom:7px}
+.qz-fields input{width:100%; padding:clamp(13px,1.1vw,17px) 15px; border-radius:3px; text-align:center;
   border:1px solid rgba(22,33,63,.18); background:#fff; color:var(--qz-ink);
-  font:400 clamp(15px,1.1vw,18px)/1.2 "Golos Text",sans-serif}
+  font:400 clamp(15px,1.1vw,19px)/1.2 "Golos Text",sans-serif}
 .qz-fields input::placeholder{color:rgba(22,33,63,.32)}
 .qz-fields input:focus{outline:2px solid rgba(47,49,146,.55); outline-offset:1px; border-color:transparent}
-.qz-err{margin:10px 0 0; font-size:13.5px; color:var(--qz-red); font-weight:600}
+.qz-err{margin:12px 0 0; font-size:13.5px; color:var(--qz-red); font-weight:600}
 .qz-err[hidden]{display:none}
 
 /* ---------- кнопки ---------- */
-.qz-act{display:flex; align-items:center; gap:12px; margin:clamp(18px,1.9vw,28px) 0 0}
-.qz-btn{flex:1; padding:clamp(15px,1.35vw,20px) 22px; border:0; border-radius:3px; cursor:pointer;
+/* Кнопка стоит ровно посередине бланка, «назад» висит слева отдельным слоем:
+   если держать их в одной строке потоком, главная кнопка смещается вправо
+   на ширину стрелки, и центр перестаёт быть центром */
+.qz-act{position:relative; display:flex; justify-content:center;
+  margin:clamp(20px,2vw,32px) auto 0; max-width:720px;
+  padding-inline:clamp(50px,3.6vw,62px)}
+.qz-btn{flex:0 1 auto; width:100%; max-width:560px;
+  padding:clamp(15px,1.35vw,21px) 26px; border:0; border-radius:3px; cursor:pointer;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(14px,1.06vw,18px); letter-spacing:.02em; text-transform:uppercase;
+  font-size:clamp(14px,1.06vw,19px); letter-spacing:.02em; text-transform:uppercase;
   color:#fff; background:var(--qz-blue); text-wrap:balance;
   box-shadow:inset 0 0 0 1px rgba(227,179,78,.42), 0 14px 28px -14px rgba(47,49,146,.95);
   transition:background .2s ease, color .2s ease, transform .12s ease, box-shadow .2s ease}
@@ -173,44 +195,56 @@ body{margin:0; background:#04081A; color:#DCE4F3;
 .qz-btn.gold{color:#231705; background:linear-gradient(166deg,#FFF3CF 0%,#F3D68C 26%,#D3A244 62%,#EBCE86 100%);
   box-shadow:inset 0 0 0 1px rgba(120,86,20,.35), 0 16px 32px -14px rgba(211,162,68,.9)}
 .qz-btn.gold:hover{filter:brightness(1.06)}
-.qz-back{flex:0 0 auto; width:clamp(46px,3.2vw,54px); height:clamp(46px,3.2vw,54px);
+.qz-back{position:absolute; left:0; top:50%; transform:translateY(-50%);
+  width:clamp(44px,3.2vw,54px); height:clamp(44px,3.2vw,54px);
   border-radius:3px; border:1px solid rgba(22,33,63,.18); background:transparent; cursor:pointer;
   color:var(--qz-ink); display:flex; align-items:center; justify-content:center;
   transition:background .18s ease, border-color .18s ease}
 .qz-back:hover{background:rgba(22,33,63,.06); border-color:rgba(22,33,63,.32)}
 .qz-back[hidden]{display:none}
 .qz-back svg{width:18px; height:18px}
-.qz-fine{margin:clamp(12px,1.2vw,18px) 0 0; font-size:12px; line-height:1.45; color:#8C8266}
+.qz-fine{margin:clamp(12px,1.2vw,18px) auto 0; max-width:60ch; font-size:12px; line-height:1.45; color:#8C8266}
 .qz-fine a{color:#6E6446}
 
 /* ---------- экран «заявка принята» ---------- */
 /* печать вместо картинки: та же звезда, что в вариантах, только крупная и золотая —
    бланк «проштампован», человек видит завершённое действие, а не просто текст */
-.qz-done{text-align:center; padding:clamp(16px,2vw,30px) 0 clamp(6px,1vw,14px)}
-.qz-seal{width:clamp(76px,6vw,104px); height:clamp(76px,6vw,104px); margin:0 auto clamp(14px,1.5vw,22px);
+.qz-done{padding:clamp(16px,2vw,32px) 0 clamp(6px,1vw,16px)}
+.qz-seal{width:clamp(76px,6vw,110px); height:clamp(76px,6vw,110px); margin:0 auto clamp(14px,1.5vw,24px);
   border-radius:50%; border:2px solid rgba(156,112,40,.5); display:flex; align-items:center; justify-content:center;
   color:#D3A244; box-shadow:inset 0 0 0 4px rgba(255,255,255,.6), 0 10px 24px -14px rgba(156,112,40,.9);
   transform:rotate(-9deg)}
 .qz-seal svg{width:52%; height:52%}
-.qz-done h3{margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
-  font-size:clamp(21px,1.9vw,32px); color:var(--qz-ink); text-transform:uppercase}
-.qz-done p{margin:12px auto 0; max-width:44ch; font-size:clamp(14px,1.02vw,17px); line-height:1.5; color:#4A4534}
-.qz-vk{display:inline-flex; align-items:center; gap:9px; margin-top:clamp(18px,1.8vw,26px);
-  padding:13px 22px; border-radius:3px; text-decoration:none; font-weight:600; font-size:15px;
+.qz-done h3{margin:0 auto; max-width:24ch;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(21px,2vw,36px); color:var(--qz-ink); text-transform:uppercase}
+.qz-done p{margin:12px auto 0; max-width:52ch; font-size:clamp(14px,1.02vw,17px); line-height:1.5; color:#4A4534}
+.qz-vk{display:inline-flex; align-items:center; gap:9px; margin-top:clamp(18px,1.8vw,28px);
+  padding:14px 24px; border-radius:3px; text-decoration:none; font-weight:600; font-size:15px;
   color:#fff; background:var(--qz-blue); transition:background .2s ease}
 .qz-vk:hover{background:#3B3DB4}
 
-/* ---------- телефон ---------- */
-@media (max-width:1023px){
-  .qz-body{grid-template-columns:minmax(0,1fr); gap:clamp(26px,5vw,40px)}
-  .qz-left{position:static}
-  .qz-lede,.qz-facts{max-width:56ch}
+/* ---------- узкие экраны ---------- */
+/* всё, что на большом мониторе стоит парами, на телефоне встаёт в одну колонку:
+   две плитки по 160 px рядом — это уже не выбор, а мелкий шрифт */
+@media (max-width:900px){
+  .qz-facts{grid-template-columns:minmax(0,1fr); gap:clamp(14px,3vw,22px); max-width:46ch}
+  .qz-facts li{padding-top:30px}
+}
+@media (max-width:760px){
+  .qz-opts{grid-template-columns:minmax(0,1fr)}
+  .qz-fields{grid-template-columns:minmax(0,1fr)}
+  .qz-nums{grid-template-columns:minmax(0,1fr); max-width:420px}
+  .qz-h{max-width:none}
+  .qz-act{padding-inline:0; flex-wrap:wrap; gap:10px}
+  /* на телефоне стрелка возвращается в поток: абсолютный слой съедал бы
+     половину узкой кнопки */
+  .qz-back{position:static; transform:none; order:2; width:100%; max-width:none; height:46px}
+  .qz-btn{order:1}
 }
 @media (max-width:520px){
-  .qz-nums{grid-template-columns:minmax(0,1fr)}
-  .qz-head{letter-spacing:.14em}
+  .qz-head{letter-spacing:.14em; gap:8px}
   .qz-opt{padding:13px 14px}
-  .qz-act{gap:8px}
 }
 @media (prefers-reduced-motion:reduce){
   .qz-opt,.qz-star,.qz-btn,.qz-cbtn{transition:none}
