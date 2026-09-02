@@ -322,7 +322,13 @@ body{
 
    z-index:25 — выше слоёв сцены первого экрана (у них максимум 20) и ниже шапки (30).
    Без него белое поле уехало бы ПОД липкую сцену, а снег стал бы не виден. */
-.wt{position:relative; z-index:25; height:1080px; background:#fff}
+/* Высоту больше не держим руками: её задаёт галерея.
+   Отступ сверху считался по всей высоте картинки со снегом - и был вчетверо больше нужного.
+   На самом деле гребни занимают только 13-36 % её высоты, а картинка поднята на 30 %:
+   внутрь белого поля сугробы заходят всего на 6 % своей высоты, это около 2 % ширины окна.
+   Всё, что ниже, - ровный непрозрачный белый, ставить на него контент можно */
+.wt{position:relative; z-index:25; background:#fff;
+  padding:clamp(64px,7.5vw,140px) 0 clamp(56px,7vw,120px)}
 /* Высоту снега в пикселях задавать НЕЛЬЗЯ: при ширине окна 1440 картинка выходит
    445 px, а контейнер в 360 срежет верхушки сугробов ровной линией — она отлично
    видна. Поэтому только пропорции исходной нарезки (3400x1050). */
@@ -339,6 +345,126 @@ body{
    иначе сугробы перестают быть сугробами. Заезд на первый экран там же чуть больше:
    полоса в 35 px читается линией, а не снегом */
 @media (max-width:760px){ .wt-snow{left:-46%; right:-46%; transform:translateY(-34%)} }
+/* ==================== БЕНТО-ГАЛЕРЕЯ ВТОРОГО ЭКРАНА ====================
+   Лента фотографий, которая едет вбок: пальцем, трекпадом или мышью с зажатой
+   кнопкой. Наведение показывает подпись, нажатие открывает кадр крупно.
+
+   Плитка стоит в ДВА РЯДА, размеров три: большой 2x2, высокий 1x2 и мелкий 1x1
+   парами. Набор выбран не на глаз: только эти три при grid-auto-flow:column
+   закрывают колонку без дырок, поэтому раскладка предсказуема и обходится без
+   dense - а он переставляет карточки местами и ломает каскад появления.
+   Широкой карточки 2x1 в наборе нет как раз поэтому: под ней остаётся пустая
+   клетка, которую нечем закрыть.
+
+   Углы везде острые, скруглений в этом блоке нет ни у карточек, ни у лайтбокса. */
+/* z-index:3 обязателен: слой снега лежит на 2, и его непрозрачный белый низ
+   накрывает всё, что стоит в потоке секции без своего уровня */
+.bn-head{position:relative; z-index:3; width:min(94vw,1720px); margin:0 auto; padding:0 clamp(16px,3vw,56px); text-align:center}
+.bn-eyebrow{margin:0 0 clamp(12px,1.4vw,20px); font-size:clamp(11px,.86vw,13px);
+  letter-spacing:.24em; text-transform:uppercase; color:#9A7326}
+/* заголовок берёт общий набор секций, но не его цвет: --h2-color белый, а поле здесь белое */
+.bn-title{margin:0;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
+  color:#0B1224; text-transform:uppercase; text-wrap:balance}
+.bn-sub{margin:clamp(14px,1.6vw,24px) auto 0; max-width:56ch;
+  font-size:clamp(15px,1.16vw,20px); line-height:1.5; color:#5C6880}
+
+/* окно ленты во всю ширину экрана. Нативная прокрутка вбок, а не transform:
+   так лента едет пальцем, трекпадом, колесом с shift и стрелками - даром и правильно.
+   Полосу прокрутки прячем: под лентой она смотрится мусором, о том что можно
+   тянуть, сказано в подзаголовке.
+   Вертикальные поля у дорожки - место для тени при наведении: окно режет по высоте */
+.bn-vp{position:relative; z-index:3; margin-top:clamp(6px,1vw,22px); overflow-x:auto; overflow-y:hidden;
+  overscroll-behavior-x:contain; cursor:grab;
+  scrollbar-width:none; -ms-overflow-style:none}
+.bn-vp::-webkit-scrollbar{display:none}
+.bn-vp.drag, .bn-vp.drag *{cursor:grabbing}
+.bn-grid{
+  --bn-row:clamp(140px,15vw,268px);
+  --bn-col:clamp(150px,14.6vw,250px);
+  --bn-gap:clamp(8px,.9vw,16px);
+  display:grid; grid-auto-flow:column;
+  grid-template-rows:repeat(2,var(--bn-row));
+  grid-auto-columns:var(--bn-col);
+  gap:var(--bn-gap); width:max-content;
+  /* левое поле ставит первую карточку на одну линию с заголовком; на широком экране
+     линия та же, что у контейнера min(94vw,1720px) */
+  padding:24px max(clamp(16px,3vw,56px), calc((100vw - 1720px)/2));
+  user-select:none; -webkit-user-select:none;
+}
+.bn-big{grid-row:span 2; grid-column:span 2}
+.bn-tall{grid-row:span 2}
+
+.bn-c{
+  position:relative; display:block; overflow:hidden; padding:0; margin:0;
+  border:0; border-radius:0; background:#E9EEF5; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:0 1px 2px rgba(11,18,36,.12);
+  /* стартовое состояние каскада; класс .in ставит наблюдатель, когда лента вошла в кадр */
+  opacity:0; transform:translateY(18px) scale(.97);
+  transition:box-shadow .35s ease;
+}
+.bn-grid.in .bn-c{opacity:1; transform:none;
+  transition:opacity .55s ease var(--d,0ms), transform .55s cubic-bezier(.2,.7,.2,1) var(--d,0ms),
+    box-shadow .35s ease}
+.bn-c img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
+  -webkit-user-drag:none; transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.bn-veil{position:absolute; inset:0; pointer-events:none; opacity:0; transition:opacity .45s ease;
+  background:linear-gradient(to top, rgba(4,7,15,.88) 0%, rgba(4,7,15,.45) 44%, rgba(4,7,15,0) 80%)}
+.bn-cap{position:absolute; left:0; right:0; bottom:0; z-index:2; text-align:left;
+  padding:clamp(10px,1vw,18px) clamp(12px,1.1vw,20px);
+  opacity:0; transform:translateY(10px);
+  transition:opacity .45s ease, transform .45s cubic-bezier(.2,.7,.2,1)}
+.bn-cap b{display:block; font-family:var(--h2-family); font-weight:700;
+  font-size:clamp(13px,1.02vw,18px); line-height:1.2; color:#fff}
+.bn-cap i{display:block; margin-top:.3em; font-style:normal;
+  font-size:clamp(11px,.82vw,14px); line-height:1.35; color:rgba(255,255,255,.82)}
+@media (hover:hover){
+  .bn-c:hover{box-shadow:0 20px 44px -20px rgba(11,18,36,.6)}
+  .bn-c:hover img{transform:scale(1.06)}
+  .bn-c:hover .bn-veil{opacity:1}
+  .bn-c:hover .bn-cap{opacity:1; transform:none}
+}
+/* на телефоне наведения не бывает - подпись просто стоит на месте */
+@media (hover:none){
+  .bn-veil{opacity:1}
+  .bn-cap{opacity:1; transform:none}
+}
+.bn-c:focus-visible{outline:2px solid var(--gold); outline-offset:3px}
+.bn-c:focus-visible .bn-veil{opacity:1}
+.bn-c:focus-visible .bn-cap{opacity:1; transform:none}
+
+/* ---------- просмотр кадра крупно ----------
+   Живёт в конце body, а не внутри секции: у .wt свой стакан (z-index:25), и любой
+   fixed-потомок остался бы под шапкой (30) */
+.bn-lb{position:fixed; inset:0; z-index:120; display:flex; align-items:center; justify-content:center;
+  padding:clamp(12px,3vw,48px); background:rgba(4,7,15,.9);
+  backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+  opacity:0; transition:opacity .28s ease}
+.bn-lb[hidden]{display:none}
+.bn-lb.on{opacity:1}
+.bn-lb figure{margin:0; max-width:min(1200px,94vw); text-align:center;
+  transform:scale(.94) translateY(14px); transition:transform .32s cubic-bezier(.2,.7,.2,1)}
+.bn-lb.on figure{transform:none}
+.bn-lb img{display:block; margin:0 auto; max-width:100%; max-height:80svh; width:auto; height:auto;
+  border-radius:0; box-shadow:0 30px 80px -30px rgba(0,0,0,.9)}
+.bn-lb figcaption{margin-top:clamp(10px,1.2vw,18px); font-size:clamp(12px,.95vw,16px); color:#B7C6E2}
+.bn-lb figcaption b{display:block; margin-bottom:.24em;
+  font-family:var(--h2-family); font-weight:700; font-size:clamp(15px,1.2vw,21px); color:#fff}
+.bn-lb-x{position:absolute; top:clamp(8px,2vw,26px); right:clamp(8px,2vw,26px);
+  width:46px; height:46px; display:grid; place-items:center; padding:0;
+  background:transparent; border:0; border-radius:0; color:rgba(255,255,255,.8);
+  cursor:pointer; transition:color .2s ease}
+.bn-lb-x:hover{color:#fff}
+/* фокус на крестике ставит скрипт при открытии - синяя рамка по умолчанию на
+   затемнённом снимке смотрится ошибкой, поэтому тонкая золотая */
+.bn-lb-x:focus-visible{outline:1px solid rgba(227,179,78,.75); outline-offset:0}
+@media (prefers-reduced-motion:reduce){
+  .bn-c, .bn-grid.in .bn-c{opacity:1; transform:none; transition:none}
+  .bn-c img{transition:none}
+  .bn-lb, .bn-lb figure{transition:none}
+}
 /* ---------- появление при прокрутке ---------- */
 .rv{opacity:0; transform:translateY(26px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
 .rv.in{opacity:1; transform:none}
@@ -929,11 +1055,145 @@ body{
      и внутри неё плашку перекрывала бы секция ниже -->
 <div id="vstatus"></div>
 
-<!-- ==================== ВТОРОЙ ЭКРАН: белое поле (заготовка) ====================
-     Пока пустой: 1080 px белого. Сверху его накрывает сугроб — он же прикрывает
-     нижний край первого экрана и служит переходом между экранами -->
-<section class="wt" id="white">
+<!-- ==================== ВТОРОЙ ЭКРАН: галерея прошлого сезона ====================
+     Белое поле, сверху его накрывает сугроб - он же прикрывает нижний край первого
+     экрана и служит переходом между экранами. Ниже лента фотографий в два ряда:
+     тянется вбок, кадр открывается крупно по нажатию.
+     Фотографии - из папки wall/, пока взяты какие есть, заменяются подстановкой
+     файлов с теми же именами. Подписи - в data-t и data-d, они же в .bn-cap -->
+<section class="wt" id="white" aria-labelledby="wtTitle">
   <div class="wt-snow" aria-hidden="true"></div>
+
+  <div class="bn-head">
+    <p class="bn-eyebrow rv">Прошлый сезон</p>
+    <h2 class="bn-title rv" id="wtTitle">Как это было в прошлом году</h2>
+    <p class="bn-sub rv">Тяните ленту вбок, нажмите на фотографию - откроется крупно</p>
+  </div>
+
+  <div class="bn-vp" id="bnVp">
+    <div class="bn-grid" id="bnGrid">
+    <button type="button" class="bn-c bn-big" data-t="Резиденция" data-d="Главный зал за час до смены">
+      <img src="wall/01.webp" alt="Резиденция" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Резиденция</b><i>Главный зал за час до смены</i></span>
+    </button>
+    <button type="button" class="bn-c bn-tall" data-t="Первый снег" data-d="Гости заходят в министерство">
+      <img src="wall/02.webp" alt="Первый снег" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Первый снег</b><i>Гости заходят в министерство</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Пульт погоды" data-d="Снегопад включают дети">
+      <img src="wall/03.webp" alt="Пульт погоды" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Пульт погоды</b><i>Снегопад включают дети</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Цех подарков" data-d="Конвейер не останавливается">
+      <img src="wall/04.webp" alt="Цех подарков" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Цех подарков</b><i>Конвейер не останавливается</i></span>
+    </button>
+    <button type="button" class="bn-c bn-tall" data-t="Хранилище писем" data-d="Доходит каждое">
+      <img src="wall/05.webp" alt="Хранилище писем" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Хранилище писем</b><i>Доходит каждое</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Звёздный час" data-d="Финал программы">
+      <img src="wall/06.webp" alt="Звёздный час" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Звёздный час</b><i>Финал программы</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Снежный патруль" data-d="Отряд на построении">
+      <img src="wall/07.webp" alt="Снежный патруль" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Снежный патруль</b><i>Отряд на построении</i></span>
+    </button>
+    <button type="button" class="bn-c bn-big" data-t="Мастерская" data-d="Здесь собирают чудеса">
+      <img src="wall/08.webp" alt="Мастерская" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Мастерская</b><i>Здесь собирают чудеса</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Ледяная почта" data-d="Отправка в один конец">
+      <img src="wall/09.webp" alt="Ледяная почта" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Ледяная почта</b><i>Отправка в один конец</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Смена началась" data-d="Табло переключилось на декабрь">
+      <img src="wall/10.webp" alt="Смена началась" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Смена началась</b><i>Табло переключилось на декабрь</i></span>
+    </button>
+    <button type="button" class="bn-c bn-tall" data-t="Гирлянды" data-d="Проверка света перед показом">
+      <img src="wall/11.webp" alt="Гирлянды" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Гирлянды</b><i>Проверка света перед показом</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Большой зал" data-d="Полторы тысячи мест">
+      <img src="wall/12.webp" alt="Большой зал" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Большой зал</b><i>Полторы тысячи мест</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Оркестр" data-d="Живой звук на сцене">
+      <img src="wall/13.webp" alt="Оркестр" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Оркестр</b><i>Живой звук на сцене</i></span>
+    </button>
+    <button type="button" class="bn-c bn-big" data-t="Дед Мороз" data-d="Выход к детям">
+      <img src="wall/14.webp" alt="Дед Мороз" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Дед Мороз</b><i>Выход к детям</i></span>
+    </button>
+    <button type="button" class="bn-c bn-tall" data-t="Снегурочка" data-d="Встреча гостей">
+      <img src="wall/15.webp" alt="Снегурочка" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Снегурочка</b><i>Встреча гостей</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Хоровод" data-d="Момент, который снимают все">
+      <img src="wall/16.webp" alt="Хоровод" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Хоровод</b><i>Момент, который снимают все</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Подарки" data-d="Выдача в конце программы">
+      <img src="wall/17.webp" alt="Подарки" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Подарки</b><i>Выдача в конце программы</i></span>
+    </button>
+    <button type="button" class="bn-c bn-tall" data-t="Классы" data-d="Школы приезжают целиком">
+      <img src="wall/18.webp" alt="Классы" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Классы</b><i>Школы приезжают целиком</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Фотозона" data-d="Очередь не кончается">
+      <img src="wall/19.webp" alt="Фотозона" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Фотозона</b><i>Очередь не кончается</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Закулисье" data-d="За пять минут до выхода">
+      <img src="wall/20.webp" alt="Закулисье" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Закулисье</b><i>За пять минут до выхода</i></span>
+    </button>
+    <button type="button" class="bn-c bn-big" data-t="Костюмерная" data-d="Двести костюмов на смену">
+      <img src="wall/21.webp" alt="Костюмерная" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Костюмерная</b><i>Двести костюмов на смену</i></span>
+    </button>
+    <button type="button" class="bn-c bn-tall" data-t="Репетиция" data-d="Утро перед первым показом">
+      <img src="wall/22.webp" alt="Репетиция" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Репетиция</b><i>Утро перед первым показом</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="Финал" data-d="Конфетти и аплодисменты">
+      <img src="wall/23.webp" alt="Финал" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>Финал</b><i>Конфетти и аплодисменты</i></span>
+    </button>
+    <button type="button" class="bn-c" data-t="До встречи" data-d="Следующий сезон уже готовится">
+      <img src="wall/24.webp" alt="До встречи" width="720" height="960" loading="lazy" decoding="async" draggable="false">
+      <span class="bn-veil" aria-hidden="true"></span>
+      <span class="bn-cap"><b>До встречи</b><i>Следующий сезон уже готовится</i></span>
+    </button>
+    </div>
+  </div>
 </section>
 
 <!-- ==================== ТРЕТИЙ ЭКРАН: шесть городов ==================== -->
@@ -1833,7 +2093,7 @@ body{
   /* заголовки и блоки всплывают по мере прокрутки.
      Каскад считается внутри своей секции, иначе четвёртый экран ждал бы очереди третьего */
   var rv = [];
-  ['#cities', '#quiz', '#frame'].forEach(function(sel){
+  ['#white', '#cities', '#quiz', '#frame'].forEach(function(sel){
     var group = Array.prototype.slice.call(document.querySelectorAll(sel + ' .rv'));
     group.forEach(function(el, i){ el.style.transitionDelay = (i * 120) + 'ms'; });
     rv = rv.concat(group);
@@ -2156,6 +2416,118 @@ body{
   });
 
   show(0);
+})();
+</script>
+<!-- окно просмотра кадра: одно на всю страницу, наполняется из нажатой карточки -->
+<div class="bn-lb" id="bnLb" hidden role="dialog" aria-modal="true" aria-label="Просмотр фотографии">
+  <button class="bn-lb-x" type="button" aria-label="Закрыть просмотр">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <figure>
+    <img id="bnLbImg" src="" alt="">
+    <figcaption id="bnLbCap"></figcaption>
+  </figure>
+</div>
+<script>
+/* ---------- бенто-галерея второго экрана ---------- */
+(function(){
+  'use strict';
+  var vp = document.getElementById('bnVp'), grid = document.getElementById('bnGrid');
+  var lb = document.getElementById('bnLb');
+  if(!vp || !grid || !lb) return;
+  var cards = Array.prototype.slice.call(grid.querySelectorAll('.bn-c'));
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- каскад появления. Задержку копим только у первых карточек: остальные
+     всё равно стоят за краем окна, а ждать своей очереди две секунды им незачем ---- */
+  cards.forEach(function(c, i){ c.style.setProperty('--d', Math.min(i, 14) * 55 + 'ms'); });
+  if(reduce || !('IntersectionObserver' in window)){
+    grid.classList.add('in');
+  } else {
+    var io = new IntersectionObserver(function(items){
+      items.forEach(function(it){
+        if(!it.isIntersecting) return;
+        grid.classList.add('in'); io.disconnect();
+      });
+    }, {threshold:.12});
+    io.observe(vp);
+  }
+
+  /* ---- перетаскивание мышью. Пальцем и трекпадом лента едет сама - это обычная
+     прокрутка вбок; мышью её не потянешь, поэтому двигаем scrollLeft руками ---- */
+  var down = false, moved = 0, startX = 0, startL = 0, pid = null;
+  function swallow(e){ e.stopPropagation(); e.preventDefault(); }
+  vp.addEventListener('pointerdown', function(e){
+    if(e.pointerType !== 'mouse' || e.button !== 0) return;
+    down = true; moved = 0; startX = e.clientX; startL = vp.scrollLeft; pid = e.pointerId;
+    vp.classList.add('drag');
+  });
+  vp.addEventListener('pointermove', function(e){
+    if(!down || e.pointerId !== pid) return;
+    var dx = e.clientX - startX;
+    if(Math.abs(dx) > moved) moved = Math.abs(dx);
+    if(moved <= 4) return;
+    /* захват ставим только когда протяжка началась: иначе обычный клик по карточке
+       уходил бы в окно ленты и до кнопки не доходил */
+    if(!vp.hasPointerCapture(pid)) vp.setPointerCapture(pid);
+    vp.scrollLeft = startL - dx;
+    e.preventDefault();
+  });
+  function release(){
+    if(!down) return;
+    down = false; vp.classList.remove('drag');
+    if(pid !== null && vp.hasPointerCapture(pid)) vp.releasePointerCapture(pid);
+    pid = null;
+    /* клик, который прилетит сразу после протяжки, гасим - иначе лента
+       открывала бы фотографию каждый раз, когда её просто подвинули */
+    if(moved > 4){
+      vp.addEventListener('click', swallow, true);
+      setTimeout(function(){ vp.removeEventListener('click', swallow, true); }, 0);
+    }
+  }
+  vp.addEventListener('pointerup', release);
+  vp.addEventListener('pointercancel', release);
+
+  /* ---- просмотр кадра крупно ---- */
+  var img = document.getElementById('bnLbImg'), cap = document.getElementById('bnLbCap');
+  var x = lb.querySelector('.bn-lb-x'), back = null, timer = null;
+
+  function open(card){
+    var t = card.getAttribute('data-t') || '', d = card.getAttribute('data-d') || '';
+    back = card;
+    clearTimeout(timer);
+    img.src = card.querySelector('img').getAttribute('src');
+    img.alt = t;
+    cap.textContent = '';
+    if(t){ var b = document.createElement('b'); b.textContent = t; cap.appendChild(b); }
+    if(d){ cap.appendChild(document.createTextNode(d)); }
+    lb.hidden = false;
+    /* страницу под окном запираем, иначе прокрутка уезжает по первому экрану */
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function(){ lb.classList.add('on'); });
+    x.focus();
+  }
+  function close(){
+    if(lb.hidden) return;
+    lb.classList.remove('on');
+    document.body.style.overflow = '';
+    timer = setTimeout(function(){
+      lb.hidden = true; img.removeAttribute('src');
+      if(back){ back.focus(); back = null; }
+    }, reduce ? 0 : 300);
+  }
+  cards.forEach(function(c){ c.addEventListener('click', function(){ open(c); }); });
+  /* нажатие мимо снимка закрывает окно; крестик закрывает тем же путём - его клик
+     всплывает сюда, отдельный обработчик не нужен */
+  lb.addEventListener('click', close);
+  lb.querySelector('figure').addEventListener('click', function(e){ e.stopPropagation(); });
+  document.addEventListener('keydown', function(e){
+    if(lb.hidden) return;
+    if(e.key === 'Escape'){ close(); return; }
+    /* фокус из окна не выпускаем: под ним лежит вся страница */
+    if(e.key === 'Tab'){ e.preventDefault(); x.focus(); }
+  });
 })();
 </script>
 </body>
