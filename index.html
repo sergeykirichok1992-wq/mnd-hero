@@ -1043,6 +1043,409 @@ body{
 @keyframes qzIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
 .qz-step:not([hidden]){animation:qzIn .34s cubic-bezier(.2,.7,.2,1) both}
 @media (prefers-reduced-motion:reduce){ .qz-step:not([hidden]){animation:none} }
+
+/* ==================== ШЕСТОЙ ЭКРАН: таблица цен ====================
+   Логика подачи взята с прайса прошлого сезона: заголовок, четыре категории дат
+   от дорогой к дешёвой, внутри каждой - чипы дат по месяцам, внизу цена «сейчас»
+   и следующее повышение, под всем - примечание про сборную группу.
+
+   МАТЕРИАЛ ДРУГОЙ. Выше на странице уже лежит кремовая бумага - бланк квиза.
+   Второй такой же лист читался бы его близнецом и выселил бы ночь с самого
+   длинного экрана страницы. Поэтому здесь не бумага, а ведомость, отпечатанная
+   золотом по ночному: те же волосяные линейки и леттерхед, но тёмные.
+
+   ОДИН ЛИСТ, А НЕ ЧЕТЫРЕ КАРТОЧКИ. У старого прайса карточки заканчивались каждая
+   на своей высоте (6 дат против 14) и цены висели на разных уровнях - сравнить их
+   взглядом было нельзя. Здесь четыре графы сидят в одной сетке, и все четыре цены
+   стоят на общей нижней строке, как «итого» в ведомости.
+
+   z-index:25 - как у .wt/.ct/.qz/.fr. Без него секцию накроет липкая сцена
+   первого экрана (её слои доходят до 20). */
+.pr{
+  position:relative; z-index:25; overflow:hidden;
+  /* верх ровно в цвет .fr (#060C18), низ ровно в цвет .next (--ink) -
+     оба стыка гасим цветом, светлой полосы-перехода нет */
+  background:linear-gradient(180deg,#060C18 0%,#080F22 22%,#050A16 66%,#04070F 100%);
+  color:#C9D6EE;
+  --pr-hair:rgba(127,168,217,.14);     /* холодная линейка: делит графы */
+  --pr-gold:rgba(227,179,78,.22);      /* золотая линейка: делит разделы документа */
+  --pr-red:#E4776B;                    /* выходные и будущая цена. На тёмном #9D0A0F не читается */
+  --pr-pad-x:clamp(14px,1.6vw,34px);   /* поля полноширинных полос: леттерхед, подвал */
+  --pr-cell-x:clamp(12px,1.15vw,24px); /* поля ячейки графы */
+}
+/* фокус на тёмном - лунный, как у .qz; синий Министерства виден только на бумаге */
+.pr :focus-visible{outline:2px solid var(--moon); outline-offset:2px}
+.pr .vh{position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0}
+
+/* ночь остаётся на экране, а не сжимается в рамку вокруг таблицы:
+   два неподвижных пятна - холодное сверху слева и золотое снизу справа */
+.pr-sky{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.pr-sky i{position:absolute; display:block; border-radius:50%; filter:blur(90px)}
+.pr-sky i:nth-child(1){left:-14vw; top:-12vh; width:64vw; height:74vh;
+  background:radial-gradient(closest-side, rgba(47,49,146,.34), rgba(47,49,146,0) 70%)}
+.pr-sky i:nth-child(2){right:-18vw; bottom:-16vh; width:58vw; height:66vh;
+  background:radial-gradient(closest-side, rgba(227,179,78,.16), rgba(227,179,78,0) 70%)}
+.pr-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.045;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* широкая вёрстка: тот же контейнер, что у квиза, узкая колонка запрещена */
+.pr-body{position:relative; z-index:1; width:min(94vw,1720px); margin-inline:auto;
+  padding:clamp(52px,6vw,104px) clamp(16px,3vw,56px) clamp(66px,7.6vw,128px);
+  text-align:center}
+.pr-eyebrow{margin:0 0 clamp(14px,1.6vw,22px); font-size:clamp(11px,.86vw,13px);
+  letter-spacing:.24em; text-transform:uppercase; color:var(--gold)}
+.pr-h{margin:0 auto; max-width:20ch;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
+  color:var(--h2-color); text-transform:uppercase; text-wrap:balance}
+.pr-lede{margin:clamp(16px,1.8vw,28px) auto clamp(28px,3.4vw,56px); max-width:60ch;
+  font-size:clamp(15px,1.16vw,21px); line-height:1.5; color:#B7C6E2}
+
+/* ---------- сам лист ведомости ---------- */
+.pr-sheet{position:relative; text-align:left; border-radius:3px; overflow:hidden;
+  border:1px solid var(--pr-gold);
+  background:linear-gradient(180deg,rgba(127,168,217,.06) 0%,rgba(127,168,217,.018) 38%,rgba(127,168,217,0) 100%),#070D1C;
+  box-shadow:
+    inset 0 1px 0 rgba(227,179,78,.16),
+    0 30px 64px -30px rgba(0,0,0,.92),
+    0 4px 14px rgba(0,0,0,.4)}
+
+/* леттерхед. У квиза шапка бланка стоит по центру - там это заголовок формы.
+   Здесь разнос по краям: слева кто выдал, справа до какого числа действует */
+.pr-stamp{display:flex; justify-content:space-between; align-items:baseline;
+  gap:clamp(10px,1.6vw,28px); flex-wrap:wrap;
+  padding:clamp(12px,1.15vw,20px) var(--pr-pad-x);
+  border-bottom:1px solid var(--pr-hair);
+  font-size:clamp(10px,.74vw,12px); letter-spacing:.2em; text-transform:uppercase;
+  color:#8496B4; font-weight:600}
+.pr-valid{white-space:nowrap; color:var(--gold)}
+
+/* ---------- переключатель города ----------
+   Город стоит графой самого документа, а не фильтром сбоку: мимо него нельзя
+   пройти к цифрам. Вторая строка - минимальная цена города: видно, что Ставрополь
+   дешевле, ещё до нажатия. Нативный <select> прятал бы ровно это. */
+/* строка-замена переключателя, когда скрипт выключен */
+.pr-nojs{display:none; border-bottom:1px solid var(--pr-hair)}
+.pr-cities-wrap{position:relative}
+.pr-cities{display:grid; grid-template-columns:repeat(5,minmax(0,1fr));
+  border-bottom:1px solid var(--pr-hair)}
+.pr-city{padding:clamp(12px,1.1vw,19px) clamp(8px,.8vw,16px);
+  border:0; border-right:1px solid var(--pr-hair); background:transparent;
+  cursor:pointer; text-align:center; color:#93A5C2; font:inherit;
+  transition:background .18s ease, color .18s ease, box-shadow .18s ease}
+.pr-city:last-child{border-right:0}
+.pr-city b{display:block; font-weight:600; font-size:clamp(13px,.98vw,16.5px); line-height:1.2}
+.pr-city em{display:block; font-style:normal; margin-top:4px; font-weight:500;
+  font-size:clamp(11px,.74vw,13px); color:#66768F}
+@media (hover:hover) and (pointer:fine){
+  .pr-city:hover{background:rgba(227,179,78,.07); color:#EDF3FF}
+}
+.pr-city.on{color:#fff;
+  background:linear-gradient(180deg,rgba(227,179,78,.17),rgba(227,179,78,.05));
+  box-shadow:inset 0 -3px 0 var(--gold)}
+.pr-city.on b{font-weight:700}
+.pr-city.on em{color:var(--gold)}
+
+/* двойная линейка - подпись документа. У квиза эту роль играет золотая рамка
+   по периметру бумаги; повторять её значило бы сделать клон бланка */
+.pr-dbl{height:5px; border-top:2px solid rgba(227,179,78,.55);
+  border-bottom:1px solid rgba(227,179,78,.24)}
+
+/* ---------- сводка цен (узкие экраны) ----------
+   Главный ход листа - четыре цены на одной строке - живёт только пока графы стоят
+   в ряд. Как только они встают друг под друга, сравнение теряется. Поэтому ниже
+   980px под шапкой появляется короткий «рельс» из тех же четырёх цен. */
+.pr-rail{display:none}
+
+/* ---------- тело: четыре графы ----------
+   grid-auto-flow:column при двух строках заполняет сетку по столбцам, поэтому
+   .pr-col и .pr-sum одной категории встают друг под другом, а все четыре .pr-sum
+   садятся на общую вторую строку. display:contents вынимает пару в сетку -
+   тот же приём уже работает в .fr-art на узких экранах. */
+.pr-cols{display:grid; grid-auto-flow:column; grid-template-rows:auto auto;
+  grid-auto-columns:minmax(0,1fr)}
+.pr-cat-block{display:contents}
+.pr-col{padding:clamp(16px,1.5vw,28px) var(--pr-cell-x) clamp(14px,1.3vw,24px);
+  border-right:1px solid var(--pr-hair)}
+.pr-cat-block:last-child .pr-col,.pr-cat-block:last-child .pr-sum{border-right:0}
+/* золотая карточка старого прайса стала золотой графой */
+.pr-cat-block[data-cat="vip"] .pr-col{
+  background:linear-gradient(180deg,rgba(227,179,78,.085),rgba(227,179,78,.02))}
+
+/* голова графы: название узким прописным с разрядкой - это голова столбца
+   в ведомости, а не заголовок карточки. Справа счётчик дат: отвечает на вопрос
+   «а много ли таких дней» и заодно объясняет, почему VIP дороже */
+.pr-cat{display:flex; align-items:baseline; justify-content:space-between; gap:8px;
+  padding-bottom:clamp(9px,.85vw,14px); border-bottom:1px solid var(--pr-hair)}
+.pr-cat b{display:inline-flex; align-items:center; gap:.4em;
+  font-family:"Oswald",Arial,sans-serif; font-weight:500;
+  font-size:clamp(16px,1.4vw,27px); text-transform:uppercase; letter-spacing:.1em;
+  line-height:1; color:#EDF3FF}
+.pr-cat svg{width:.7em; height:.7em; flex:0 0 auto; color:var(--gold)}
+.pr-cat i{font-style:normal; font-size:clamp(10px,.74vw,12px); letter-spacing:.14em;
+  text-transform:uppercase; color:#6E7E9B; font-weight:600; white-space:nowrap}
+.pr-cat-block[data-cat="vip"] .pr-cat b{color:#F5E3B4}
+
+/* месяц - не «Январь:», а заголовок с выносной линейкой: двоеточие не нужно,
+   его работу делает линия до правого края графы */
+.pr-mon{display:flex; align-items:center; gap:9px;
+  margin:clamp(13px,1.15vw,21px) 0 clamp(7px,.6vw,11px);
+  font-size:clamp(10px,.72vw,12px); letter-spacing:.18em; text-transform:uppercase;
+  font-weight:700; color:#7B8BA8}
+.pr-mon::after{content:''; flex:1; height:1px; background:var(--pr-hair)}
+.pr-mgroup:first-child .pr-mon{margin-top:clamp(11px,.9vw,16px)}
+
+/* чип даты. Иконки календаря нет - вместо неё информация: день недели прижат
+   к правому краю, суббота и воскресенье красные. В «Специальных» красного нет
+   вовсе, в VIP его семь - экран сам, без единого слова, показывает, за что доплата */
+.pr-days{list-style:none; margin:0; padding:0; display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(5px,.42vw,8px)}
+.pr-day{display:flex; align-items:baseline; gap:6px; white-space:nowrap;
+  padding:clamp(6px,.55vw,10px) clamp(7px,.6vw,11px);
+  border:1px solid rgba(127,168,217,.15); border-radius:2px;
+  background:rgba(127,168,217,.05); color:#C3D0E6;
+  transition:border-color .18s ease, background .18s ease}
+.pr-day b{font-family:"Oswald",Arial,sans-serif; font-weight:500;
+  font-size:clamp(14px,1.1vw,19px); color:#F0F5FF; font-variant-numeric:tabular-nums}
+.pr-day span{font-size:clamp(11px,.8vw,13.5px); font-weight:500; color:#93A5C2}
+.pr-day em{font-style:normal; margin-left:auto; font-size:clamp(10px,.72vw,12.5px);
+  color:#66768F}
+.pr-day.we em{color:var(--pr-red); font-weight:600}
+@media (hover:hover) and (pointer:fine){
+  /* бумага не пружинит: меняются только цвет рамки и подложка, без сдвига */
+  .pr-day:hover{border-color:rgba(227,179,78,.42); background:rgba(227,179,78,.07)}
+}
+
+/* ---------- строка цен ----------
+   Цена набрана белым и подчёркнута золотой чертой, а цвет отдан ТОЛЬКО будущему
+   повышению. На старом прайсе выделена цветом была текущая цена; здесь первым
+   читается «сколько платить», вторым «сколько будет». */
+.pr-sum{padding:clamp(15px,1.4vw,27px) var(--pr-cell-x) clamp(17px,1.55vw,29px);
+  border-top:1px solid var(--pr-gold); border-right:1px solid var(--pr-hair);
+  background:rgba(227,179,78,.045);
+  display:flex; flex-direction:column; align-items:flex-start}
+.pr-cat-block[data-cat="vip"] .pr-sum{background:rgba(227,179,78,.115)}
+.pr-now-l{font-size:clamp(10px,.7vw,11.5px); letter-spacing:.2em; text-transform:uppercase;
+  font-weight:600; color:#7E8FAC; margin-bottom:clamp(6px,.5vw,10px)}
+.pr-now{display:inline-flex; align-items:baseline;
+  padding-bottom:clamp(6px,.5vw,10px); border-bottom:2px solid rgba(227,179,78,.5);
+  font-family:"Oswald",Arial,sans-serif; font-weight:700;
+  font-size:clamp(32px,3.25vw,58px); line-height:.9; color:#fff;
+  font-variant-numeric:tabular-nums}
+.pr-now i{font-style:normal}
+.pr-now s{text-decoration:none; font-size:.4em; font-weight:500;
+  color:var(--gold); margin-left:.16em}
+.pr-cat-block[data-cat="vip"] .pr-now{border-bottom-color:rgba(227,179,78,.9)}
+.pr-next{margin:clamp(10px,.9vw,16px) 0 0; width:100%;
+  padding-top:clamp(9px,.75vw,14px); border-top:1px dashed rgba(127,168,217,.2);
+  display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+  font-size:clamp(11.5px,.86vw,14.5px); color:#8496B4}
+.pr-next b{display:inline-flex; align-items:center; gap:.3em;
+  font-family:"Oswald",Arial,sans-serif; font-weight:700;
+  font-size:clamp(15px,1.18vw,21px); color:var(--pr-red);
+  font-variant-numeric:tabular-nums}
+.pr-next svg{width:.55em; height:.55em; flex:0 0 auto}
+.pr-next.final{justify-content:flex-start}
+
+/* ---------- подвал ---------- */
+.pr-foot{padding:clamp(14px,1.2vw,23px) var(--pr-pad-x);
+  border-top:1px solid var(--pr-gold);
+  display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
+  gap:clamp(10px,1.4vw,30px); align-items:center;
+  font-size:clamp(12.5px,.92vw,15.5px); line-height:1.5; color:#8FA0BC}
+.pr-foot p{margin:0}
+.pr-foot b{font-family:"Oswald",Arial,sans-serif; font-weight:700; color:#fff}
+.pr-off{text-align:right; color:#66768F}
+
+/* у этого сайта лист всегда заканчивается действием: человек увидел цену -
+   ему есть куда нажать. Кнопка ведёт в квиз выше, к расчёту на весь класс */
+.pr-act{margin:clamp(26px,3vw,52px) auto 0}
+.pr-btn{display:inline-block; padding:clamp(15px,1.35vw,21px) clamp(26px,2.6vw,48px);
+  border-radius:3px; text-decoration:none;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(14px,1.06vw,19px); letter-spacing:.02em; text-transform:uppercase;
+  color:#231705; text-wrap:balance;
+  background:linear-gradient(166deg,#FFF3CF 0%,#F3D68C 26%,#D3A244 62%,#EBCE86 100%);
+  box-shadow:inset 0 0 0 1px rgba(120,86,20,.35), 0 16px 32px -14px rgba(211,162,68,.9);
+  transition:filter .2s ease, transform .12s ease}
+.pr-btn:hover{filter:brightness(1.06)}
+.pr-btn:active{transform:translateY(1px)}
+.pr-fine{margin:clamp(12px,1.1vw,18px) auto 0; max-width:60ch;
+  font-size:clamp(12px,.86vw,14px); line-height:1.45; color:#66768F}
+
+/* смена города - «перештамповка»: цифры пропечатываются волной слева направо.
+   Геометрия, месяцы и даты неподвижны, меняются ровно те числа, которые зависят
+   от города. Иначе на Тюмени, где отличается одна цифра из четырёх, человек
+   не уверен, что вообще попал по кнопке. */
+@keyframes prSet{from{opacity:.2; transform:scale(1.03)} to{opacity:1; transform:none}}
+.pr-sum.set .pr-now,.pr-sum.set .pr-next b{
+  animation:prSet .28s cubic-bezier(.2,.7,.2,1) both; animation-delay:var(--d,0ms)}
+
+/* ---------- узкие экраны ----------
+   Блок категории физически цел: .pr-cat-block содержит и даты, и цену, а
+   перестроение идёт только сменой раскладки сетки. Поэтому цена никогда
+   не отрывается от своей графы. */
+@media (max-width:1180px){
+  .pr-cols{grid-auto-flow:row; grid-template-rows:none; grid-auto-columns:auto;
+    grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pr-cat-block{display:flex; flex-direction:column;
+    border-right:1px solid var(--pr-hair); border-bottom:1px solid var(--pr-hair)}
+  .pr-cat-block:nth-child(2n){border-right:0}
+  .pr-cat-block:nth-child(n+3){border-bottom:0}
+  .pr-col{border-right:0}
+  /* margin-top:auto возвращает выравнивание: в каждом ряду обе цены снова
+     стоят на одной линии, сравнение сохраняется попарно */
+  .pr-sum{border-right:0; margin-top:auto}
+}
+@media (max-width:980px){
+  .pr-rail{display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+    border-bottom:1px solid var(--pr-hair)}
+  .pr-rail div{padding:clamp(9px,1.4vw,13px) 6px; text-align:center;
+    border-right:1px solid var(--pr-hair)}
+  .pr-rail div:last-child{border-right:0}
+  .pr-rail div[data-cat="vip"]{background:rgba(227,179,78,.09)}
+  .pr-rail i{display:block; font-style:normal; font-size:10px; letter-spacing:.12em;
+    text-transform:uppercase; font-weight:600; color:#7E90AD}
+  .pr-rail b{display:block; margin-top:4px; font-family:"Oswald",Arial,sans-serif;
+    font-weight:700; font-size:clamp(17px,2.4vw,23px); color:#fff;
+    font-variant-numeric:tabular-nums}
+  .pr-rail div[data-cat="vip"] b{color:#F5E3B4}
+}
+@media (max-width:760px){
+  .pr-cols{grid-template-columns:minmax(0,1fr)}
+  .pr-cat-block{border-right:0}
+  .pr-cat-block:nth-child(n+3){border-bottom:1px solid var(--pr-hair)}
+  .pr-cat-block:last-child{border-bottom:0}
+  /* цена ложится в строку, а не в башню: слева «сейчас», справа повышение */
+  .pr-sum{flex-direction:row; align-items:flex-end; justify-content:space-between;
+    gap:14px; flex-wrap:wrap}
+  .pr-now{font-size:clamp(30px,8.2vw,44px)}
+  .pr-next{margin-top:0; padding-top:0; border-top:0; width:auto;
+    flex-direction:column; align-items:flex-end; text-align:right; gap:2px}
+  .pr-next.final{align-items:flex-start; text-align:left}
+  /* пять граф по 65px нечитаемы - переключатель становится лентой с прокруткой.
+     Полосу прокрутки прячем тем же приёмом, что в ленте полароидов .bn-vp */
+  .pr-cities{display:flex; overflow-x:auto; scroll-snap-type:x proximity;
+    overscroll-behavior-x:contain; scrollbar-width:none; -ms-overflow-style:none;
+    -webkit-overflow-scrolling:touch}
+  .pr-cities::-webkit-scrollbar{display:none}
+  .pr-city{flex:0 0 auto; min-width:max-content; scroll-snap-align:center;
+    padding:12px 16px}
+  .pr-cities-wrap::after{content:''; position:absolute; right:0; top:0; bottom:0;
+    width:34px; pointer-events:none;
+    background:linear-gradient(90deg,rgba(7,13,28,0),#070D1C)}
+}
+@media (max-width:560px){
+  .pr-rail{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pr-rail div:nth-child(2n){border-right:0}
+  .pr-rail div:nth-child(-n+2){border-bottom:1px solid var(--pr-hair)}
+}
+@media (max-width:520px){
+  .pr-stamp{flex-direction:column; align-items:flex-start; gap:6px; letter-spacing:.14em}
+  .pr-foot{grid-template-columns:minmax(0,1fr); gap:10px}
+  .pr-off{text-align:left}
+  .pr-btn{display:block; width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  .pr-now,.pr-next b{animation:none}
+  .pr-day,.pr-city,.pr-btn{transition:none}
+}
+
+/* ==================== ЭКРАН «ЧТО ЖЕ В ПРОГРАММЕ»  ====================
+   Копия одноимённого экрана с ministrynn.ru: сетка 3x3, в каждой карточке
+   свой слайдер с стрелками и точками. Размеры текста сняты с оригинала
+   один в один (64 / 28 / 18 / 12 / 40 px), геометрия карточки тоже:
+   радиус 28px, тень 0 11px 5px -7px, поля 20 / 19 / 40 px.
+   Отличий от оригинала два, оба намеренные:
+   1) шрифты наши - заголовок секции набором --h2-family, всё остальное
+      Golos Text (подзаголовки и основной текст просили без засечек);
+   2) контейнер широкий, min(94vw,1720px), а не колонка 1170px:
+      это постоянное правило вёрстки сайта. Вернуть исходную ширину -
+      поменять --pg-w ниже на 1170px. */
+.pg{position:relative; z-index:20; background:#0A1020 center/cover no-repeat;
+  --pg-w:1720px; --pg-card:#FFF0F0; --pg-dot:rgba(51,51,51,.2); --pg-dot-on:#1666F1}
+.pg.bgon{background-image:url(program/pg-bg.webp)}
+@media (max-width:1100px){.pg.bgon{background-image:url(program/pg-bg-mob.webp)}}
+/* оригинальная подсветка фона: почти неразличимая, но снята как есть */
+.pg::before{content:''; position:absolute; inset:0; background:rgba(255,255,255,.02); pointer-events:none}
+.pg-body{position:relative; z-index:1; width:min(94vw,var(--pg-w)); margin-inline:auto;
+  padding:clamp(56px,7vw,94px) clamp(16px,3vw,56px) clamp(84px,10.5vw,143px)}
+.pg-title{margin:0; text-align:center; color:#fff; text-wrap:balance;
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:clamp(30px,4.4vw,64px); line-height:1.1; letter-spacing:var(--h2-ls)}
+.pg-sub{margin:14px 0 0; text-align:center; color:#fff; font-size:16px; line-height:1.45}
+
+.pg-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  column-gap:40px; row-gap:40px; margin-top:61px; align-items:start}
+@media (max-width:1180px){.pg-grid{grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:28px; row-gap:32px}}
+@media (max-width:760px){.pg-grid{grid-template-columns:minmax(0,1fr); row-gap:26px}}
+
+.pg-card{background:var(--pg-card); color:#333; text-align:center;
+  border-radius:28px; box-shadow:0 11px 5px -7px rgba(0,0,0,.35);
+  padding:5px 6px 40px; overflow:hidden}
+
+/* слайдер: стрелки стоят в ряд с картинкой и отъедают по 30px с боков -
+   ровно как в оригинале, поэтому кадр внутри карточки чуть уже её самой */
+.pg-slider{display:flex; align-items:center}
+.pg-arrow{flex:0 0 30px; width:30px; height:30px; padding:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  background:transparent; color:#333; opacity:.8;
+  border:3px solid rgba(51,51,51,.2); border-radius:100%;
+  transition:opacity .2s ease}
+.pg-arrow:hover{opacity:1}
+.pg-arrow:focus-visible{outline:2px solid var(--pg-dot-on); outline-offset:2px}
+.pg-arrow svg{width:9px; height:9px; display:block}
+.pg-view{flex:1 1 auto; min-width:0; overflow:hidden}
+.pg-track{display:flex; touch-action:pan-y;
+  transition:transform .45s cubic-bezier(.2,.7,.2,1); will-change:transform}
+.pg-track.pg-drag{transition:none}
+.pg-slide{flex:0 0 100%; min-width:0; padding:5px}
+.pg-slide img{display:block; width:100%; height:auto; border-radius:10px;
+  -webkit-user-drag:none; user-select:none}
+.pg-hint{margin:0; padding:5px; font-size:12px; line-height:1.3; color:#333}
+
+.pg-dots{display:flex; justify-content:center; align-items:center; gap:6.67px}
+.pg-dot{width:10px; height:10px; padding:0; border:0; cursor:pointer;
+  border-radius:100%; background:var(--pg-dot); transition:background-color .3s}
+.pg-dot.on{background:var(--pg-dot-on)}
+.pg-dot:focus-visible{outline:2px solid var(--pg-dot-on); outline-offset:3px}
+
+.pg-h{margin:20px 0 0; padding:0 6px; color:#111;
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif; font-weight:600;
+  font-size:28px; line-height:1.14; letter-spacing:-.005em; text-wrap:balance}
+.pg-p{margin:19px 0 0; padding:0 14px; color:#333; font-size:18px; line-height:1.45}
+
+.pg-foot{display:grid; grid-template-columns:37.4% 62.6%; align-items:center;
+  gap:20px; margin-top:64px}
+.pg-cta{display:flex; flex-direction:column; align-items:center; gap:12px}
+.pg-btn{display:inline-block; max-width:420px; padding:16px 30px; border-radius:3px;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(14px,1.06vw,19px); letter-spacing:.02em; text-transform:uppercase;
+  color:#231705; text-decoration:none; text-align:center;
+  background:linear-gradient(166deg,#FFF3CF 0%,#F3D68C 26%,#D3A244 62%,#EBCE86 100%);
+  box-shadow:inset 0 0 0 1px rgba(120,86,20,.35), 0 16px 32px -14px rgba(211,162,68,.9);
+  transition:filter .2s ease, transform .12s ease}
+.pg-btn:hover{filter:brightness(1.06)}
+.pg-btn:active{transform:translateY(1px)}
+.pg-oferta{font-size:14px; color:#fff; opacity:.7; text-decoration:underline;
+  text-underline-offset:3px}
+.pg-oferta:hover{opacity:1}
+.pg-more{margin:0; text-align:center; color:#FDC68C; text-wrap:balance;
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif; font-weight:400;
+  font-size:clamp(22px,2.7vw,40px); line-height:1.2}
+@media (max-width:860px){
+  .pg-foot{grid-template-columns:minmax(0,1fr); gap:26px; margin-top:48px}
+}
+/* на телефоне стрелки прячутся и кадр занимает карточку целиком - как в оригинале */
+@media (max-width:760px){
+  .pg-arrow{display:none}
+  .pg-h{font-size:24px}
+  .pg-p{font-size:17px}
+}
+@media (prefers-reduced-motion:reduce){
+  .pg-track{transition:none}
+}
 </style>
 </head>
 <body>
@@ -1380,6 +1783,283 @@ body{
   </div>
 </section>
 
+<!-- ==================== ЭКРАН: что же в программе ==================== -->
+<section class="pg" id="program" aria-labelledby="pgTitle">
+  <div class="pg-body">
+    <h2 class="pg-title rv" id="pgTitle">Что же в программе?</h2>
+    <p class="pg-sub rv">Продолжительность 1 час 20 минут (идеальный тайминг без спешки)</p>
+
+    <div class="pg-grid">
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-1-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-1-2.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-1-3.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button><button class="pg-dot" type="button" aria-label="Фото 2"></button><button class="pg-dot" type="button" aria-label="Фото 3"></button></div>
+        <h3 class="pg-h">Яркое приветственное шоу во дворе</h3>
+        <p class="pg-p">Старт программы, знакомство с главными героями, завязка сюжета квеста должны быть фееричными! Спецэффекты, танец, конфликт добра и зла. Наш квест начнётся прямо с ворот Министерства!</p>
+      </article>
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-2-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button></div>
+        <h3 class="pg-h">Познавательный квест-детектив</h3>
+        <p class="pg-p">Большое новогоднее расследование! По ходу программы дети разгадают тайну хранителей времени, восстановят капсулы времени и выведут на чистую воду злодея министерства. Всё это будет красиво, загадочно и технологично!</p>
+      </article>
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-3-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-3-2.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-3-3.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button><button class="pg-dot" type="button" aria-label="Фото 2"></button><button class="pg-dot" type="button" aria-label="Фото 3"></button></div>
+        <h3 class="pg-h">Обновлённый карамельный мастер-класс</h3>
+        <p class="pg-p">Главная часть программы! Каждый ребёнок сделает красивые разноцветные леденцы, прям как в магазине. Мы сами производим натуральную вкуснейшую карамель по ГОСТу для своих мастер-классов.</p>
+      </article>
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-4-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button></div>
+        <h3 class="pg-h">Выставка карамельного искусства</h3>
+        <p class="pg-p">Впервые наш цех готовит большую авторскую экспозицию уникальных леденцов самых разных размеров, которые удивят даже взрослых!</p>
+      </article>
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-5-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-5-2.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button><button class="pg-dot" type="button" aria-label="Фото 2"></button></div>
+        <h3 class="pg-h">Волшебное люминесцентное шоу-сказка</h3>
+        <p class="pg-p">Это, безо всяких преувеличений, очень завораживающее зрелище - новогодняя сказка, нарисованная неоновым светом, впечатляет даже родителей. В этом году она, конечно же, новая.</p>
+      </article>
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-6-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-6-2.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-6-3.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button><button class="pg-dot" type="button" aria-label="Фото 2"></button><button class="pg-dot" type="button" aria-label="Фото 3"></button></div>
+        <h3 class="pg-h">Экскурсия в кабинет (тайный архив) Деда Мороза</h3>
+        <p class="pg-p">В этом году кабинет Деда Мороза будет исполнен в стиле старого архива-библиотеки. Это будет очень необыкновенно! Как всегда, кабинет будет очень детализирован, с максимальным погружением в сказку.</p>
+      </article>
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-7-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-7-2.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button><button class="pg-dot" type="button" aria-label="Фото 2"></button></div>
+        <h3 class="pg-h">Мульти-проекционное оформление</h3>
+        <p class="pg-p">Казалось бы, обычные картины в кабинете Деда Мороза оживут прямо на глазах деток! Мы приобрели собственное проекционное оборудование для создания 3D-проекций в помещениях. Это будет очень эффектно!</p>
+      </article>
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-8-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-8-2.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-8-3.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button><button class="pg-dot" type="button" aria-label="Фото 2"></button><button class="pg-dot" type="button" aria-label="Фото 3"></button></div>
+        <h3 class="pg-h">Новый интерактив с пультом управления делами Деда Мороза</h3>
+        <p class="pg-p">Настоящее ноу-хау в новогодних мероприятиях - интерактив с главным гаджетом Деда Мороза! Министр покажет детям не только различные новые трюки с пультом, но и самих же детей! В прошлом году дети по-настоящему были в шоке от демонстрации их школьных фото Дедом Морозом на экранах пульта!</p>
+      </article>
+      <article class="pg-card rv">
+        <div class="pg-slider" data-pg-slider data-autoplay="5000">
+          <button class="pg-arrow" type="button" data-pg-prev aria-label="Предыдущее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5.8 1.2 2.2 4.5l3.6 3.3"/></svg>
+          </button>
+          <div class="pg-view">
+            <div class="pg-track">
+            <div class="pg-slide">
+              <img src="program/pg-9-1.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-9-2.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            <div class="pg-slide">
+              <img src="program/pg-9-3.webp" width="737" height="810" alt=""
+                   loading="lazy" decoding="async" draggable="false">
+              <p class="pg-hint">Листай слайдер</p>
+            </div>
+            </div>
+          </div>
+          <button class="pg-arrow" type="button" data-pg-next aria-label="Следующее фото">
+            <svg viewBox="0 0 9 9" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3.2 1.2 6.8 4.5 3.2 7.8"/></svg>
+          </button>
+        </div>
+        <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button><button class="pg-dot" type="button" aria-label="Фото 2"></button><button class="pg-dot" type="button" aria-label="Фото 3"></button></div>
+        <h3 class="pg-h">Фото у нескольких фото-зон с главными героями!</h3>
+        <p class="pg-p">Завершающий этап программы - групповое и индивидуальное фотографирование с Дедом Морозом и другими актёрами. Наш дом - сплошная фото-зона! Каждый уголок мы делаем таким, чтобы на его фоне хотелось сфотографироваться даже родителям.</p>
+      </article>
+    </div>
+
+    <div class="pg-foot rv">
+      <div class="pg-cta">
+        <a class="pg-btn" href="#quiz">Оставить заявку!</a>
+        <a class="pg-oferta" href="https://clck.ru/35wiQS" target="_blank" rel="noopener">Публичная оферта</a>
+      </div>
+      <p class="pg-more">И это далеко не всё! Читайте далее...</p>
+    </div>
+  </div>
+</section>
+
 <!-- ==================== ЧЕТВЁРТЫЙ ЭКРАН: расчёт для класса (квиз) ==================== -->
 <section class="qz" id="quiz" aria-labelledby="qzTitle">
   <div class="qz-sky" aria-hidden="true"><i></i><i></i></div>
@@ -1574,6 +2254,191 @@ body{
     </div>
   </div>
 </section>
+
+<!-- ==================== ШЕСТОЙ ЭКРАН: таблица цен ==================== -->
+<section class="pr" id="prices" aria-labelledby="prTitle">
+  <div class="pr-sky" aria-hidden="true"><i></i><i></i></div>
+  <div class="pr-grain" aria-hidden="true"></div>
+
+  <div class="pr-body">
+    <p class="pr-eyebrow rv">Сезон 2026 / 2027</p>
+    <h2 class="pr-h rv" id="prTitle">Таблица цен</h2>
+    <p class="pr-lede rv">Цена зависит от даты, а не от программы: чем ближе к Новому году, тем дороже. Даты во всех городах одинаковые - отличается только цена.</p>
+
+    <div class="pr-sheet rv">
+      <div class="pr-stamp">
+        <span>Министерство новогодних дел · тарифная ведомость</span>
+        <span class="pr-valid" id="prValid">Цена действует до 30 сентября</span>
+      </div>
+
+      <!-- город: без скрипта переключатель не переключает, поэтому он прячется,
+           а на его место встаёт строка про Нижний Новгород - его цены и стоят в разметке -->
+      <noscript><style>.pr-cities-wrap{display:none}.pr-nojs{display:block}</style></noscript>
+      <div class="pr-cities-wrap">
+        <div class="pr-cities" role="radiogroup" aria-label="Город">
+          <button class="pr-city on" type="button" role="radio" aria-checked="true" tabindex="0" data-city="nizhny"><b>Нижний Новгород</b><em>от 1490 ₽</em></button>
+          <button class="pr-city" type="button" role="radio" aria-checked="false" tabindex="-1" data-city="kazan"><b>Казань</b><em>от 1490 ₽</em></button>
+          <button class="pr-city" type="button" role="radio" aria-checked="false" tabindex="-1" data-city="tyumen"><b>Тюмень</b><em>от 1390 ₽</em></button>
+          <button class="pr-city" type="button" role="radio" aria-checked="false" tabindex="-1" data-city="stavropol"><b>Ставрополь</b><em>от 1290 ₽</em></button>
+          <button class="pr-city" type="button" role="radio" aria-checked="false" tabindex="-1" data-city="crimea"><b>Крым</b><em>от 1390 ₽</em></button>
+        </div>
+      </div>
+      <p class="pr-nojs pr-stamp">Цены указаны для Нижнего Новгорода</p>
+
+      <div class="pr-dbl" aria-hidden="true"></div>
+
+      <!-- сводка для узких экранов: те же четыре цены одной строкой -->
+      <div class="pr-rail" aria-hidden="true">
+        <div data-cat="vip"><i>VIP</i><b>1890 ₽</b></div>
+        <div data-cat="premium"><i>Премиум</i><b>1690 ₽</b></div>
+        <div data-cat="standard"><i>Стандарт</i><b>1590 ₽</b></div>
+        <div data-cat="special"><i>Специальные</i><b>1490 ₽</b></div>
+      </div>
+
+      <div class="pr-cols">
+        <div class="pr-cat-block" data-cat="vip">
+          <div class="pr-col">
+            <div class="pr-cat"><b><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#qzStar"/></svg>VIP</b><i>14 дат</i></div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Декабрь</p>
+              <ul class="pr-days" aria-label="Даты категории VIP, декабрь">
+                <li class="pr-day we" aria-label="12 декабря, суббота"><b>12</b><span>дек</span><em>сб</em></li>
+                <li class="pr-day we" aria-label="13 декабря, воскресенье"><b>13</b><span>дек</span><em>вс</em></li>
+                <li class="pr-day" aria-label="18 декабря, пятница"><b>18</b><span>дек</span><em>пт</em></li>
+                <li class="pr-day we" aria-label="19 декабря, суббота"><b>19</b><span>дек</span><em>сб</em></li>
+                <li class="pr-day we" aria-label="20 декабря, воскресенье"><b>20</b><span>дек</span><em>вс</em></li>
+                <li class="pr-day" aria-label="24 декабря, четверг"><b>24</b><span>дек</span><em>чт</em></li>
+                <li class="pr-day" aria-label="25 декабря, пятница"><b>25</b><span>дек</span><em>пт</em></li>
+                <li class="pr-day we" aria-label="26 декабря, суббота"><b>26</b><span>дек</span><em>сб</em></li>
+                <li class="pr-day we" aria-label="27 декабря, воскресенье"><b>27</b><span>дек</span><em>вс</em></li>
+                <li class="pr-day" aria-label="28 декабря, понедельник"><b>28</b><span>дек</span><em>пн</em></li>
+                <li class="pr-day" aria-label="29 декабря, вторник"><b>29</b><span>дек</span><em>вт</em></li>
+              </ul>
+            </div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Январь</p>
+              <ul class="pr-days" aria-label="Даты категории VIP, январь">
+                <li class="pr-day we" aria-label="3 января, воскресенье"><b>3</b><span>янв</span><em>вс</em></li>
+                <li class="pr-day" aria-label="4 января, понедельник"><b>4</b><span>янв</span><em>пн</em></li>
+                <li class="pr-day" aria-label="5 января, вторник"><b>5</b><span>янв</span><em>вт</em></li>
+              </ul>
+            </div>
+          </div>
+          <div class="pr-sum">
+            <p class="pr-now-l">Сейчас</p>
+            <span class="pr-now"><i>1890</i><s>₽</s></span>
+            <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1990</i> ₽</b></p>
+          </div>
+        </div>
+        <div class="pr-cat-block" data-cat="premium">
+          <div class="pr-col">
+            <div class="pr-cat"><b>Премиум</b><i>12 дат</i></div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Декабрь</p>
+              <ul class="pr-days" aria-label="Даты категории Премиум, декабрь">
+                <li class="pr-day we" aria-label="5 декабря, суббота"><b>5</b><span>дек</span><em>сб</em></li>
+                <li class="pr-day we" aria-label="6 декабря, воскресенье"><b>6</b><span>дек</span><em>вс</em></li>
+                <li class="pr-day" aria-label="11 декабря, пятница"><b>11</b><span>дек</span><em>пт</em></li>
+                <li class="pr-day" aria-label="15 декабря, вторник"><b>15</b><span>дек</span><em>вт</em></li>
+                <li class="pr-day" aria-label="16 декабря, среда"><b>16</b><span>дек</span><em>ср</em></li>
+                <li class="pr-day" aria-label="17 декабря, четверг"><b>17</b><span>дек</span><em>чт</em></li>
+                <li class="pr-day" aria-label="21 декабря, понедельник"><b>21</b><span>дек</span><em>пн</em></li>
+                <li class="pr-day" aria-label="22 декабря, вторник"><b>22</b><span>дек</span><em>вт</em></li>
+                <li class="pr-day" aria-label="23 декабря, среда"><b>23</b><span>дек</span><em>ср</em></li>
+                <li class="pr-day" aria-label="30 декабря, среда"><b>30</b><span>дек</span><em>ср</em></li>
+              </ul>
+            </div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Январь</p>
+              <ul class="pr-days" aria-label="Даты категории Премиум, январь">
+                <li class="pr-day we" aria-label="9 января, суббота"><b>9</b><span>янв</span><em>сб</em></li>
+                <li class="pr-day we" aria-label="10 января, воскресенье"><b>10</b><span>янв</span><em>вс</em></li>
+              </ul>
+            </div>
+          </div>
+          <div class="pr-sum">
+            <p class="pr-now-l">Сейчас</p>
+            <span class="pr-now"><i>1690</i><s>₽</s></span>
+            <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1790</i> ₽</b></p>
+          </div>
+        </div>
+        <div class="pr-cat-block" data-cat="standard">
+          <div class="pr-col">
+            <div class="pr-cat"><b>Стандарт</b><i>10 дат</i></div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Ноябрь</p>
+              <ul class="pr-days" aria-label="Даты категории Стандарт, ноябрь">
+                <li class="pr-day we" aria-label="28 ноября, суббота"><b>28</b><span>ноя</span><em>сб</em></li>
+                <li class="pr-day we" aria-label="29 ноября, воскресенье"><b>29</b><span>ноя</span><em>вс</em></li>
+              </ul>
+            </div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Декабрь</p>
+              <ul class="pr-days" aria-label="Даты категории Стандарт, декабрь">
+                <li class="pr-day" aria-label="7 декабря, понедельник"><b>7</b><span>дек</span><em>пн</em></li>
+                <li class="pr-day" aria-label="8 декабря, вторник"><b>8</b><span>дек</span><em>вт</em></li>
+                <li class="pr-day" aria-label="9 декабря, среда"><b>9</b><span>дек</span><em>ср</em></li>
+                <li class="pr-day" aria-label="10 декабря, четверг"><b>10</b><span>дек</span><em>чт</em></li>
+                <li class="pr-day" aria-label="14 декабря, понедельник"><b>14</b><span>дек</span><em>пн</em></li>
+              </ul>
+            </div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Январь</p>
+              <ul class="pr-days" aria-label="Даты категории Стандарт, январь">
+                <li class="pr-day" aria-label="6 января, среда"><b>6</b><span>янв</span><em>ср</em></li>
+                <li class="pr-day" aria-label="7 января, четверг"><b>7</b><span>янв</span><em>чт</em></li>
+                <li class="pr-day" aria-label="8 января, пятница"><b>8</b><span>янв</span><em>пт</em></li>
+              </ul>
+            </div>
+          </div>
+          <div class="pr-sum">
+            <p class="pr-now-l">Сейчас</p>
+            <span class="pr-now"><i>1590</i><s>₽</s></span>
+            <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1690</i> ₽</b></p>
+          </div>
+        </div>
+        <div class="pr-cat-block" data-cat="special">
+          <div class="pr-col">
+            <div class="pr-cat"><b>Специальные</b><i>6 дат</i></div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Ноябрь</p>
+              <ul class="pr-days" aria-label="Даты категории Специальные, ноябрь">
+                <li class="pr-day" aria-label="27 ноября, пятница"><b>27</b><span>ноя</span><em>пт</em></li>
+                <li class="pr-day" aria-label="30 ноября, понедельник"><b>30</b><span>ноя</span><em>пн</em></li>
+              </ul>
+            </div>
+            <div class="pr-mgroup">
+              <p class="pr-mon">Декабрь</p>
+              <ul class="pr-days" aria-label="Даты категории Специальные, декабрь">
+                <li class="pr-day" aria-label="1 декабря, вторник"><b>1</b><span>дек</span><em>вт</em></li>
+                <li class="pr-day" aria-label="2 декабря, среда"><b>2</b><span>дек</span><em>ср</em></li>
+                <li class="pr-day" aria-label="3 декабря, четверг"><b>3</b><span>дек</span><em>чт</em></li>
+                <li class="pr-day" aria-label="4 декабря, пятница"><b>4</b><span>дек</span><em>пт</em></li>
+              </ul>
+            </div>
+          </div>
+          <div class="pr-sum">
+            <p class="pr-now-l">Сейчас</p>
+            <span class="pr-now"><i>1490</i><s>₽</s></span>
+            <p class="pr-next"><span class="pr-when">с 1 октября</span><b><svg viewBox="0 0 12 12" aria-hidden="true" focusable="false"><path d="M6 1.5 11 8H7.4v2.6H4.6V8H1z" fill="currentColor"/></svg><i>1590</i> ₽</b></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pr-foot">
+        <p>Цены указаны для организованных групп: класс или садик приходит одним составом, от 20 детей. Для сборной группы детский билет на <b>300 ₽</b> дороже - взрослый билет стоит одинаково для любых групп.</p>
+        <p class="pr-off">Не работаем 31 декабря, 1 и 2 января</p>
+      </div>
+    </div>
+
+    <div class="pr-act rv">
+      <a class="pr-btn" href="#quiz">Рассчитать стоимость для класса</a>
+      <p class="pr-fine">Взрослый билет считаем отдельно - назовём цену в ответе на заявку.</p>
+    </div>
+    <p class="vh" id="prLive" aria-live="polite"></p>
+  </div>
+</section>
+
 
 <section class="next" id="next">
   <div class="inner">
@@ -2211,7 +3076,7 @@ body{
   /* заголовки и блоки всплывают по мере прокрутки.
      Каскад считается внутри своей секции, иначе четвёртый экран ждал бы очереди третьего */
   var rv = [];
-  ['#white', '#cities', '#quiz', '#frame'].forEach(function(sel){
+  ['#white', '#cities', '#program', '#quiz', '#frame', '#prices'].forEach(function(sel){
     var group = Array.prototype.slice.call(document.querySelectorAll(sel + ' .rv'));
     group.forEach(function(el, i){ el.style.transitionDelay = (i * 120) + 'ms'; });
     rv = rv.concat(group);
@@ -2648,5 +3513,268 @@ body{
   });
 })();
 </script>
+
+<script>
+/* ==================== ЭКРАН ЦЕН: город и ступени повышения ====================
+   Две задачи. Первая: переключить город - меняются ровно восемь чисел, даты
+   и вся геометрия листа неподвижны. Вторая: цена сама считает, на какой ступени
+   она сейчас стоит.
+
+   Ступени +100 руб приходятся на 1 октября, 1 ноября и 1 декабря. В разметке
+   лежит сентябрьская цена Нижнего Новгорода - без скрипта и для поисковика виден
+   готовый документ, а не пустой лист. Скрипт прибавляет пройденные ступени, поэтому
+   1 октября страница не протухнет: сама покажет «сейчас 1990, с 1 ноября 2090».
+   После 1 декабря повышений больше нет - строка «с 1 ...» заменяется на
+   «Финальная цена сезона», иначе сайт пообещает несуществующее повышение. */
+(function(){
+  'use strict';
+  var sec = document.getElementById('prices');
+  if (!sec) return;
+
+  /* базовая (сентябрьская) цена, порядок как в разметке: VIP, Премиум, Стандарт, Специальные */
+  var CITY = {
+    nizhny:    {n:'Нижнего Новгорода', p:[1890,1690,1590,1490]},
+    kazan:     {n:'Казани',            p:[1890,1690,1590,1490]},
+    tyumen:    {n:'Тюмени',            p:[1890,1690,1590,1390]},
+    stavropol: {n:'Ставрополя',        p:[1690,1490,1390,1290]},
+    crimea:    {n:'Крыма',             p:[1790,1590,1490,1390]}
+  };
+  var STEPS = [
+    {k:20261001, from:'с 1 октября', till:'до 30 сентября'},
+    {k:20261101, from:'с 1 ноября',  till:'до 31 октября'},
+    {k:20261201, from:'с 1 декабря', till:'до 30 ноября'}
+  ];
+  var UP = 100;
+
+  var t = new Date();
+  var today = t.getFullYear() * 10000 + (t.getMonth() + 1) * 100 + t.getDate();
+  var passed = 0, i;
+  for (i = 0; i < STEPS.length; i++){ if (today >= STEPS[i].k) passed++; }
+  var next = STEPS[passed] || null;
+
+  var cities = sec.querySelectorAll('.pr-city');
+  var sums   = sec.querySelectorAll('.pr-sum');
+  var rails  = sec.querySelectorAll('.pr-rail b');
+  var valid  = document.getElementById('prValid');
+  var live   = document.getElementById('prLive');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (valid) valid.textContent = next ? ('Цена действует ' + next.till)
+                                      : 'Действует последняя цена сезона';
+
+  function paint(key, animate){
+    var c = CITY[key];
+    if (!c) return;
+    for (var i = 0; i < sums.length; i++){
+      var cur   = c.p[i] + UP * passed;
+      var cell  = sums[i];
+      var nowEl = cell.querySelector('.pr-now i');
+      var line  = cell.querySelector('.pr-next');
+      if (nowEl) nowEl.textContent = cur;
+      if (line){
+        var when = line.querySelector('.pr-when');
+        var box  = line.querySelector('b');
+        if (next){
+          line.classList.remove('final');
+          if (when) when.textContent = next.from;
+          if (box){ box.hidden = false; box.querySelector('i').textContent = cur + UP; }
+        } else {
+          line.classList.add('final');
+          if (when) when.textContent = 'Финальная цена сезона';
+          if (box) box.hidden = true;
+        }
+      }
+      if (rails[i]) rails[i].textContent = cur + ' ₽';
+      /* цифры пропечатываются волной слева направо. Класс снимаем, форсируем
+         перерисовку и ставим заново - иначе повторный щелчок анимацию не перезапустит */
+      if (animate && !reduce){
+        cell.classList.remove('set');
+        void cell.offsetWidth;
+        cell.style.setProperty('--d', (i * 45) + 'ms');
+        cell.classList.add('set');
+      }
+    }
+    /* «от 1490 руб» под названием города - тоже цена, и она тоже растёт */
+    for (i = 0; i < cities.length; i++){
+      var slug = cities[i].getAttribute('data-city');
+      var em = cities[i].querySelector('em');
+      if (!em || !CITY[slug]) continue;
+      em.textContent = 'от ' + (Math.min.apply(null, CITY[slug].p) + UP * passed) + ' ₽';
+    }
+  }
+
+  /* активный город подводится под глаз сдвигом самой ленты. scrollIntoView здесь
+     нельзя: на загрузке страницы он утащил бы человека вниз, к секции цен */
+  function center(btn){
+    var box = btn.parentNode;
+    if (!box || box.scrollWidth <= box.clientWidth) return;
+    box.scrollLeft = btn.offsetLeft - (box.clientWidth - btn.offsetWidth) / 2;
+  }
+
+  function select(key, opts){
+    opts = opts || {};
+    for (var i = 0; i < cities.length; i++){
+      var on = cities[i].getAttribute('data-city') === key;
+      cities[i].classList.toggle('on', on);
+      cities[i].setAttribute('aria-checked', on ? 'true' : 'false');
+      cities[i].tabIndex = on ? 0 : -1;
+      if (on){
+        center(cities[i]);
+        if (opts.focus) cities[i].focus();
+      }
+    }
+    paint(key, !opts.silent);
+    if (!opts.silent){
+      if (live) live.textContent = 'Цены для ' + CITY[key].n;
+      /* менеджер может отправить школе ссылку сразу на её город */
+      try { history.replaceState(null, '', '?city=' + key + location.hash); } catch (e){}
+    }
+  }
+
+  for (i = 0; i < cities.length; i++){
+    cities[i].addEventListener('click', function(){
+      select(this.getAttribute('data-city'), {});
+    });
+  }
+  /* стрелками ходим по группе, как положено радиокнопкам */
+  sec.addEventListener('keydown', function(e){
+    var el = e.target;
+    if (!el || !el.classList || !el.classList.contains('pr-city')) return;
+    var idx = Array.prototype.indexOf.call(cities, el), n = cities.length, to = -1;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') to = (idx + 1) % n;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') to = (idx - 1 + n) % n;
+    else if (e.key === 'Home') to = 0;
+    else if (e.key === 'End') to = n - 1;
+    else return;
+    e.preventDefault();
+    select(cities[to].getAttribute('data-city'), {focus:true});
+  });
+
+  var start = 'nizhny';
+  var m = /[?&]city=([a-z]+)/.exec(location.search || '');
+  if (m && CITY[m[1]]) start = m[1];
+  select(start, {silent:true});
+})();
+</script>
+
+
+<script>
+/* ==================== СЛАЙДЕРЫ ЭКРАНА «ЧТО ЖЕ В ПРОГРАММЕ» ====================
+   Свой маленький слайдер вместо библиотеки: стрелки, точки, свайп пальцем
+   и мышью, автолистание раз в 5 секунд - как на ministrynn.ru.
+   Автолистание засыпает, когда карточка ушла с экрана или под курсором,
+   и не включается при «уменьшить движение» в системе. */
+(function(){
+  'use strict';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function build(root){
+    var track  = root.querySelector('.pg-track');
+    var slides = Array.prototype.slice.call(root.querySelectorAll('.pg-slide'));
+    var dots   = Array.prototype.slice.call(root.parentNode.querySelectorAll('.pg-dot'));
+    var n = slides.length;
+    if (!track || !n) return;
+
+    var i = 0, timer = null, visible = false, hover = false;
+    var pause = parseInt(root.getAttribute('data-autoplay'), 10) || 5000;
+
+    function draw(){
+      track.style.transform = 'translate3d(' + (-i * 100) + '%,0,0)';
+      dots.forEach(function(d, k){ d.classList.toggle('on', k === i); });
+    }
+    function go(to, byUser){
+      i = (to % n + n) % n;
+      draw();
+      if (byUser) restart();
+    }
+    function tick(){ go(i + 1); }
+    function restart(){
+      stop();
+      if (reduce || n < 2 || !visible || hover) return;
+      timer = setInterval(tick, pause);
+    }
+    function stop(){ if (timer){ clearInterval(timer); timer = null; } }
+
+    var prev = root.querySelector('[data-pg-prev]');
+    var next = root.querySelector('[data-pg-next]');
+    if (prev) prev.addEventListener('click', function(){ go(i - 1, true); });
+    if (next) next.addEventListener('click', function(){ go(i + 1, true); });
+    dots.forEach(function(d, k){ d.addEventListener('click', function(){ go(k, true); }); });
+
+    root.addEventListener('mouseenter', function(){ hover = true;  stop();    });
+    root.addEventListener('mouseleave', function(){ hover = false; restart(); });
+    root.addEventListener('focusin',    function(){ hover = true;  stop();    });
+    root.addEventListener('focusout',   function(){ hover = false; restart(); });
+
+    /* свайп: тянем ленту за пальцем, отпускаем - долистываем к ближайшему кадру */
+    var id = null, x0 = 0, y0 = 0, dx = 0, locked = false, w = 1;
+    track.addEventListener('pointerdown', function(e){
+      if (id !== null || e.button === 1 || e.button === 2) return;
+      id = e.pointerId; x0 = e.clientX; y0 = e.clientY; dx = 0; locked = false;
+      w = track.getBoundingClientRect().width || 1;
+      stop();
+    });
+    track.addEventListener('pointermove', function(e){
+      if (e.pointerId !== id) return;
+      var ax = e.clientX - x0, ay = e.clientY - y0;
+      if (!locked){
+        if (Math.abs(ax) < 6 && Math.abs(ay) < 6) return;
+        if (Math.abs(ay) > Math.abs(ax)) { id = null; return; }  /* это вертикальная прокрутка */
+        locked = true;
+        track.classList.add('pg-drag');
+        try { track.setPointerCapture(id); } catch(err){}
+      }
+      dx = ax;
+      /* у краёв лента тянется вдвое туже - видно, что дальше кадров нет */
+      if ((i === 0 && dx > 0) || (i === n - 1 && dx < 0)) dx *= .35;
+      e.preventDefault();
+      track.style.transform = 'translate3d(calc(' + (-i * 100) + '% + ' + dx + 'px),0,0)';
+    });
+    function release(e){
+      if (e.pointerId !== id) return;
+      try { track.releasePointerCapture(id); } catch(err){}
+      id = null;
+      if (!locked){ restart(); return; }
+      locked = false;
+      track.classList.remove('pg-drag');
+      if (Math.abs(dx) > Math.min(70, w * .18)) go(i + (dx < 0 ? 1 : -1)); else draw();
+      dx = 0;
+      restart();
+    }
+    track.addEventListener('pointerup', release);
+    track.addEventListener('pointercancel', release);
+    track.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+    draw();
+
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(function(items){
+        visible = items[0].isIntersecting;
+        if (visible) restart(); else stop();
+      }, {threshold: .25}).observe(root);
+    } else {
+      visible = true; restart();
+    }
+  }
+
+  Array.prototype.slice.call(document.querySelectorAll('[data-pg-slider]')).forEach(build);
+
+  /* фон экрана грузится, только когда секция подошла к окну */
+  var pg = document.getElementById('program');
+  if (pg){
+    if (!('IntersectionObserver' in window)){
+      pg.classList.add('bgon');
+    } else {
+      var bgio = new IntersectionObserver(function(items){
+        if (!items[0].isIntersecting) return;
+        pg.classList.add('bgon');
+        bgio.disconnect();
+      }, {rootMargin: '700px 0px'});
+      bgio.observe(pg);
+    }
+  }
+})();
+</script>
+
 </body>
 </html>
