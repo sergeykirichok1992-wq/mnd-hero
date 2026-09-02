@@ -1,0 +1,1447 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Звёздная смена — новая страница</title>
+<meta name="theme-color" content="#04070F">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Экскурсия-шоу «Звёздная смена». Сезон 2026/2027, Нижний Новгород. Первый экран Звёздной смены и экраны старого сайта.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Министерство новогодних дел">
+<meta property="og:title" content="Звёздная смена — сезон 2026/2027">
+<meta property="og:description" content="Экскурсия-шоу в Министерство новогодних дел. Нижний Новгород, 27 ноября — 10 января. Демо первого экрана.">
+<meta property="og:image" content="https://sergeykirichok1992-wq.github.io/mnd-hero/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://sergeykirichok1992-wq.github.io/mnd-hero/v2.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" as="image" href="poster.webp" fetchpriority="high" media="(min-width: 820px)">
+<link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="cr-bloggersans.woff2" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600;700&family=Oswald:wght@300;500;700&family=Prata&display=swap">
+<style>
+/* Blogger Sans Bold - шрифт всех заголовков. В Google Fonts его нет, файл лежит
+   рядом в репозитории (55 КБ, кириллица на месте). swap: пока файл едет, заголовок
+   виден запасным шрифтом, а не пустым местом */
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+:root{
+  --ink:#04070F; --ink2:#080D1B; --line:#18223B;
+  --text:#DCE4F3; --dim:#8695B3; --faint:#5A6784;
+  --gold:#E3B34E; --moon:#7FA8D9;
+  /* Набор заголовков секций. Один на все экраны: эталон снят с квиза,
+     менять размер/цвет заголовков — только здесь, а не в каждой секции */
+  --h2-family:"Blogger Sans","Golos Text",Arial,sans-serif;
+  --h2-weight:700; --h2-size:clamp(22.4px,3.52vw,62.4px);   /* на 20% меньше исходного 28/4.4/78 */
+  --h2-lh:1.1; --h2-ls:.005em; --h2-color:#fff;
+  /* размеры логотипа, пересчитанные из кадра 1920x1080 при object-fit:cover */
+  --logo-w: max(52.2vw, 92.8vh);
+  --logo-top: 48%;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- шапка ---------- */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  padding-top:max(16px, env(safe-area-inset-top));
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(4,7,15,.82);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
+}
+.brand span{color:var(--gold)}
+.navlinks{display:flex; gap:24px; margin-left:auto; font-size:14px; color:var(--dim)}
+.navlinks a{color:inherit; text-decoration:none; transition:color .2s}
+.navlinks a:hover,.navlinks a:focus-visible{color:#fff}
+.navbtn{
+  border:1px solid var(--gold); color:var(--gold); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+}
+.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
+.demoflag{
+  font:400 11px/1 "Golos Text",sans-serif; color:var(--faint);
+  border:1px dashed var(--line); border-radius:2px; padding:5px 9px; white-space:nowrap;
+}
+@media(max-width:880px){ .navlinks,.demoflag{display:none} }
+/* на телефоне шапка не помещалась: кнопка уезжала за правый край */
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- первый экран ---------- */
+#hero{height:330vh; position:relative}
+.stage{position:sticky; top:0; height:100vh; overflow:hidden; background:var(--ink)}
+.stage > *{position:absolute; inset:0}
+#v{width:100%; height:100%; object-fit:cover; display:block; z-index:1;
+   filter:saturate(1.14) contrast(1.07) brightness(1.04)}
+#poster{width:100%; height:100%; object-fit:cover; display:block; z-index:2; pointer-events:none;
+  filter:saturate(1.14) contrast(1.07) brightness(1.04); transition:opacity .32s ease}
+.vig{
+  z-index:2; pointer-events:none;
+  background:
+    radial-gradient(130% 92% at 50% 45%, transparent 62%, rgba(2,4,10,.30) 100%),
+    linear-gradient(180deg, rgba(4,7,15,.46) 0%, transparent 18%, transparent 80%, rgba(4,7,15,.55) 100%);
+}
+#snowBack{z-index:3; pointer-events:none; width:100%; height:100%; display:block}
+#beams,#beamsFront{
+  width:100%; height:100%; display:block; pointer-events:none;
+  mix-blend-mode:screen; opacity:0;
+}
+#beams{z-index:5; filter:blur(13px)}
+#beamsFront{z-index:12; filter:blur(26px)}
+@media (max-width:819px){ #beams{filter:blur(8px)} #beamsFront{filter:blur(16px)} }
+#logoLight{z-index:10; width:100%; height:100%; display:block; pointer-events:none;
+  mix-blend-mode:screen; opacity:0; filter:blur(5px)}
+#logoFx{z-index:8; width:100%; height:100%; display:block; pointer-events:none;
+  mix-blend-mode:screen; opacity:0; filter:blur(1.5px)}
+/* дым из-под садящегося острова: задний уходит ЗА логотип, передний стелется ПЕРЕД кромкой */
+#smokeBack,#smokeFront{
+  width:100%; height:100%; display:block; pointer-events:none;
+  mix-blend-mode:screen; opacity:0;
+}
+#smokeBack{z-index:6; filter:blur(5px)}
+#smokeFront{z-index:9; filter:blur(2px)}
+#v{transform-origin:50% 50%}
+#glow{
+  z-index:6; pointer-events:none; inset:auto;
+  left:50%; top:var(--logo-top);
+  width:calc(var(--logo-w)*1.55); height:calc(var(--logo-w)*1.5);
+  transform:translate(-50%,-50%); opacity:0;
+  background:radial-gradient(ellipse at center, rgba(104,158,240,.62) 0%, rgba(88,140,225,.26) 34%, rgba(80,130,220,0) 66%);
+  mix-blend-mode:screen;
+}
+#logo{
+  z-index:7; inset:auto; pointer-events:none;
+  left:50%; top:var(--logo-top); width:var(--logo-w); height:auto;
+  transform:translate(-50%,-50%) scale(1.085);
+  opacity:0; will-change:transform,opacity;
+}
+#snowFront{z-index:11; pointer-events:none; width:100%; height:100%; display:block}
+@media (max-aspect-ratio:1/1){
+  :root{ --logo-w:min(98vw, 106vh); --logo-top:47%; }
+}
+
+
+.hint{
+  z-index:8; inset:auto; left:50%; transform:translateX(-50%); bottom:26px;
+  font-size:12.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--faint);
+  display:flex; flex-direction:column; align-items:center; gap:9px;
+}
+.hint i{display:block; width:1px; height:34px;
+  background:linear-gradient(180deg,transparent,var(--faint));
+  animation:drop 1.9s ease-in-out infinite}
+@keyframes drop{0%,100%{opacity:.25;transform:scaleY(.6)}50%{opacity:1;transform:scaleY(1)}}
+@media(prefers-reduced-motion:reduce){.hint i{animation:none}}
+
+/* ---------- дальше по странице ---------- */
+.next{position:relative; z-index:10; background:var(--ink); padding:96px 30px 120px; border-top:1px solid var(--line)}
+.inner{max-width:1080px; margin:0 auto}
+.eyebrow{font-size:11.5px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); margin:0 0 18px}
+.next h2{
+  font-family:var(--h2-family); font-weight:var(--h2-weight);
+  font-size:var(--h2-size); line-height:var(--h2-lh); letter-spacing:var(--h2-ls);
+  color:var(--h2-color);
+  text-transform:uppercase; margin:0 0 18px; text-wrap:balance}
+.next h2 b{font-weight:inherit; color:inherit}
+.next p.lede{color:var(--dim); font-size:17px; max-width:58ch; margin:0 0 52px}
+.cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+@media(max-width:800px){.cards{grid-template-columns:1fr}}
+.card{border:1px solid var(--line); border-radius:4px; padding:26px;
+  background:linear-gradient(180deg,rgba(127,168,217,.05),transparent 60%),var(--ink2)}
+.card h3{font-family:var(--h2-family); font-weight:var(--h2-weight); font-size:16px; margin:0 0 10px}
+.card p{color:var(--dim); font-size:14.5px; margin:0; line-height:1.6}
+.stub{margin-top:44px; padding:14px 18px; border-left:2px solid var(--line); color:var(--faint); font-size:13.5px}
+
+
+/* ---------- боковые блоки: сезон и город ---------- */
+.side{
+  position:absolute; z-index:11; top:27vh;      /* оба блока от одной линии */
+  opacity:0; pointer-events:none; will-change:opacity;
+}
+.side.left{left:4vw; text-align:left}
+.side.right{right:3.4vw; text-align:right; padding-top:.16em}
+
+.kicker{
+  font-family:"Golos Text",Arial,sans-serif; font-weight:500;
+  font-size:clamp(10px,.82vw,13px); letter-spacing:.34em; text-transform:uppercase;
+  color:rgba(205,220,245,.66); margin-top:clamp(12px,1.2vw,20px);
+}
+.season{
+  font-family:"Oswald",Arial,sans-serif; font-weight:500;
+  font-size:clamp(16px,1.62vw,27px); letter-spacing:.34em; text-transform:uppercase;
+  margin-bottom:clamp(8px,.9vw,15px);
+  background:
+    linear-gradient(102deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.9) 50%, rgba(255,255,255,0) 62%),
+    linear-gradient(180deg,#FFFFFF 0%,#EAF1FC 46%,#BCCBE2 100%);
+  -webkit-background-clip:text; background-clip:text;
+
+  color:transparent; -webkit-text-fill-color:transparent;
+}
+.years{
+  font-family:"Oswald",Arial,sans-serif; font-weight:700; line-height:.84;
+  font-size:clamp(46px,7.4vw,116px); letter-spacing:-.005em;
+}
+.years .fill{
+  display:block;
+  background:
+    linear-gradient(102deg, rgba(255,255,255,0) 34%, rgba(255,255,255,.92) 48%, rgba(255,255,255,0) 62%),
+    linear-gradient(166deg,#FFFAE8 0%,#F3D68C 24%,#D3A244 46%,#8A6220 60%,#EBCE86 80%,#FFFBF0 100%);
+  background-size:250% 100%, 100% 100%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent; -webkit-text-fill-color:transparent;
+  animation:sheenGold 7.5s linear infinite;
+}
+@keyframes sheenGold{
+  0%  {background-position:-160% 0, 0 0; filter:drop-shadow(0 0 8px rgba(227,179,78,.20))}
+  11% {                                   filter:drop-shadow(0 0 24px rgba(246,214,140,.62))}
+  26% {background-position:250% 0, 0 0;   filter:drop-shadow(0 0 8px rgba(227,179,78,.20))}
+  100%{background-position:250% 0, 0 0;   filter:drop-shadow(0 0 8px rgba(227,179,78,.20))}
+}
+@keyframes sheenSilver{
+  0%  {background-position:-160% 0, 0 0; filter:drop-shadow(0 0 8px rgba(178,206,244,.18))}
+  11% {                                   filter:drop-shadow(0 0 22px rgba(226,240,255,.58))}
+  26% {background-position:250% 0, 0 0;   filter:drop-shadow(0 0 8px rgba(178,206,244,.18))}
+  100%{background-position:250% 0, 0 0;   filter:drop-shadow(0 0 8px rgba(178,206,244,.18))}
+}
+.years .outline{
+  display:block; color:transparent;
+  -webkit-text-fill-color:transparent;
+  -webkit-text-stroke:1.4px rgba(232,198,126,.8);
+  filter:drop-shadow(0 0 16px rgba(227,179,78,.22));
+}
+
+.city{
+  font-family:"Prata",Georgia,serif; line-height:1.14;
+  font-size:clamp(19px,2.15vw,38px);
+  text-transform:uppercase; letter-spacing:.045em;
+  background:
+    linear-gradient(102deg, rgba(255,255,255,0) 36%, rgba(255,255,255,.95) 49%, rgba(255,255,255,0) 62%),
+    linear-gradient(172deg,#FFFFFF 0%,#E4EDFA 40%,#A9BBD4 72%,#F2F7FF 100%);
+  background-size:250% 100%, 100% 100%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent; -webkit-text-fill-color:transparent;
+  animation:sheenSilver 9s linear 2.6s infinite;
+}
+.season{ animation:sheenSilver 13s linear 5s infinite; background-size:250% 100%, 100% 100%; background-repeat:no-repeat }
+.rule{
+  height:1px; margin:clamp(12px,1.3vw,22px) 0 clamp(12px,1.2vw,20px);
+  margin-left:auto; width:clamp(70px,7vw,120px);
+  background:linear-gradient(90deg,rgba(227,179,78,0),rgba(227,179,78,.85));
+}
+.facts{list-style:none; margin:0; padding:0}
+.facts li{
+  font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(12px,1.04vw,17px); letter-spacing:.055em;
+  color:rgba(214,226,245,.9); line-height:1.65;
+}
+.facts li + li{color:rgba(196,210,234,.72)}
+
+@media (max-aspect-ratio:1/1), (max-width:820px){
+  /* Оба блока стартуют с одной линии: слева сезон, справа город.
+     Правый растянут на всю ширину, чтобы даты и возраст встали по центру экрана,
+     а город с адресом остались прижаты вправо. */
+  /* ниже дюз (на 63vh текст лежал на сосульках) и ещё на полтора сантиметра вниз.
+     Второе значение — предохранитель: на коротком экране блок иначе уезжает за нижний край. */
+  .side{ top:min(calc(72vh + 1.5cm), calc(100vh - 170px)); bottom:auto; transform:none; }
+  .side.left { left:0; right:auto; width:auto; text-align:left;  padding:0 18px; }
+  .side.right{ left:0; right:0;   width:100%;  text-align:right; padding:0 18px; }
+
+  .season{ display:block; margin:0 0 5px; font-size:12px; letter-spacing:.30em }
+  .years { display:block; font-size:31px; line-height:1 }
+  .years .fill, .years .outline{ display:inline }
+  .years .outline{ -webkit-text-stroke-width:1px }
+  .kicker{ margin-top:8px; font-size:10px; letter-spacing:.26em }
+
+  .city{ display:block; font-size:20px; letter-spacing:.04em; line-height:1.12 }
+  .rule{ display:none }
+  .facts li{ display:block; font-size:13px; line-height:1.5 }
+  .facts li:nth-child(1){ text-align:right; margin-top:7px }        /* адрес — под городом */
+  .facts li:nth-child(2){ text-align:center; margin-top:26px }      /* даты — по центру */
+  .facts li:nth-child(3){ text-align:center; margin-top:4px }       /* возраст — ещё ниже */
+  .facts li + li::before{ content:none }
+}
+@media (prefers-reduced-motion:reduce){ .years .fill,.city,.season{animation:none} }
+@media (max-width:819px){
+  .curtain{display:none}                    /* на телефоне кулис нет — и файл бархата не грузится */
+  /* низ кадра занят огнями набережной, и белый текст на них терялся — кладём мягкую подложку */
+  .vig::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; height:34vh; pointer-events:none;
+    background:linear-gradient(to top, rgba(3,6,14,.90) 0%, rgba(3,6,14,.62) 34%, rgba(3,6,14,.22) 66%, transparent 100%);
+  }
+}
+.curtain{
+  position:absolute; inset:auto; top:0; width:50%; aspect-ratio:1359/768;
+  z-index:20; pointer-events:none; opacity:0; will-change:transform,opacity;
+  background-image:url(curtain.webp);
+  background-size:200% 100%; background-repeat:no-repeat;
+  filter:drop-shadow(0 14px 34px rgba(0,0,0,.5));
+}
+#curtainL{left:0;  background-position:left top;  transform-origin:0% 0%}
+#curtainR{right:0; background-position:right top; transform-origin:100% 0%}
+@media (max-aspect-ratio:1/1){ .curtain{width:62%} }
+#vstatus{
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:40;
+  background:rgba(5,8,15,.9); border:1px solid var(--line); border-radius:5px;
+  padding:14px 20px; font:500 14px/1.5 "Golos Text",Arial,sans-serif; color:var(--dim);
+  text-align:center; max-width:80vw; display:none;
+}
+#vstatus b{color:var(--gold)}
+:focus-visible{outline:2px solid var(--moon); outline-offset:3px}
+
+/* ==================================================================
+   ЭКРАНЫ 2 И 3 — ТОЧНАЯ КОПИЯ СТАРОГО САЙТА (9r9k83a2.plp7.me)
+   Все размеры сняты с оригинала замером в браузере, а не на глаз:
+   контейнер 1100/940/720/100%, отступы секций 60px, пустые блоки
+   44/12/40/20 и 66/28/33/19 px, кегли 48/28/64/20/20 px, шрифты те же
+   файлы, что отдаёт старый сайт. Всё живёт в своём пространстве имён
+   .cr-*, чтобы не смешаться со стилями первого экрана.
+   ================================================================== */
+
+/* Шрифты старого сайта, взяты его же файлами.
+   У Blogger Sans там только начертание 400 — жирный браузер дорисовывает сам.
+   Поэтому здесь тоже объявлено только 400: подключи настоящий bold — и буквы
+   станут другими, копия перестанет совпадать с оригиналом. */
+@font-face{font-family:"CR Blogger"; font-style:normal; font-weight:400; font-display:swap;
+  src:url(cr-bloggersans.woff2) format("woff2"), url(cr-bloggersans.woff) format("woff")}
+@font-face{font-family:"CR Yeseva"; font-style:normal; font-weight:400; font-display:swap;
+  src:url(cr-yeseva.woff) format("woff")}
+@font-face{font-family:"CR Roboto Light"; font-style:normal; font-weight:400; font-display:swap;
+  src:url(cr-roboto-light.woff) format("woff")}
+@font-face{font-family:"CR Roboto"; font-style:normal; font-weight:400; font-display:swap;
+  src:url(cr-roboto.woff) format("woff")}
+
+/* ---------- каркас, общий для обоих экранов ---------- */
+.cr{
+  position:relative; z-index:25;                 /* выше липкой сцены первого экрана */
+  font-family:"CR Roboto Light",Arial,sans-serif; font-size:16px; line-height:1.4285714285714286;
+  text-align:left;
+}
+.cr *,.cr *::before,.cr *::after{box-sizing:border-box}
+/* контейнер старого сайта: ширина фиксированная и меняется ступенями,
+   а не тянется резиной. Пороги те же, что у движка: 1160 / 992 / 768 */
+.cr-cont{width:100%; margin:0 auto; position:relative; z-index:7}
+@media (min-width:768px){ .cr-cont{width:720px} }
+@media (min-width:992px){ .cr-cont{width:940px} }
+@media (min-width:1160px){ .cr-cont{width:1100px} }
+/* «нода» — обёртка любого блока, у неё свои поля. У текстовых они 5px */
+.cr-n{padding:5px}
+.cr-t{margin:0; line-height:1.4; word-wrap:break-word; word-break:break-word; position:relative}
+
+/* ---------- ЭКРАН 2: белое поле ---------- */
+.cr-s2{background:#fff; color:#333; padding:60px 0}
+.cr-h2{
+  text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-weight:500;
+  font-size:16px; line-height:1.1; letter-spacing:0;
+}
+.cr-h2 span{font-size:300%}
+.cr-h2 strong{font-weight:700}
+.cr-red{color:rgb(157,10,15)}
+.cr-blue{color:rgb(47,49,146)}
+.cr-lead{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:28px; line-height:1.4}
+@media (max-width:767px){ .cr-h2{font-size:13px} }
+
+/* слайдер: круглые стрелки по бокам, лента внутри, точки под ней */
+.cr-slider{position:relative; display:flex; align-items:center}
+.cr-arrow{
+  flex:0 0 30px; height:30px; font-size:10px; line-height:26px; text-align:center;
+  border-radius:100%; border:2px solid rgba(51,51,51,.2); color:rgb(51,51,51);
+  opacity:.8; background:none; padding:0; cursor:pointer;
+}
+.cr-arrow:hover{opacity:1}
+.cr-arrow svg{width:1em; height:1em; vertical-align:middle; fill:currentColor}
+.cr-prev svg{margin-right:2px}
+.cr-next svg{margin-left:2px}
+.cr-track{margin:0 20px; flex-grow:1; overflow:hidden; min-width:0}
+/* лента: слайды одной высоты — самый высокий задаёт её всем,
+   ровно как fixheight у слайдера старого сайта */
+.cr-strip{display:flex; will-change:transform; transition:transform .45s cubic-bezier(.25,.7,.3,1)}
+.cr-slide{flex:0 0 100%; max-width:100%}
+.cr-slidebox{padding:10px 5px 36px; text-align:center}
+.cr-slidebox img{display:inline-block; width:980px; max-width:100%; height:auto; vertical-align:middle}
+.cr-dots{text-align:center; margin-top:0; line-height:1.4285714285714286}
+.cr-dot{
+  display:inline-block; width:7px; height:7px; padding:1.4px; border:0;
+  background-color:rgba(51,51,51,.2); border-radius:100%;
+  transition:background-color .3s; vertical-align:middle; cursor:pointer;
+}
+.cr-dot + .cr-dot{margin-left:4.666666666666667px}
+.cr-dot.is-active{background-color:rgb(234,100,86)}
+@media (max-width:767px){
+  .cr-arrow{display:none}
+  .cr-track{margin:0}
+}
+@media (prefers-reduced-motion:reduce){ .cr-strip{transition:none} }
+
+/* цифры сезона: четыре колонки таблицей, как в оригинале */
+.cr-grid{margin-left:-10px; margin-right:-10px}
+.cr-gridwrap{display:table; table-layout:fixed; width:100%}
+.cr-col{display:table-cell; padding:0 10px; vertical-align:top; width:25%}
+.cr-num{
+  margin:0; text-align:center; font-family:"CR Yeseva",Georgia,serif; font-weight:500;
+  font-size:64px; line-height:1.1; color:rgb(251,176,90);
+}
+.cr-cap{margin:0; text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:20px; line-height:1.4}
+@media (max-width:767px){
+  .cr-grid{margin-left:0; margin-right:0}
+  .cr-gridwrap{display:block}
+  .cr-col{display:block; width:100% !important; padding-left:0; padding-right:0}
+  .cr-num{font-size:51px}
+}
+
+/* ---------- ЭКРАН 3: карта городов ----------
+   Фон нарисован кодом, картинки фона нет. Числа не выдуманы: поле фона
+   старого сайта посчитано попиксельно (картинка 1920x919 в режиме cover
+   плюс плёнка 16 % чёрного), а потом под него подобраны три слоя —
+   ночная вертикаль, столб холодного сияния и светлая полоса у низа.
+   Расхождение с оригиналом — 2,8 уровня из 255, глазом не видно.
+   Правишь числа — сверяйся с оригиналом, а не на глаз. */
+.cr-s3{
+  position:relative; overflow:hidden; color:#fff; padding:60px 0;
+  background:
+    radial-gradient(55.7% 41.8% at 61.3% 89.9%, rgba(80,105,192,0.567), rgba(80,105,192,0) 100%),
+    radial-gradient(37.6% 54.9% at 50.3% 40.1%, rgba(57,90,228,0.670), rgba(57,90,228,0) 100%),
+    linear-gradient(180deg, #070E37 0%, #061247 14%, #041651 28%, #092265 44%, #0B297A 58%, #243C84 72%, #504A80 86%, #383F85 100%);
+}
+/* плёнка старого сайта поверх фона — ровно те же 16 % чёрного */
+.cr-s3::before{
+  content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:rgba(0,0,0,.16);
+}
+/* мягкая тень у верхней кромки — та же, что кладёт движок старого сайта
+   картинкой shadowtop с непрозрачностью 0,5 */
+.cr-shadowtop{
+  position:absolute; left:0; right:0; top:0; z-index:4; pointer-events:none;
+  height:2.73vw; min-height:14px; max-height:52px;
+  background:linear-gradient(180deg,
+    rgba(0,0,0,.198) 0%, rgba(0,0,0,.176) 12%, rgba(0,0,0,.118) 29%,
+    rgba(0,0,0,.059) 47%, rgba(0,0,0,.022) 65%, rgba(0,0,0,.004) 88%, rgba(0,0,0,0) 100%);
+}
+.cr-h2b{
+  text-align:center; font-family:"CR Roboto",Arial,sans-serif; font-weight:500;
+  font-size:16px; line-height:1.1; letter-spacing:0; color:#fff;
+}
+.cr-h2b span{font-family:"CR Blogger",Arial,sans-serif; font-size:300%}
+.cr-h2b strong{font-weight:700}
+.cr-amber{color:rgb(253,198,140)}
+.cr-p20{text-align:center; font-family:"CR Roboto Light",Arial,sans-serif; font-size:20px; line-height:1.4; color:#fff}
+@media (max-width:767px){ .cr-h2b{font-size:13px} }
+.cr-nimg{padding:10px 5px}
+
+/* ---------- сама карта ----------
+   Кадр держит пропорцию 1750x975 — тот же прямоугольник, что занимала
+   картинка на старом сайте. Внутри него всё расставлено долями, поэтому
+   подписи, точки и линии не разъезжаются ни на какой ширине.
+   Кегли заданы в cqw — долях ширины этого кадра. */
+.cr-map{
+  position:relative; width:100%; aspect-ratio:1750/975;
+  container-type:inline-size; container-name:crmap;
+}
+/* карта стоит там же, где стояла на старом сайте: замерено по силуэту страны */
+.cr-map-img{
+  position:absolute; left:8.743%; top:11.385%; width:89.143%; height:auto;
+  display:block; pointer-events:none;
+}
+/* линии-выноски. Рисуются в координатах кадра, поэтому привязаны к рисунку,
+   а не к пикселям экрана. Толщина не плывёт при растягивании */
+.cr-lines{
+  position:absolute; inset:0; width:100%; height:100%; overflow:visible;
+  pointer-events:none; filter:drop-shadow(0 1px 4px rgba(0,0,0,.75)); z-index:1;
+}
+/* янтарная, а не белая: полпути линия идёт по белому снегу */
+.cr-lines path{
+  fill:none; stroke:#E8B267; stroke-width:1.7; stroke-opacity:.85;
+  vector-effect:non-scaling-stroke; stroke-linecap:round;
+  transition:stroke .28s ease, stroke-width .28s ease, stroke-opacity .28s ease;
+}
+.cr-lines path.on{stroke:#FFE0A8; stroke-width:2.6; stroke-opacity:1}
+/* невидимая толстая копия ловит мышь: в нить 1,7 px курсором не попасть */
+.cr-lines .hit{stroke:transparent; stroke-width:16; stroke-opacity:1; pointer-events:stroke; cursor:pointer}
+
+.cr-city{
+  position:absolute; left:var(--x); top:var(--y); transform:translateY(-50%);
+  z-index:2; white-space:nowrap; cursor:default;
+  font-family:"Golos Text",Arial,sans-serif;
+  transition:transform .3s cubic-bezier(.2,.7,.2,1);
+}
+.cr-city:hover,.cr-city.on{transform:translateY(-50%) translateY(-2px)}
+.cr-city b{
+  display:block; font-weight:700; font-size:22.9px; font-size:2.10cqw; line-height:1.06;
+  color:#fff; letter-spacing:-.01em;
+  text-shadow:0 2px 16px rgba(0,0,0,.8), 0 0 34px rgba(0,0,0,.55);
+  transition:color .25s ease;
+}
+.cr-city em{
+  position:absolute; left:0; top:calc(100% + 8px); top:calc(100% + .75cqw);
+  font-style:normal; font-weight:500; font-size:14.6px; font-size:1.34cqw; line-height:1.2;
+  color:rgba(255,255,255,.88); text-shadow:0 2px 12px rgba(0,0,0,.8);
+}
+/* приписка над названием — только у города с главным офисом */
+.cr-city i{
+  position:absolute; left:0; bottom:calc(100% + 7px); bottom:calc(100% + .66cqw);
+  font-style:normal; font-weight:600; font-size:14.1px; font-size:1.29cqw; line-height:1.2;
+  color:#FDC68C; text-shadow:0 2px 12px rgba(0,0,0,.8);
+}
+/* огонёк слева от названия */
+.cr-city::before{
+  content:''; position:absolute; right:calc(100% + 13px); right:calc(100% + 1.19cqw);
+  top:50%; width:5.7px; height:5.7px; margin-top:-2.85px;
+  width:.52cqw; height:.52cqw; margin-top:-.26cqw;
+  border-radius:50%; background:#FFF3E0;
+  /* сначала пиксели, потом cqw: в браузере без единиц контейнера свечение
+     иначе пропало бы целиком — вся строка была бы объявлена неверной */
+  box-shadow:0 0 0 2px rgba(255,190,105,.32), 0 0 10px 3px rgba(255,186,96,.75);
+  box-shadow:0 0 0 .17cqw rgba(255,190,105,.32), 0 0 .95cqw .3cqw rgba(255,186,96,.75);
+  transition:box-shadow .25s ease;
+}
+.cr-city:hover b,.cr-city.on b{color:#FFE9C4}
+.cr-city:hover::before,.cr-city.on::before{
+  box-shadow:0 0 0 3px rgba(255,205,140,.45), 0 0 14px 4px rgba(255,196,116,.95);
+  box-shadow:0 0 0 .22cqw rgba(255,205,140,.45), 0 0 1.35cqw .42cqw rgba(255,196,116,.95);
+}
+/* телефон: выноски не поместятся, подписи собираются в две колонки под картой */
+@media (max-width:767px){
+  .cr-map{aspect-ratio:auto; padding-bottom:4px}
+  .cr-map-img{position:static; left:auto; top:auto; width:100%; margin:0 auto}
+  .cr-lines{display:none}
+  .cr-cities{position:static; display:grid; grid-template-columns:repeat(2,1fr); gap:18px 10px; padding:20px 6px 0}
+  /* relative, а не static: иначе огонёк и подписи начнут считаться от всего кадра */
+  .cr-city{position:relative; left:auto; top:auto; transform:none !important; text-align:center; padding-left:14px}
+  .cr-city b{font-size:17px}
+  .cr-city em{position:static; display:block; margin-top:4px; font-size:12.5px}
+  .cr-city i{position:static; display:block; margin-bottom:4px; font-size:11px}
+  .cr-city::before{right:auto; left:0; top:.72em; margin-top:0; width:6px; height:6px;
+    box-shadow:0 0 0 2px rgba(255,190,105,.32), 0 0 10px 3px rgba(255,186,96,.75)}
+}
+@media (prefers-reduced-motion:reduce){
+  .cr-city,.cr-lines path{transition:none}
+  .cr-city:hover,.cr-city.on{transform:translateY(-50%)}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="brand">МНД<span>·</span>Звёздная смена</div>
+  <span class="demoflag">демо первого экрана</span>
+  <nav class="navlinks"><a href="#next">Программа</a><a href="#next">Города</a><a href="#next">Отзывы</a></nav>
+  <button class="navbtn" type="button">Выбрать город</button>
+</header>
+
+<section id="hero">
+  <div class="stage">
+    <video id="v" playsinline webkit-playsinline muted autoplay preload="auto" disablepictureinpicture></video>
+    <img id="poster" alt="">
+    <div class="vig" style="z-index:3"></div>
+    <canvas id="snowBack" style="z-index:4"></canvas>
+    <canvas id="beams" style="z-index:5"></canvas>
+    <div id="glow"></div>
+    <canvas id="smokeBack"></canvas>
+    <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Звёздная смена">
+    <canvas id="logoFx"></canvas>
+    <canvas id="smokeFront"></canvas>
+    <canvas id="logoLight"></canvas>
+    <canvas id="snowFront"></canvas>
+    <canvas id="beamsFront"></canvas>
+    <div class="curtain" id="curtainL"></div>
+    <div class="curtain" id="curtainR"></div>
+    <div class="side left" id="sideL">
+      <div class="season">Сезон</div>
+      <div class="years"><span class="fill">2026</span><span class="outline">2027</span></div>
+      <div class="kicker">Экскурсия-шоу</div>
+    </div>
+    <div class="side right" id="sideR">
+      <div class="city">Нижний<br>Новгород</div>
+      <div class="rule"></div>
+      <ul class="facts">
+        <li>Ольгино, 62</li>
+        <li>27 ноября — 10 января</li>
+        <li>Детям 4+</li>
+      </ul>
+    </div>
+    <div class="hint" id="hint">Крути вниз<i></i></div>
+  </div>
+</section>
+<!-- плашка статуса видео живёт вне сцены: sticky-сцена запирает z-index своих детей,
+     и внутри неё плашку перекрывала бы секция ниже -->
+<div id="vstatus"></div>
+
+<!-- ==================== ЭКРАН 2: «Грандиозное новогоднее мероприятие» ====================
+     Точная копия второго экрана старого сайта: заголовок в два цвета, подпись,
+     слайдер из двух коллажей и четыре цифры сезона. Отступы, кегли и шрифты
+     сняты замером с оригинала, менять их — значит расходиться с ним. -->
+<section class="cr cr-s2" id="was" aria-labelledby="crT2">
+  <div class="cr-cont">
+
+    <div class="cr-n">
+      <h2 class="cr-t cr-h2" id="crT2"><span class="cr-red"><strong>ГРАНДИОЗНОЕ НОВОГОДНЕЕ МЕРОПРИЯТИЕ&nbsp;</strong></span><span class="cr-blue"><strong>ДЛЯ ШКОЛЬНИКОВ</strong></span><span class="cr-blue"><strong>,</strong></span><span class="cr-red"><strong>&nbsp;</strong></span><span class="cr-blue"><strong>АНАЛОГОВ КОТОРОМУ НЕТ В РОССИИ!&nbsp;</strong></span></h2>
+    </div>
+
+    <div style="height:44px"></div>
+
+    <div class="cr-n"><p class="cr-t cr-lead">Посмотрите как это уже было:</p></div>
+
+    <div style="height:12px"></div>
+
+    <!-- слайдер: две страницы коллажа, сам листает раз в 5 секунд, петля -->
+    <div style="padding:10px 5px">
+      <div class="cr-slider" id="crSlider">
+        <button class="cr-arrow cr-prev" type="button" aria-label="Предыдущий кадр"><svg viewBox="0 0 8 14" aria-hidden="true"><path d="M7 1 1.4 7 7 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="cr-track">
+          <div class="cr-strip" id="crStrip">
+            <div class="cr-slide">
+              <div class="cr-slidebox">
+                <img src="v2-slide1-980.webp" srcset="v2-slide1-980.webp 980w, v2-slide1-1542.webp 1542w"
+                     sizes="(max-width:767px) calc(100vw - 20px), (max-width:991px) 600px, (max-width:1159px) 820px, 980px"
+                     width="980" height="662" alt="Кадры прошлого сезона: дети, Дед Мороз, лаборатория Министерства"
+                     decoding="async">
+              </div>
+            </div>
+            <div class="cr-slide">
+              <div class="cr-slidebox">
+                <img src="v2-slide2-980.webp" srcset="v2-slide2-980.webp 980w, v2-slide2-1397.webp 1397w"
+                     sizes="(max-width:767px) calc(100vw - 20px), (max-width:991px) 600px, (max-width:1159px) 820px, 980px"
+                     width="980" height="666" alt="Кадры прошлого сезона: шоу, мастерская карамели, гости"
+                     loading="lazy" decoding="async">
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="cr-arrow cr-next" type="button" aria-label="Следующий кадр"><svg viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1 6.6 7 1 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+      <div class="cr-dots" id="crDots">
+        <button class="cr-dot is-active" type="button" aria-label="Кадр 1"></button><button class="cr-dot" type="button" aria-label="Кадр 2"></button>
+      </div>
+    </div>
+
+    <div style="height:40px"></div>
+
+    <div class="cr-n">
+      <div class="cr-grid"><div class="cr-gridwrap">
+        <div class="cr-col"><div class="cr-n">
+          <div class="cr-n"><h3 class="cr-t cr-num">52 000</h3></div>
+          <div class="cr-n"><p class="cr-t cr-cap">детей посетили наше мероприятие в прошлом сезоне в 5 городах России</p></div>
+          <div style="height:20px"></div>
+        </div></div>
+        <div class="cr-col"><div class="cr-n">
+          <div class="cr-n"><h3 class="cr-t cr-num">7</h3></div>
+          <div class="cr-n"><p class="cr-t cr-cap">год мы создаем сказку для детей и родителей. До 300 000 детей побывали у нас с 2018 года</p></div>
+          <div style="height:20px"></div>
+        </div></div>
+        <div class="cr-col"><div class="cr-n">
+          <div class="cr-n"><h3 class="cr-t cr-num">6 500</h3></div>
+          <div class="cr-n"><p class="cr-t cr-cap">килограмм карамели мы произвели в своем цеху за прошлые 2 сезона</p></div>
+          <div style="height:20px"></div>
+        </div></div>
+        <div class="cr-col"><div class="cr-n">
+          <div class="cr-n"><h3 class="cr-t cr-num">150+&nbsp;</h3></div>
+          <div class="cr-n"><p class="cr-t cr-cap">человек работают над проектом каждый год</p></div>
+          <div style="height:20px"></div>
+        </div></div>
+      </div></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== ЭКРАН 3: карта городов ====================
+     Тот же экран старого сайта, но с двумя отличиями, о которых просил Серёга:
+     1) названия городов — живой текст, а не запечённые в картинку буквы;
+     2) от каждого города к его ёлке идёт линия, она загорается под курсором,
+        и то же самое делает подпись. Наведи на линию — загорится подпись,
+        наведи на подпись — загорится линия.
+     Фон нарисован кодом (см. .cr-s3 в стилях), картинки фона нет. -->
+<section class="cr cr-s3" id="cities" aria-labelledby="crT3">
+  <div class="cr-shadowtop" aria-hidden="true"></div>
+  <div class="cr-cont">
+
+    <div style="height:66px"></div>
+
+    <div class="cr-n">
+      <h2 class="cr-t cr-h2b" id="crT3"><span><strong>МЫ СОЗДАЕМ САМЫЕ МАСШТАБНЫЕ НОВОГОДНИЕ МЕРОПРИЯТИЯ&nbsp;</strong></span><span><strong>В 7 ГОРОДАХ РОССИИ&nbsp;</strong></span><br><span class="cr-amber"><strong>И МЫ НЕ ФРАНШИЗА!</strong></span><span><strong>&nbsp;</strong></span></h2>
+    </div>
+
+    <div style="height:28px"></div>
+
+    <div class="cr-n"><p class="cr-t cr-p20">Мы организовываем свои мероприятия в нескольких городах, </p></div>
+    <div class="cr-n"><p class="cr-t cr-p20">не привлекая партнеров по франшизе</p></div>
+
+    <div style="height:33px"></div>
+
+    <div class="cr-nimg">
+      <div class="cr-map" id="crMap">
+        <img class="cr-map-img" src="map.webp"
+             srcset="map-mob.webp 1000w, map-mid.webp 1200w, map.webp 1559w"
+             sizes="(max-width:767px) 100vw, (max-width:991px) 642px, (max-width:1159px) 838px, 981px"
+             width="1559" height="668" loading="lazy" decoding="async"
+             alt="Карта России: ёлки стоят в семи городах, где проходит экскурсия-шоу">
+
+        <!-- выноски. Координаты — в системе кадра 1750x975, поэтому линии
+             привязаны к рисунку и не разъезжаются при изменении ширины -->
+        <svg class="cr-lines" viewBox="0 0 1750 975" aria-hidden="true">
+          <path data-city="crimea" d="M169.5 490.2 C165.8 481.2 158.9 450.7 147.3 436.3 C135.8 421.9 110.2 416.8 100.2 403.6 C90.2 390.5 93.2 369.3 87.2 357.3 C81.2 345.3 67.8 335.9 63.9 331.6"/>
+          <path data-city="yaroslavl" d="M435.2 405.2 C421.8 392.4 373.4 358.4 354.5 328.4 C335.7 298.3 339.5 251.5 322.1 225.0 C304.6 198.5 267.3 188.2 249.9 169.2 C232.4 150.2 223.0 120.8 217.6 111.2"/>
+          <path data-city="nizhny" d="M480.0 461.2 C491.2 446.8 532.6 406.4 547.5 374.7 C562.3 343.0 555.2 299.1 569.0 271.0 C582.8 242.9 616.0 226.9 630.4 205.9 C644.8 185.0 651.1 155.5 655.3 145.4"/>
+          <path data-city="kazan" d="M518.7 508.2 C549.3 484.0 635.6 397.0 702.1 362.8 C768.7 328.6 859.1 334.4 918.2 302.8 C977.3 271.1 1012.6 204.3 1056.9 172.9 C1101.2 141.4 1162.7 123.9 1183.9 114.2"/>
+          <path data-city="stavropol" d="M251.6 606.3 C250.3 615.0 251.3 643.7 243.9 658.7 C236.5 673.7 213.4 682.8 207.1 696.4 C200.9 710.0 209.1 728.5 206.3 740.4 C203.5 752.2 193.1 763.1 190.5 767.6"/>
+          <path data-city="ekb" d="M619.8 521.3 C615.4 536.4 594.2 581.9 593.2 612.0 C592.2 642.0 615.2 674.8 613.7 701.7 C612.2 728.5 589.0 752.0 584.3 773.3 C579.6 794.6 585.2 820.2 585.4 829.6"/>
+          <path data-city="tyumen" d="M676.4 553.2 C695.6 565.1 760.8 594.1 791.7 624.4 C822.6 654.7 833.4 708.4 861.6 735.0 C889.8 761.6 935.0 766.0 960.6 784.1 C986.3 802.1 1006.4 833.6 1015.6 843.4"/>
+          <path class="hit" data-city="crimea" d="M169.5 490.2 C165.8 481.2 158.9 450.7 147.3 436.3 C135.8 421.9 110.2 416.8 100.2 403.6 C90.2 390.5 93.2 369.3 87.2 357.3 C81.2 345.3 67.8 335.9 63.9 331.6"/>
+          <path class="hit" data-city="yaroslavl" d="M435.2 405.2 C421.8 392.4 373.4 358.4 354.5 328.4 C335.7 298.3 339.5 251.5 322.1 225.0 C304.6 198.5 267.3 188.2 249.9 169.2 C232.4 150.2 223.0 120.8 217.6 111.2"/>
+          <path class="hit" data-city="nizhny" d="M480.0 461.2 C491.2 446.8 532.6 406.4 547.5 374.7 C562.3 343.0 555.2 299.1 569.0 271.0 C582.8 242.9 616.0 226.9 630.4 205.9 C644.8 185.0 651.1 155.5 655.3 145.4"/>
+          <path class="hit" data-city="kazan" d="M518.7 508.2 C549.3 484.0 635.6 397.0 702.1 362.8 C768.7 328.6 859.1 334.4 918.2 302.8 C977.3 271.1 1012.6 204.3 1056.9 172.9 C1101.2 141.4 1162.7 123.9 1183.9 114.2"/>
+          <path class="hit" data-city="stavropol" d="M251.6 606.3 C250.3 615.0 251.3 643.7 243.9 658.7 C236.5 673.7 213.4 682.8 207.1 696.4 C200.9 710.0 209.1 728.5 206.3 740.4 C203.5 752.2 193.1 763.1 190.5 767.6"/>
+          <path class="hit" data-city="ekb" d="M619.8 521.3 C615.4 536.4 594.2 581.9 593.2 612.0 C592.2 642.0 615.2 674.8 613.7 701.7 C612.2 728.5 589.0 752.0 584.3 773.3 C579.6 794.6 585.2 820.2 585.4 829.6"/>
+          <path class="hit" data-city="tyumen" d="M676.4 553.2 C695.6 565.1 760.8 594.1 791.7 624.4 C822.6 654.7 833.4 708.4 861.6 735.0 C889.8 761.6 935.0 766.0 960.6 784.1 C986.3 802.1 1006.4 833.6 1015.6 843.4"/>
+        </svg>
+
+        <div class="cr-cities">
+          <span class="cr-city" data-city="yaroslavl" style="--x:13.371%;--y:10.000%"><b>Ярославль</b><em>С 2023 года</em></span>
+          <span class="cr-city" data-city="nizhny" style="--x:39.029%;--y:13.385%"><i>Главный офис тут</i><b>Нижний Новгород</b><em>С 2019 года</em></span>
+          <span class="cr-city" data-city="kazan" style="--x:69.714%;--y:10.821%"><b>Казань</b><em>С 2022 года</em></span>
+          <span class="cr-city" data-city="crimea" style="--x:4.400%;--y:32.564%"><b>Крым</b><em>С 2018 года</em></span>
+          <span class="cr-city" data-city="stavropol" style="--x:11.943%;--y:80.359%"><b>Ставрополь</b><em>С 2025 года</em></span>
+          <span class="cr-city" data-city="ekb" style="--x:35.029%;--y:86.821%"><b>Екатеринбург</b><em>Впервые!</em></span>
+          <span class="cr-city" data-city="tyumen" style="--x:60.686%;--y:87.641%"><b>Тюмень</b><em>Впервые!</em></span>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:19px"></div>
+
+  </div>
+</section>
+<script>
+(function(){
+  var v=document.getElementById('v'), hero=document.getElementById('hero');
+  var logo=document.getElementById('logo'), glow=document.getElementById('glow');
+  var hint=document.getElementById('hint'), nav=document.getElementById('nav');
+  var cvB=document.getElementById('snowBack'), cvF=document.getElementById('snowFront');
+  var poster=document.getElementById('poster');
+  var curL=document.getElementById('curtainL'), curR=document.getElementById('curtainR');
+  var sideL=document.getElementById('sideL'), sideR=document.getElementById('sideR');
+  var cvL=document.getElementById('beams'), cvLF=document.getElementById('beamsFront');
+  var ctxL=cvL.getContext('2d'), ctxLF=cvLF.getContext('2d');
+  var cvLL=document.getElementById('logoLight'), ctxLL=cvLL.getContext('2d');
+  var cvFX=document.getElementById('logoFx'), ctxFX=cvFX.getContext('2d');
+  var cvSB=document.getElementById('smokeBack'), ctxSB=cvSB.getContext('2d');
+  var cvSF=document.getElementById('smokeFront'), ctxSF=cvSF.getContext('2d');
+  var ctxB=cvB.getContext('2d'), ctxF=cvF.getContext('2d');
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var dur=7.2, ready=false, cur=0, W=0, Hh=0;
+  // пока предыдущая перемотка не закончилась, новую не просим:
+  // иначе на слабом декодере seek'и встают в очередь и кадр застывает навсегда
+  var seekBusy=false, seekAt=0;
+  var FORCE=null;   // отладка: window.__freeze(p) фиксирует прокрутку для съёмки кадров
+  // на телефоне перемотка видео пальцем идёт рывками — там ролик играет сам
+  var TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 820;
+  // класс для CSS: на тач-устройствах сугробы второго экрана не наезжают на играющий ролик
+  if (TOUCH) document.documentElement.classList.add('touch');
+  // На телефоне идёт отдельный вертикальный ролик, в который логотип уже вклеен.
+  // Значит все слои, которые на десктопе рисуют и оживляют логотип, там не нужны.
+  var BAKED = TOUCH;
+  // autoplay нужен только телефону. На десктопе ролик ведёт прокрутка, поэтому снимаем сразу —
+  // до того, как у видео появится источник, так что ничего само не поедет.
+  if(!TOUCH){ v.autoplay = false; v.removeAttribute('autoplay'); }
+  poster.src = TOUCH ? 'poster-mob.webp' : 'poster.webp';
+  if(!BAKED) logo.src = 'logo.webp';   // на телефоне логотип уже в ролике — файл не качаем
+  var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
+  var DPR=Math.min(2, window.devicePixelRatio||1);
+  var LW=2, LH=2;
+
+  // прожекторы: основание внизу у города, целятся вверх к логотипу и качаются
+  // маятник: пары ходят навстречу друг другу, скорости чуть разные —
+  // поэтому рисунок медленно расходится и никогда не повторяется
+  // На телефоне лучи короче и тише: они упираются в 51 % высоты кадра — это ровно
+  // верх таблички «ЗВЁЗДНАЯ СМЕНА», выше свет не заходит и надпись не глушит.
+  var BEAMS = TOUCH ? [
+    {x:0.13, aim:0.34, len:0.49, w:0.095, sp:1.500, sw:0.10, ph:0.00, a:0.46},
+    {x:0.33, aim:0.44, len:0.45, w:0.070, sp:2.050, sw:0.07, ph:1.57, a:0.36},
+    {x:0.67, aim:0.56, len:0.45, w:0.070, sp:1.980, sw:0.07, ph:4.71, a:0.36},
+    {x:0.87, aim:0.66, len:0.49, w:0.095, sp:1.580, sw:0.10, ph:3.14, a:0.46}
+  ] : [
+    {x:0.11, aim:0.42, len:1.06, w:0.105, sp:1.500, sw:0.42, ph:0.00, a:0.30},
+    {x:0.29, aim:0.47, len:0.98, w:0.075, sp:2.050, sw:0.32, ph:1.57, a:0.23},
+    {x:0.71, aim:0.53, len:0.98, w:0.075, sp:1.980, sw:0.32, ph:4.71, a:0.23},
+    {x:0.89, aim:0.58, len:1.06, w:0.105, sp:1.580, sw:0.42, ph:3.14, a:0.30}
+  ];
+  // ---- оживление логотипа: радиоволны, дюзы, гирлянды, окна ----
+  var GARLAND=[], WINDOWS=[];
+  (function(){
+    var r=seeded(97);
+    for(var i=0;i<18;i++){
+      var u=i/17;                                   // вдоль нижнего края острова
+      GARLAND.push({fx:0.155+u*0.69, fy:0.665+Math.sin(u*Math.PI)*0.108+(r()-0.5)*0.02,
+                    ph:r()*6.283, sp:1.1+r()*2.2, r:0.010+r()*0.010,
+                    c: r()<0.42 ? [255,196,104] : (r()<0.6 ? [255,132,96] : [148,214,255])});
+    }
+    for(var j=0;j<6;j++){
+      WINDOWS.push({fx:0.445+r()*0.155, fy:0.300+r()*0.075, ph:r()*6.283, sp:0.5+r()*1.1, r:0.012+r()*0.008});
+    }
+  })();
+  var ENGINES=[[0.272,0.876,0.052],[0.396,0.928,0.062],[0.626,0.928,0.062],[0.734,0.876,0.052]];
+
+  function blob(ctx,x,y,r,col,a){
+    if(a<=0.004) return;
+    var g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,'rgba('+col[0]+','+col[1]+','+col[2]+','+a+')');
+    g.addColorStop(0.45,'rgba('+col[0]+','+col[1]+','+col[2]+','+(a*0.34)+')');
+    g.addColorStop(1,'rgba('+col[0]+','+col[1]+','+col[2]+',0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(x,y,r,0,6.2832); ctx.fill();
+  }
+
+  function paintLogoFx(t, k, thrust){
+    ctxFX.clearRect(0,0,LW,LH);
+    if(k<=0.01 || !logo.complete || !logo.naturalWidth) return;
+    var st=cvFX.getBoundingClientRect(), lr=logo.getBoundingClientRect();
+    if(!st.width||!st.height) return;
+    var sx=LW/st.width, sy=LH/st.height;
+    var x0=(lr.left-st.left)*sx, y0=(lr.top-st.top)*sy, w=lr.width*sx, h=lr.height*sy;
+    ctxFX.globalCompositeOperation='lighter';
+
+    // сигнал уходит от тарелки
+    var cx=x0+0.455*w, cy=y0+0.168*h;
+    for(var i=0;i<3;i++){
+      var ph=((t*0.62)+i/3)%1;
+      var a=(1-ph)*0.42*k;
+      ctxFX.strokeStyle='rgba(150,208,255,'+a+')';
+      ctxFX.lineWidth=Math.max(1, 0.0042*w);
+      ctxFX.beginPath();
+      ctxFX.arc(cx, cy, (0.035+ph*0.085)*w, -2.62, -1.02);
+      ctxFX.stroke();
+    }
+
+    // дюзы под островом
+    for(var e=0;e<ENGINES.length;e++){
+      var E=ENGINES[e];
+      var pu=0.62+0.38*Math.sin(t*1.9+e*1.7);
+      var th=thrust||1;
+      blob(ctxFX, x0+E[0]*w, y0+E[1]*h, E[2]*w*(0.9+0.22*pu)*(1+0.55*(th-1)), [128,196,255], 0.34*pu*k*th);
+    }
+
+    // гирлянды по краю острова
+    for(var g2=0;g2<GARLAND.length;g2++){
+      var G=GARLAND[g2];
+      var v=Math.sin(t*G.sp+G.ph);
+      var a=(v>0.35? (v-0.35)/0.65 : 0);
+      blob(ctxFX, x0+G.fx*w, y0+G.fy*h, G.r*w, G.c, 0.60*a*k);
+    }
+
+    // тёплые окна дома
+    for(var q=0;q<WINDOWS.length;q++){
+      var Wi=WINDOWS[q];
+      var a2=0.30+0.30*Math.sin(t*Wi.sp+Wi.ph);
+      blob(ctxFX, x0+Wi.fx*w, y0+Wi.fy*h, Wi.r*w, [255,186,96], 0.26*a2*k);
+    }
+    ctxFX.globalCompositeOperation='source-over';
+  }
+
+  // свет ложится только на логотип: рисуем лучи и вырезаем их по его силуэту
+  function paintLogoLight(t, k){
+    ctxLL.clearRect(0,0,LW,LH);
+    if(k<=0.01 || !logo.complete || !logo.naturalWidth) return;
+    var st=cvLL.getBoundingClientRect(), lr=logo.getBoundingClientRect();
+    if(!st.width||!st.height) return;
+    var sx=LW/st.width, sy=LH/st.height;
+    paintBeams(ctxLL, t, 1, 0.80);
+    ctxLL.globalCompositeOperation='destination-in';
+    ctxLL.drawImage(logo, (lr.left-st.left)*sx, (lr.top-st.top)*sy, lr.width*sx, lr.height*sy);
+    ctxLL.globalCompositeOperation='source-over';
+  }
+
+  function paintBeams(ctx, t, k, mul){
+    ctx.clearRect(0,0,LW,LH);
+    if(k<=0.01) return;
+    ctx.globalCompositeOperation='lighter';
+    for(var i=0;i<BEAMS.length;i++){
+      var b=BEAMS[i];
+      var x0=b.x*LW, y0=LH*0.965;
+      var x1=b.aim*LW + Math.sin(t*b.sp+b.ph)*b.sw*LW, y1=LH*(1-b.len);
+      var a=b.a*k*mul*(0.80+0.20*Math.sin(t*(0.6+i*0.21)+b.ph*2));
+      var dx=x1-x0, dy=y1-y0, L=Math.sqrt(dx*dx+dy*dy)||1;
+      var nx=-dy/L, ny=dx/L, wb=b.w*LW*0.14, wt=b.w*LW;
+      var g=ctx.createLinearGradient(x0,y0,x1,y1);
+      g.addColorStop(0,   'rgba(172,208,255,'+a+')');
+      g.addColorStop(0.38,'rgba(152,194,255,'+(a*0.40)+')');
+      g.addColorStop(1,   'rgba(140,186,255,0)');
+      ctx.fillStyle=g;
+      ctx.beginPath();
+      ctx.moveTo(x0+nx*wb, y0+ny*wb);
+      ctx.lineTo(x1+nx*wt, y1+ny*wt);
+      ctx.lineTo(x1-nx*wt, y1-ny*wt);
+      ctx.lineTo(x0-nx*wb, y0-ny*wb);
+      ctx.closePath(); ctx.fill();
+      // сам прожектор внизу
+      var rg=ctx.createRadialGradient(x0,y0,0,x0,y0,LW*0.035);
+      rg.addColorStop(0,'rgba(200,225,255,'+(a*1.5)+')');
+      rg.addColorStop(1,'rgba(200,225,255,0)');
+      ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(x0,y0,LW*0.035,0,6.2832); ctx.fill();
+    }
+    ctx.globalCompositeOperation='source-over';
+  }
+
+  function cl(x){return x<0?0:x>1?1:x;}
+  function ez(p,a,b,k){ if(p<=a)return 0; if(p>=b)return 1; var u=(p-a)/(b-a); return 1-Math.pow(1-u,k||2); }
+
+  /* ---- снег: спрайты + частицы ---- */
+  function sprite(r,mid){
+    var c=document.createElement('canvas'), d=Math.max(2,Math.ceil(r*2*DPR)); c.width=c.height=d;
+    var x=c.getContext('2d'), g=x.createRadialGradient(d/2,d/2,0,d/2,d/2,d/2);
+    g.addColorStop(0,'rgba(238,245,255,1)');
+    g.addColorStop(mid,'rgba(226,237,255,.5)');
+    g.addColorStop(1,'rgba(214,229,255,0)');
+    x.fillStyle=g; x.fillRect(0,0,d,d); return c;
+  }
+  function seeded(s){ return function(){ s=(s*1103515245+12345)&0x7FFFFFFF; return s/0x7FFFFFFF; }; }
+  function layer(n,rmin,rmax,vmin,vmax,amin,amax,mid,wind,seed){
+    var r=seeded(seed), P=[];
+    for(var i=0;i<n;i++){
+      var rad=rmin+r()*(rmax-rmin);
+      P.push({fx:r(), fy:r(), r:rad, v:vmin+r()*(vmax-vmin), a:amin+r()*(amax-amin),
+              ph:r()*6.283, wf:.35+r()*.9, s:sprite(rad,mid)});
+    }
+    return {P:P, wind:wind};
+  }
+  var BACK=[ layer(240, 1.6,3.2, 20,36, .16,.34, .34, 9,  11),
+             layer(105, 3.4,7.0, 44,80, .22,.46, .40, 15, 29) ];
+  var FRONT=[layer(15, 22,58, 105,185, .045,.095, .62, 28, 47)];
+
+  function paint(ctx, layers, t, k){
+    ctx.clearRect(0,0,W,Hh);
+    if(k<=0.01) return;
+    for(var L=0;L<layers.length;L++){
+      var lay=layers[L], P=lay.P;
+      for(var i=0;i<P.length;i++){
+        var p=P[i], span=Hh+p.r*4;
+        var y=(p.fy*span + p.v*t) % span - p.r*2;
+        var x=(p.fx*(W+240) + Math.sin(t*p.wf+p.ph)*lay.wind + t*lay.wind*.3) % (W+240) - 120;
+        if(y<-p.r*2||y>Hh+p.r) continue;
+        var a=p.a*k*(0.82+0.18*Math.sin(t*2.1+p.ph*3.7));
+        a*= 0.85 + 0.3*Math.exp(-(Math.pow((x-W*.5)/(W*.45),2)+Math.pow((y-Hh*.42)/(Hh*.6),2)));
+        ctx.globalAlpha=a>.95?.95:a;
+        ctx.drawImage(p.s, x-p.r, y-p.r, p.r*2, p.r*2);
+      }
+    }
+    ctx.globalAlpha=1;
+  }
+
+  /* ---- дым из-под садящегося острова ---- */
+  // клуб пара: три октавы решётчатого шума под мягкой круглой маской.
+  // считается один раз при первом появлении, дальше только вращаем, растим и гасим —
+  // рисование остаётся одним drawImage на частицу
+  function makePuff(seed, size, col){
+    var r=seeded(seed), oct=[3,6,12], amp=[0.55,0.30,0.15], G=[];
+    for(var o=0;o<oct.length;o++){
+      var n=oct[o], g=new Float32Array((n+1)*(n+1));
+      for(var i=0;i<g.length;i++) g[i]=r();
+      G.push({n:n,g:g});
+    }
+    function nz(gr,u,v){
+      var n=gr.n,g=gr.g, fx=u*n, fy=v*n, x0=fx|0, y0=fy|0;
+      if(x0>n-1)x0=n-1; if(y0>n-1)y0=n-1;
+      var tx=fx-x0, ty=fy-y0;
+      tx=tx*tx*(3-2*tx); ty=ty*ty*(3-2*ty);
+      var a=g[y0*(n+1)+x0], b=g[y0*(n+1)+x0+1], c=g[(y0+1)*(n+1)+x0], d=g[(y0+1)*(n+1)+x0+1];
+      return (a+(b-a)*tx)*(1-ty)+(c+(d-c)*tx)*ty;
+    }
+    var cv=document.createElement('canvas'); cv.width=cv.height=size;
+    var cx=cv.getContext('2d'), im=cx.createImageData(size,size), D=im.data;
+    for(var y=0;y<size;y++) for(var x=0;x<size;x++){
+      var u=x/size, v=y/size, f=0;
+      for(var o2=0;o2<G.length;o2++) f+=amp[o2]*nz(G[o2],u,v);
+      var dx=u-0.5, dy=v-0.5, d2=Math.sqrt(dx*dx+dy*dy)*2;
+      var mask=d2>=1?0:Math.pow(1-d2*d2,1.7);
+      var a=(f-0.33)*2.4; a=a<0?0:a>1?1:a;
+      var i4=(y*size+x)*4;
+      D[i4]=col[0]; D[i4+1]=col[1]; D[i4+2]=col[2]; D[i4+3]=Math.round(255*a*mask);
+    }
+    cx.putImageData(im,0,0);
+    return cv;
+  }
+  var PUFF=[];
+  function puffs(){
+    if(!PUFF.length) PUFF=[ makePuff(13,128,[172,210,255]), makePuff(71,128,[198,226,255]),
+                            makePuff(29,128,[156,198,252]), makePuff(53,128,[216,234,255]) ];
+    return PUFF;
+  }
+
+  // частицы живут в координатах слоя, а не логотипа: остров опускается, а выдох остаётся
+  // в воздухе — именно это отставание читается как посадка на тяге, а не как облачко-наклейка
+  var SMOKE_ON=false;              // дым выключен — включить: true
+  var SMOKE=[], SMOKE_MAX=140, emitAcc=0;
+  function emit(front,x,y,sp,pw){
+    if(SMOKE.length>=SMOKE_MAX) return;
+    var r=Math.random;
+    SMOKE.push({front:front, x:x, y:y,
+      vx:(r()-0.5)*sp*(front?0.60:0.40), vy:sp*(front?0.95:0.62)*(0.55+r()*0.9)*(pw||1),
+      r0:sp*(front?0.034:0.055)*(0.7+r()*0.8), grow:2.0+r()*1.6,
+      life:0, ttl:(front?1.15:2.0)*(0.75+r()*0.6),
+      rot:r()*6.283, vr:(r()-0.5)*1.2,
+      a:(front?0.44:0.34)*(0.65+r()*0.7), s:(r()*4)|0});
+  }
+  function stepSmoke(dt,k,geo,dpNow){
+    if(k>0.002 && geo && geo.w>0){
+      puffs();
+      var bump=Math.exp(-Math.pow((dpNow-0.90)/0.075,2));   // хлопок при касании
+      var pw=1+0.9*bump;
+      emitAcc += dt*k*(95+150*bump);
+      var guard=0;
+      while(emitAcc>=1 && guard++<60){
+        emitAcc-=1;
+        var front=Math.random()<0.45, ex, ey;
+        if(Math.random()<0.68){                       // из дюз
+          var E=ENGINES[(Math.random()*ENGINES.length)|0];
+          ex=geo.x+E[0]*geo.w; ey=geo.y+E[1]*geo.h;
+        } else {                                      // вдоль нижней кромки скалы
+          var u=0.16+Math.random()*0.68;
+          ex=geo.x+u*geo.w;
+          ey=geo.y+(0.66+Math.sin(u*Math.PI)*0.11+Math.random()*0.06)*geo.h;
+        }
+        emit(front,ex,ey,geo.w,pw);
+      }
+    }
+    for(var i=SMOKE.length-1;i>=0;i--){
+      var s2=SMOKE[i];
+      s2.life+=dt;
+      if(s2.life>=s2.ttl){ SMOKE.splice(i,1); continue; }
+      s2.x+=s2.vx*dt; s2.y+=s2.vy*dt;
+      s2.vx*=(1-0.9*dt); s2.vy*=(1-2.4*dt);          // струя быстро гаснет и превращается в клуб
+      s2.vy+=(geo?geo.w:LW)*0.020*dt;                // и клуб медленно оседает
+      s2.rot+=s2.vr*dt;
+    }
+  }
+  function paintSmoke(ctx,front,k){
+    ctx.clearRect(0,0,LW,LH);
+    if(k<=0.004 || !SMOKE.length) return;
+    var P=puffs();
+    ctx.globalCompositeOperation='lighter';
+    for(var i=0;i<SMOKE.length;i++){
+      var s3=SMOKE[i];
+      if(s3.front!==front) continue;
+      var u=s3.life/s3.ttl;
+      var a=s3.a*k*Math.sin(Math.pow(u,0.5)*Math.PI);   // мягко разгорается и мягко тает
+      if(s3.y>LH*0.80) a*=cl(1-(s3.y-LH*0.80)/(LH*0.14));   // у города дым обязан растаять
+      if(a<=0.004) continue;
+      var rad=s3.r0*(1+(s3.grow-1)*Math.pow(u,0.7)), d=rad*2;
+      ctx.globalAlpha=a>1?1:a;
+      ctx.save(); ctx.translate(s3.x,s3.y); ctx.rotate(s3.rot);
+      ctx.drawImage(P[s3.s],-d/2,-d/2,d,d);
+      ctx.restore();
+    }
+    ctx.globalAlpha=1;
+    ctx.globalCompositeOperation='source-over';
+  }
+
+  function ensureSize(){
+    var w=cvB.clientWidth||window.innerWidth, h=cvB.clientHeight||window.innerHeight;
+    if(w!==W||h!==Hh){
+      W=w; Hh=h;
+      cvB.width=Math.round(W*DPR); cvB.height=Math.round(Hh*DPR);
+      cvF.width=Math.round(W*DPR); cvF.height=Math.round(Hh*DPR);
+      ctxB.setTransform(DPR,0,0,DPR,0,0); ctxF.setTransform(DPR,0,0,DPR,0,0);
+      // лучи всё равно размыты — рисуем их вполовину меньше, это дешевле
+      LW=Math.max(2,Math.round(W/2)); LH=Math.max(2,Math.round(Hh/2));
+      cvL.width=LW; cvL.height=LH; cvLF.width=LW; cvLF.height=LH;
+      cvLL.width=LW; cvLL.height=LH;
+      cvFX.width=LW; cvFX.height=LH;
+      cvSB.width=LW; cvSB.height=LH; cvSF.width=LW; cvSF.height=LH;
+    }
+  }
+  ensureSize();
+
+  v.addEventListener('loadedmetadata', function(){
+    if(v.duration && isFinite(v.duration)) dur=v.duration; ready=true;
+  });
+  v.addEventListener('seeking', function(){ seekBusy=true; seekAt=performance.now(); });
+  v.addEventListener('seeked',  function(){ seekBusy=false; });
+  // ВАЖНО: canplay прилетает после КАЖДОЙ перемотки. Сбрасывать время можно только один раз,
+  // иначе ролик бесконечно откатывается в начало и первый экран замирает на стоп-кадре.
+  var primed=false;
+  v.addEventListener('canplay', function(){
+    if(stat) stat.style.display='none';
+    if(!TOUCH && !primed){ primed=true; try{ v.pause(); v.currentTime=0; }catch(e){} }
+  });
+
+
+  var stat=document.getElementById('vstatus');
+  function say(msg, keep){ if(!stat) return; stat.style.display='block'; stat.innerHTML=msg;
+    if(!keep) setTimeout(function(){ stat.style.display='none'; }, 2200); }
+
+  // Safari на айфоне отклоняет первый play(), если данных ещё нет, и второй попытки не было —
+  // ролик просыпался только от касания. Поэтому пробуем настойчиво и на каждом удобном событии.
+  var playTries = 0;
+  function tryPlay(){
+    if(started || !TOUCH) return;
+    var pr = v.play();
+    if(pr && pr.then) pr.then(function(){ started = true; })
+                        .catch(function(){ if(++playTries < 20) setTimeout(tryPlay, 300); });
+    else started = true;
+  }
+
+  (function loadVideo(){
+    function start(url){
+      if(TOUCH){
+        // весь набор, который айфон требует для запуска без касания
+        v.muted = true; v.defaultMuted = true; v.autoplay = true;
+        v.setAttribute('autoplay','');
+        v.setAttribute('playsinline','');
+        v.setAttribute('webkit-playsinline','');
+      }
+      v.src = url; v.load();
+      if(TOUCH) tryPlay();
+    }
+    v.addEventListener('error', function(){
+      say('Видео не открылось.<br><b>код '+((v.error&&v.error.code)||'?')+'</b>', true);
+    });
+
+    // На телефоне перемотки прокруткой нет — ролик просто играет,
+    // и там файл по ссылке лучше: Safari умеет докачивать его кусками.
+    // На десктопе качаем целиком в память: перемотка идёт без рывков.
+    if(TOUCH){ v.loop = true; start('hero-mob.mp4'); return; }   // вертикальный ролик, крутится петлёй
+    if(!window.fetch || !window.ReadableStream){ start('hero.mp4'); return; }
+
+    say('Загружаем ролик… <b>0\u00a0%</b>', true);
+    fetch('hero.mp4').then(function(r){
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      var total = +(r.headers.get('content-length') || 0);
+      if(!r.body) return r.blob();
+      var reader = r.body.getReader(), chunks = [], got = 0;
+      return (function pump(){
+        return reader.read().then(function(res){
+          if(res.done) return new Blob(chunks, {type:'video/mp4'});
+          chunks.push(res.value); got += res.value.length;
+          if(total) say('Загружаем ролик… <b>'+Math.round(got/total*100)+'\u00a0%</b>', true);
+          return pump();
+        });
+      })();
+    }).then(function(b){ start(URL.createObjectURL(b)); })
+      .catch(function(){ say('Ролик грузится напрямую…'); start('hero.mp4'); });
+  })();
+
+  // ?debug — маленькая плашка с тем, что реально происходит с воспроизведением.
+  // Нужна, чтобы причину было видно с телефона, а не угадывать её отсюда.
+  if(/[?&]debug/.test(location.search)){
+    var dbg=document.createElement('div');
+    dbg.style.cssText='position:fixed;left:8px;top:64px;z-index:99;background:rgba(0,0,0,.82);'+
+      'color:#cfe3ff;font:11px/1.45 ui-monospace,Menlo,monospace;padding:8px 10px;border-radius:6px;'+
+      'max-width:82vw;white-space:pre-wrap;pointer-events:none';
+    document.body.appendChild(dbg);
+    var lastErr='—';
+    tryPlay=function(){ if(started||!TOUCH) return;
+      var pr=v.play();
+      if(pr&&pr.then) pr.then(function(){started=true;lastErr='ok';})
+                        .catch(function(e){ lastErr=(e&&e.name||'?')+': '+(e&&e.message||''); if(++playTries<20) setTimeout(tryPlay,300); });
+      else started=true; };
+    setInterval(function(){
+      dbg.textContent =
+        'TOUCH '+TOUCH+'  BAKED '+BAKED+'\n'+
+        'src '+((v.currentSrc||'—').split('/').pop())+'\n'+
+        'readyState '+v.readyState+'  networkState '+v.networkState+'\n'+
+        'paused '+v.paused+'  muted '+v.muted+'  autoplay '+v.autoplay+'\n'+
+        'playsinline '+v.hasAttribute('playsinline')+'  loop '+v.loop+'\n'+
+        'currentTime '+v.currentTime.toFixed(2)+' / '+(v.duration||0).toFixed(2)+'\n'+
+        'started '+started+'  попыток '+playTries+'\n'+
+        'ошибка play(): '+lastErr+'\n'+
+        'video.error '+(v.error?v.error.code:'нет')+'\n'+
+        'размер '+v.videoWidth+'x'+v.videoHeight+'  экран '+innerWidth+'x'+innerHeight;
+    }, 400);
+  }
+
+  var VIDEO_END=0.80;                 // на этой доле прокрутки ролик доигран, дальше — задержка
+  var t0=performance.now();
+
+  if (TOUCH){
+    hero.style.height='100svh';
+    hint.textContent='';
+    function kick(){
+      if(started) return;
+      var pr=v.play();
+      if(pr&&pr.then) pr.then(function(){started=true;}).catch(function(){});
+      else started=true;
+    }
+    v.addEventListener('playing', function(){ started=true; if(stat) stat.style.display='none'; });
+    // каждое из этих событий — новый шанс запуститься без участия человека
+    ['loadedmetadata','loadeddata','canplay','canplaythrough'].forEach(function(e){
+      v.addEventListener(e, tryPlay);
+    });
+    document.addEventListener('visibilitychange', function(){ if(!document.hidden) tryPlay(); });
+    window.addEventListener('pageshow', tryPlay);
+    document.addEventListener('touchstart', kick, {once:true, passive:true});
+    document.addEventListener('click', kick, {once:true});
+    setTimeout(tryPlay, 200); setTimeout(tryPlay, 700); setTimeout(tryPlay, 1600);
+  }
+
+  if (BAKED){
+    var off = [logo, glow, curL, curR, cvLL, cvFX, cvSB, cvSF];   // лучи оставляем, они светят на остров
+    for (var oi=0; oi<off.length; oi++) if(off[oi]) off[oi].style.display='none';
+  }
+
+  var PAUSED=false;
+  // сцена ушла из вьюпорта (человек читает второй экран и ниже) — кадры не рисуем,
+  // иначе канвасы со снегом и лучами продолжают жечь процессор под белой секцией
+  var stageLive=true;
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(e){ stageLive=e[0].isIntersecting; })
+      .observe(document.querySelector('.stage'));
+  }
+  window.__freeze = function(x){ FORCE = x; };            // отладка: зафиксировать долю прокрутки
+  window.__smokeCount = function(){ return SMOKE.length; };   // отладка
+  window.__pause  = function(b){ PAUSED = !!b; lastNow=0; }; // отладка: снять нагрузку с CPU, чтобы декодер успел перемотать
+
+  function frame(now){
+    if(PAUSED){ requestAnimationFrame(frame); return; }
+    if(!stageLive){ lastNow=now; requestAnimationFrame(frame); return; }
+    ensureSize();
+    var dt = lastNow ? Math.min(0.1,(now-lastNow)/1000) : 0; lastNow = now;
+    var p;
+
+    // предохранитель: если 'seeked' потерялся, через полсекунды разрешаем новую перемотку
+    if(seekBusy && now-seekAt>500) seekBusy=false;
+
+    if (FORCE!=null){
+      p = FORCE;                                   // отладка: без сглаживания, кадр в кадр
+      cur = cl(p/VIDEO_END)*dur;
+      if(ready && !seekBusy && Math.abs(v.currentTime-cur)>0.012){ try{ v.currentTime=cur; }catch(e){} }
+    } else if (TOUCH){
+      // прогресс ведёт сам ролик, а после его конца ещё 1,2 с на «задержку» логотипа
+      var vp = ready && dur ? cl(v.currentTime/dur) : 0;
+      if (vp > 0.985 || v.ended) tailP = cl(tailP + dt/1.2);
+      p = VIDEO_END*vp + (1-VIDEO_END)*tailP;
+    } else {
+      var total=hero.offsetHeight-window.innerHeight;
+      p = total>0 ? cl(-hero.getBoundingClientRect().top/total) : 0;
+      var target=cl(p/VIDEO_END)*dur;
+      cur = reduce ? target : cur+(target-cur)*0.17;
+      if(ready && !seekBusy && Math.abs(v.currentTime-cur)>0.012){ try{ v.currentTime=cur; }catch(e){} }
+    }
+
+    // ---- логотип выезжает сверху навстречу восходящей луне ----
+    // прозрачностью он больше не «проявляется»: вводим её, пока остров ещё за верхним краем,
+    // а на экран он въезжает уже плотным — так объект читается как вещь, а не как призрак
+    // LEAD — на сколько секунд ролика раньше начинается спуск. Одна секунда ролика
+    // это VIDEO_END/dur долей прокрутки; правится одним числом.
+    var LEAD = 1.0 * (VIDEO_END/dur);
+    var DROP_A=0.545-LEAD, DROP_B=0.790-LEAD;
+    var dp   = cl((p-DROP_A)/(DROP_B-DROP_A));
+    var fall = 1-Math.pow(1-dp,2.6);                // резкий сход и долгое торможение
+    // затухающие колебания в конце: тяжёлый остров оседает на подушке, а не втыкается
+    var sq   = dp>0.60 ? (dp-0.60)/0.40 : -1;
+    var spring = sq<0 ? 0 : 2.2*Math.exp(-4.2*sq)*Math.sin(sq*Math.PI*3);
+    var lp = cl(dp/0.035);                          // ввод прозрачности — ещё за кадром
+    logo.style.opacity=lp;
+    var tt=(now-t0)/1000;
+    // наезд идёт сам по себе, по времени: прокрутку можно остановить, логотип продолжит расти
+    logoT = cl(logoT + (fall>0.88 ? (dt||0)/15 : -(dt||0)/2.5));
+    var grow   = 0.075*(1-Math.pow(1-logoT,2));
+    var breath = 0.007*Math.sin(tt*0.52)*fall;      // дышит, даже когда прокрутка стоит
+    var float  = 0.85*Math.sin(tt*0.38+1.3)*fall;   // остров слегка парит
+    var dyVh   = -96*(1-fall) + spring;             // -96vh — заведомо выше верхнего края кадра
+    var dySgn  = dyVh<0 ? ' - ' : ' + ';
+    logo.style.transform='translate(-50%, calc('+(-50+float).toFixed(3)+'%'+dySgn+Math.abs(dyVh).toFixed(3)+'vh)) scale('
+      +(1.055-0.055*fall+grow+breath).toFixed(4)+')';
+
+    if(!BAKED) glow.style.opacity = ez(p,0.56-LEAD,0.66-LEAD)*(1-0.74*ez(p,0.73-LEAD,0.88-LEAD));
+
+    var bk=ez(p,0.544-LEAD,0.72-LEAD,1.7);     // лучи включаются за полсекунды до логотипа
+    cvL.style.opacity=bk; cvLF.style.opacity=bk;
+    var sk=ez(p,0.48,0.64,1.6);
+    var t = reduce ? 3 : (now-t0)/1000;
+    paint(ctxB, BACK,  t, sk);
+    paint(ctxF, FRONT, t, sk);
+    if(!BAKED){
+      // кулисы выезжают из-за края с лёгким перелётом и покачиваются, как тяжёлая ткань
+      var craw = cl((p-(0.60-LEAD))/0.26);     // кулисы едут с той же секундой опережения
+      var ce = 1-Math.pow(1-craw,3);           // строго снаружи внутрь, без отката
+      var coff = (1-ce)*100;
+      var camp = 0.95*(0.26+0.74*(1-craw));    // качается сильнее, пока едет
+      var sw1 = camp*Math.sin(t*2.35);
+      var sw2 = camp*Math.sin(t*2.05+1.9);
+      curL.style.opacity=craw; curR.style.opacity=craw;
+      curL.style.transform='translateX('+(-coff)+'%) rotate('+(-sw1)+'deg)';
+      curR.style.transform='translateX('+( coff)+'%) rotate('+( sw2)+'deg)';
+
+      // логотип оживает вместе со своим появлением
+      cvFX.style.opacity=lp;
+      paintLogoFx(t, lp, 1+2.2*(1-fall));
+    }
+
+    // ---- дым из-под острова ----
+    var geo=null;
+    if(!BAKED && dp>0 && logo.complete && logo.naturalWidth){
+      var stS=cvSB.getBoundingClientRect(), lrS=logo.getBoundingClientRect();
+      if(stS.width && stS.height){
+        var gx=LW/stS.width, gy=LH/stS.height;
+        geo={x:(lrS.left-stS.left)*gx, y:(lrS.top-stS.top)*gy, w:lrS.width*gx, h:lrS.height*gy};
+      }
+    }
+    // разгорается со сходом, пик у касания, дальше тонкий остаточный пар
+    var sK = (SMOKE_ON && !BAKED) ? ez(dp,0.04,0.50,1.15)*(1-0.80*ez(p,0.80,1.00,1.1)) : 0;
+    if(!BAKED){
+      stepSmoke(dt, sK, geo, dp);
+      cvSB.style.opacity=1; cvSF.style.opacity=1;
+      paintSmoke(ctxSB, false, sK);
+      paintSmoke(ctxSF, true,  sK);
+    }
+
+    if(BAKED){
+      // прокрутки нет — разгораем лучи по времени, один раз, и дальше они просто качаются
+      var bkm = cl(((now-t0)/1000 - 0.5)/1.4);
+      cvL.style.opacity=bkm; cvLF.style.opacity=bkm;
+      if(bkm>0.01){ paintBeams(ctxL, t, 1, 1); paintBeams(ctxLF, t, 1, 0.22); }
+    }
+    else if(bk>0.01){
+      paintBeams(ctxL,  t, 1, 1);
+      paintBeams(ctxLF, t, 1, 0.22);
+      // подсветка самого логотипа — только там, где по нему проходит луч
+      var ll=bk*lp*0.62;
+      cvLL.style.opacity=ll;
+      paintLogoLight(t, ll);
+    } else {
+      cvLL.style.opacity=0;
+    }
+    // кадр дышит: очень медленный наплыв, чтобы фон не выглядел мёртвым
+    var br=0.006+0.006*Math.sin(t*0.42);
+    if(!BAKED) v.style.transform='scale('+(1+br*ez(p,0.68,0.92))+')';
+    // размытие фона под логотипом: мягче прежнего и на секунду позже
+    var bl=(2.1*ez(p,0.71,0.90,1.6)).toFixed(2);
+    // на телефоне размытие не трогаем: ролик там идёт целиком и мазался бы под конец каждого круга
+    if(!BAKED) v.style.filter='saturate(1.14) contrast(1.07) brightness(1.04) blur('+bl+'px)';
+    else v.style.filter='saturate(1.06) contrast(1.03)';
+
+    if(TOUCH && !started && v.currentTime > 0.05 && !v.paused) started = true;
+    poster.style.opacity = TOUCH ? (started ? 0 : 1) : (1 - cl(p/0.006));
+    // тексты уже на экране при загрузке и тают к моменту, когда логотип встал целиком
+    introT = cl(introT + (dt||0)/0.85);
+    var so = introT * (BAKED ? 1 : (1 - ez(p,0.495-LEAD,0.600-LEAD,1.7)));
+    sideL.style.opacity=so; sideR.style.opacity=so;
+    hint.style.opacity= TOUCH ? 0 : cl(1-p*12);
+    // плашка шапки только ЗА первым экраном: иначе она перерезает въезжающий остров
+    if(TOUCH ? window.scrollY>24 : p>0.985) nav.classList.add('solid'); else nav.classList.remove('solid');
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<script>
+/* ==================== СЛАЙДЕР ВТОРОГО ЭКРАНА ====================
+   Повтор поведения слайдера старого сайта: две страницы, сам листает
+   раз в 5 секунд, петля, стрелки, точки, свайп пальцем. Пока курсор
+   на слайдере — автолистание стоит, иначе кадр уезжает из-под мыши. */
+(function(){
+  'use strict';
+  var root = document.getElementById('crSlider');
+  var strip = document.getElementById('crStrip');
+  var dotsBox = document.getElementById('crDots');
+  if (!root || !strip || !dotsBox) return;
+
+  var slides = strip.children.length;
+  var dots = Array.prototype.slice.call(dotsBox.querySelectorAll('.cr-dot'));
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var i = 0, timer = null;
+
+  function show(n){
+    i = (n % slides + slides) % slides;
+    strip.style.transform = 'translateX(' + (-100 * i) + '%)';
+    dots.forEach(function(d, k){ d.classList.toggle('is-active', k === i); });
+  }
+  function play(){ stop(); if (!reduce) timer = setInterval(function(){ show(i + 1); }, 5000); }
+  function stop(){ if (timer) { clearInterval(timer); timer = null; } }
+  function go(n){ show(n); play(); }
+
+  root.querySelector('.cr-prev').addEventListener('click', function(){ go(i - 1); });
+  root.querySelector('.cr-next').addEventListener('click', function(){ go(i + 1); });
+  dots.forEach(function(d, k){ d.addEventListener('click', function(){ go(k); }); });
+
+  root.addEventListener('pointerenter', stop);
+  root.addEventListener('pointerleave', play);
+
+  /* свайп пальцем: считаем только явно горизонтальное движение,
+     иначе слайдер будет перехватывать вертикальную прокрутку страницы */
+  var sx = 0, sy = 0, tracking = false;
+  root.addEventListener('touchstart', function(e){
+    if (e.touches.length !== 1) return;
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY; tracking = true; stop();
+  }, {passive: true});
+  root.addEventListener('touchend', function(e){
+    if (!tracking) return;
+    tracking = false;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - sx, dy = t.clientY - sy;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(i + (dx < 0 ? 1 : -1));
+    play();
+  }, {passive: true});
+
+  show(0);
+  play();
+})();
+</script>
+
+<script>
+/* ==================== КАРТА: ЛИНИЯ И ПОДПИСЬ — ОДНО ЦЕЛОЕ ====================
+   Наводишь на подпись — загорается её линия. Наводишь на линию — загорается
+   подпись. В нить толщиной 1,7 px курсором не попасть, поэтому у каждой линии
+   есть невидимая копия с обводкой 16 px, она и ловит мышь. */
+(function(){
+  'use strict';
+  var map = document.getElementById('crMap');
+  if (!map) return;
+
+  var byCity = {};
+  function group(key){
+    if (byCity[key]) return byCity[key];
+    var g = {
+      label: map.querySelector('.cr-city[data-city="' + key + '"]'),
+      line:  map.querySelector('.cr-lines path[data-city="' + key + '"]:not(.hit)')
+    };
+    byCity[key] = g;
+    return g;
+  }
+  function light(key, on){
+    var g = group(key);
+    if (g.label) g.label.classList.toggle('on', on);
+    if (g.line)  g.line.classList.toggle('on', on);
+  }
+  function wire(el){
+    var key = el.getAttribute('data-city');
+    if (!key) return;
+    el.addEventListener('pointerenter', function(){ light(key, true); });
+    el.addEventListener('pointerleave', function(){ light(key, false); });
+    /* палец: подсветка на время касания, чтобы на телефоне тоже было видно,
+       какая линия к какому городу идёт */
+    el.addEventListener('touchstart', function(){ light(key, true); }, {passive: true});
+    el.addEventListener('touchend',   function(){ light(key, false); }, {passive: true});
+  }
+  Array.prototype.forEach.call(map.querySelectorAll('.cr-city'), wire);
+  Array.prototype.forEach.call(map.querySelectorAll('.cr-lines .hit'), wire);
+})();
+</script>
+
+</body>
+</html>
