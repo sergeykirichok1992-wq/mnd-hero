@@ -419,7 +419,7 @@ body{margin:0; background:#04081A; color:#DCE4F3;
   var kids  = document.getElementById('qzKids');
   var adults= document.getElementById('qzAdults');
   var phone = document.getElementById('qzPhone');
-  var cur = 0, history = [];
+  var cur = 0, trail = [];
 
   function show(n){
     for (var k in steps) steps[k].hidden = (k !== String(n));
@@ -439,7 +439,7 @@ body{margin:0; background:#04081A; color:#DCE4F3;
   }
 
   function go(n){
-    if (n > cur) history.push(cur);
+    if (n > cur) trail.push(cur);
     show(n);
   }
 
@@ -466,8 +466,11 @@ body{margin:0; background:#04081A; color:#DCE4F3;
     var v = parseInt(el.value, 10);
     return isNaN(v) || v < 0 ? 0 : Math.min(v, 500);
   }
-  function syncNums(){
-    kids.value = num(kids); adults.value = num(adults);
+  /* norm=true переписывает значение в поле. При наборе с клавиатуры этого делать
+     нельзя: человек стирает «20», чтобы ввести «25», а поле тут же само ставит «0»
+     и цифры уезжают не туда. Поэтому во время набора мы только гасим минус */
+  function syncNums(norm){
+    if (norm){ kids.value = num(kids); adults.value = num(adults); }
     form.querySelector('[data-step-btn="kids"][data-d="-1"]').disabled = num(kids) === 0;
     form.querySelector('[data-step-btn="adults"][data-d="-1"]').disabled = num(adults) === 0;
   }
@@ -476,12 +479,12 @@ body{margin:0; background:#04081A; color:#DCE4F3;
     if (b){
       var el = b.getAttribute('data-step-btn') === 'kids' ? kids : adults;
       el.value = Math.max(0, Math.min(500, num(el) + parseInt(b.getAttribute('data-d'), 10)));
-      syncNums();
+      syncNums(true);
       if (num(kids) > 0) err('qzErr3', false);
       return;
     }
     var back = e.target.closest('[data-back]');
-    if (back){ show(history.length ? history.pop() : 0); return; }
+    if (back){ show(trail.length ? trail.pop() : 0); return; }
     var next = e.target.closest('[data-go]');
     if (!next) return;
     var to = parseInt(next.getAttribute('data-go'), 10);
@@ -491,9 +494,12 @@ body{margin:0; background:#04081A; color:#DCE4F3;
     go(to);
   });
   form.addEventListener('input', function(e){
-    if (e.target === kids || e.target === adults) syncNums();
+    if (e.target === kids || e.target === adults) syncNums(false);
   });
-  syncNums();
+  form.addEventListener('change', function(e){
+    if (e.target === kids || e.target === adults) syncNums(true);
+  });
+  syncNums(true);
 
   /* телефон: в поле всегда российский формат, что бы человек ни вставил */
   function mask(v){
