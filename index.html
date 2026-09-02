@@ -1130,26 +1130,36 @@ body{
   border-radius:clamp(14px,1.15vw,22px);
   color:var(--c-ink);
   background:linear-gradient(180deg,var(--c-top),var(--c-bot));
+  /* НЕОНОВЫЙ КОНТУР. Три слоя одной тени: жёсткая нить в 1px по краю,
+     ближний ореол и дальнее зарево. Светлая карточка на ночном фоне - и край
+     читается как светящаяся трубка, а не как рамка.
+     Цвет свой у каждой категории, поэтому ступени цены различимы боковым
+     зрением ещё до того, как прочитаны цифры.
+     Тень сделана box-shadow, а не отдельным слоем с blur: свечение лежит
+     СНАРУЖИ карточки, overflow:hidden его не режет, лишних узлов не нужно. */
   box-shadow:
+    0 0 0 1px var(--c-neon),
+    0 0 12px -1px var(--c-neon),
+    0 0 42px -6px var(--c-halo),
     inset 0 1px 0 rgba(255,255,255,.85),
-    0 26px 48px -26px rgba(0,0,0,.9),
+    0 24px 46px -26px rgba(0,0,0,.9),
     0 5px 16px rgba(0,0,0,.32);
   /* набор чернил по умолчанию, каждая карточка перебивает свой */
   --c-ink:#16213F; --c-mute:#6C7A93; --c-line:rgba(22,33,63,.13);
   --c-chip:rgba(255,255,255,.66); --c-rule:rgba(22,33,63,.2);
-  --c-top:#F4F7FB; --c-bot:#E7EEF7}
+  --c-top:#F4F7FB; --c-bot:#E7EEF7;
+  --c-neon:rgba(150,192,242,.6); --c-halo:rgba(127,168,217,.3)}
 .pr-card[data-cat="vip"]{--c-top:#FCEFCB; --c-bot:#F3DEA8;
   --c-mute:#8A7648; --c-line:rgba(120,86,20,.2); --c-rule:rgba(120,86,20,.3);
   --c-chip:rgba(255,255,255,.6);
-  box-shadow:
-    inset 0 0 0 1px rgba(211,162,68,.55),
-    inset 0 1px 0 rgba(255,255,255,.85),
-    0 26px 48px -26px rgba(0,0,0,.9),
-    0 5px 16px rgba(0,0,0,.32)}
+  /* у золотой карточки неон ярче остальных: это верхняя ступень прайса */
+  --c-neon:rgba(245,204,113,.85); --c-halo:rgba(227,179,78,.45)}
 .pr-card[data-cat="premium"]{--c-top:#FBEAE4; --c-bot:#F3D9D1;
-  --c-mute:#8B7167; --c-line:rgba(120,60,45,.17); --c-rule:rgba(120,60,45,.26)}
+  --c-mute:#8B7167; --c-line:rgba(120,60,45,.17); --c-rule:rgba(120,60,45,.26);
+  --c-neon:rgba(242,142,126,.72); --c-halo:rgba(224,110,92,.36)}
 .pr-card[data-cat="standard"]{--c-top:#E8F4EA; --c-bot:#D6E9DC;
-  --c-mute:#5E7B69; --c-line:rgba(24,64,44,.15); --c-rule:rgba(24,64,44,.24)}
+  --c-mute:#5E7B69; --c-line:rgba(24,64,44,.15); --c-rule:rgba(24,64,44,.24);
+  --c-neon:rgba(108,222,166,.72); --c-halo:rgba(78,200,146,.36)}
 
 /* голова карточки по центру, как на прайсе прошлого сезона.
    Под названием счётчик дат: отвечает на вопрос «а много ли таких дней»
@@ -1271,12 +1281,16 @@ body{
     gap:8px; margin:0 auto clamp(16px,4vw,24px); text-align:left}
   .pr-rail div{display:flex; align-items:baseline; justify-content:space-between;
     gap:8px; padding:10px 14px; border-radius:12px;
-    border:1px solid rgba(227,179,78,.22); background:rgba(127,168,217,.06)}
+    border:1px solid var(--r-neon,rgba(150,192,242,.42));
+    box-shadow:0 0 12px -4px var(--r-neon,rgba(150,192,242,.42));
+    background:rgba(127,168,217,.06)}
+  .pr-rail div[data-cat="premium"]{--r-neon:rgba(242,142,126,.55)}
+  .pr-rail div[data-cat="standard"]{--r-neon:rgba(108,222,166,.55)}
   .pr-rail i{font-style:normal; font-size:10.5px; letter-spacing:.1em;
     text-transform:uppercase; font-weight:600; color:#8FA0BC}
   .pr-rail b{font-family:"Oswald",Arial,sans-serif; font-weight:700;
     font-size:17px; color:#fff; font-variant-numeric:tabular-nums}
-  .pr-rail div[data-cat="vip"]{border-color:rgba(227,179,78,.5);
+  .pr-rail div[data-cat="vip"]{--r-neon:rgba(245,204,113,.75);
     background:rgba(227,179,78,.12)}
   .pr-rail div[data-cat="vip"] b{color:#F5E3B4}
   /* цена ложится в строку: башня из подписи, числа и повышения съедала бы экран */
