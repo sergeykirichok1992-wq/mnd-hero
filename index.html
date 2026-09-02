@@ -1137,7 +1137,7 @@ body{
 .pr-city:last-child{border-right:0}
 .pr-city b{display:block; font-weight:600; font-size:clamp(13px,.98vw,16.5px); line-height:1.2}
 .pr-city em{display:block; font-style:normal; margin-top:4px; font-weight:500;
-  font-size:clamp(11px,.74vw,13px); color:#66768F}
+  font-size:clamp(11px,.74vw,13px); color:#7A8AA6}
 @media (hover:hover) and (pointer:fine){
   .pr-city:hover{background:rgba(227,179,78,.07); color:#EDF3FF}
 }
@@ -1210,7 +1210,7 @@ body{
   font-size:clamp(14px,1.1vw,19px); color:#F0F5FF; font-variant-numeric:tabular-nums}
 .pr-day span{font-size:clamp(11px,.8vw,13.5px); font-weight:500; color:#93A5C2}
 .pr-day em{font-style:normal; margin-left:auto; font-size:clamp(10px,.72vw,12.5px);
-  color:#66768F}
+  color:#7A8AA6}
 .pr-day.we em{color:var(--pr-red); font-weight:600}
 @media (hover:hover) and (pointer:fine){
   /* бумага не пружинит: меняются только цвет рамки и подложка, без сдвига */
@@ -1256,7 +1256,7 @@ body{
   font-size:clamp(12.5px,.92vw,15.5px); line-height:1.5; color:#8FA0BC}
 .pr-foot p{margin:0}
 .pr-foot b{font-family:"Oswald",Arial,sans-serif; font-weight:700; color:#fff}
-.pr-off{text-align:right; color:#66768F}
+.pr-off{text-align:right; color:#7A8AA6}
 
 /* у этого сайта лист всегда заканчивается действием: человек увидел цену -
    ему есть куда нажать. Кнопка ведёт в квиз выше, к расчёту на весь класс */
@@ -1272,7 +1272,7 @@ body{
 .pr-btn:hover{filter:brightness(1.06)}
 .pr-btn:active{transform:translateY(1px)}
 .pr-fine{margin:clamp(12px,1.1vw,18px) auto 0; max-width:60ch;
-  font-size:clamp(12px,.86vw,14px); line-height:1.45; color:#66768F}
+  font-size:clamp(12px,.86vw,14px); line-height:1.45; color:#7A8AA6}
 
 /* смена города - «перештамповка»: цифры пропечатываются волной слева направо.
    Геометрия, месяцы и даты неподвижны, меняются ровно те числа, которые зависят
@@ -3545,6 +3545,7 @@ body{
     {k:20261201, from:'с 1 декабря', till:'до 30 ноября'}
   ];
   var UP = 100;
+  function has(k){ return Object.prototype.hasOwnProperty.call(CITY, k); }
 
   var t = new Date();
   var today = t.getFullYear() * 10000 + (t.getMonth() + 1) * 100 + t.getDate();
@@ -3563,8 +3564,10 @@ body{
                                       : 'Действует последняя цена сезона';
 
   function paint(key, animate){
+    /* ключ приходит из адресной строки. Просто CITY[key] тут нельзя: ?city=constructor
+       достанет свойство прототипа, и вместо цен в графах встанет NaN */
+    if (!has(key)) return;
     var c = CITY[key];
-    if (!c) return;
     for (var i = 0; i < sums.length; i++){
       var cur   = c.p[i] + UP * passed;
       var cell  = sums[i];
@@ -3612,6 +3615,7 @@ body{
   }
 
   function select(key, opts){
+    if (!has(key)) return;
     opts = opts || {};
     for (var i = 0; i < cities.length; i++){
       var on = cities[i].getAttribute('data-city') === key;
@@ -3652,7 +3656,7 @@ body{
 
   var start = 'nizhny';
   var m = /[?&]city=([a-z]+)/.exec(location.search || '');
-  if (m && CITY[m[1]]) start = m[1];
+  if (m && has(m[1])) start = m[1];
   select(start, {silent:true});
 })();
 </script>
