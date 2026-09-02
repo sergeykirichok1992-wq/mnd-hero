@@ -394,6 +394,9 @@ body{
    ровно как fixheight у слайдера старого сайта */
 .cr-strip{display:flex; will-change:transform; transition:transform .45s cubic-bezier(.25,.7,.3,1)}
 .cr-slide{flex:0 0 100%; max-width:100%}
+/* клон первого кадра в хвосте ленты: нужен только чтобы петля ехала
+   в одну сторону, для чтения с экрана он лишний */
+.cr-clone{pointer-events:none}
 .cr-slidebox{padding:calc(10 * var(--u)) calc(5 * var(--u)) calc(36 * var(--u)); text-align:center}
 .cr-slidebox img{display:inline-block; width:calc(980 * var(--u)); max-width:100%; height:auto; vertical-align:middle}
 .cr-dots{text-align:center; margin-top:0; line-height:1.4285714285714286}
@@ -632,7 +635,7 @@ body{
                 <img src="v2-slide1-980.webp" srcset="v2-slide1-980.webp 980w, v2-slide1-1542.webp 1542w"
                      sizes="(max-width:767px) calc(100vw - 20px), (min-width:1830px) 1440px, 78vw"
                      width="980" height="662" alt="Кадры прошлого сезона: дети, Дед Мороз, лаборатория Министерства"
-                     decoding="async">
+                     loading="lazy" decoding="async">
               </div>
             </div>
             <div class="cr-slide">
@@ -641,6 +644,15 @@ body{
                      sizes="(max-width:767px) calc(100vw - 20px), (min-width:1830px) 1440px, 78vw"
                      width="980" height="666" alt="Кадры прошлого сезона: шоу, мастерская карамели, гости"
                      loading="lazy" decoding="async">
+              </div>
+            </div>
+            <!-- клон первого кадра: с ним лента всегда едет в одну сторону,
+                 как петля Swiper на старом сайте, а не откатывается назад -->
+            <div class="cr-slide cr-clone" aria-hidden="true">
+              <div class="cr-slidebox">
+                <img src="v2-slide1-980.webp" srcset="v2-slide1-980.webp 980w, v2-slide1-1542.webp 1542w"
+                     sizes="(max-width:767px) calc(100vw - 20px), (min-width:1830px) 1440px, 78vw"
+                     width="980" height="662" alt="" loading="lazy" decoding="async">
               </div>
             </div>
           </div>
@@ -1365,8 +1377,21 @@ body{
 <script>
 /* ==================== СЛАЙДЕР ВТОРОГО ЭКРАНА ====================
    Повтор поведения слайдера старого сайта: две страницы, сам листает
-   раз в 5 секунд, петля, стрелки, точки, свайп пальцем. Пока курсор
-   на слайдере — автолистание стоит, иначе кадр уезжает из-под мыши. */
+   раз в 5 секунд, петля, стрелки, точки, свайп пальцем.
+
+   Две вещи, которые нашло ревью и которые тут исправлены:
+
+   1. ПЕТЛЯ ЕДЕТ В ОДНУ СТОРОНУ. Раньше переход «второй кадр -> первый»
+      проигрывался как движение ленты вправо, то есть кадр откатывался назад,
+      хотя стрелка обещала «вперёд». Теперь в конце ленты стоит клон первого
+      кадра: лента доезжает до него обычной анимацией, а сразу после неё
+      мгновенно, без анимации, перескакивает на настоящий первый кадр.
+      Так же сделана петля у слайдера старого сайта.
+
+   2. КЛИК ПО СТРЕЛКЕ НЕ БУДИТ АВТОЛИСТАНИЕ. Раньше после клика таймер
+      заводился заново, даже если курсор так и стоял на слайдере, и через
+      пять секунд кадр уезжал из-под мыши. Теперь есть флаг hover: пока
+      мышь на слайдере, таймер не заводится вообще. */
 (function(){
   'use strict';
   var root = document.getElementById('crSlider');
@@ -1374,32 +1399,80 @@ body{
   var dotsBox = document.getElementById('crDots');
   if (!root || !strip || !dotsBox) return;
 
-  var slides = strip.children.length;
+  var prevBtn = root.querySelector('.cr-prev');
+  var nextBtn = root.querySelector('.cr-next');
   var dots = Array.prototype.slice.call(dotsBox.querySelectorAll('.cr-dot'));
+  var real = strip.querySelectorAll('.cr-slide:not(.cr-clone)').length;
+  if (!real || !dots.length) return;
+
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var i = 0, timer = null;
+  var pos = 0;          /* позиция ленты: 0..real, где real - это клон первого кадра */
+  var hover = false;
+  var timer = null, snapT = null, snapOn = null;
 
-  function show(n){
-    i = (n % slides + slides) % slides;
-    strip.style.transform = 'translateX(' + (-100 * i) + '%)';
-    dots.forEach(function(d, k){ d.classList.toggle('is-active', k === i); });
+  /* сдвиг ленты. animate=false - мгновенно: анимацию гасим, двигаем,
+     заставляем браузер пересчитать вёрстку и только потом возвращаем */
+  function place(p, animate){
+    if (!animate) strip.style.transition = 'none';
+    strip.style.transform = 'translateX(' + (-100 * p) + '%)';
+    if (!animate){ void strip.offsetWidth; strip.style.transition = ''; }
   }
-  function play(){ stop(); if (!reduce) timer = setInterval(function(){ show(i + 1); }, 5000); }
-  function stop(){ if (timer) { clearInterval(timer); timer = null; } }
-  function go(n){ show(n); play(); }
+  function mark(){
+    var k = pos % real;
+    for (var j = 0; j < dots.length; j++) dots[j].classList.toggle('is-active', j === k);
+  }
+  /* доехали до клона - подменяем его настоящим кадром, когда анимация кончилась.
+     Таймер на 700 мс - страховка: при prefers-reduced-motion перехода нет
+     и transitionend не приходит вовсе */
+  function snapBack(){
+    clearSnap();
+    snapOn = function(){
+      clearSnap();
+      if (pos === real){ pos = 0; place(0, false); mark(); }
+    };
+    strip.addEventListener('transitionend', snapOn);
+    snapT = setTimeout(snapOn, 700);
+  }
+  function clearSnap(){
+    if (snapOn){ strip.removeEventListener('transitionend', snapOn); snapOn = null; }
+    if (snapT){ clearTimeout(snapT); snapT = null; }
+  }
 
-  root.querySelector('.cr-prev').addEventListener('click', function(){ go(i - 1); });
-  root.querySelector('.cr-next').addEventListener('click', function(){ go(i + 1); });
-  dots.forEach(function(d, k){ d.addEventListener('click', function(){ go(k); }); });
+  function step(dir){
+    clearSnap();
+    if (pos === real){ pos = 0; place(0, false); }      /* застряли на клоне - выходим на настоящий кадр */
+    if (dir > 0){
+      pos += 1; place(pos, true); mark();
+      if (pos === real) snapBack();
+    } else {
+      if (pos === 0){ pos = real; place(real, false); } /* заходим слева от первого кадра через клон */
+      pos -= 1; place(pos, true); mark();
+    }
+  }
+  function jump(k){
+    clearSnap();
+    pos = k; place(pos, true); mark();
+  }
 
-  root.addEventListener('pointerenter', stop);
-  root.addEventListener('pointerleave', play);
+  function stop(){ if (timer){ clearInterval(timer); timer = null; } }
+  function play(){
+    stop();
+    if (!reduce && !hover) timer = setInterval(function(){ step(1); }, 5000);
+  }
+  function go(fn){ fn(); play(); }   /* play() сам не заведётся, пока мышь на слайдере */
+
+  if (prevBtn) prevBtn.addEventListener('click', function(){ go(function(){ step(-1); }); });
+  if (nextBtn) nextBtn.addEventListener('click', function(){ go(function(){ step(1); }); });
+  dots.forEach(function(d, k){ d.addEventListener('click', function(){ go(function(){ jump(k); }); }); });
+
+  root.addEventListener('pointerenter', function(){ hover = true; stop(); });
+  root.addEventListener('pointerleave', function(){ hover = false; play(); });
 
   /* свайп пальцем: считаем только явно горизонтальное движение,
      иначе слайдер будет перехватывать вертикальную прокрутку страницы */
   var sx = 0, sy = 0, tracking = false;
   root.addEventListener('touchstart', function(e){
-    if (e.touches.length !== 1) return;
+    if (e.touches.length !== 1){ tracking = false; return; }
     sx = e.touches[0].clientX; sy = e.touches[0].clientY; tracking = true; stop();
   }, {passive: true});
   root.addEventListener('touchend', function(e){
@@ -1407,12 +1480,13 @@ body{
     tracking = false;
     var t = e.changedTouches[0];
     var dx = t.clientX - sx, dy = t.clientY - sy;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) show(i + (dx < 0 ? 1 : -1));
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
     play();
   }, {passive: true});
+  /* палец увели за край или касание перехватила система - листание возвращаем */
+  root.addEventListener('touchcancel', function(){ tracking = false; play(); }, {passive: true});
 
-  show(0);
-  play();
+  place(0, false); mark(); play();
 })();
 </script>
 
