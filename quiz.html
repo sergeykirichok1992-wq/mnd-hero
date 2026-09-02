@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Квиз-расчёт — Звёздная смена</title>
+<meta name="theme-color" content="#04081A">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600&family=M+PLUS+Rounded+1c:wght@500;700&display=swap">
+<noscript><style>.rv{opacity:1 !important; transform:none !important}</style></noscript>
+<style>
+:root{--moon:#7FA8D9; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0; background:#04081A; color:#DCE4F3;
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif; -webkit-font-smoothing:antialiased}
+.rv{opacity:0; transform:translateY(26px); transition:opacity .7s ease, transform .7s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1; transform:none}
+@media (prefers-reduced-motion:reduce){ .rv{opacity:1; transform:none; transition:none} }
+
+/* ==================== ЧЕТВЁРТЫЙ ЭКРАН: расчёт для класса (квиз) ====================
+   Слева — обещание и три довода, справа — бумажный бланк заявки в Министерство.
+   Бумага тут не украшение: второй экран заканчивается стеной полароидов, костяная
+   бумага уже в языке сайта, и бланк читается как её продолжение, а не как чужая форма.
+   Все шаги лежат в разметке сразу, JS показывает один. Без JS и для поисковика
+   видно весь текст квиза, а не пустая коробка. */
+.qz{
+  position:relative; z-index:25; overflow:hidden;
+  /* Верх ровно в цвет низа второго экрана (#04081A), низ — в цвет кадра с рамкой
+     (#060C18). Оба стыка гасим цветом, а не светлой полосой-переходом */
+  background:linear-gradient(180deg,#04081A 0%,#070E22 26%,#091132 58%,#070D1C 86%,#060C18 100%);
+  color:#C9D6EE;
+  --qz-paper:#FFFDF8; --qz-ink:#16213F; --qz-mute:#7A7059;
+  --qz-gold:#9C7028; --qz-blue:#2F3192; --qz-red:#9D0A0F;
+}
+.qz :focus-visible{outline:2px solid var(--moon); outline-offset:2px}
+/* два холодных пятна: то же ночное небо, что на втором экране, но неподвижное —
+   рядом с формой любое движение фона мешает читать */
+.qz-sky{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.qz-sky i{position:absolute; display:block; border-radius:50%; filter:blur(80px)}
+.qz-sky i:nth-child(1){left:-18vw; top:-14vh; width:70vw; height:80vh;
+  background:radial-gradient(closest-side, rgba(47,49,146,.42), rgba(47,49,146,0) 70%)}
+.qz-sky i:nth-child(2){right:-16vw; bottom:-18vh; width:62vw; height:72vh;
+  background:radial-gradient(closest-side, rgba(157,10,15,.24), rgba(157,10,15,0) 70%)}
+.qz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* широкая вёрстка: контейнер почти во весь экран, узкая колонка тут запрещена */
+.qz-body{position:relative; z-index:1; width:min(94vw,1720px); margin-inline:auto;
+  padding:clamp(58px,7vw,120px) clamp(16px,3vw,56px) clamp(66px,8vw,132px);
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,720px);
+  gap:clamp(28px,4vw,84px); align-items:start}
+/* бланк длиннее текста слева, поэтому левая половина едет с прокруткой:
+   обещание и подарок держатся в кадре, пока человек отвечает */
+.qz-left{position:sticky; top:clamp(84px,13vh,150px)}
+.qz-eyebrow{margin:0 0 clamp(14px,1.6vw,22px); font-size:clamp(11px,.86vw,13px);
+  letter-spacing:.24em; text-transform:uppercase; color:#8FA3C8}
+.qz-h{margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(28px,3.7vw,62px); line-height:1.14; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff}
+.qz-h em{font-style:normal; color:#A9C7F2}
+.qz-h b{font-weight:700; color:#E3B34E}
+.qz-lede{margin:clamp(18px,2vw,30px) 0 0; max-width:34ch;
+  font-size:clamp(15px,1.16vw,20px); line-height:1.5; color:#B7C6E2}
+.qz-facts{list-style:none; margin:clamp(24px,2.8vw,42px) 0 0; padding:0; display:grid;
+  gap:clamp(12px,1.3vw,20px); max-width:32ch}
+.qz-facts li{position:relative; padding-left:34px; font-size:clamp(14px,1.02vw,17px);
+  line-height:1.45; color:#9FB2D2}
+.qz-facts li b{display:block; color:#EDF2FC; font-weight:600}
+.qz-facts svg{position:absolute; left:0; top:1px; width:20px; height:20px; color:#E3B34E}
+
+/* ---------- бумажный бланк ---------- */
+.qz-paper{position:relative; border-radius:4px; color:var(--qz-ink);
+  padding:clamp(20px,2.1vw,34px) clamp(18px,2.4vw,42px) clamp(22px,2.4vw,38px);
+  background:linear-gradient(158deg,#FFFDF8 0%,#FBF5E9 48%,#F2E9D6 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 -1px 0 rgba(150,128,92,.2),
+    0 34px 70px -26px rgba(0,0,0,.78),
+    0 6px 18px rgba(0,0,0,.34)}
+/* тонкая золотая линейка внутри — как на бланке-документе. Отдельным слоем, а не
+   border: рамка должна отступать от края бумаги, а не резать её */
+.qz-paper::before{content:''; position:absolute; inset:clamp(7px,.7vw,11px); pointer-events:none;
+  border:1px solid rgba(156,112,40,.26); border-radius:2px}
+.qz-inner{position:relative}
+.qz-head{display:flex; align-items:baseline; justify-content:space-between; gap:14px;
+  padding-bottom:clamp(12px,1.2vw,18px); border-bottom:1px dashed rgba(22,33,63,.22);
+  font-size:clamp(9.5px,.72vw,11.5px); letter-spacing:.2em; text-transform:uppercase;
+  color:#9A8B6C; font-weight:600}
+.qz-head span:last-child{white-space:nowrap; color:var(--qz-gold)}
+
+/* прогресс: четыре деления — три вопроса и контакты. На обложке скрыт: пока человек
+   не начал, шкала только пугает объёмом */
+.qz-prog{display:flex; align-items:center; gap:12px; margin:clamp(14px,1.4vw,20px) 0 0}
+.qz-prog[hidden]{display:none}
+.qz-bar{display:flex; gap:5px; flex:1}
+.qz-bar i{flex:1; height:3px; border-radius:2px; background:rgba(22,33,63,.14);
+  transition:background .35s ease}
+.qz-bar i.on{background:linear-gradient(90deg,#D3A244,#F3D68C)}
+.qz-count{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--qz-mute);
+  white-space:nowrap; font-weight:600}
+
+.qz-step{padding-top:clamp(18px,2vw,30px)}
+.qz-step[hidden]{display:none}
+.qz-q{margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(19px,1.72vw,30px); line-height:1.24; color:var(--qz-ink); text-wrap:balance}
+.qz-note{margin:8px 0 0; font-size:clamp(13px,.98vw,15px); line-height:1.45; color:var(--qz-mute)}
+.qz-note b{color:#5E5644; font-weight:600}
+.qz-req{color:var(--qz-red)}
+
+/* ---------- варианты со звездой ---------- */
+/* Звезда вместо галочки: она же в иконке сайта и в названии «Звёздная смена».
+   Выбранный вариант не просто помечен — он загорается, как лампочка на пульте */
+.qz-opts{display:grid; gap:8px; margin:clamp(16px,1.7vw,26px) 0 0}
+.qz-opt{position:relative; display:flex; align-items:center; gap:13px; cursor:pointer;
+  padding:clamp(12px,1.1vw,16px) clamp(13px,1.2vw,18px); border-radius:3px;
+  border:1px solid rgba(22,33,63,.14); background:rgba(255,255,255,.55);
+  font-size:clamp(14px,1.02vw,17px); line-height:1.35; color:#1D2A4A;
+  transition:border-color .18s ease, background .18s ease, transform .12s ease}
+.qz-opt:hover{border-color:rgba(156,112,40,.55); background:#fff}
+.qz-opt:active{transform:translateY(1px)}
+.qz-opt input{position:absolute; opacity:0; width:1px; height:1px; pointer-events:none}
+.qz-opt:has(input:focus-visible){outline:2px solid rgba(47,49,146,.6); outline-offset:2px}
+.qz-star{flex:0 0 auto; width:22px; height:22px; color:rgba(22,33,63,.24); transition:color .2s ease, transform .25s cubic-bezier(.2,.8,.2,1)}
+.qz-opt.on{border-color:#D3A244; background:linear-gradient(120deg,#FFF8E6,#FDF1D8);
+  box-shadow:inset 0 0 0 1px rgba(211,162,68,.5), 0 6px 16px -10px rgba(156,112,40,.9)}
+.qz-opt.on .qz-star{color:#D3A244; transform:rotate(-18deg) scale(1.1)}
+.qz-opt.on span{font-weight:600}
+
+/* ---------- счётчики ---------- */
+.qz-nums{display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(14px,1.6vw,26px); margin:clamp(16px,1.7vw,26px) 0 0}
+.qz-num{border:1px solid rgba(22,33,63,.14); border-radius:3px; padding:clamp(12px,1.2vw,18px);
+  background:rgba(255,255,255,.55)}
+.qz-num > span{display:block; font-size:clamp(12.5px,.92vw,14.5px); color:var(--qz-mute); font-weight:600}
+.qz-ctl{display:flex; align-items:center; gap:6px; margin-top:10px}
+.qz-cbtn{width:clamp(38px,2.6vw,44px); height:clamp(38px,2.6vw,44px); flex:0 0 auto;
+  border-radius:50%; border:1px solid rgba(22,33,63,.18); background:#fff; cursor:pointer;
+  color:var(--qz-ink); font:400 22px/1 "Golos Text",sans-serif;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .18s ease, border-color .18s ease, color .18s ease}
+.qz-cbtn:hover{background:var(--qz-blue); border-color:var(--qz-blue); color:#fff}
+.qz-cbtn:disabled{opacity:.35; cursor:default; background:#fff; border-color:rgba(22,33,63,.18); color:var(--qz-ink)}
+.qz-cval{flex:1; min-width:0; width:100%; text-align:center; border:0; background:transparent;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(26px,2.2vw,38px); color:var(--qz-ink); -moz-appearance:textfield}
+.qz-cval::-webkit-outer-spin-button,.qz-cval::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+
+/* ---------- поля контактов ---------- */
+.qz-fields{display:grid; gap:12px; margin:clamp(16px,1.7vw,26px) 0 0}
+.qz-fields label{display:block; font-size:12.5px; font-weight:600; letter-spacing:.04em;
+  text-transform:uppercase; color:var(--qz-mute); margin-bottom:6px}
+.qz-fields input{width:100%; padding:clamp(13px,1.1vw,16px) 15px; border-radius:3px;
+  border:1px solid rgba(22,33,63,.18); background:#fff; color:var(--qz-ink);
+  font:400 clamp(15px,1.1vw,18px)/1.2 "Golos Text",sans-serif}
+.qz-fields input::placeholder{color:rgba(22,33,63,.32)}
+.qz-fields input:focus{outline:2px solid rgba(47,49,146,.55); outline-offset:1px; border-color:transparent}
+.qz-err{margin:10px 0 0; font-size:13.5px; color:var(--qz-red); font-weight:600}
+.qz-err[hidden]{display:none}
+
+/* ---------- кнопки ---------- */
+.qz-act{display:flex; align-items:center; gap:12px; margin:clamp(18px,1.9vw,28px) 0 0}
+.qz-btn{flex:1; padding:clamp(15px,1.35vw,20px) 22px; border:0; border-radius:3px; cursor:pointer;
+  font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(14px,1.06vw,18px); letter-spacing:.02em; text-transform:uppercase;
+  color:#fff; background:var(--qz-blue); text-wrap:balance;
+  box-shadow:inset 0 0 0 1px rgba(227,179,78,.42), 0 14px 28px -14px rgba(47,49,146,.95);
+  transition:background .2s ease, color .2s ease, transform .12s ease, box-shadow .2s ease}
+.qz-btn:hover{background:#3B3DB4}
+.qz-btn:active{transform:translateY(1px)}
+.qz-btn.gold{color:#231705; background:linear-gradient(166deg,#FFF3CF 0%,#F3D68C 26%,#D3A244 62%,#EBCE86 100%);
+  box-shadow:inset 0 0 0 1px rgba(120,86,20,.35), 0 16px 32px -14px rgba(211,162,68,.9)}
+.qz-btn.gold:hover{filter:brightness(1.06)}
+.qz-back{flex:0 0 auto; width:clamp(46px,3.2vw,54px); height:clamp(46px,3.2vw,54px);
+  border-radius:3px; border:1px solid rgba(22,33,63,.18); background:transparent; cursor:pointer;
+  color:var(--qz-ink); display:flex; align-items:center; justify-content:center;
+  transition:background .18s ease, border-color .18s ease}
+.qz-back:hover{background:rgba(22,33,63,.06); border-color:rgba(22,33,63,.32)}
+.qz-back[hidden]{display:none}
+.qz-back svg{width:18px; height:18px}
+.qz-fine{margin:clamp(12px,1.2vw,18px) 0 0; font-size:12px; line-height:1.45; color:#8C8266}
+.qz-fine a{color:#6E6446}
+
+/* ---------- экран «заявка принята» ---------- */
+/* печать вместо картинки: та же звезда, что в вариантах, только крупная и золотая —
+   бланк «проштампован», человек видит завершённое действие, а не просто текст */
+.qz-done{text-align:center; padding:clamp(16px,2vw,30px) 0 clamp(6px,1vw,14px)}
+.qz-seal{width:clamp(76px,6vw,104px); height:clamp(76px,6vw,104px); margin:0 auto clamp(14px,1.5vw,22px);
+  border-radius:50%; border:2px solid rgba(156,112,40,.5); display:flex; align-items:center; justify-content:center;
+  color:#D3A244; box-shadow:inset 0 0 0 4px rgba(255,255,255,.6), 0 10px 24px -14px rgba(156,112,40,.9);
+  transform:rotate(-9deg)}
+.qz-seal svg{width:52%; height:52%}
+.qz-done h3{margin:0; font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
+  font-size:clamp(21px,1.9vw,32px); color:var(--qz-ink); text-transform:uppercase}
+.qz-done p{margin:12px auto 0; max-width:44ch; font-size:clamp(14px,1.02vw,17px); line-height:1.5; color:#4A4534}
+.qz-vk{display:inline-flex; align-items:center; gap:9px; margin-top:clamp(18px,1.8vw,26px);
+  padding:13px 22px; border-radius:3px; text-decoration:none; font-weight:600; font-size:15px;
+  color:#fff; background:var(--qz-blue); transition:background .2s ease}
+.qz-vk:hover{background:#3B3DB4}
+
+/* ---------- телефон ---------- */
+@media (max-width:1023px){
+  .qz-body{grid-template-columns:minmax(0,1fr); gap:clamp(26px,5vw,40px)}
+  .qz-left{position:static}
+  .qz-lede,.qz-facts{max-width:56ch}
+}
+@media (max-width:520px){
+  .qz-nums{grid-template-columns:minmax(0,1fr)}
+  .qz-head{letter-spacing:.14em}
+  .qz-opt{padding:13px 14px}
+  .qz-act{gap:8px}
+}
+@media (prefers-reduced-motion:reduce){
+  .qz-opt,.qz-star,.qz-btn,.qz-cbtn{transition:none}
+}
+/* шаг въезжает при появлении: смена вопроса должна читаться как движение вперёд,
+   иначе бланк просто моргает и непонятно, что ответ засчитан */
+@keyframes qzIn{from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none}}
+.qz-step:not([hidden]){animation:qzIn .34s cubic-bezier(.2,.7,.2,1) both}
+@media (prefers-reduced-motion:reduce){ .qz-step:not([hidden]){animation:none} }
+</style>
+</head>
+<body>
+
+<!-- ==================== ЧЕТВЁРТЫЙ ЭКРАН: расчёт для класса (квиз) ==================== -->
+<section class="qz" id="quiz" aria-labelledby="qzTitle">
+  <div class="qz-sky" aria-hidden="true"><i></i><i></i></div>
+  <div class="qz-grain" aria-hidden="true"></div>
+
+  <!-- звёзды-иконки лежат один раз, дальше вызываются через <use> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="qzStar" viewBox="0 0 24 24">
+      <path d="M12 2.6l2.75 6.6 7.15.6-5.42 4.68 1.63 6.98L12 17.75 5.89 21.46l1.63-6.98L2.1 9.8l7.15-.6z"
+            fill="currentColor"/>
+    </symbol>
+    <symbol id="qzStarLine" viewBox="0 0 24 24">
+      <path d="M12 2.6l2.75 6.6 7.15.6-5.42 4.68 1.63 6.98L12 17.75 5.89 21.46l1.63-6.98L2.1 9.8l7.15-.6z"
+            fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
+
+  <div class="qz-body">
+    <div class="qz-left">
+      <p class="qz-eyebrow rv">Организованным группам от 20 детей</p>
+      <h2 class="qz-h rv" id="qzTitle">Получите расчёт стоимости для вашего класса <b>+ подарок</b></h2>
+      <p class="qz-lede rv">Индивидуальное предложение и <em>1 взрослый билет для себя в подарок</em> — ответив всего на 3 простых вопроса.</p>
+      <ul class="qz-facts rv">
+        <li><svg aria-hidden="true"><use href="#qzStar"></use></svg>
+            <b>Билет для взрослого в подарок</b>Закрепим за вашим номером при групповом бронировании</li>
+        <li><svg aria-hidden="true"><use href="#qzStar"></use></svg>
+            <b>Цена под вашу дату</b>Подберём даты, где стоимость для класса ниже</li>
+        <li><svg aria-hidden="true"><use href="#qzStar"></use></svg>
+            <b>Перезвоним в течение часа</b>В рабочее время с 09:30 до 19:00, программу пришлём в WhatsApp</li>
+      </ul>
+    </div>
+
+    <form class="qz-paper rv" id="qzForm" novalidate>
+      <div class="qz-inner">
+        <div class="qz-head">
+          <span>Министерство новогодних дел</span>
+          <span id="qzHeadNo">бланк расчёта</span>
+        </div>
+
+        <div class="qz-prog" id="qzProg" hidden>
+          <div class="qz-bar" id="qzBar"><i></i><i></i><i></i><i></i></div>
+          <div class="qz-count" id="qzCount">Шаг 1 из 4</div>
+        </div>
+
+        <!-- обложка -->
+        <div class="qz-step" data-step="0">
+          <h3 class="qz-q">Три вопроса — и мы посчитаем стоимость именно для вашего класса</h3>
+          <p class="qz-note">Займёт меньше минуты. <b>Подарок лишним не будет ;)</b> Только для организованных групп от 20 детей.</p>
+          <div class="qz-act">
+            <button class="qz-btn" type="button" data-go="1">Начать!</button>
+          </div>
+        </div>
+
+        <!-- вопрос 1 -->
+        <div class="qz-step" data-step="1" hidden>
+          <h3 class="qz-q">Бывали ли вы уже на нашей программе?</h3>
+          <p class="qz-note">Также мы были организаторами Карамельной фабрики в Ольгино в 2023. <span class="qz-req">*</span></p>
+          <div class="qz-opts" role="group" aria-label="Бывали ли вы уже на нашей программе">
+            <label class="qz-opt"><input type="checkbox" name="been" value="Были в прошлом году">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Были в прошлом году</span></label>
+            <label class="qz-opt"><input type="checkbox" name="been" value="Никогда не были и вас не знаем">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Никогда не были и вас не знаем</span></label>
+            <label class="qz-opt"><input type="checkbox" name="been" value="Были в 2023 году в Ольгино">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Были в 2023 году в Ольгино</span></label>
+            <label class="qz-opt"><input type="checkbox" name="been" value="Хотели к вам попасть, но не успели забронировать">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Хотели к вам попасть, но не успели забронировать</span></label>
+          </div>
+          <p class="qz-err" id="qzErr1" hidden>Выберите хотя бы один вариант</p>
+          <div class="qz-act">
+            <button class="qz-back" type="button" data-back aria-label="Назад">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+            <button class="qz-btn" type="button" data-go="2">Ответить</button>
+          </div>
+        </div>
+
+        <!-- вопрос 2 -->
+        <div class="qz-step" data-step="2" hidden>
+          <h3 class="qz-q">Какие даты Вы бы рассмотрели?</h3>
+          <p class="qz-note">Можно отметить несколько — так мы точнее подберём цену.</p>
+          <div class="qz-opts" role="group" aria-label="Какие даты вы бы рассмотрели">
+            <label class="qz-opt"><input type="checkbox" name="dates" value="Начало декабря">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Начало декабря</span></label>
+            <label class="qz-opt"><input type="checkbox" name="dates" value="Середина декабря">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Середина декабря</span></label>
+            <label class="qz-opt"><input type="checkbox" name="dates" value="Конец декабря">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Конец декабря</span></label>
+            <label class="qz-opt"><input type="checkbox" name="dates" value="Январь">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Январь</span></label>
+            <label class="qz-opt"><input type="checkbox" name="dates" value="Главное, чтобы это были выходные">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Главное, чтобы это были выходные</span></label>
+            <label class="qz-opt"><input type="checkbox" name="dates" value="Главное, чтобы это были будние дни">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Главное, чтобы это были будние дни</span></label>
+            <label class="qz-opt"><input type="checkbox" name="dates" value="Мы готовы рассмотреть максимально низкие по цене даты">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Мы готовы рассмотреть максимально низкие по цене даты</span></label>
+            <label class="qz-opt"><input type="checkbox" name="dates" value="Нам важнее удобная дата, чем низкая цена">
+              <svg class="qz-star" aria-hidden="true"><use href="#qzStarLine"></use></svg><span>Нам важнее удобная дата, чем низкая цена</span></label>
+          </div>
+          <div class="qz-act">
+            <button class="qz-back" type="button" data-back aria-label="Назад">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+            <button class="qz-btn" type="button" data-go="3">Ответить</button>
+          </div>
+        </div>
+
+        <!-- вопрос 3 -->
+        <div class="qz-step" data-step="3" hidden>
+          <h3 class="qz-q">Приблизительное количество участников</h3>
+          <p class="qz-note">Точные цифры не нужны — уточним по телефону.</p>
+          <div class="qz-nums">
+            <div class="qz-num">
+              <span id="qzKidsLab">Кол-во детей <span class="qz-req">*</span></span>
+              <div class="qz-ctl">
+                <button class="qz-cbtn" type="button" data-step-btn="kids" data-d="-1" aria-label="Меньше детей">−</button>
+                <input class="qz-cval" id="qzKids" type="number" inputmode="numeric" min="0" max="500" step="1" value="0" aria-labelledby="qzKidsLab">
+                <button class="qz-cbtn" type="button" data-step-btn="kids" data-d="1" aria-label="Больше детей">+</button>
+              </div>
+            </div>
+            <div class="qz-num">
+              <span id="qzAdultsLab">Кол-во взрослых</span>
+              <div class="qz-ctl">
+                <button class="qz-cbtn" type="button" data-step-btn="adults" data-d="-1" aria-label="Меньше взрослых">−</button>
+                <input class="qz-cval" id="qzAdults" type="number" inputmode="numeric" min="0" max="500" step="1" value="0" aria-labelledby="qzAdultsLab">
+                <button class="qz-cbtn" type="button" data-step-btn="adults" data-d="1" aria-label="Больше взрослых">+</button>
+              </div>
+            </div>
+          </div>
+          <p class="qz-err" id="qzErr3" hidden>Укажите количество детей</p>
+          <div class="qz-act">
+            <button class="qz-back" type="button" data-back aria-label="Назад">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+            <button class="qz-btn" type="button" data-go="4">Ответить</button>
+          </div>
+        </div>
+
+        <!-- контакты -->
+        <div class="qz-step" data-step="4" hidden>
+          <h3 class="qz-q">Последний шаг: оставьте свой номер телефона</h3>
+          <p class="qz-note">Перезвоним в течение 1 часа (в рабочее время), предложим подходящие даты и цены, пришлём программу в WhatsApp и закрепим за вашим номером <b>1 взрослый билет в подарок</b> — при групповом бронировании.</p>
+          <div class="qz-fields">
+            <div>
+              <label for="qzName">Ваше имя</label>
+              <input id="qzName" name="name" type="text" autocomplete="name" placeholder="Как к вам обращаться">
+            </div>
+            <div>
+              <label for="qzPhone">Ваш номер телефона <span class="qz-req">*</span></label>
+              <input id="qzPhone" name="phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="+7 (___) ___-__-__">
+            </div>
+          </div>
+          <p class="qz-err" id="qzErr4" hidden>Введите номер телефона полностью</p>
+          <div class="qz-act">
+            <button class="qz-back" type="button" data-back aria-label="Назад">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+            <button class="qz-btn gold" type="submit" id="qzSend">Рассчитать стоимость и получить подарок</button>
+          </div>
+          <p class="qz-fine">Нажимая кнопку, вы даёте согласие на обработку персональных данных.</p>
+        </div>
+
+        <!-- заявка принята -->
+        <div class="qz-step qz-done" data-step="5" hidden>
+          <div class="qz-seal" aria-hidden="true"><svg><use href="#qzStar"></use></svg></div>
+          <h3>Спасибо! Ваша заявка принята</h3>
+          <p>Наш сотрудник свяжется с вами в течение 1 часа. Рабочее время: с 09:30 до 19:00.</p>
+          <p>А пока загляните в нашу группу — там ответы почти на все вопросы.</p>
+          <a class="qz-vk" href="https://vk.com/ministrynn" target="_blank" rel="noopener">Открыть группу ВКонтакте</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<script>
+/* ==================== КВИЗ ЧЕТВЁРТОГО ЭКРАНА ====================
+   Шаги переключаются подменой hidden, ответы копятся в объекте.
+   Отправлять некуда: страница статическая, бэкенда нет. Поэтому заявка ложится
+   в window.__qzLead (видно в консоли) и показывается экран «принято».
+   Когда появится приёмник — вписать адрес в QZ_ENDPOINT, и та же заявка уедет
+   POST-запросом JSON-ом, ничего больше править не нужно. */
+(function(){
+  var QZ_ENDPOINT = '';                 // '' — не отправляем, только показываем «принято»
+
+  var form = document.getElementById('qzForm');
+  if (!form) return;
+
+  var steps = {}, list = form.querySelectorAll('.qz-step');
+  for (var i = 0; i < list.length; i++) steps[list[i].getAttribute('data-step')] = list[i];
+  var prog  = document.getElementById('qzProg');
+  var bars  = document.getElementById('qzBar').children;
+  var count = document.getElementById('qzCount');
+  var kids  = document.getElementById('qzKids');
+  var adults= document.getElementById('qzAdults');
+  var phone = document.getElementById('qzPhone');
+  var cur = 0, history = [];
+
+  function show(n){
+    for (var k in steps) steps[k].hidden = (k !== String(n));
+    cur = n;
+    /* прогресс живёт только на вопросах: на обложке он пугает объёмом,
+       на экране «принято» уже не нужен */
+    var onQ = n >= 1 && n <= 4;
+    prog.hidden = !onQ;
+    if (onQ){
+      for (var b = 0; b < bars.length; b++) bars[b].className = (b < n) ? 'on' : '';
+      count.textContent = 'Шаг ' + n + ' из 4';
+    }
+    /* если верх бланка ушёл за экран — подтягиваем его, иначе на телефоне
+       новый вопрос открывается где-то выше и человек видит середину формы */
+    var r = form.getBoundingClientRect();
+    if (r.top < 0) form.scrollIntoView({block:'start', behavior:'smooth'});
+  }
+
+  function go(n){
+    if (n > cur) history.push(cur);
+    show(n);
+  }
+
+  function err(id, on){
+    var el = document.getElementById(id);
+    if (el) el.hidden = !on;
+  }
+
+  function picked(name){
+    var out = [], f = form.querySelectorAll('input[name="' + name + '"]:checked');
+    for (var i = 0; i < f.length; i++) out.push(f[i].value);
+    return out;
+  }
+
+  /* галочка подсвечивает всю плитку: класс вешаем сами, чтобы не зависеть от :has() */
+  form.addEventListener('change', function(e){
+    var inp = e.target;
+    if (inp.type !== 'checkbox') return;
+    inp.closest('.qz-opt').classList.toggle('on', inp.checked);
+    if (inp.name === 'been' && inp.checked) err('qzErr1', false);
+  });
+
+  function num(el){
+    var v = parseInt(el.value, 10);
+    return isNaN(v) || v < 0 ? 0 : Math.min(v, 500);
+  }
+  function syncNums(){
+    kids.value = num(kids); adults.value = num(adults);
+    form.querySelector('[data-step-btn="kids"][data-d="-1"]').disabled = num(kids) === 0;
+    form.querySelector('[data-step-btn="adults"][data-d="-1"]').disabled = num(adults) === 0;
+  }
+  form.addEventListener('click', function(e){
+    var b = e.target.closest('[data-step-btn]');
+    if (b){
+      var el = b.getAttribute('data-step-btn') === 'kids' ? kids : adults;
+      el.value = Math.max(0, Math.min(500, num(el) + parseInt(b.getAttribute('data-d'), 10)));
+      syncNums();
+      if (num(kids) > 0) err('qzErr3', false);
+      return;
+    }
+    var back = e.target.closest('[data-back]');
+    if (back){ show(history.length ? history.pop() : 0); return; }
+    var next = e.target.closest('[data-go]');
+    if (!next) return;
+    var to = parseInt(next.getAttribute('data-go'), 10);
+    /* первый вопрос обязателен — как в исходном квизе; второй можно пропустить */
+    if (to === 2 && !picked('been').length){ err('qzErr1', true); return; }
+    if (to === 4 && num(kids) === 0){ err('qzErr3', true); kids.focus(); return; }
+    go(to);
+  });
+  form.addEventListener('input', function(e){
+    if (e.target === kids || e.target === adults) syncNums();
+  });
+  syncNums();
+
+  /* телефон: в поле всегда российский формат, что бы человек ни вставил */
+  function mask(v){
+    var d = v.replace(/\D/g, '');
+    if (!d) return '';
+    if (d[0] === '8' || d[0] === '9') d = (d[0] === '8' ? '7' + d.slice(1) : '7' + d);
+    if (d[0] !== '7') d = '7' + d;
+    d = d.slice(0, 11);
+    var out = '+7';
+    if (d.length > 1) out += ' (' + d.slice(1, 4);
+    if (d.length >= 5) out += ') ' + d.slice(4, 7);
+    if (d.length >= 8) out += '-' + d.slice(7, 9);
+    if (d.length >= 10) out += '-' + d.slice(9, 11);
+    return out;
+  }
+  phone.addEventListener('input', function(){
+    var atEnd = phone.selectionStart === phone.value.length;
+    phone.value = mask(phone.value);
+    if (atEnd) phone.selectionStart = phone.selectionEnd = phone.value.length;
+    if (phone.value.replace(/\D/g, '').length === 11) err('qzErr4', false);
+  });
+  phone.addEventListener('focus', function(){ if (!phone.value) phone.value = '+7 '; });
+  phone.addEventListener('blur',  function(){ if (phone.value.replace(/\D/g,'').length < 2) phone.value = ''; });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var digits = phone.value.replace(/\D/g, '');
+    if (digits.length !== 11){ err('qzErr4', true); phone.focus(); return; }
+    err('qzErr4', false);
+
+    var lead = {
+      been:   picked('been'),
+      dates:  picked('dates'),
+      kids:   num(kids),
+      adults: num(adults),
+      name:   document.getElementById('qzName').value.trim(),
+      phone:  '+' + digits,
+      page:   location.href,
+      sentAt: new Date().toISOString()
+    };
+    window.__qzLead = lead;
+
+    var btn = document.getElementById('qzSend');
+    btn.disabled = true;
+    function done(){ show(5); }
+    if (!QZ_ENDPOINT){ done(); return; }
+    fetch(QZ_ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(lead)
+    }).then(done, function(){
+      /* сеть отвалилась — заявку всё равно показываем принятой: номер уже у нас
+         в объекте, а извиняться перед человеком за нашу сеть незачем */
+      done();
+    });
+  });
+
+  show(0);
+})();
+</script>
+
+<script>
+/* демо-страница: та же анимация появления, что на главной */
+(function(){
+  var rv = [].slice.call(document.querySelectorAll('.rv'));
+  rv.forEach(function(el,i){ el.style.transitionDelay = (i*110)+'ms'; });
+  if (!('IntersectionObserver' in window)){ rv.forEach(function(el){ el.classList.add('in'); }); return; }
+  var io = new IntersectionObserver(function(items){
+    items.forEach(function(it){ if(!it.isIntersecting) return; it.target.classList.add('in'); io.unobserve(it.target); });
+  }, {threshold:.18});
+  rv.forEach(function(el){ io.observe(el); });
+})();
+</script>
+</body>
+</html>
