@@ -568,14 +568,17 @@ body{
   .cr-map-img{left:11.2%; top:11.35%; width:215.7%; max-width:none}
   .cr-lines{display:none}                       /* на крупной карте выноски не нужны */
   .cr-city{left:var(--mx,var(--x)); top:var(--my,var(--y))}
-  .cr-city b{font-size:14px; font-size:max(13px, 3.7cqw)}
+  /* пороги max() — не про макет, а про читаемость: макет нарисован шириной
+     1080 px, телефон показывает его втрое мельче, и пропорция даёт 9 px
+     у «Впервые!». Ниже 15/11 px опускаться нельзя, это продающие строки */
+  .cr-city b{font-size:15px; font-size:max(15px, 3.7cqw)}
   .cr-city em{
     top:calc(100% + 6px); top:calc(100% + 1.5cqw);
-    font-size:9.5px; font-size:max(9.5px, 2.35cqw);
+    font-size:11px; font-size:max(11px, 2.35cqw);
   }
   .cr-city i{
     bottom:calc(100% + 5px); bottom:calc(100% + 1.3cqw);
-    font-size:9.5px; font-size:max(9.5px, 2.35cqw);
+    font-size:11px; font-size:max(11px, 2.35cqw);
   }
   .cr-city::before{
     right:calc(100% + 3px); right:calc(100% + .8cqw);
@@ -596,6 +599,7 @@ body{
   /* главный офис: пунктирная рамка вокруг подписи и багровый отсвет под ней */
   .cr-city[data-city="nizhny"]::after{
     right:auto; margin-top:0; width:auto; height:auto;
+    left:-18px; right:-11px; top:-33px; bottom:-26px;
     left:-4.7cqw; right:-2.8cqw; top:-8.6cqw; bottom:-6.9cqw;
     border:1px dashed rgba(255,255,255,.5); border-radius:26px;
     border-width:max(1px, .19cqw); border-radius:3.7cqw;
