@@ -301,34 +301,21 @@ body{
 :focus-visible{outline:2px solid var(--moon); outline-offset:3px}
 
 /* ==================== ВТОРОЙ ЭКРАН: «Как это было в прошлом году» ==================== */
-/* Повтор второго экрана старого сайта: сугробы, красно-синий заголовок, лента полароидов */
-/* сугробы наезжают на низ последнего кадра первого экрана — шва между экранами нет.
-   z-index выше всех слоёв сцены (их максимум 20), но ниже шапки (30) */
-.ls-snowband{position:relative; z-index:25; margin-top:-14vh; pointer-events:none}
+/* Второй экран: ночное небо, заголовок, цифры сезона, стена полароидов */
+/* Сугробы отсюда убраны. Они были мостиком из тёмной сцены в БЕЛОЕ поле: без них
+   на стыке стояла жёсткая граница ночь/белизна. Второй экран стал тёмным, мостик
+   потерял работу — и молочная полоса на стыке двух ночей читалась заплаткой.
+   Теперь ночь просто продолжается: z-index секции по-прежнему выше слоёв сцены
+   (их максимум 20) и ниже шапки (30) */
 /* база нарочно плоская: любой заметный градиент на четыре экрана высоты даст полосу.
    Зерно одной картинкой — без него длинные мягкие переходы на тёмно-синем идут
    ступеньками: глаз в тенях ловит разницу в один уровень. Шум обесцвечен, цветная
    крупа на почти одноцветном фоне читается грязью */
 .ls{position:relative; background:#0A1129; color:#C9D6EE; z-index:25;
   --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E")}
-/* наезд отменяется и по ширине, и по классу .touch (его ставит JS): на тач-устройствах
-   ролик играет сам, и снег закрывал бы живое видео — в т.ч. на iPad шире 820px */
-@media (max-width:820px){ .ls-snowband{margin-top:0} }
-.touch .ls-snowband{margin-top:0}
 /* секция снова тёмная — лунная рамка шапки здесь видна лучше собственной */
 .ls :focus-visible{outline-color:var(--moon)}
 .ls ::selection{background:rgba(127,168,217,.34); color:#fff}
-/* сугробы: ночь первого экрана оседает в ночной снег.
-   Чистый белый над тёмно-синим давал бы жёсткую ступеньку, да и снег ночью не белый —
-   он ловит луну и уходит в синюю тень. Цвет задан из CSS: свойство fill перебивает
-   одноимённый атрибут в теге, саму разметку SVG трогать не нужно.
-   Порядок путей: дальний гребень — средний — ближний, до дна кадра */
-.ls-snow{display:block; width:100%; height:clamp(84px,13vw,190px)}
-.ls-snow svg{display:block; width:100%; height:100%}
-.ls-snow svg path:nth-of-type(1){fill:#8FA9CE}
-.ls-snow svg path:nth-of-type(2){fill:#B9CDE6}
-.ls-snow svg path:nth-of-type(3){fill:#EAF2FB}
-
 /* ---------- ночное небо второго экрана ----------
    ГЛАВНОЕ РЕШЕНИЕ. Свет НЕ лежит в фоне секции. Секция высотой почти в четыре экрана:
    любое пятно, положенное в background у .ls, растянется на всю её длину, и человек
@@ -399,13 +386,6 @@ body{
    Лежит НАД пятнами и швами, ПОД контентом: полароиды и текст зерном не трогаются */
 .ls-grain{position:absolute; inset:0; z-index:-1; pointer-events:none;
   opacity:.05; background:var(--grain) 0 0/140px 140px repeat}
-/* ШОВ СВЕРХУ: полоса начинается ровно тем цветом, которым кончаются сугробы, и валится
-   в базу. Основное падение в первой половине: крутой переход бэндингом не идёт,
-   а пологий на тёмно-синем полосит */
-.ls::before{content:''; position:absolute; z-index:-2; left:0; right:0; top:0;
-  height:clamp(80px,11vh,180px); pointer-events:none;
-  background:linear-gradient(180deg, #EAF2FB 0%, #CFDEF0 13%, #92AACB 29%, #55709F 45%,
-    #2E4272 61%, #182747 78%, rgba(10,17,41,0) 100%)}
 /* ШОВ СНИЗУ: разводим по светлоте ВНИЗ, а не вверх. Плёнка третьего экрана поверх
    фотоколлажа даёт примерно #262A2E, наш низ — #04081A: третий экран открывается
    заметно светлее, шов читается как горизонт, экраны не сливаются. Заодно последний
@@ -419,9 +399,9 @@ body{
       rgba(5,9,22,.86) 72%, rgba(4,8,20,.97) 88%, #04081A 100%)}
 /* нижний отступ был рассчитан на слайдер; стена идёт сразу за подзаголовком,
    поэтому воздуха снизу нужно меньше */
-/* воздуха между снегом и заголовком нужно больше, чем было на белом:
-   на тёмном заголовок иначе садится прямо в отсвет снега */
-.ls-body{max-width:1240px; margin:0 auto; padding:clamp(52px,7vw,104px) clamp(18px,4vw,44px) clamp(14px,2vw,30px)}
+/* секция начинается сразу за последним кадром сцены, поэтому воздух над заголовком
+   отбивает его от неба, а не от снега */
+.ls-body{max-width:1240px; margin:0 auto; padding:clamp(64px,8vw,124px) clamp(18px,4vw,44px) clamp(14px,2vw,30px)}
 .ls-title{
   margin:0 auto; text-align:center;
   font-family:"M PLUS Rounded 1c","Rubik",Arial,sans-serif; font-weight:700;
@@ -647,6 +627,8 @@ body{
   vector-effect:non-scaling-stroke; stroke-linecap:round;
   transition:stroke .28s ease, stroke-width .28s ease, stroke-opacity .28s ease}
 .map-lines path.on{stroke:#FFE0A8; stroke-width:2.6; stroke-opacity:1}
+/* толстая прозрачная копия ловит мышь: в нить 1,7 px курсором не попасть */
+.map-lines .hit{stroke:transparent; stroke-width:16; stroke-opacity:1; pointer-events:stroke; cursor:default}
 /* точка города: огонёк у основания ёлки */
 .map-dot{position:absolute; left:var(--x); top:var(--y); width:10px; height:10px; margin:-5px 0 0 -5px;
   border-radius:50%; background:#FFF3E0; pointer-events:none;
@@ -688,8 +670,9 @@ body{
     radial-gradient(64% 68% at 50% 52%, rgba(6,8,20,.8), transparent 74%);
   filter:blur(11px); opacity:1; transition:opacity .3s ease, transform .35s ease;
 }
-.map-city:hover::before{transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(1.07)}
-.map-city:hover b{color:#FFE9C4}
+/* класс .on ставит скрипт, когда мышь на линии города: подпись и линия — одно целое */
+.map-city:hover::before,.map-city.on::before{transform:translate(-50%,-50%) rotate(var(--rot,0deg)) scale(1.07)}
+.map-city:hover b,.map-city.on b{color:#FFE9C4}
 /* телефон: выноски не поместятся — подписи собираются в две колонки под картой */
 @media (max-width:820px){
   .map-lines,.map-dot{display:none}
@@ -811,9 +794,10 @@ body{
 .fr-stage img,.fr-art>img{position:absolute; inset:0; display:block; width:100%; height:100%}
 /* Персонажи с рамкой уменьшаются вместе: рука Деда Мороза лежит на карамельной планке,
    врозь он либо повиснет в воздухе, либо оторвётся от рамки.
-   Точка отсчёта — низ по центру: ноги остаются на том же снегу, накладка ужимается вверх.
-   Текст сидит в той же обёртке, поэтому уезжает и ужимается вместе с рамкой. */
-.fr-art{position:absolute; inset:0; transform:scale(var(--k)); transform-origin:50% 100%}
+   Точка отсчёта — центр кадра: накладка ужимается к середине и стоит по центру
+   по высоте, воздух остаётся поровну сверху и снизу.
+   Текст сидит в той же обёртке, поэтому едет и ужимается вместе с рамкой. */
+.fr-art{position:absolute; inset:0; transform:scale(var(--k)); transform-origin:50% 50%}
 /* окно рамки замерено по картинке: 38,4–91,7 % ширины и 33,0–82,6 % высоты.
    Текст стоит внутри с запасом, чтобы строки не липли к карамели */
 .fr-text{position:absolute; left:40.6%; width:49.6%; top:36.2%; height:43.6%;
@@ -968,18 +952,8 @@ body{
   </div>
 </section>
 <!-- плашка статуса видео живёт вне сцены: sticky-сцена запирает z-index своих детей,
-     и внутри неё плашку перекрывала бы белая секция ниже -->
+     и внутри неё плашку перекрывала бы секция ниже -->
 <div id="vstatus"></div>
-
-<div class="ls-snowband" aria-hidden="true">
-  <div class="ls-snow">
-    <svg viewBox="0 0 1440 190" preserveAspectRatio="none">
-      <path fill="#C7D8EA" d="M0,88 C110,34 260,36 400,72 C520,102 640,44 780,52 C920,60 1010,96 1130,84 C1250,72 1330,46 1440,64 L1440,190 L0,190 Z"/>
-      <path fill="#E4EEF7" d="M0,120 C150,70 300,78 450,104 C600,130 720,78 880,88 C1040,98 1150,124 1270,112 C1350,104 1400,98 1440,104 L1440,190 L0,190 Z"/>
-      <path fill="#FFFFFF" d="M0,152 C160,104 320,116 470,134 C620,152 760,108 910,116 C1060,124 1200,148 1440,132 L1440,190 L0,190 Z"/>
-    </svg>
-  </div>
-</div>
 
 <section class="ls" id="lastseason" aria-labelledby="lsTitle">
   <div class="ls-sky" aria-hidden="true">
@@ -1083,13 +1057,22 @@ body{
                  sizes="(max-width:820px) 96vw, min(1120px, calc(100vw - 88px))" width="1559" height="668"
                  alt="" aria-hidden="true" loading="lazy" decoding="async">
             <svg class="map-lines" viewBox="0 0 1000 428" preserveAspectRatio="none" aria-hidden="true">
-              <path data-city="crimea" d="M11 243 C11 108 35 -4 45 -58"/>
-              <path data-city="yaroslavl" d="M181 188 C181 78 219 -13 235 -58"/>
-              <path data-city="nizhny" d="M210 224 C210 97 388 -7 465 -58"/>
-              <path data-city="kazan" d="M234 254 C234 114 571 -2 715 -58"/>
-              <path data-city="stavropol" d="M63 317 C63 393 71 455 75 486"/>
-              <path data-city="ekb" d="M299 263 C299 363 450 446 515 486"/>
-              <path data-city="tyumen" d="M336 283 C336 374 657 449 795 486"/>
+              <path data-city="crimea" d="M10.6 242.8 C13.5 230.3 29.1 210.1 28.0 194.0 C27.0 177.9 5.0 160.8 4.3 146.4 C3.6 132.0 21.3 119.0 23.7 107.6 C26.2 96.1 19.6 82.5 19.0 77.5"/>
+              <path data-city="yaroslavl" d="M180.9 188.4 C187.3 175.7 214.2 159.3 219.3 141.1 C224.5 122.9 206.9 95.3 211.7 79.1 C216.6 62.8 241.2 55.5 248.5 43.7 C255.7 32.0 252.4 14.4 255.0 8.6"/>
+              <path data-city="nizhny" d="M209.7 224.3 C230.3 213.8 301.1 216.8 333.5 193.7 C366.0 170.6 375.1 105.9 404.4 85.6 C433.8 65.4 482.6 82.5 509.7 72.1 C536.8 61.8 550.3 31.6 567.0 23.5"/>
+              <path data-city="kazan" d="M234.4 254.4 C265.5 239.0 367.3 234.8 421.1 205.2 C474.9 175.5 508.5 102.6 556.9 76.5 C605.3 50.4 669.6 63.4 711.6 48.6 C753.6 33.7 781.3 -2.3 809.0 -12.4"/>
+              <path data-city="stavropol" d="M63.2 317.1 C67.4 325.5 76.9 346.1 88.6 353.3 C100.3 360.5 123.0 353.7 133.4 360.3 C143.7 366.9 144.0 385.6 150.8 392.9 C157.5 400.3 167.9 402.5 174.0 404.5"/>
+              <path data-city="ekb" d="M299.2 262.7 C299.8 278.8 293.6 309.6 302.5 327.7 C311.5 345.8 345.1 355.1 352.9 371.5 C360.6 387.8 346.4 411.3 349.0 425.8 C351.7 440.3 364.3 453.0 369.0 458.4"/>
+              <path data-city="tyumen" d="M335.5 283.2 C353.0 300.6 401.1 350.8 440.6 362.0 C480.1 373.3 537.4 340.4 572.7 351.0 C607.9 361.6 626.1 410.7 652.0 425.7 C677.9 440.7 707.5 438.3 728.0 440.8"/>
+              <!-- невидимые толстые копии тех же кривых: по ним мышь ловит линию,
+                   в тонкую нить в 1,7 px попасть невозможно -->
+              <path class="hit" data-city="crimea" d="M10.6 242.8 C13.5 230.3 29.1 210.1 28.0 194.0 C27.0 177.9 5.0 160.8 4.3 146.4 C3.6 132.0 21.3 119.0 23.7 107.6 C26.2 96.1 19.6 82.5 19.0 77.5"/>
+              <path class="hit" data-city="yaroslavl" d="M180.9 188.4 C187.3 175.7 214.2 159.3 219.3 141.1 C224.5 122.9 206.9 95.3 211.7 79.1 C216.6 62.8 241.2 55.5 248.5 43.7 C255.7 32.0 252.4 14.4 255.0 8.6"/>
+              <path class="hit" data-city="nizhny" d="M209.7 224.3 C230.3 213.8 301.1 216.8 333.5 193.7 C366.0 170.6 375.1 105.9 404.4 85.6 C433.8 65.4 482.6 82.5 509.7 72.1 C536.8 61.8 550.3 31.6 567.0 23.5"/>
+              <path class="hit" data-city="kazan" d="M234.4 254.4 C265.5 239.0 367.3 234.8 421.1 205.2 C474.9 175.5 508.5 102.6 556.9 76.5 C605.3 50.4 669.6 63.4 711.6 48.6 C753.6 33.7 781.3 -2.3 809.0 -12.4"/>
+              <path class="hit" data-city="stavropol" d="M63.2 317.1 C67.4 325.5 76.9 346.1 88.6 353.3 C100.3 360.5 123.0 353.7 133.4 360.3 C143.7 366.9 144.0 385.6 150.8 392.9 C157.5 400.3 167.9 402.5 174.0 404.5"/>
+              <path class="hit" data-city="ekb" d="M299.2 262.7 C299.8 278.8 293.6 309.6 302.5 327.7 C311.5 345.8 345.1 355.1 352.9 371.5 C360.6 387.8 346.4 411.3 349.0 425.8 C351.7 440.3 364.3 453.0 369.0 458.4"/>
+              <path class="hit" data-city="tyumen" d="M335.5 283.2 C353.0 300.6 401.1 350.8 440.6 362.0 C480.1 373.3 537.4 340.4 572.7 351.0 C607.9 361.6 626.1 410.7 652.0 425.7 C677.9 440.7 707.5 438.3 728.0 440.8"/>
             </svg>
               <b class="map-dot" style="--x:1.06%;--y:56.74%"></b>
               <b class="map-dot" style="--x:18.09%;--y:44.01%"></b>
@@ -1099,13 +1082,13 @@ body{
               <b class="map-dot" style="--x:29.92%;--y:61.38%"></b>
               <b class="map-dot" style="--x:33.55%;--y:66.17%"></b>
             <figcaption class="map-cities">
-                <span class="map-city up" data-city="crimea" data-x="0.0106" data-y="0.5674" style="--x:4.50%;--y:-13.50%;--spot:rgba(232,150,60,.8);--rot:-7deg"><b>Крым</b><em>С 2018 года</em></span>
-                <span class="map-city up" data-city="yaroslavl" data-x="0.1809" data-y="0.4401" style="--x:23.50%;--y:-13.50%;--spot:rgba(232,150,60,.8);--rot:6deg"><b>Ярославль</b><em>С 2023 года</em></span>
-                <span class="map-city up" data-city="nizhny" data-x="0.2097" data-y="0.5240" style="--x:46.50%;--y:-13.50%;--spot:rgba(255,186,84,.88);--rot:-4deg"><i>Главный офис тут</i><b>Нижний Новгород</b><em>С 2019 года</em></span>
-                <span class="map-city up" data-city="kazan" data-x="0.2344" data-y="0.5943" style="--x:71.50%;--y:-13.50%;--spot:rgba(232,150,60,.8);--rot:8deg"><b>Казань</b><em>С 2022 года</em></span>
-                <span class="map-city down" data-city="stavropol" data-x="0.0632" data-y="0.7410" style="--x:7.50%;--y:113.50%;--spot:rgba(232,150,60,.8);--rot:5deg"><b>Ставрополь</b><em>С 2025 года</em></span>
-                <span class="map-city down" data-city="ekb" data-x="0.2992" data-y="0.6138" style="--x:51.50%;--y:113.50%;--spot:rgba(208,44,42,.85);--rot:-6deg"><b>Екатеринбург</b><em>Впервые!</em></span>
-                <span class="map-city down" data-city="tyumen" data-x="0.3355" data-y="0.6617" style="--x:79.50%;--y:113.50%;--spot:rgba(208,44,42,.85);--rot:7deg"><b>Тюмень</b><em>Впервые!</em></span>
+                <span class="map-city up" data-city="crimea" data-x="0.0106" data-y="0.5674" style="--x:1.90%;--y:18.10%;--spot:rgba(232,150,60,.8);--rot:-7deg"><b>Крым</b><em>С 2018 года</em></span>
+                <span class="map-city up" data-city="yaroslavl" data-x="0.1809" data-y="0.4401" style="--x:25.50%;--y:2.00%;--spot:rgba(232,150,60,.8);--rot:6deg"><b>Ярославль</b><em>С 2023 года</em></span>
+                <span class="map-city up" data-city="nizhny" data-x="0.2097" data-y="0.5240" style="--x:56.70%;--y:5.50%;--spot:rgba(255,186,84,.88);--rot:-4deg"><i>Главный офис тут</i><b>Нижний Новгород</b><em>С 2019 года</em></span>
+                <span class="map-city up" data-city="kazan" data-x="0.2344" data-y="0.5943" style="--x:80.90%;--y:-2.90%;--spot:rgba(232,150,60,.8);--rot:8deg"><b>Казань</b><em>С 2022 года</em></span>
+                <span class="map-city down" data-city="stavropol" data-x="0.0632" data-y="0.7410" style="--x:17.40%;--y:94.50%;--spot:rgba(232,150,60,.8);--rot:5deg"><b>Ставрополь</b><em>С 2025 года</em></span>
+                <span class="map-city down" data-city="ekb" data-x="0.2992" data-y="0.6138" style="--x:36.90%;--y:107.10%;--spot:rgba(208,44,42,.85);--rot:-6deg"><b>Екатеринбург</b><em>Впервые!</em></span>
+                <span class="map-city down" data-city="tyumen" data-x="0.3355" data-y="0.6617" style="--x:72.80%;--y:103.00%;--spot:rgba(208,44,42,.85);--rot:7deg"><b>Тюмень</b><em>Впервые!</em></span>
             </figcaption>
           </div>
         </figure>
@@ -2079,23 +2062,33 @@ body{
   }, {passive: true});
   wrap.addEventListener('pointerleave', function(){ target = 0; kick(); });
 
-  /* наведение на подпись города: свет переезжает к его ёлке, линия выноски загорается.
-     Города видит и мышь на самой карте, и мышь на подписи — точка одна и та же */
-  Array.prototype.forEach.call(wrap.querySelectorAll('.map-city'), function(el){
-    var cx = parseFloat(el.getAttribute('data-x')), cy = parseFloat(el.getAttribute('data-y'));
-    var line = wrap.querySelector('.map-lines path[data-city="' + el.getAttribute('data-city') + '"]');
+  /* подпись города и его линия ведут себя как одно целое: наведение на любую из них
+     переводит свет карты к ёлке этого города и зажигает обе */
+  function bindCity(el, key){
+    var label = wrap.querySelector('.map-city[data-city="' + key + '"]');
+    var line = wrap.querySelector('.map-lines path[data-city="' + key + '"]:not(.hit)');
+    if (!label) return;
+    var cx = parseFloat(label.getAttribute('data-x')), cy = parseFloat(label.getAttribute('data-y'));
     el.addEventListener('pointerenter', function(){
       overCity = true;
       tx = cx; ty = cy; target = 1;
       if (line) line.classList.add('on');
+      label.classList.add('on');
       kick();
     });
     el.addEventListener('pointerleave', function(){
       overCity = false;
       target = 0;
       if (line) line.classList.remove('on');
+      label.classList.remove('on');
       kick();
     });
+  }
+  Array.prototype.forEach.call(wrap.querySelectorAll('.map-city'), function(el){
+    bindCity(el, el.getAttribute('data-city'));
+  });
+  Array.prototype.forEach.call(wrap.querySelectorAll('.map-lines .hit'), function(el){
+    bindCity(el, el.getAttribute('data-city'));
   });
 })();
 </script>
