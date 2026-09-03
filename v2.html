@@ -420,6 +420,41 @@ body{
 }
 @media (prefers-reduced-motion:reduce){ .cr-strip{transition:none} }
 
+/* ---- телефон: вместо слайдера одна длинная лента фотографий ----
+   На компьютере второй экран показывает два коллажа по три ряда. На узком
+   экране те же снимки разложены в ДВА ряда, чтобы лица было видно, и склеены
+   в одну ленту: она едет справа налево сама, а пальцем её можно разогнать.
+   Карточки строит скрипт (см. «ЛЕНТА ФОТО» внизу файла) и только когда лента
+   реально видна - на компьютере ни один из 52 снимков не скачивается. */
+.cr-lenta{display:none}
+@media (max-width:767px){
+  .cr-nsl{display:none}                        /* слайдер коллажей - только на большом экране */
+  .cr-lenta{
+    display:block; overflow:hidden;
+    /* высота ряда считается от ширины экрана, а не от vh: на телефоне адресная
+       строка прячется при прокрутке, vh скачет вместе с ней и лента дёргалась бы */
+    --lh:min(52vw, 240px);
+    --fr:calc(var(--lh) * .035);               /* рамка полароида - те же 3,5 %, что в коллаже */
+    padding:calc(var(--lh) * .08) 0;           /* запас, чтобы наклонённые углы не срезались */
+    touch-action:pan-y;                        /* вертикальную прокрутку отдаём странице */
+  }
+  .cr-row{display:flex; align-items:center; will-change:transform}
+  .cr-row + .cr-row{margin-top:calc(var(--lh) * .05)}
+  .cr-card{
+    flex:0 0 auto; height:var(--lh);
+    margin:0 calc(var(--lh) * -.01);           /* снимки чуть находят друг на друга, как в коллаже */
+    padding:var(--fr) var(--fr) calc(var(--fr) * 3);   /* низ втрое шире боков */
+    background:#fff; border-radius:1px;
+    box-shadow:0 1px 3px rgba(0,0,0,.3);
+    transform:rotate(var(--r)) translateY(var(--dy));
+  }
+  .cr-card img{display:block; height:100%; width:auto; max-width:none}
+}
+/* выключенная анимация: лента не едет сама, но её можно листать пальцем */
+@media (max-width:767px) and (prefers-reduced-motion:reduce){
+  .cr-lenta{overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch}
+}
+
 /* цифры сезона: четыре колонки таблицей, как в оригинале */
 .cr-grid{margin-left:calc(-10 * var(--u)); margin-right:calc(-10 * var(--u))}
 .cr-gridwrap{display:table; table-layout:fixed; width:100%}
@@ -815,6 +850,10 @@ body{
         <button class="cr-dot is-active" type="button" aria-label="Кадр 1"></button><button class="cr-dot" type="button" aria-label="Кадр 2"></button>
       </div>
     </div>
+
+    <!-- та же фотоплёнка для телефона: два ряда, едет сама, карточки строит скрипт -->
+    <div class="cr-lenta" id="crLenta" role="img"
+         aria-label="Кадры прошлых сезонов: дети, Дед Мороз, шоу, мастерская карамели"></div>
 
     <div style="height:calc(40 * var(--u))"></div>
 
@@ -1709,6 +1748,171 @@ body{
   }
   Array.prototype.forEach.call(map.querySelectorAll('.cr-city'), wire);
   Array.prototype.forEach.call(map.querySelectorAll('.cr-lines .hit'), wire);
+})();
+</script>
+
+<script>
+/* ==================== ЛЕНТА ФОТО: ЭКРАН 2 НА ТЕЛЕФОНЕ ====================
+   На компьютере второй экран листает два коллажа по три ряда. На телефоне те же
+   снимки лежат в два ряда одной длинной лентой: она едет справа налево сама,
+   медленно и без остановок, а пальцем её можно разогнать или отмотать назад.
+
+   Три решения, которые тут важны:
+
+   1. КАРТОЧКИ СТРОИТ СКРИПТ, А НЕ РАЗМЕТКА. На компьютере лента скрыта через
+      display:none, и тогда браузер не качает ни один из 52 снимков. Строим
+      только когда контейнер реально виден (offsetParent !== null) - при
+      загрузке или после поворота телефона.
+
+   2. ПЕТЛЯ БЕЗ ШВА. Каждый ряд повторён дважды, лента сдвигается на
+      -(pos % ширина одного повтора). В момент, когда первый повтор уезжает
+      за левый край, второй стоит ровно на его месте, и стыка не видно.
+      Ширину повтора меряем по offsetLeft первой копии: наклон карточек задан
+      через transform и на разметку не влияет, поэтому число честное.
+
+   3. ПАЛЕЦ НЕ ЛОМАЕТ ПРОКРУТКУ СТРАНИЦЫ. Разбирать жест руками не нужно:
+      touch-action:pan-y отдаёт вертикальные движения странице, а горизонтальные
+      приходят сюда. После броска скорость затухает обратно к базовой. */
+(function(){
+  'use strict';
+  var box = document.getElementById('crLenta');
+  if (!box) return;
+
+  var H = 520;                        /* высота файлов в lenta/, px */
+  /* ширина каждого снимка при этой высоте и его средний цвет. Цвет стоит фоном
+     под ещё не загруженной картинкой: пока она грузится, на её месте пятно
+     нужного тона, а не белая дырка */
+  var PH = [
+    [390,'#747c91'], [693,'#413124'], [390,'#887f84'], [390,'#7c402e'], [390,'#323518'], [405,'#572d49'],
+    [390,'#1b4a19'], [693,'#2a1709'], [780,'#734f41'], [390,'#8e7170'], [390,'#01112b'], [390,'#956757'],
+    [921,'#4a4648'], [411,'#0f2d1c'], [829,'#5d4a44'], [390,'#3e2e32'], [780,'#6f4e3f'], [757,'#0b1927'],
+    [390,'#7c6554'], [390,'#775247'], [390,'#09161b'], [390,'#6b3524'], [390,'#371805'], [384,'#211435'],
+    [390,'#ac897a'], [390,'#8a6663'], [390,'#201512'], [390,'#684940'], [390,'#4c3e45'], [743,'#6d4f40'],
+    [390,'#3f2444'], [390,'#775952'], [418,'#4e2b20'], [382,'#696c6e'], [390,'#867d69'], [390,'#7a5d4b'],
+    [780,'#5a494e'], [390,'#72472e'], [390,'#8e7982'], [390,'#292528'], [390,'#60392d'], [390,'#3f251c'],
+    [390,'#432f22'], [637,'#5f5565'], [347,'#885950'], [861,'#614c3b'], [390,'#734d3f'], [390,'#845e4f'],
+    [385,'#5b2914'], [927,'#5a3a1f'], [693,'#754938'], [390,'#7d5343']
+  ];
+
+  var ROWS = 2;
+  var BASE = 26;                      /* базовая скорость ленты, px/с */
+  var MAXV = 2600;                    /* потолок разгона пальцем */
+  var TAU  = 0.75;                    /* за сколько секунд бросок затухает к базовой */
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var built = false, rows = [], w = [], pos = 0, v = BASE, raf = 0, last = 0;
+  var drag = false, pid = null, x0 = 0, t0 = 0, vx = 0, moved = 0;
+
+  /* один и тот же псевдослучай при каждой сборке: наклоны не прыгают после поворота */
+  function rnd(seed){ var x = Math.sin(seed * 12.9898) * 43758.5453; return x - Math.floor(x); }
+
+  function card(i){
+    var d = document.createElement('div');
+    d.className = 'cr-card';
+    d.style.setProperty('--r',  (rnd(i + 1) * 6 - 3).toFixed(2) + 'deg');
+    d.style.setProperty('--dy', (rnd(i + 7.3) * 10 - 5).toFixed(1) + 'px');
+    var im = document.createElement('img');
+    im.src = 'lenta/p' + (i < 9 ? '0' : '') + (i + 1) + '.webp';
+    im.width = PH[i][0]; im.height = H;
+    im.alt = ''; im.decoding = 'async';
+    if (i > 5) im.loading = 'lazy';   /* первые шесть нужны сразу, остальные подтянутся по ходу */
+    im.style.background = PH[i][1];
+    d.appendChild(im);
+    return d;
+  }
+
+  function build(){
+    var r, i;
+    for (r = 0; r < ROWS; r++){
+      var row = document.createElement('div');
+      row.className = 'cr-row';
+      rows.push(row); box.appendChild(row);
+    }
+    for (i = 0; i < PH.length; i++) rows[i % ROWS].appendChild(card(i));
+    built = true;
+    if (reduce) return;               /* без движения второй повтор не нужен */
+    for (r = 0; r < ROWS; r++){
+      var kids = Array.prototype.slice.call(rows[r].children);
+      for (i = 0; i < kids.length; i++) rows[r].appendChild(kids[i].cloneNode(true));
+    }
+    measure();
+  }
+
+  function measure(){
+    for (var r = 0; r < ROWS; r++){
+      var kids = rows[r].children;
+      var half = kids.length / 2;
+      w[r] = kids[half] ? (kids[half].offsetLeft - kids[0].offsetLeft) : 0;
+    }
+    apply();
+  }
+
+  function apply(){
+    for (var r = 0; r < ROWS; r++){
+      var x = w[r] ? -(((pos % w[r]) + w[r]) % w[r]) : 0;
+      rows[r].style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+    }
+  }
+
+  function frame(now){
+    raf = requestAnimationFrame(frame);
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+    last = now;
+    if (!drag){
+      v += (BASE - v) * (1 - Math.exp(-dt / TAU));
+      pos += v * dt;
+    }
+    apply();
+  }
+  function start(){ if (!raf && built && !reduce){ last = 0; raf = requestAnimationFrame(frame); } }
+  function stop(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+
+  box.addEventListener('pointerdown', function(e){
+    if (reduce || !built) return;
+    drag = true; pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; moved = 0;
+    try{ box.setPointerCapture(pid); }catch(err){}
+  });
+  box.addEventListener('pointermove', function(e){
+    if (!drag || e.pointerId !== pid) return;
+    var dx = e.clientX - x0, dt = (e.timeStamp - t0) / 1000;
+    pos -= dx;                                    /* лента идёт за пальцем */
+    moved += Math.abs(dx);
+    if (dt > 0.004) vx = 0.7 * vx + 0.3 * (dx / dt);   /* сглаженная скорость пальца */
+    x0 = e.clientX; t0 = e.timeStamp;
+    apply();
+  });
+  function release(){
+    if (!drag) return;
+    drag = false;
+    if (pid !== null){ try{ box.releasePointerCapture(pid); }catch(err){} pid = null; }
+    if (moved < 8) return;                        /* это была вертикальная прокрутка страницы, не свайп */
+    v = Math.max(-MAXV, Math.min(MAXV, -vx));     /* палец влево - лента поехала влево быстрее */
+  }
+  box.addEventListener('pointerup', release);
+  box.addEventListener('pointercancel', release);
+  box.addEventListener('lostpointercapture', release);
+
+  /* лента живёт только пока она на экране: за кадром кадры не считаем */
+  function watch(){
+    if (!('IntersectionObserver' in window)) { start(); return; }
+    new IntersectionObserver(function(en){
+      if (en[0].isIntersecting) start(); else stop();
+    }, {rootMargin: '100px'}).observe(box);
+  }
+
+  var tmr = null;
+  function ready(){
+    if (box.offsetParent === null) return;        /* лента скрыта - это компьютер */
+    if (!built){ build(); watch(); return; }
+    measure();                                    /* ширина экрана изменилась - перемерить повтор */
+  }
+  ready();
+  window.addEventListener('resize', function(){
+    clearTimeout(tmr); tmr = setTimeout(ready, 150);
+  });
+  window.addEventListener('orientationchange', function(){
+    clearTimeout(tmr); tmr = setTimeout(ready, 300);
+  });
 })();
 </script>
 
