@@ -1812,11 +1812,13 @@ body{
     d.style.setProperty('--r',  (rnd(i + 1) * 6 - 3).toFixed(2) + 'deg');
     d.style.setProperty('--dy', (rnd(i + 7.3) * 10 - 5).toFixed(1) + 'px');
     var im = document.createElement('img');
-    im.src = 'lenta/p' + (i < 9 ? '0' : '') + (i + 1) + '.webp';
+    /* loading ставим ДО src: после назначения src браузер уже начал качать,
+       и «ленивость» опоздала бы - все 52 снимка поехали бы сразу */
+    if (i > 5) im.loading = 'lazy';   /* первые шесть нужны сразу, остальные подтянутся по ходу */
     im.width = PH[i][0]; im.height = H;
     im.alt = ''; im.decoding = 'async';
-    if (i > 5) im.loading = 'lazy';   /* первые шесть нужны сразу, остальные подтянутся по ходу */
     im.style.background = PH[i][1];
+    im.src = 'lenta/p' + (i < 9 ? '0' : '') + (i + 1) + '.webp';
     d.appendChild(im);
     return d;
   }
@@ -1839,6 +1841,7 @@ body{
   }
 
   function measure(){
+    if (reduce) return;               /* повтора нет, мерить нечего */
     for (var r = 0; r < ROWS; r++){
       var kids = rows[r].children;
       var half = kids.length / 2;
