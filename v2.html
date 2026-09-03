@@ -429,7 +429,7 @@ body{
    позади ленты и текста, кликам не мешают.
 
    Цвет — синий сайта на очень малой непрозрачности. Пик задаёт --o для каждой
-   цифры отдельно (0.09-0.17): одинаковая плотность у всех читалась бы узором. */
+   цифры отдельно (0.08-0.16): одинаковая плотность у всех читалась бы узором. */
 .cr-years{
   position:absolute; inset:0; z-index:3; overflow:hidden; pointer-events:none;
   contain:paint;                                    /* цифры не вылезают за экран */
@@ -780,25 +780,144 @@ body{
 }
 .dk-btn:hover{filter:brightness(1.06)}
 .dk-btn:active{transform:translateY(1px)}
-/* ВРЕМЕННО, пока не пришёл макет телефона. Порог тут свой, 1024 px, а не общие
-   для сайта 768: кегль внутри письма считается от ширины картинки, и уже на
-   900 px строчки падают до 14 px, а на 390 px поле письма — это 167 px, куда
-   текст не помещается физически. Ниже порога картинка остаётся картинкой,
-   а заголовок и список встают под ней. */
+.dk-girl,.dk-t-mob{display:none}                       /* только для телефона */
+
+/* ==================== ЭКРАН 4 НА ТЕЛЕФОНЕ ====================
+   Своя композиция, снятая с макета «4 экран/референс для 4 экрана.png»
+   (холст 1080x2182): девушка-часовщица выходит на экран с картой, под ней
+   дуга-холм с золотой кромкой, ниже заголовок и семь плашек.
+
+   Все числа — пиксели этого макета, пересчитанные через --m: это ширина
+   макета в нашем масштабе. Выше 620 px композиция расти перестаёт, иначе
+   на планшете девушка вырастает в великаншу, а строчки — в афишу.
+
+   Порог 1024, а не общие для сайта 768: письмо с персонажами (широкий
+   вариант) начинает разваливаться уже на 1000 px — кегль внутри него
+   считается от ширины картинки. */
 @media (max-width:1023px){
-  .dk-frame{margin-top:-6%}
-  .dk-t,.dk-list{position:static; left:auto; top:auto; width:auto}
-  .dk-t{margin:18px 16px 12px; font-size:clamp(20px,5.6vw,30px); color:#fff;
-    letter-spacing:0; white-space:normal; line-height:1.15}
-  .dk-list{margin:0 16px; gap:8px}
-  .dk-list li{height:auto; min-height:44px; padding:11px 14px 11px 46px;
-    border-radius:14px; font-size:clamp(14px,3.9vw,17px); line-height:1.3;
-    letter-spacing:0; white-space:normal; box-shadow:0 -1px 3px rgba(0,0,0,.13)}
-  .dk-ico{left:14px; width:24px; font-size:17px}
-  .dk-cta{margin-top:22px}
-  .dk-btn{padding:14px 24px}
+  /* Воздух под картой. Девушка выходит на экран с картой на 799 px макета,
+     а у нас там ещё стоят подписи Ставрополя, Екатеринбурга и Тюмени —
+     она бы их закрыла. Поэтому низу экрана с картой добавлен пустой запас
+     ровно на её рост. Сама карта, подписи и фон не тронуты: это только поле. */
+  .cr-s3{padding-bottom:calc(60 * var(--u) + 512 * min(100vw, 620px) / 1080)}
+  .dk{
+    --m: min(100vw, 620px);
+    background:none;                                   /* фон уезжает на «холм» */
+    padding-bottom:calc(150 * var(--m) / 1080);
+  }
+  /* холм: фон секции с дугой по верхней кромке. Дуга снята с макета —
+     вершина по центру, к краям опускается на 128 px макета. */
+  .dk::after{
+    content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+    background:linear-gradient(180deg, #00043E 0%, #000338 26%, #000335 100%);
+    border-radius:50% 50% 0 0 /
+      calc(128 * var(--m) / 1080) calc(128 * var(--m) / 1080) 0 0;
+    border-top:max(2px, calc(5 * var(--m) / 1080)) solid rgba(255,236,196,.95);
+    box-shadow:0 calc(-6 * var(--m) / 1080) calc(70 * var(--m) / 1080) rgba(255,183,92,.5);
+    animation:dkArc 6s ease-in-out infinite;
+  }
+  @keyframes dkArc{
+    0%,100%{box-shadow:0 calc(-6 * var(--m) / 1080) calc(64 * var(--m) / 1080) rgba(255,183,92,.42)}
+    50%    {box-shadow:0 calc(-6 * var(--m) / 1080) calc(96 * var(--m) / 1080) rgba(255,201,120,.62)}
+  }
+  /* звёзды соседней сессии поднимаем над холмом и обрезаем той же дугой,
+     иначе на телефоне их не было бы видно вообще */
+  .dk-sky{
+    z-index:3;
+    border-radius:50% 50% 0 0 /
+      calc(128 * var(--m) / 1080) calc(128 * var(--m) / 1080) 0 0;
+  }
+  /* девушка. z-index не ставим намеренно: элемент со своим слоем изолировал бы
+     наложение, и чёрный фон картинки перестал бы исчезать.
+     Фон самого блока — тёмная вуаль: картинка кладётся режимом screen, а он
+     складывает цвета с подложкой. Без вуали синий фон карты высветлил бы
+     плащ до сирени. Маска гасит края картинки там же, где кончается вуаль. */
+  .dk-girl{
+    display:block; position:absolute; left:0; right:0; pointer-events:none;
+    top:calc(-799 * var(--m) / 1080);
+    height:calc(920 * var(--m) / 1080);
+    /* окно шире экрана не бывает: картинка вылезает за края, и без обрезки
+       страница получала бы горизонтальную прокрутку. overflow тут не создаёт
+       свой слой — наложение screen продолжает считаться с фоном страницы */
+    overflow:hidden;
+    /* вуаль широкая и плотная: за девушкой стоит низ экрана с картой, а там
+       снег и ёлки. Без плотной вуали они лезут ей в лицо, в макете за ней чисто */
+    background:radial-gradient(37% 58% at 49% 53%,
+      rgba(0,3,26,.96) 42%, rgba(0,3,26,.72) 68%, rgba(0,3,26,.3) 84%, rgba(0,3,26,0) 100%);
+    animation:dkFloat 9s ease-in-out infinite;
+  }
+  .dk-girl img{
+    display:block; position:absolute; top:0; left:50%;
+    width:calc(1380 * var(--m) / 1080); height:auto;
+    margin-left:calc(-690 * var(--m) / 1080);
+    mix-blend-mode:screen;
+    filter:saturate(.9);
+    -webkit-mask-image:radial-gradient(62% 64% at 50% 48%, #000 62%, transparent 96%);
+            mask-image:radial-gradient(62% 64% at 50% 48%, #000 62%, transparent 96%);
+  }
+  @keyframes dkFloat{
+    0%,100%{transform:translateY(0)}
+    50%    {transform:translateY(calc(-14 * var(--m) / 1080))}
+  }
+  /* письма на телефоне нет — вместо него девушка */
+  .dk-art{display:none}
+  .dk-frame{margin-top:0; container-type:normal}
+  .dk-t-wide{display:none}
+  .dk-t-mob{display:inline}
+  .dk-t{
+    position:static; left:auto; top:auto; width:auto;
+    margin:calc(112 * var(--m) / 1080) auto 0; text-align:center;
+    font-size:max(18px, calc(60 * var(--m) / 1080)); line-height:1; letter-spacing:-.045em;
+    color:#fff; white-space:nowrap; text-shadow:0 2px calc(18 * var(--m) / 1080) rgba(0,0,0,.5);
+  }
+  /* плашки. Ширину против макета подняли с 795 до 994 px макета: строчки
+     набраны настоящим шрифтом, а не нарисованы, и в макетные 795 px самая
+     длинная («Значительные бонусы…») не влезает ни при каком читаемом кегле.
+     Шрифт — Oswald, узкий: им строки помещаются в одну, как в макете. */
+  .dk-list{
+    position:static; left:auto; top:auto;
+    width:calc(994 * var(--m) / 1080);
+    margin:calc(48 * var(--m) / 1080) auto 0;
+    gap:calc(13 * var(--m) / 1080);
+  }
+  .dk-list li{
+    height:auto; min-height:max(32px, calc(104 * var(--m) / 1080));
+    padding:calc(8 * var(--m) / 1080) calc(28 * var(--m) / 1080)
+            calc(8 * var(--m) / 1080) calc(146 * var(--m) / 1080);
+    border:max(1px, calc(4 * var(--m) / 1080)) solid transparent;
+    border-radius:calc(38 * var(--m) / 1080);
+    /* кремовая заливка и золотая рамка одним фоном: padding-box под заливку,
+       border-box под рамку — так рамка получает градиент, а не плоский цвет */
+    background:
+      linear-gradient(168deg, #FDF7EA 0%, #F6E9D2 46%, #EEDBB9 100%) padding-box,
+      linear-gradient(180deg, #FFF3C8 0%, #E9BB61 36%, #C58E27 70%, #8C5D11 100%) border-box;
+    color:#150E04;
+    font-family:"Oswald","Golos Text",Arial,sans-serif; font-weight:500;
+    font-size:max(12px, calc(41 * var(--m) / 1080)); line-height:1.15; letter-spacing:0;
+    white-space:normal;
+    box-shadow:0 calc(6 * var(--m) / 1080) calc(14 * var(--m) / 1080) rgba(0,0,0,.38),
+               0 0 calc(20 * var(--m) / 1080) rgba(255,214,140,.16);
+  }
+  .dk-ico{
+    left:calc(6 * var(--m) / 1080); width:calc(122 * var(--m) / 1080);
+    font-size:max(22px, calc(74 * var(--m) / 1080));
+  }
+  .dk-cta{margin-top:calc(70 * var(--m) / 1080)}
+  .dk-btn{padding:calc(38 * var(--m) / 1080) calc(80 * var(--m) / 1080);
+    font-size:calc(40 * var(--m) / 1080); border-radius:calc(10 * var(--m) / 1080)}
+  /* появление плашек по очереди. Прятать их умеет только класс .dkrv, а его
+     вешает скрипт — если скрипт не отработал, плашки просто видны сразу,
+     а не исчезают навсегда */
+  .dk.dkrv .dk-list li{opacity:0; transform:translateY(calc(26 * var(--m) / 1080))}
+  .dk.dkrv.on .dk-list li{opacity:1; transform:none;
+    transition:opacity .5s ease, transform .5s cubic-bezier(.2,.7,.3,1);
+    transition-delay:calc(var(--i, 0) * 70ms)}
 }
-@media (prefers-reduced-motion:reduce){ .dk-btn{transition:none} }
+@media (prefers-reduced-motion:reduce){
+  .dk-btn{transition:none}
+  .dk-girl,.dk::after{animation:none}
+  .dk.dkrv .dk-list li{opacity:1; transform:none; transition:none}
+}
 </style>
 </head>
 <body>
@@ -977,6 +1096,12 @@ body{
      Персонажи и верх письма заходят на экран с картой: так в макете. -->
 <section class="cr dk" id="forwhom" aria-labelledby="dkT">
   <canvas class="dk-sky" id="dkSky" aria-hidden="true"></canvas>
+  <!-- телефон: девушка-часовщица выходит на экран с картой, «холм» (.dk::after)
+       закрывает её низ. На широком экране этот слой скрыт. -->
+  <div class="dk-girl" aria-hidden="true">
+    <img src="v2-girl.webp" srcset="v2-girl-1000.webp 1000w, v2-girl.webp 1536w"
+         sizes="128vw" width="1536" height="1024" alt="" loading="lazy" decoding="async">
+  </div>
   <div class="cr-cont">
     <div class="dk-frame">
       <img class="dk-art" src="v2-frame.webp"
@@ -984,7 +1109,9 @@ body{
            sizes="(max-width:1023px) 100vw, 84vw"
            width="1526" height="833" loading="lazy" decoding="async"
            alt="Дед Мороз с посохом и мальчик на стремянке стоят у большого письма">
-      <h2 class="dk-t" id="dkT">Для кого, где и когда:</h2>
+      <!-- порядок слов в макете телефона другой, чем на широком экране,
+           поэтому два варианта: лишний скрыт через display:none и в чтении с экрана не участвует -->
+      <h2 class="dk-t" id="dkT"><span class="dk-t-wide">Для кого, где и когда:</span><span class="dk-t-mob">Где, когда и для кого:</span></h2>
       <ul class="dk-list">
         <li><span class="dk-ico" aria-hidden="true">🐣</span>Для детей от 4 до 11 лет</li>
         <li><span class="dk-ico" aria-hidden="true">📍</span>Нижний Новгород, Ольгино 62</li>
@@ -2257,6 +2384,26 @@ body{
   }, {rootMargin: '0px 0px -22% 0px'});   /* пуск, когда блок зашёл в нижнюю четверть экрана */
   io.observe(items[0].el.closest('.cr-grid') || items[0].el);
 })();
+</script>
+
+<script>
+/* Четвёртый экран, телефон: плашки появляются по очереди, когда экран доехал.
+   Задержку держит переменная --i, сам перебор — в CSS. Наблюдатель отключается
+   после первого срабатывания: анимация одноразовая, повторов при прокрутке нет. */
+(function(){
+  var sec = document.getElementById('forwhom');
+  if (!sec) return;
+  var items = sec.querySelectorAll('.dk-list li');
+  for (var i = 0; i < items.length; i++) items[i].style.setProperty('--i', i);
+  if (!('IntersectionObserver' in window)) return;      /* нет наблюдателя — плашки просто видны */
+  sec.classList.add('dkrv');                            /* прятать разрешаем только сейчас */
+  var io = new IntersectionObserver(function(es){
+    if (!es[0].isIntersecting) return;
+    io.disconnect();
+    sec.classList.add('on');
+  }, {rootMargin: '0px 0px -12% 0px'});
+  io.observe(sec.querySelector('.dk-list') || sec);
+})();
 
 /* ==================== ГОДА НА ФОНЕ ВТОРОГО ЭКРАНА ====================
    Раз в секунду-полторы на фоне вспыхивает год прошлого сезона и сразу гаснет.
@@ -2271,8 +2418,8 @@ body{
    1. Одновременно на экране не больше MAX цифр (по умолчанию четыре).
    2. Новая точка ищется подальше от уже горящих — иначе цифры слипаются
       в пятно и фон становится грязным.
-   3. Полоса, куда они ставятся, — только вокруг ленты: заголовок сверху
-      прикрыт сугробом, а цифры сезона снизу остаются на чистом белом.
+   3. Полоса, куда они ставятся, — только вокруг ленты (BAND сверху и снизу
+      от неё). Заголовок и цифры сезона остаются на чистом белом.
    4. Один и тот же год не появляется дважды подряд.
 
    ЭКОНОМИЯ. Пока второй экран не в окне или вкладка спрятана, таймер стоит:
