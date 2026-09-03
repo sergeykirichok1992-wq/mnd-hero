@@ -556,19 +556,18 @@ body{
 .cr-city b{
   display:block; font-family:"CR Blogger Bold","CR Blogger",Arial,sans-serif; font-weight:700;
   font-size:29px; font-size:2.55cqw; line-height:1.06; color:#fff;
-  text-shadow:0 2px 16px rgba(0,0,0,.8), 0 0 34px rgba(0,0,0,.55);
   transition:color .25s ease;
 }
 .cr-city em{
   position:absolute; left:0; top:calc(100% + 7px); top:calc(100% + .62cqw);
   font-style:normal; font-weight:400; font-size:18px; font-size:1.60cqw; line-height:1.2;
-  color:rgba(255,255,255,.88); text-shadow:0 2px 12px rgba(0,0,0,.8);
+  color:rgba(255,255,255,.88);
 }
 /* приписка над названием — только у города с главным офисом */
 .cr-city i{
   position:absolute; left:0; bottom:calc(100% + 6px); bottom:calc(100% + .55cqw);
   font-style:normal; font-weight:600; font-size:18px; font-size:1.59cqw; line-height:1.2;
-  color:#FDC68C; text-shadow:0 2px 12px rgba(0,0,0,.8);
+  color:#FDC68C;
 }
 /* огонёк слева от названия */
 .cr-city::before{
@@ -631,13 +630,13 @@ body{
     right:calc(100% - 6.55cqw); width:16cqw; height:12cqw; margin-top:-6cqw;
     background:radial-gradient(closest-side, rgba(255,178,92,.34), rgba(255,178,92,0) 100%);
   }
-  /* главный офис: пунктирная рамка вокруг подписи и багровый отсвет под ней */
+  /* главный офис: багровый отсвет вместо тёплого. Пунктирная рамка тут была,
+     Серёга попросил убрать — осталась только её коробка, она задаёт отсвету
+     размер и место */
   .cr-city[data-city="nizhny"]::after{
     right:auto; margin-top:0; width:auto; height:auto;
     left:-18px; right:-11px; top:-33px; bottom:-26px;
     left:-4.7cqw; right:-2.8cqw; top:-8.6cqw; bottom:-6.9cqw;
-    border:1px dashed rgba(255,255,255,.5); border-radius:26px;
-    border-width:max(1px, .19cqw); border-radius:3.7cqw;
     background:radial-gradient(42% 50% at 13% 52%, rgba(226,66,74,.5), rgba(226,66,74,0) 74%);
   }
 }
