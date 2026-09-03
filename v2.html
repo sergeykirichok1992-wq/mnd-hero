@@ -428,8 +428,15 @@ body{
    z-index:3 — выше сугроба (2) и ниже начинки .cr-cont (7): цифры всегда
    позади ленты и текста, кликам не мешают.
 
-   Цвет — синий сайта на очень малой непрозрачности. Пик задаёт --o для каждой
-   цифры отдельно (0.08-0.16): одинаковая плотность у всех читалась бы узором. */
+   Цвет — золото сайта rgb(251,176,90), то же, что у цифр «52 000».
+
+   ПРО ПЛОТНОСТЬ. Числа --o (0.24-0.42) выглядят большими рядом с прежними
+   0.09-0.17 у синего, но на белом это тот же вес: золото светлое, разница
+   с белым фоном у него вдвое меньше, чем у синего, и на прежней плотности
+   цифр просто не было видно. Пик своей у каждой цифры — одинаковая плотность
+   у всех читалась бы узором.
+
+   Цифры стоят ровно, без наклона — так просил Серёга. */
 .cr-years{
   position:absolute; inset:0; z-index:3; overflow:hidden; pointer-events:none;
   contain:paint;                                    /* цифры не вылезают за экран */
@@ -437,23 +444,22 @@ body{
 .cr-years b{
   position:absolute; left:0; top:0; display:block; white-space:nowrap;
   font-family:"CR Yeseva",Georgia,serif; font-weight:400; line-height:1;
-  color:rgb(47,49,146);
+  color:rgb(251,176,90);
   font-size:calc(var(--fs) * var(--u));
-  transform:translate(-50%,-50%) rotate(var(--rot)) scale(.92);
+  transform:translate(-50%,-50%) scale(.92);
   opacity:0;
   animation:crYear var(--dur) ease-in-out both;
   will-change:opacity, transform;
 }
 @keyframes crYear{
-  0%   {opacity:0;        transform:translate(-50%,-50%) rotate(var(--rot)) scale(.92)}
-  38%  {opacity:var(--o); transform:translate(-50%,-50%) rotate(var(--rot)) scale(1)}
-  62%  {opacity:var(--o); transform:translate(-50%,-50%) rotate(var(--rot)) scale(1.01)}
-  100% {opacity:0;        transform:translate(-50%,-50%) rotate(var(--rot)) scale(1.04)}
+  0%   {opacity:0;        transform:translate(-50%,-50%) scale(.92)}
+  38%  {opacity:var(--o); transform:translate(-50%,-50%) scale(1)}
+  62%  {opacity:var(--o); transform:translate(-50%,-50%) scale(1.01)}
+  100% {opacity:0;        transform:translate(-50%,-50%) scale(1.04)}
 }
 /* «уменьшить движение»: цифры остаются, но не мигают — просто лежат на фоне */
 @media (prefers-reduced-motion:reduce){
-  .cr-years b{animation:none; opacity:var(--o);
-    transform:translate(-50%,-50%) rotate(var(--rot))}
+  .cr-years b{animation:none; opacity:var(--o); transform:translate(-50%,-50%)}
 }
 
 /* ---- лента фотографий второго экрана ----
@@ -537,6 +543,13 @@ body{
 .cr-s3::before{
   content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
   background:rgba(0,0,0,.16);
+}
+/* звёзды по всему полю карты. z-index 2 — выше плёнки (у неё 1), поэтому
+   точки не гасит её чернота, и ниже тени у кромки (4) и содержимого (7):
+   заголовок, карта, подписи и линии всегда сверху. */
+.cr-sky{
+  position:absolute; inset:0; z-index:2; display:block;
+  width:100%; height:100%; pointer-events:none;
 }
 /* мягкая тень у верхней кромки — та же, что кладёт движок старого сайта
    картинкой shadowtop с непрозрачностью 0,5 */
@@ -1030,6 +1043,7 @@ body{
         наведи на подпись — загорится линия.
      Фон нарисован кодом (см. .cr-s3 в стилях), картинки фона нет. -->
 <section class="cr cr-s3" id="cities" aria-labelledby="crT3">
+  <canvas class="cr-sky" id="crSky" aria-hidden="true"></canvas>
   <div class="cr-shadowtop" aria-hidden="true"></div>
   <div class="cr-cont">
 
@@ -2021,33 +2035,33 @@ body{
 </script>
 
 <script>
-/* ==================== ЭКРАН 4: живое небо ====================
-   Фон секции (пять градиентов) НЕ трогаем: он подобран замером под макет,
-   расхождение 3,4 уровня из 255. Сверху ложится только слой светлых точек.
+/* ==================== ЖИВОЕ НЕБО: экраны 3 и 4 ====================
+   Один и тот же слой звёзд лежит на двух экранах: на карте городов и на
+   письме с персонажами. Нарисованные фоны обеих секций НЕ трогаем — они
+   подобраны замером под оригинал (расхождение 2,8 и 3,4 уровня из 255),
+   сверху ложатся только светлые точки.
 
-   Что делает: звёзды трёх калибров с несинхронным мерцанием, неровная
-   плотность (сгущения и пустоты, гуще вверху — там фон тёмный), редкая
-   падающая звезда, лёгкий сдвиг слоя при прокрутке и за курсором.
+   Что делает: звёзды трёх калибров, у каждой своя фаза и скорость мерцания,
+   плотность неровная (сгущения и пустоты), редкая падающая звезда, лёгкий
+   сдвиг слоя при прокрутке и за курсором — дальние медленнее ближних.
 
-   Экономия: звёзды не рисуются кружками каждый кадр, а штампуются четырьмя
-   заготовками-спрайтами. Прокрутка не дёргает вёрстку: положение секции
-   замерено один раз, дальше только арифметика. Вне экрана и в свёрнутой
-   вкладке цикл кадров останавливается полностью. */
+   Чем это дёшево:
+   - звёзды не рисуются кружком каждый кадр, а штампуются четырьмя
+     заготовками-спрайтами, общими на оба неба;
+   - на все небеса один цикл кадров, а не по циклу на каждое;
+   - положение секции замерено один раз, прокрутка не дёргает вёрстку;
+   - небо вне экрана и свёрнутая вкладка цикл останавливают.
+
+   Отличия экранов заданы настройками при подключении внизу файла:
+   у письма звёзды гуще вверху и гаснут к низу (там фон светлеет),
+   у карты рассыпаны по всему полю. */
 (function(){
-  var host = document.getElementById('forwhom');
-  var cv   = document.getElementById('dkSky');
-  if (!host || !cv || !cv.getContext) return;
-  var ctx = cv.getContext('2d');
-  if (!ctx) return;
+  var slow = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)');
 
-  var slow  = window.matchMedia('(prefers-reduced-motion: reduce)');
-  var fine  = window.matchMedia('(hover:hover) and (pointer:fine)');
-
-  var W = 0, H = 0, dpr = 1;
-  var stars = [], sprites = null;
-  var shoot = null, nextShoot = 6;
-  var tSec = 0, last = 0, raf = 0, running = false, seen = true;
-  var hostTop = 0, hostH = 1, shiftY = 0, mx = 0, my = 0, mxT = 0, myT = 0;
+  var sprites = null;
+  var list = [], raf = 0, last = 0, tSec = 0;
+  var mxT = 0, myT = 0, mx = 0, my = 0;      /* курсор общий на все небеса */
 
   /* ---------- заготовки звёзд: белая, ледяная, лиловая, тёплая ---------- */
   function makeSprites(){
@@ -2068,18 +2082,29 @@ body{
     }
   }
 
-  /* ---------- расстановка ---------- */
-  function seed(){
-    stars = [];
-    if (W < 2 || H < 2) return;
-    var n = Math.round(Math.min(340, Math.max(70, (W * H) / 6200)));
+  /* ---------- одно небо ---------- */
+  function Sky(host, cv, o){
+    this.host = host; this.cv = cv; this.ctx = cv.getContext('2d'); this.o = o;
+    this.W = 0; this.H = 0;
+    this.stars = [];
+    this.shoot = null; this.nextShoot = o.first;
+    this.shiftY = 0; this.hostTop = 0; this.hostH = 1;
+    this.seen = true;
+  }
 
-    /* три-пять центров сгущения в верхней, тёмной половине кадра */
+  Sky.prototype.seed = function(){
+    var o = this.o, W = this.W, H = this.H;
+    this.stars = [];
+    if (W < 2 || H < 2) return;
+    var n = Math.round(Math.min(o.cap, Math.max(60, (W * H) / o.div)));
+
+    /* центры сгущения: у письма только в тёмной верхней половине,
+       у карты — по всей высоте, звёзды нужны по всему полю */
     var knots = [], kn = 3 + ((Math.random() * 3) | 0), k;
     for (k = 0; k < kn; k++){
       knots.push({
         x: Math.random() * W,
-        y: (0.04 + Math.random() * 0.44) * H,
+        y: (o.knotTop + Math.random() * o.knotLen) * H,
         r: (0.09 + Math.random() * 0.15) * W
       });
     }
@@ -2094,14 +2119,14 @@ body{
         y = q.y + Math.sin(a) * d;
       } else {
         x = Math.random() * W;
-        y = Math.pow(Math.random(), 1.7) * H;      /* гуще вверху */
+        y = Math.pow(Math.random(), o.bias) * H;   /* bias 1 — ровно по всей высоте */
       }
       x = x < 0 ? 0 : (x > W ? W : x);
       y = y < 0 ? 0 : (y > H ? H : y);
 
-      /* внизу секции фон светлый — там звёзды гасим, иначе выглядит грязью */
+      /* там, где фон светлеет, звёзды гасим: на светлом они читаются грязью */
       var v = y / H, fade = 1;
-      if (v > 0.54) fade = Math.max(0, 1 - (v - 0.54) / 0.40);
+      if (v > o.fadeFrom) fade = Math.max(0, 1 - (v - o.fadeFrom) / o.fadeLen);
       fade = fade * fade;
       if (fade < 0.04) continue;
 
@@ -2110,9 +2135,9 @@ body{
             : big > 0.70 ? (1.6 + Math.random() * 0.9)
             :              (0.9 + Math.random() * 0.6);
 
-      stars.push({
+      this.stars.push({
         x: x, y: y, r: r * 3.1,                    /* спрайт мягкий, радиус с запасом */
-        a: (0.36 + Math.random() * 0.66) * (r > 2.4 ? 1 : 0.86),
+        a: (0.36 + Math.random() * 0.66) * (r > 2.4 ? 1 : 0.86) * o.alpha,
         sp: 0.5 + Math.random() * 1.9,             /* своя скорость мерцания */
         ph: Math.random() * Math.PI * 2,           /* своя фаза: небо не дышит в такт */
         c: Math.random() < 0.62 ? 0 : (1 + ((Math.random() * 3) | 0)),
@@ -2120,69 +2145,44 @@ body{
         f: fade
       });
     }
-  }
+  };
 
-  /* ---------- размеры ---------- */
-  function measure(){
-    var r = host.getBoundingClientRect();
-    hostTop = r.top + (window.pageYOffset || document.documentElement.scrollTop || 0);
-    hostH   = Math.max(1, r.height);
+  Sky.prototype.measure = function(){
+    var r = this.host.getBoundingClientRect();
+    this.hostTop = r.top + (window.pageYOffset || document.documentElement.scrollTop || 0);
+    this.hostH   = Math.max(1, r.height);
     var w = Math.max(1, Math.round(r.width));
     var h = Math.max(1, Math.round(r.height));
-    dpr = Math.min(2, window.devicePixelRatio || 1);
-    if (w === W && h === H) return false;
-    W = w; H = h;
-    cv.width  = Math.round(W * dpr);
-    cv.height = Math.round(H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    seed();
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    if (w === this.W && h === this.H) return false;
+    this.W = w; this.H = h;
+    this.cv.width  = Math.round(w * dpr);
+    this.cv.height = Math.round(h * dpr);
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    this.seed();
     return true;
-  }
+  };
 
-  /* ---------- прокрутка: без чтения размеров, одна арифметика ---------- */
-  function onScroll(){
+  /* прокрутка: без чтения размеров, одна арифметика */
+  Sky.prototype.onScroll = function(){
     var vh = window.innerHeight || 800;
     var y  = window.pageYOffset || document.documentElement.scrollTop || 0;
-    var p  = (y + vh - hostTop) / (vh + hostH);
+    var p  = (y + vh - this.hostTop) / (vh + this.hostH);
     p = p < 0 ? 0 : (p > 1 ? 1 : p);
-    shiftY = (p - 0.5) * 46;
-  }
+    this.shiftY = (p - 0.5) * this.o.shift;
+  };
 
-  /* ---------- рисование ---------- */
-  function draw(dt){
-    ctx.clearRect(0, 0, W, H);
-    if (!sprites) return;
-
-    /* курсор ведём с запаздыванием, иначе слой дёргается за рукой */
-    mx += (mxT - mx) * Math.min(1, dt * 3.2);
-    my += (myT - my) * Math.min(1, dt * 3.2);
-
-    for (var i = 0; i < stars.length; i++){
-      var s = stars[i];
-      var tw = slow.matches ? 0.9 : (0.6 + 0.4 * Math.sin(tSec * s.sp + s.ph));
-      var a  = s.a * tw * s.f;
-      if (a <= 0.01) continue;
-      var r  = s.r * (0.88 + 0.22 * tw);
-      var px = s.x + mx * 9 * s.d;
-      var py = s.y + shiftY * s.d + my * 6 * s.d;
-      ctx.globalAlpha = a > 1 ? 1 : a;
-      ctx.drawImage(sprites[s.c], px - r, py - r, r * 2, r * 2);
-    }
-    ctx.globalAlpha = 1;
-    drawShoot();
-  }
-
-  /* ---------- падающая звезда ---------- */
-  function stepShoot(dt){
-    if (slow.matches) return;
-    if (!shoot){
-      if (tSec >= nextShoot && W > 2){
+  Sky.prototype.stepShoot = function(dt){
+    if (slow.matches || this.W < 2) return;
+    var o = this.o;
+    if (!this.shoot){
+      if (tSec >= this.nextShoot){
         var left = Math.random() < 0.5;
-        shoot = {
-          x:  left ? -0.12 * W : 1.12 * W,
-          y:  (0.03 + Math.random() * 0.30) * H,
-          vx: (left ? 1 : -1) * (0.5 + Math.random() * 0.4) * W,
-          vy: (0.16 + Math.random() * 0.22) * H,
+        this.shoot = {
+          x:  left ? -0.12 * this.W : 1.12 * this.W,
+          y:  (0.03 + Math.random() * 0.30) * this.H,
+          vx: (left ? 1 : -1) * (0.5 + Math.random() * 0.4) * this.W,
+          vy: (0.16 + Math.random() * 0.22) * this.H,
           t:  0,
           dur: 1.0 + Math.random() * 0.6,
           len: 0.10 + Math.random() * 0.09
@@ -2190,24 +2190,27 @@ body{
       }
       return;
     }
-    shoot.t += dt;
-    shoot.x += shoot.vx * dt;
-    shoot.y += shoot.vy * dt;
-    if (shoot.t >= shoot.dur){
-      shoot = null;
-      nextShoot = tSec + 15 + Math.random() * 22;   /* раз в 15-37 секунд */
+    this.shoot.t += dt;
+    this.shoot.x += this.shoot.vx * dt;
+    this.shoot.y += this.shoot.vy * dt;
+    if (this.shoot.t >= this.shoot.dur){
+      this.shoot = null;
+      this.nextShoot = tSec + o.gap + Math.random() * o.gapSpread;
     }
-  }
-  function drawShoot(){
-    if (!shoot) return;
-    var k = shoot.t / shoot.dur;
+  };
+
+  Sky.prototype.drawShoot = function(){
+    var s = this.shoot;
+    if (!s) return;
+    var ctx = this.ctx;
+    var k = s.t / s.dur;
     var a = k < 0.18 ? k / 0.18 : (k > 0.62 ? Math.max(0, (1 - k) / 0.38) : 1);
     if (a <= 0.01) return;
-    var m  = Math.sqrt(shoot.vx * shoot.vx + shoot.vy * shoot.vy) || 1;
-    var L  = shoot.len * W;
-    var tx = shoot.x - shoot.vx / m * L;
-    var ty = shoot.y - shoot.vy / m * L;
-    var g  = ctx.createLinearGradient(shoot.x, shoot.y, tx, ty);
+    var m  = Math.sqrt(s.vx * s.vx + s.vy * s.vy) || 1;
+    var L  = s.len * this.W;
+    var tx = s.x - s.vx / m * L;
+    var ty = s.y - s.vy / m * L;
+    var g  = ctx.createLinearGradient(s.x, s.y, tx, ty);
     g.addColorStop(0, 'rgba(255,255,255,' + (0.9 * a).toFixed(3) + ')');
     g.addColorStop(0.35, 'rgba(206,226,255,' + (0.38 * a).toFixed(3) + ')');
     g.addColorStop(1, 'rgba(206,226,255,0)');
@@ -2215,55 +2218,126 @@ body{
     ctx.lineWidth = 1.7;
     ctx.lineCap = 'round';
     ctx.beginPath();
-    ctx.moveTo(shoot.x, shoot.y);
+    ctx.moveTo(s.x, s.y);
     ctx.lineTo(tx, ty);
     ctx.stroke();
     if (sprites){
       ctx.globalAlpha = a;
-      ctx.drawImage(sprites[0], shoot.x - 9, shoot.y - 9, 18, 18);
+      ctx.drawImage(sprites[0], s.x - 9, s.y - 9, 18, 18);
       ctx.globalAlpha = 1;
     }
-  }
+  };
 
-  /* ---------- цикл ---------- */
+  Sky.prototype.draw = function(){
+    var ctx = this.ctx, st = this.stars;
+    ctx.clearRect(0, 0, this.W, this.H);
+    if (!sprites) return;
+    for (var i = 0; i < st.length; i++){
+      var s = st[i];
+      var tw = slow.matches ? 0.9 : (0.6 + 0.4 * Math.sin(tSec * s.sp + s.ph));
+      var a  = s.a * tw * s.f;
+      if (a <= 0.01) continue;
+      var r  = s.r * (0.88 + 0.22 * tw);
+      var px = s.x + mx * 9 * s.d;
+      var py = s.y + this.shiftY * s.d + my * 6 * s.d;
+      ctx.globalAlpha = a > 1 ? 1 : a;
+      ctx.drawImage(sprites[s.c], px - r, py - r, r * 2, r * 2);
+    }
+    ctx.globalAlpha = 1;
+    this.drawShoot();
+  };
+
+  /* ---------- один цикл кадров на все небеса ---------- */
   function frame(now){
     raf = 0;
-    if (!running) return;
     var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
     last = now;
     tSec += dt;
-    stepShoot(dt);
-    draw(dt);
-    raf = requestAnimationFrame(frame);
+    mx += (mxT - mx) * Math.min(1, dt * 3.2);   /* курсор с запаздыванием: без него дёргается */
+    my += (myT - my) * Math.min(1, dt * 3.2);
+    var any = false;
+    for (var i = 0; i < list.length; i++){
+      var s = list[i];
+      if (!s.seen) continue;
+      any = true;
+      s.stepShoot(dt);
+      s.draw();
+    }
+    if (any && !document.hidden && !slow.matches) raf = requestAnimationFrame(frame);
+    else last = 0;
   }
-  function start(){
-    if (running || slow.matches || !seen) return;
-    running = true; last = 0;
-    raf = requestAnimationFrame(frame);
+  function kick(){
+    if (raf || slow.matches || document.hidden) return;
+    for (var i = 0; i < list.length; i++){
+      if (list[i].seen){ last = 0; raf = requestAnimationFrame(frame); return; }
+    }
   }
-  function stop(){
-    running = false;
+  function halt(){
     if (raf){ cancelAnimationFrame(raf); raf = 0; }
+    last = 0;
   }
 
-  /* ---------- подключение ---------- */
+  /* ---------- подключение одного неба ---------- */
+  function add(hostId, cvId, o){
+    var host = document.getElementById(hostId);
+    var cv   = document.getElementById(cvId);
+    if (!host || !cv || !cv.getContext) return;
+    var sky = new Sky(host, cv, o);
+    if (!sky.ctx) return;
+
+    sky.measure();
+    sky.onScroll();
+    sky.draw();                                   /* первый кадр сразу, до анимации */
+    list.push(sky);
+
+    if (window.IntersectionObserver){
+      new IntersectionObserver(function(es){
+        sky.seen = es[0].isIntersecting;
+        sky.seen ? kick() : null;
+      }, {rootMargin: '260px 0px'}).observe(host);
+    }
+
+    if (window.ResizeObserver){
+      var tmr = 0;
+      new ResizeObserver(function(){
+        clearTimeout(tmr);
+        tmr = setTimeout(function(){
+          sky.measure();
+          sky.onScroll();
+          if (!raf) sky.draw();
+        }, 140);
+      }).observe(host);
+    }
+  }
+
+  /* ---------- запуск ---------- */
   makeSprites();
-  measure();
-  onScroll();
-  draw(0.016);                                   /* первый кадр сразу, до анимации */
 
-  if (window.IntersectionObserver){
-    new IntersectionObserver(function(es){
-      seen = es[0].isIntersecting;
-      seen ? start() : stop();
-    }, {rootMargin: '260px 0px'}).observe(host);
-  } else { seen = true; start(); }
-
-  document.addEventListener('visibilitychange', function(){
-    document.hidden ? stop() : start();
+  /* письмо с персонажами: гуще вверху, к низу гаснет — там фон светлеет */
+  add('forwhom', 'dkSky', {
+    div: 6200, cap: 340, bias: 1.7, knotTop: 0.04, knotLen: 0.44,
+    fadeFrom: 0.54, fadeLen: 0.40, alpha: 1, shift: 46,
+    first: 6, gap: 15, gapSpread: 22
   });
 
-  window.addEventListener('scroll', onScroll, {passive: true});
+  /* карта городов: по всему полю, без затухания. Секция высокая,
+     поэтому потолок числа звёзд выше, а сами они чуть скромнее по яркости —
+     под ними лежит плёнка старого сайта и над ними идёт белый текст. */
+  add('cities', 'crSky', {
+    div: 6400, cap: 460, bias: 1, knotTop: 0.05, knotLen: 0.86,
+    fadeFrom: 1.2, fadeLen: 1, alpha: 0.9, shift: 40,
+    first: 3, gap: 14, gapSpread: 20
+  });
+
+  if (!list.length) return;
+
+  window.addEventListener('scroll', function(){
+    for (var i = 0; i < list.length; i++) list[i].onScroll();
+  }, {passive: true});
+
+  document.addEventListener('visibilitychange', function(){
+    document.hidden ? halt() : kick();
+  });
 
   if (fine.matches){
     window.addEventListener('pointermove', function(e){
@@ -2272,27 +2346,26 @@ body{
     }, {passive: true});
   }
 
-  if (window.ResizeObserver){
-    var tmr = 0;
-    new ResizeObserver(function(){
-      clearTimeout(tmr);
-      tmr = setTimeout(function(){
-        if (measure()) { onScroll(); if (!running) draw(0.016); }
-        else { onScroll(); }
-      }, 140);
-    }).observe(host);
-  } else {
+  if (!window.ResizeObserver){
     var tmr2 = 0;
     window.addEventListener('resize', function(){
       clearTimeout(tmr2);
-      tmr2 = setTimeout(function(){ measure(); onScroll(); if (!running) draw(0.016); }, 160);
+      tmr2 = setTimeout(function(){
+        for (var i = 0; i < list.length; i++){ list[i].measure(); list[i].onScroll(); }
+        if (!raf) for (var j = 0; j < list.length; j++) list[j].draw();
+      }, 160);
     });
   }
 
   /* системная настройка «уменьшить движение» может включиться на ходу */
-  var onSlow = function(){ slow.matches ? (stop(), draw(0.016)) : start(); };
+  var onSlow = function(){
+    if (slow.matches){ halt(); for (var i = 0; i < list.length; i++) list[i].draw(); }
+    else kick();
+  };
   if (slow.addEventListener) slow.addEventListener('change', onSlow);
   else if (slow.addListener) slow.addListener(onSlow);
+
+  kick();
 })();
 </script>
 
@@ -2406,7 +2479,7 @@ body{
 })();
 
 /* ==================== ГОДА НА ФОНЕ ВТОРОГО ЭКРАНА ====================
-   Раз в секунду-полторы на фоне вспыхивает год прошлого сезона и сразу гаснет.
+   Каждые полсекунды на фоне вспыхивает год прошлого сезона и сразу гаснет.
    Всё, что делает скрипт, — кладёт в слой .cr-years один <b> и убирает его,
    когда анимация доиграла. Сама вспышка живёт в CSS (@keyframes crYear).
 
@@ -2415,7 +2488,7 @@ body{
    точка каждый раз новая, поэтому фон не «зацикливается».
 
    ЧТОБЫ НЕ БЫЛО ПЕРЕГРУЖЕНО:
-   1. Одновременно на экране не больше MAX цифр (по умолчанию четыре).
+   1. Одновременно на экране не больше MAX цифр (сейчас восемь).
    2. Новая точка ищется подальше от уже горящих — иначе цифры слипаются
       в пятно и фон становится грязным.
    3. Полоса, куда они ставятся, — только вокруг ленты (BAND сверху и снизу
@@ -2431,7 +2504,7 @@ body{
   if (!layer || !sec || !lenta) return;
 
   var YEARS = ['2018','2019','2020','2021','2022','2023','2024','2025','2026'];
-  var MAX   = 4;          /* сколько цифр может гореть одновременно */
+  var MAX   = 8;          /* сколько цифр может гореть одновременно */
 
   var alive = [];         /* {x, y, r} горящих сейчас — чтобы не ставить рядом */
   var last  = '';         /* какой год показали прошлым */
@@ -2470,15 +2543,15 @@ body{
     var u  = parseFloat(getComputedStyle(sec).getPropertyValue('--u')) || 1;
     var px = fs * u;                             /* примерная высота цифры в пикселях */
 
-    /* ищем свободное место: до 14 попыток отойти от уже горящих цифр */
+    /* ищем свободное место: до 22 попыток отойти от уже горящих цифр */
     var x, y, ok = false;
-    for (var i = 0; i < 14 && !ok; i++){
+    for (var i = 0; i < 22 && !ok; i++){
       x = rnd(b.w * 0.06, b.w * 0.94);
       y = rnd(b.top + px * 0.4, b.bot - px * 0.4);
       ok = true;
       for (var j = 0; j < alive.length; j++){
         var a = alive[j];
-        var need = (px + a.r) * 1.15;            /* «личное пространство» цифры */
+        var need = (px + a.r) * 0.85;            /* «личное пространство» цифры */
         if (Math.abs(x - a.x) < need * 1.6 && Math.abs(y - a.y) < need) { ok = false; break; }
       }
     }
@@ -2492,8 +2565,7 @@ body{
     var el = document.createElement('b');
     el.textContent = year;
     el.style.setProperty('--fs',  fs.toFixed(1));
-    el.style.setProperty('--rot', rnd(-7, 7).toFixed(1) + 'deg');
-    el.style.setProperty('--o',   rnd(0.09, 0.17).toFixed(3));
+    el.style.setProperty('--o',   rnd(0.24, 0.42).toFixed(3));
     el.style.setProperty('--dur', rnd(2.8, 4.4).toFixed(2) + 's');
     el.style.left = (x / b.w * 100).toFixed(2) + '%';
     el.style.top  = y.toFixed(0) + 'px';
@@ -2514,7 +2586,7 @@ body{
 
   function tick(){
     if (!document.hidden && alive.length < MAX) spawn();
-    timer = setTimeout(tick, rnd(700, 1600));
+    timer = setTimeout(tick, rnd(340, 800));
   }
   function start(){ if (!timer) tick(); }
   function stop(){ clearTimeout(timer); timer = 0; }
