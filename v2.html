@@ -2073,5 +2073,90 @@ body{
 })();
 </script>
 
+<script>
+/* ==================== ЦИФРЫ СЕЗОНА: НАБИРАЮТСЯ ПРИ ДОКРУТКЕ ====================
+   Четыре числа второго экрана (52 000, 7, 6 500, 150+) не появляются готовыми,
+   а быстро "накручиваются" от нуля, когда экран доезжает до них. Шрифт, кегль,
+   цвет и разметка не трогаются вообще - меняется только текст внутри <h3>.
+
+   Что тут важно:
+
+   1. ФОРМАТ ЧИСЛА БЕРЁТСЯ ИЗ РАЗМЕТКИ, А НЕ ЗАДАЁТСЯ РУКАМИ. Скрипт читает
+      написанное в HTML, отделяет само число от хвоста ("+" и неразрывный
+      пробел у 150) и запоминает, каким знаком разделены тысячи. В конце
+      возвращается ровно исходная строка, символ в символ.
+
+   2. АНИМАЦИЯ ОДНА НА ВСЕ ЧЕТЫРЕ ЧИСЛА. Один requestAnimationFrame крутит
+      весь блок сразу: колонки набираются синхронно, лишних таймеров нет.
+
+   3. ЗАМЕДЛЕНИЕ К КОНЦУ (easeOutCubic). Первые кадры число проскакивает
+      большую часть пути, поэтому "мигание" количества цифр длится доли
+      секунды, а последние сотни доезжают медленно - взгляд успевает прочитать.
+
+   4. СРАБАТЫВАЕТ ОДИН РАЗ. После набора наблюдатель отключается: при прокрутке
+      вверх-вниз числа не дёргаются заново.
+
+   При системной настройке "уменьшить движение" и на старых браузерах без
+   IntersectionObserver скрипт молча выходит - в разметке уже лежат финальные
+   числа, страница выглядит как раньше. */
+(function(){
+  var nodes = [].slice.call(document.querySelectorAll('.cr-s2 .cr-num'));
+  if (!nodes.length) return;
+  if (!('IntersectionObserver' in window) || !window.requestAnimationFrame) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  var DUR = 1500;                                  /* столько длится набор, мс */
+
+  /* ---------- разбор того, что написано в разметке ---------- */
+  var items = [];
+  nodes.forEach(function(el){
+    var src = el.textContent;
+    var m = /^([^\d]*)([\d   ]*\d)([\s\S]*)$/.exec(src);
+    if (!m) return;
+    var body = m[2];
+    var sepM = /[   ]/.exec(body);
+    items.push({
+      el:   el,
+      head: m[1],
+      tail: m[3],
+      full: src,                                   /* чем закончить, буква в букву */
+      sep:  sepM ? sepM[0] : ' ',
+      to:   parseInt(body.replace(/[^\d]/g, ''), 10) || 0
+    });
+  });
+  if (!items.length) return;
+
+  function group(n, sep){
+    var s = String(n), out = '', i = s.length;
+    while (i > 3){ out = sep + s.slice(i - 3, i) + out; i -= 3; }
+    return s.slice(0, i) + out;
+  }
+  function put(it, n){ it.el.textContent = it.head + group(n, it.sep) + it.tail; }
+
+  items.forEach(function(it){ put(it, 0); });      /* стартовое состояние - нули */
+
+  /* ---------- сам набор ---------- */
+  var t0 = 0;
+  function frame(now){
+    if (!t0) t0 = now;
+    var p = Math.min(1, (now - t0) / DUR);
+    var e = 1 - Math.pow(1 - p, 3);                /* easeOutCubic */
+    if (p < 1){
+      items.forEach(function(it){ put(it, Math.round(it.to * e)); });
+      requestAnimationFrame(frame);
+    } else {
+      items.forEach(function(it){ it.el.textContent = it.full; });
+    }
+  }
+
+  var io = new IntersectionObserver(function(es){
+    if (!es[0].isIntersecting) return;
+    io.disconnect();
+    requestAnimationFrame(frame);
+  }, {threshold: 0.4});
+  io.observe(items[0].el.closest('.cr-grid') || items[0].el);
+})();
+</script>
+
 </body>
 </html>
