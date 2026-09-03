@@ -416,76 +416,50 @@ body{
 .cr-lead{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(28 * var(--u)); line-height:1.4}
 @media (max-width:767px){ .cr-h2{font-size:13px} }
 
-/* слайдер: круглые стрелки по бокам, лента внутри, точки под ней */
-.cr-nsl{padding:calc(10 * var(--u)) calc(5 * var(--u))}
-.cr-slider{position:relative; display:flex; align-items:center}
-.cr-arrow{
-  flex:0 0 calc(30 * var(--u)); height:calc(30 * var(--u));
-  font-size:calc(10 * var(--u)); line-height:calc(26 * var(--u)); text-align:center;
-  border-radius:100%; border:calc(2 * var(--u)) solid rgba(51,51,51,.2); color:rgb(51,51,51);
-  opacity:.8; background:none; padding:0; cursor:pointer;
-}
-.cr-arrow:hover{opacity:1}
-.cr-arrow svg{width:1em; height:1em; vertical-align:middle; fill:currentColor}
-.cr-prev svg{margin-right:2px}
-.cr-next svg{margin-left:2px}
-.cr-track{margin:0 calc(20 * var(--u)); flex-grow:1; overflow:hidden; min-width:0}
-/* лента: слайды одной высоты — самый высокий задаёт её всем,
-   ровно как fixheight у слайдера старого сайта */
-.cr-strip{display:flex; will-change:transform; transition:transform .45s cubic-bezier(.25,.7,.3,1)}
-.cr-slide{flex:0 0 100%; max-width:100%}
-/* клон первого кадра в хвосте ленты: нужен только чтобы петля ехала
-   в одну сторону, для чтения с экрана он лишний */
-.cr-clone{pointer-events:none}
-.cr-slidebox{padding:calc(10 * var(--u)) calc(5 * var(--u)) calc(36 * var(--u)); text-align:center}
-.cr-slidebox img{display:inline-block; width:calc(980 * var(--u)); max-width:100%; height:auto; vertical-align:middle}
-.cr-dots{text-align:center; margin-top:0; line-height:1.4285714285714286}
-.cr-dot{
-  display:inline-block; width:calc(7 * var(--u)); height:calc(7 * var(--u));
-  padding:calc(1.4 * var(--u)); border:0;
-  background-color:rgba(51,51,51,.2); border-radius:100%;
-  transition:background-color .3s; vertical-align:middle; cursor:pointer;
-}
-.cr-dot + .cr-dot{margin-left:calc(4.666666666666667 * var(--u))}
-.cr-dot.is-active{background-color:rgb(234,100,86)}
-@media (max-width:767px){
-  .cr-arrow{display:none}
-  .cr-track{margin:0}
-}
-@media (prefers-reduced-motion:reduce){ .cr-strip{transition:none} }
+/* ---- лента фотографий второго экрана ----
+   52 снимка в два ряда одной длинной лентой: она едет справа налево сама,
+   без остановок, а пальцем или мышью её можно разогнать, отмотать назад
+   и притормозить. Раньше на компьютере тут листались два коллажа по три ряда,
+   а лента жила только на телефоне - теперь лента одна на все ширины.
+   Карточки строит скрипт (см. «ЛЕНТА ФОТО» внизу файла).
 
-/* ---- телефон: вместо слайдера одна длинная лента фотографий ----
-   На компьютере второй экран показывает два коллажа по три ряда. На узком
-   экране те же снимки разложены в ДВА ряда, чтобы лица было видно, и склеены
-   в одну ленту: она едет справа налево сама, а пальцем её можно разогнать.
-   Карточки строит скрипт (см. «ЛЕНТА ФОТО» внизу файла) и только когда лента
-   реально видна - на компьютере ни один из 52 снимков не скачивается. */
-.cr-lenta{display:none}
-@media (max-width:767px){
-  .cr-nsl{display:none}                        /* слайдер коллажей - только на большом экране */
+   ВЫСОТА РЯДА. На телефоне считается от ширины экрана, а не от vh: там адресная
+   строка прячется при прокрутке, vh скачет вместе с ней и лента дёргалась бы.
+   От 768 px высота идёт через общий множитель --u - те же 240 px старого сайта
+   растут вместе со всей страницей, как и остальные размеры на этих экранах. */
+.cr-lenta{
+  display:block; overflow:hidden;
+  --lh:min(52vw, 240px);
+  --fr:calc(var(--lh) * .035);               /* рамка полароида - те же 3,5 %, что в коллаже */
+  padding:calc(var(--lh) * .08) 0;           /* запас, чтобы наклонённые углы не срезались */
+  touch-action:pan-y;                        /* вертикальную прокрутку отдаём странице */
+  user-select:none; -webkit-user-select:none;/* мышь тянет ленту, а не выделяет снимки */
+}
+.cr-row{display:flex; align-items:center; will-change:transform}
+.cr-row + .cr-row{margin-top:calc(var(--lh) * .05)}
+.cr-card{
+  flex:0 0 auto; height:var(--lh);
+  margin:0 calc(var(--lh) * -.01);           /* снимки чуть находят друг на друга, как в коллаже */
+  padding:var(--fr) var(--fr) calc(var(--fr) * 3);   /* низ втрое шире боков */
+  background:#fff; border-radius:1px;
+  box-shadow:0 1px 3px rgba(0,0,0,.3);
+  transform:rotate(var(--r)) translateY(var(--dy));
+}
+.cr-card img{display:block; height:100%; width:auto; max-width:none; -webkit-user-drag:none}
+/* Компьютер и планшет: лента обрывается не по краю монитора, а примерно в пяти
+   сантиметрах от него. Около четырёх даёт сам контейнер (.cr-cont ужат до
+   min(94vw,1720px) со своими полями), эти поля добирают остальное. На планшете
+   они сжимаются: там пять сантиметров с двух сторон съели бы пол-ленты. */
+@media (min-width:768px){
   .cr-lenta{
-    display:block; overflow:hidden;
-    /* высота ряда считается от ширины экрана, а не от vh: на телефоне адресная
-       строка прячется при прокрутке, vh скачет вместе с ней и лента дёргалась бы */
-    --lh:min(52vw, 240px);
-    --fr:calc(var(--lh) * .035);               /* рамка полароида - те же 3,5 %, что в коллаже */
-    padding:calc(var(--lh) * .08) 0;           /* запас, чтобы наклонённые углы не срезались */
-    touch-action:pan-y;                        /* вертикальную прокрутку отдаём странице */
+    --lh:calc(240 * var(--u));
+    margin-inline:clamp(0px, 2.6vw, 52px);
+    cursor:grab;
   }
-  .cr-row{display:flex; align-items:center; will-change:transform}
-  .cr-row + .cr-row{margin-top:calc(var(--lh) * .05)}
-  .cr-card{
-    flex:0 0 auto; height:var(--lh);
-    margin:0 calc(var(--lh) * -.01);           /* снимки чуть находят друг на друга, как в коллаже */
-    padding:var(--fr) var(--fr) calc(var(--fr) * 3);   /* низ втрое шире боков */
-    background:#fff; border-radius:1px;
-    box-shadow:0 1px 3px rgba(0,0,0,.3);
-    transform:rotate(var(--r)) translateY(var(--dy));
-  }
-  .cr-card img{display:block; height:100%; width:auto; max-width:none}
+  .cr-lenta.drag, .cr-lenta.drag *{cursor:grabbing}
 }
 /* выключенная анимация: лента не едет сама, но её можно листать пальцем */
-@media (max-width:767px) and (prefers-reduced-motion:reduce){
+@media (prefers-reduced-motion:reduce){
   .cr-lenta{overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch}
 }
 
@@ -835,9 +809,11 @@ body{
 <div id="vstatus"></div>
 
 <!-- ==================== ЭКРАН 2: «Грандиозное новогоднее мероприятие» ====================
-     Точная копия второго экрана старого сайта: заголовок в два цвета, подпись,
-     слайдер из двух коллажей и четыре цифры сезона. Отступы, кегли и шрифты
-     сняты замером с оригинала, менять их — значит расходиться с ним. -->
+     Второй экран старого сайта: заголовок в два цвета, подпись и четыре цифры
+     сезона — отступы, кегли и шрифты сняты замером с оригинала, менять их —
+     значит расходиться с ним. Отличие одно: вместо слайдера из двух коллажей
+     тут бесконечная лента снимков, одна и та же на телефоне, планшете
+     и компьютере. -->
 <section class="cr cr-s2" id="was" aria-labelledby="crT2">
   <div class="cr-snow" aria-hidden="true"></div>
   <div class="cr-cont">
@@ -852,47 +828,7 @@ body{
 
     <div style="height:calc(12 * var(--u))"></div>
 
-    <!-- слайдер: две страницы коллажа, сам листает раз в 5 секунд, петля -->
-    <div class="cr-nsl">
-      <div class="cr-slider" id="crSlider">
-        <button class="cr-arrow cr-prev" type="button" aria-label="Предыдущий кадр"><svg viewBox="0 0 8 14" aria-hidden="true"><path d="M7 1 1.4 7 7 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <div class="cr-track">
-          <div class="cr-strip" id="crStrip">
-            <div class="cr-slide">
-              <div class="cr-slidebox">
-                <img src="v2-slide1-980.webp" srcset="v2-slide1-980.webp 980w, v2-slide1-1542.webp 1542w"
-                     sizes="(max-width:767px) calc(100vw - 20px), (min-width:1830px) 1440px, 78vw"
-                     width="980" height="662" alt="Кадры прошлого сезона: дети, Дед Мороз, лаборатория Министерства"
-                     loading="lazy" decoding="async">
-              </div>
-            </div>
-            <div class="cr-slide">
-              <div class="cr-slidebox">
-                <img src="v2-slide2-980.webp" srcset="v2-slide2-980.webp 980w, v2-slide2-1397.webp 1397w"
-                     sizes="(max-width:767px) calc(100vw - 20px), (min-width:1830px) 1440px, 78vw"
-                     width="980" height="666" alt="Кадры прошлого сезона: шоу, мастерская карамели, гости"
-                     loading="lazy" decoding="async">
-              </div>
-            </div>
-            <!-- клон первого кадра: с ним лента всегда едет в одну сторону,
-                 как петля Swiper на старом сайте, а не откатывается назад -->
-            <div class="cr-slide cr-clone" aria-hidden="true">
-              <div class="cr-slidebox">
-                <img src="v2-slide1-980.webp" srcset="v2-slide1-980.webp 980w, v2-slide1-1542.webp 1542w"
-                     sizes="(max-width:767px) calc(100vw - 20px), (min-width:1830px) 1440px, 78vw"
-                     width="980" height="662" alt="" loading="lazy" decoding="async">
-              </div>
-            </div>
-          </div>
-        </div>
-        <button class="cr-arrow cr-next" type="button" aria-label="Следующий кадр"><svg viewBox="0 0 8 14" aria-hidden="true"><path d="M1 1 6.6 7 1 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </div>
-      <div class="cr-dots" id="crDots">
-        <button class="cr-dot is-active" type="button" aria-label="Кадр 1"></button><button class="cr-dot" type="button" aria-label="Кадр 2"></button>
-      </div>
-    </div>
-
-    <!-- та же фотоплёнка для телефона: два ряда, едет сама, карточки строит скрипт -->
+    <!-- фотоплёнка прошлых сезонов: два ряда, едет сама, карточки строит скрипт -->
     <div class="cr-lenta" id="crLenta" role="img"
          aria-label="Кадры прошлых сезонов: дети, Дед Мороз, шоу, мастерская карамели"></div>
 
@@ -1638,122 +1574,6 @@ body{
 </script>
 
 <script>
-/* ==================== СЛАЙДЕР ВТОРОГО ЭКРАНА ====================
-   Повтор поведения слайдера старого сайта: две страницы, сам листает
-   раз в 5 секунд, петля, стрелки, точки, свайп пальцем.
-
-   Две вещи, которые нашло ревью и которые тут исправлены:
-
-   1. ПЕТЛЯ ЕДЕТ В ОДНУ СТОРОНУ. Раньше переход «второй кадр -> первый»
-      проигрывался как движение ленты вправо, то есть кадр откатывался назад,
-      хотя стрелка обещала «вперёд». Теперь в конце ленты стоит клон первого
-      кадра: лента доезжает до него обычной анимацией, а сразу после неё
-      мгновенно, без анимации, перескакивает на настоящий первый кадр.
-      Так же сделана петля у слайдера старого сайта.
-
-   2. КЛИК ПО СТРЕЛКЕ НЕ БУДИТ АВТОЛИСТАНИЕ. Раньше после клика таймер
-      заводился заново, даже если курсор так и стоял на слайдере, и через
-      пять секунд кадр уезжал из-под мыши. Теперь есть флаг hover: пока
-      мышь на слайдере, таймер не заводится вообще. */
-(function(){
-  'use strict';
-  var root = document.getElementById('crSlider');
-  var strip = document.getElementById('crStrip');
-  var dotsBox = document.getElementById('crDots');
-  if (!root || !strip || !dotsBox) return;
-
-  var prevBtn = root.querySelector('.cr-prev');
-  var nextBtn = root.querySelector('.cr-next');
-  var dots = Array.prototype.slice.call(dotsBox.querySelectorAll('.cr-dot'));
-  var real = strip.querySelectorAll('.cr-slide:not(.cr-clone)').length;
-  if (!real || !dots.length) return;
-
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var pos = 0;          /* позиция ленты: 0..real, где real - это клон первого кадра */
-  var hover = false;
-  var timer = null, snapT = null, snapOn = null;
-
-  /* сдвиг ленты. animate=false - мгновенно: анимацию гасим, двигаем,
-     заставляем браузер пересчитать вёрстку и только потом возвращаем */
-  function place(p, animate){
-    if (!animate) strip.style.transition = 'none';
-    strip.style.transform = 'translateX(' + (-100 * p) + '%)';
-    if (!animate){ void strip.offsetWidth; strip.style.transition = ''; }
-  }
-  function mark(){
-    var k = pos % real;
-    for (var j = 0; j < dots.length; j++) dots[j].classList.toggle('is-active', j === k);
-  }
-  /* доехали до клона - подменяем его настоящим кадром, когда анимация кончилась.
-     Таймер на 700 мс - страховка: при prefers-reduced-motion перехода нет
-     и transitionend не приходит вовсе */
-  function snapBack(){
-    clearSnap();
-    snapOn = function(){
-      clearSnap();
-      if (pos === real){ pos = 0; place(0, false); mark(); }
-    };
-    strip.addEventListener('transitionend', snapOn);
-    snapT = setTimeout(snapOn, 700);
-  }
-  function clearSnap(){
-    if (snapOn){ strip.removeEventListener('transitionend', snapOn); snapOn = null; }
-    if (snapT){ clearTimeout(snapT); snapT = null; }
-  }
-
-  function step(dir){
-    clearSnap();
-    if (pos === real){ pos = 0; place(0, false); }      /* застряли на клоне - выходим на настоящий кадр */
-    if (dir > 0){
-      pos += 1; place(pos, true); mark();
-      if (pos === real) snapBack();
-    } else {
-      if (pos === 0){ pos = real; place(real, false); } /* заходим слева от первого кадра через клон */
-      pos -= 1; place(pos, true); mark();
-    }
-  }
-  function jump(k){
-    clearSnap();
-    pos = k; place(pos, true); mark();
-  }
-
-  function stop(){ if (timer){ clearInterval(timer); timer = null; } }
-  function play(){
-    stop();
-    if (!reduce && !hover) timer = setInterval(function(){ step(1); }, 5000);
-  }
-  function go(fn){ fn(); play(); }   /* play() сам не заведётся, пока мышь на слайдере */
-
-  if (prevBtn) prevBtn.addEventListener('click', function(){ go(function(){ step(-1); }); });
-  if (nextBtn) nextBtn.addEventListener('click', function(){ go(function(){ step(1); }); });
-  dots.forEach(function(d, k){ d.addEventListener('click', function(){ go(function(){ jump(k); }); }); });
-
-  root.addEventListener('pointerenter', function(){ hover = true; stop(); });
-  root.addEventListener('pointerleave', function(){ hover = false; play(); });
-
-  /* свайп пальцем: считаем только явно горизонтальное движение,
-     иначе слайдер будет перехватывать вертикальную прокрутку страницы */
-  var sx = 0, sy = 0, tracking = false;
-  root.addEventListener('touchstart', function(e){
-    if (e.touches.length !== 1){ tracking = false; return; }
-    sx = e.touches[0].clientX; sy = e.touches[0].clientY; tracking = true; stop();
-  }, {passive: true});
-  root.addEventListener('touchend', function(e){
-    if (!tracking) return;
-    tracking = false;
-    var t = e.changedTouches[0];
-    var dx = t.clientX - sx, dy = t.clientY - sy;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
-    play();
-  }, {passive: true});
-  /* палец увели за край или касание перехватила система - листание возвращаем */
-  root.addEventListener('touchcancel', function(){ tracking = false; play(); }, {passive: true});
-
-  place(0, false); mark(); play();
-})();
-</script>
-
-<script>
 /* ==================== КАРТА: ЛИНИЯ И ПОДПИСЬ — ОДНО ЦЕЛОЕ ====================
    Наводишь на подпись — загорается её линия. Наводишь на линию — загорается
    подпись. В нить толщиной 1,7 px курсором не попасть, поэтому у каждой линии
@@ -1794,17 +1614,18 @@ body{
 </script>
 
 <script>
-/* ==================== ЛЕНТА ФОТО: ЭКРАН 2 НА ТЕЛЕФОНЕ ====================
-   На компьютере второй экран листает два коллажа по три ряда. На телефоне те же
-   снимки лежат в два ряда одной длинной лентой: она едет справа налево сама,
-   медленно и без остановок, а пальцем её можно разогнать или отмотать назад.
+/* ==================== ЛЕНТА ФОТО: ВТОРОЙ ЭКРАН ====================
+   52 снимка в два ряда одной длинной лентой: она едет справа налево сама,
+   медленно и без остановок, а пальцем или мышью её можно разогнать или отмотать
+   назад. Раньше лента жила только на телефоне, а на компьютере листались два
+   коллажа - теперь она одна на все ширины.
 
-   Три решения, которые тут важны:
+   Четыре решения, которые тут важны:
 
-   1. КАРТОЧКИ СТРОИТ СКРИПТ, А НЕ РАЗМЕТКА. На компьютере лента скрыта через
-      display:none, и тогда браузер не качает ни один из 52 снимков. Строим
-      только когда контейнер реально виден (offsetParent !== null) - при
-      загрузке или после поворота телефона.
+   1. КАРТОЧКИ СТРОИТ СКРИПТ, А НЕ РАЗМЕТКА. Пока лента скрыта (display:none)
+      браузер не качает ни один из 52 снимков. Строим только когда контейнер
+      реально виден (offsetParent !== null) - при загрузке или после поворота
+      телефона.
 
    2. ПЕТЛЯ БЕЗ ШВА. Каждый ряд повторён дважды, лента сдвигается на
       -(pos % ширина одного повтора). В момент, когда первый повтор уезжает
@@ -1814,7 +1635,12 @@ body{
 
    3. ПАЛЕЦ НЕ ЛОМАЕТ ПРОКРУТКУ СТРАНИЦЫ. Разбирать жест руками не нужно:
       touch-action:pan-y отдаёт вертикальные движения странице, а горизонтальные
-      приходят сюда. После броска скорость затухает обратно к базовой. */
+      приходят сюда. После броска скорость затухает обратно к базовой.
+
+   4. СКОРОСТЬ СЧИТАЕТСЯ ОТ РАЗМЕРА КАРТОЧКИ. На мониторе снимки крупнее, и те же
+      26 px/с выглядели бы вдвое медленнее: глаз мерит скорость долями кадра,
+      а не пикселями. Поэтому базовая скорость умножается на то же число, во
+      сколько раз карточка выше телефонных 240 px. */
 (function(){
   'use strict';
   var box = document.getElementById('crLenta');
@@ -1837,7 +1663,8 @@ body{
   ];
 
   var ROWS = 2;
-  var BASE = 26;                      /* базовая скорость ленты, px/с */
+  var BASE = 26;                      /* базовая скорость ленты на телефоне, px/с */
+  var LH0  = 240;                     /* высота карточки, под которую эта скорость подобрана */
   var MAXV = 2600;                    /* потолок разгона пальцем */
   var TAU  = 0.75;                    /* за сколько секунд бросок затухает к базовой */
 
@@ -1884,6 +1711,13 @@ body{
 
   function measure(){
     if (reduce) return;               /* повтора нет, мерить нечего */
+    /* крупнее карточка - быстрее лента, чтобы движение читалось одинаково
+       и на телефоне, и на мониторе. Ниже телефонной высоты не замедляемся */
+    /* offsetHeight, а не getBoundingClientRect: карточки повёрнуты, и рамка
+       вокруг наклонённой карточки выше её самой - число поплыло бы от наклона */
+    var card0 = rows[0] && rows[0].children[0];
+    var h = card0 ? card0.offsetHeight : 0;
+    BASE = 26 * Math.max(1, h / LH0);
     for (var r = 0; r < ROWS; r++){
       var kids = rows[r].children;
       var half = kids.length / 2;
@@ -1915,6 +1749,7 @@ body{
   box.addEventListener('pointerdown', function(e){
     if (reduce || !built) return;
     drag = true; pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; moved = 0;
+    box.classList.add('drag');                    /* курсор «зажатая рука» на компьютере */
     try{ box.setPointerCapture(pid); }catch(err){}
   });
   box.addEventListener('pointermove', function(e){
@@ -1929,6 +1764,7 @@ body{
   function release(){
     if (!drag) return;
     drag = false;
+    box.classList.remove('drag');
     if (pid !== null){ try{ box.releasePointerCapture(pid); }catch(err){} pid = null; }
     if (moved < 8) return;                        /* это была вертикальная прокрутка страницы, не свайп */
     v = Math.max(-MAXV, Math.min(MAXV, -vx));     /* палец влево - лента поехала влево быстрее */
@@ -1947,7 +1783,7 @@ body{
 
   var tmr = null;
   function ready(){
-    if (box.offsetParent === null) return;        /* лента скрыта - это компьютер */
+    if (box.offsetParent === null) return;        /* лента ещё не показана - строить нечего */
     if (!built){ build(); watch(); return; }
     measure();                                    /* ширина экрана изменилась - перемерить повтор */
   }
