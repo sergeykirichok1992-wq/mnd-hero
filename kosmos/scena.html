@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Слоёная сцена</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#05070f;color:#dfe7f7;
+    font:400 16px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    overflow:hidden;-webkit-font-smoothing:antialiased}
+  /* корневой блок приёма всегда занимает весь кадр */
+  body>section{width:100%;height:100%;min-height:100%}
+</style>
+</head><body>
+<!-- ==========================================================================
+     КАРКАС СЦЕНЫ «Звёздная смена» - то, что заменяет hero.mp4.
+     Свои имена: классы .ks-*, id ks*. Внешних запросов нет, тега video нет.
+     Один пульт на всю сцену: --ks-p (прогресс прокрутки 0..1),
+     --ks-tx / --ks-ty (разворот за мышью), --ks-depth (скорость слоя).
+     ========================================================================== -->
+<style>
+/* Числовые переменные объявляем через @property - тогда браузер ведёт их
+   плавно и пересчитывает дешевле, чем безымянные текстовые подстановки. */
+@property --ks-p     { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ks-depth { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ks-mx    { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ks-my    { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ks-tx    { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --ks-ty    { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+/* ------------------------------------------------------------------ сцена */
+.ks-hero{
+  /* палитра: глубокая ночь, пурпур, лиловый, один тёплый акцент */
+  --ks-ink:#04081A; --ks-ink2:#070E22; --ks-ink3:#0B1338; --ks-ink4:#060C18;
+  --ks-blue:47,49,146;   --ks-violet:108,43,217;
+  --ks-lilac:176,106,224; --ks-warm:216,150,66;
+
+  --ks-p:0;              /* общий прогресс 0..1 */
+  --ks-tx:0; --ks-ty:0;  /* разворот за мышью, в градусах */
+  --ks-mx:0; --ks-my:0;  /* мышь -1..1, для сдвига слоёв по глубине */
+  --ks-depth:0;          /* множитель скорости, свой у каждого слоя */
+
+  position:relative;
+  height:320vh;                    /* три экрана прокрутки */
+  background:var(--ks-ink);
+  color:#DCE4F3;
+}
+.ks-stage{
+  position:sticky; top:0;
+  height:100vh; height:100svh;     /* svh - чтобы не прыгало от адресной строки */
+  overflow:hidden;
+  background:var(--ks-ink);
+  contain:layout paint;
+}
+
+/* «плита» с дальними слоями: её и разворачиваем за мышью.
+   Текст, виньетка и кулисы лежат ВНЕ плиты - их вращать не нужно,
+   иначе буквы теряют резкость.
+   isolation:isolate - чтобы «осветление» тарелки всегда смешивалось
+   с небом внутри плиты, а не с тем, что лежит под секцией. Это не зависит
+   от того, есть сейчас разворот или он отключён на телефоне. */
+.ks-tilt{
+  position:absolute; top:0; right:0; bottom:0; left:0; z-index:0;
+  isolation:isolate;
+  transform:
+    perspective(1400px)
+    rotateX(calc(var(--ks-ty) * 1deg))
+    rotateY(calc(var(--ks-tx) * 1deg));
+  transform-origin:50% 50%;
+}
+
+/* --------------------------------------------------------- базовый слой */
+.ks-layer{
+  position:absolute; top:-7%; right:-7%; bottom:-7%; left:-7%;
+  pointer-events:none;
+  /* параллакс: вертикаль от прокрутки, горизонталь от мыши, лёгкий наезд */
+  transform:
+    translate3d(
+      calc(var(--ks-mx) * var(--ks-depth) * -0.9%),
+      calc(var(--ks-p)  * var(--ks-depth) * -11%),
+      0)
+    scale(calc(1 + var(--ks-depth) * var(--ks-p) * 0.045));
+}
+.ks-flat{ top:0; right:0; bottom:0; left:0 }     /* для canvas: без запаса по краям */
+.ks-layer > img{
+  position:absolute; display:block;
+  -webkit-user-select:none; user-select:none;    /* webkit-пара нужна для Safari < 17 */
+}
+canvas.ks-layer{ display:block; width:100%; height:100% }
+
+/* will-change поднимаем ТОЛЬКО пока сцена в кадре (класс ks-live ставит скрипт) */
+.ks-stage.ks-live .ks-move,
+.ks-stage.ks-live .ks-tilt{ will-change:transform }
+
+/* ============ СЛОИ ПО ГЛУБИНЕ: от самого дальнего к самому ближнему ====== */
+
+/* 0 · небо ---------------------------------------------------------------- */
+.ks-sky{
+  z-index:0; --ks-depth:0;
+  background:
+    radial-gradient(120% 80% at 50% 108%, rgba(var(--ks-violet),.22), rgba(var(--ks-violet),0) 62%),
+    linear-gradient(180deg, var(--ks-ink) 0%, var(--ks-ink2) 26%, var(--ks-ink3) 58%, #070D1C 86%, var(--ks-ink4) 100%);
+}
+
+/* 1 · дальние звёзды - СЛОТ «живой фон» ---------------------------------- */
+.ks-stars{ z-index:1; --ks-depth:.07; opacity:.9 }
+
+/* 2 · туманность: размытые отблески --------------------------------------
+   will-change тут не ставим: четыре пятна и так уезжают на видеочип
+   собственными анимациями, а поднимать ещё и родителя - лишняя
+   полноэкранная картинка в памяти. */
+.ks-neb{ z-index:2; --ks-depth:.14 }
+.ks-neb i{ position:absolute; display:block; border-radius:50%; filter:blur(80px); opacity:.9 }
+.ks-neb i:nth-child(1){ left:-16%; top:-12%; width:66%; height:78%;
+  background:radial-gradient(closest-side, rgba(var(--ks-blue),.42), rgba(var(--ks-blue),0) 70%) }
+.ks-neb i:nth-child(2){ right:-14%; top:6%; width:58%; height:66%;
+  background:radial-gradient(closest-side, rgba(var(--ks-violet),.34), rgba(var(--ks-violet),0) 70%) }
+.ks-neb i:nth-child(3){ left:18%; bottom:-22%; width:64%; height:70%;
+  background:radial-gradient(closest-side, rgba(var(--ks-lilac),.26), rgba(var(--ks-lilac),0) 70%) }
+.ks-neb i:nth-child(4){ right:2%; bottom:-8%; width:38%; height:44%;
+  background:radial-gradient(closest-side, rgba(var(--ks-warm),.16), rgba(var(--ks-warm),0) 70%) }
+
+/* еле заметный перелив; длительности разные, чтобы не пульсировали в такт */
+@media (prefers-reduced-motion:no-preference){
+  .ks-stage.ks-live .ks-neb i:nth-child(1){ animation:ks-drift1 34s ease-in-out infinite alternate }
+  .ks-stage.ks-live .ks-neb i:nth-child(2){ animation:ks-drift2 27s ease-in-out infinite alternate }
+  .ks-stage.ks-live .ks-neb i:nth-child(3){ animation:ks-drift3 41s ease-in-out infinite alternate }
+  .ks-stage.ks-live .ks-neb i:nth-child(4){ animation:ks-drift2 23s ease-in-out infinite alternate -8s }
+}
+@keyframes ks-drift1{ from{transform:translate3d(0,0,0) scale(1);    opacity:.82}
+                        to{transform:translate3d(3%,-2%,0) scale(1.07); opacity:.95} }
+@keyframes ks-drift2{ from{transform:translate3d(0,0,0) scale(1.05); opacity:.92}
+                        to{transform:translate3d(-3%,2%,0) scale(1);   opacity:.78} }
+@keyframes ks-drift3{ from{transform:translate3d(-2%,1%,0) scale(1);  opacity:.70}
+                        to{transform:translate3d(2%,-2%,0) scale(1.08); opacity:.90} }
+
+/* 3 · ближняя звёздная пыль (чистый CSS, без canvas) --------------------- */
+.ks-dust{
+  z-index:3; --ks-depth:.24; opacity:.5;
+  background-image:
+    radial-gradient(1.6px 1.6px at 18% 22%, #fff, transparent 60%),
+    radial-gradient(1.4px 1.4px at 63% 14%, #EAD9FF, transparent 60%),
+    radial-gradient(1.8px 1.8px at 82% 38%, #fff, transparent 60%),
+    radial-gradient(1.2px 1.2px at 34% 58%, #C8D6FF, transparent 60%),
+    radial-gradient(1.6px 1.6px at 71% 68%, #fff, transparent 60%),
+    radial-gradient(1.3px 1.3px at 8%  74%, #EAD9FF, transparent 60%);
+}
+
+/* 4 · дальняя комета - СЛОТ «летящая комета» ----------------------------- */
+.ks-comet{ z-index:4; --ks-depth:.36 }
+.ks-comet img{
+  left:60%; top:3%; width:30%; height:auto;
+  opacity:.75; filter:saturate(.85) brightness(1.05) drop-shadow(0 0 26px rgba(var(--ks-lilac),.45));
+  transform:rotate(-14deg);
+}
+
+/* 5 · дымка горизонта ---------------------------------------------------- */
+.ks-horizon{
+  z-index:5; --ks-depth:.46;
+  background:
+    radial-gradient(90% 42% at 50% 100%, rgba(var(--ks-blue),.34), rgba(var(--ks-blue),0) 72%),
+    linear-gradient(180deg, transparent 58%, rgba(6,12,24,.55) 100%);
+}
+
+/* 6 · тарелка на горизонте - СЛОТ «оживающая тарелка» -------------------- */
+/* ВАЖНО: screen висит на самом СЛОЕ, а не на картинке внутри.
+   У слоя свой transform, он «запирает» смешивание, и чёрный фон снимка
+   остался бы чёрным прямоугольником. На слое смешивание идёт с небом.
+   backface-visibility тут НЕ ставим: в WebKit «спрятанная изнанка» уводит
+   слой в отдельную картинку на видеочипе, и смешивание отваливается. */
+.ks-dish{ z-index:6; --ks-depth:.56; mix-blend-mode:screen; opacity:.78 }
+.ks-dish img{
+  left:63%; bottom:7%; width:33%; height:auto; margin-left:0;
+  filter:contrast(1.06) saturate(1.05);
+  /* мягкий край стоит ВСЕГДА, а не только в @supports: если конкретная
+     сборка Safari не смешает слой, увидим картинку с растворённым краем,
+     а не чёрный прямоугольник. При работающем screen маска почти не видна. */
+  -webkit-mask-image:radial-gradient(72% 72% at 50% 56%, #000 68%, transparent 100%);
+          mask-image:radial-gradient(72% 72% at 50% 56%, #000 68%, transparent 100%);
+}
+@supports not (mix-blend-mode:screen){
+  .ks-dish{ opacity:.8 }
+  .ks-dish img{
+    -webkit-mask-image:radial-gradient(62% 62% at 50% 58%, #000 52%, transparent 100%);
+            mask-image:radial-gradient(62% 62% at 50% 58%, #000 52%, transparent 100%);
+  }
+}
+
+/* 7 · свечение над тарелкой: разгорается на втором экране ----------------
+   filter:blur здесь не нужен - радиальный градиент и так мягкий, а размытие
+   полноэкранного слоя, у которого каждый кадр меняется сдвиг, стоит дорого. */
+.ks-glow{
+  z-index:7; --ks-depth:.56;
+  background:radial-gradient(42% 34% at 50% 74%, rgba(var(--ks-warm),.5), rgba(var(--ks-warm),0) 78%);
+  opacity:0;
+  opacity:clamp(0, calc((var(--ks-p) - .30) * 4), .85);
+}
+
+/* 8 · ровер - СЛОТ «едущий ровер» и «мигающая гирлянда» ------------------ */
+.ks-rover{ z-index:8; --ks-depth:.88 }
+.ks-rover img{
+  left:5%; bottom:6%; width:21%; height:auto;
+  filter:drop-shadow(0 22px 34px rgba(2,4,12,.6));
+}
+
+/* 9 · ближний снег/пыль - СЛОТ ------------------------------------------- */
+.ks-snow{ z-index:9; --ks-depth:1.15; opacity:.85 }
+
+/* 10 · текст ------------------------------------------------------------
+   Лежит выше кулис (z-index 14 против 12), иначе последняя подпись
+   с кнопкой гаснет вместе с кадром.
+   Своя формула сдвига: БЕЗ scale(). Слой поднят на видеочип (will-change),
+   а поднятый слой рисуется один раз и потом растягивается - от масштаба
+   буквы мылятся ровно так же, как от разворота. */
+.ks-text{
+  z-index:14; --ks-depth:1.35;
+  display:flex; align-items:center; justify-content:center;
+  padding:0 clamp(16px,3vw,56px); text-align:center;
+  transform:translate3d(0, calc(var(--ks-p) * var(--ks-depth) * -11%), 0);
+}
+.ks-cap{
+  position:absolute; max-width:min(94vw,1000px); pointer-events:none;
+  opacity:0;                                        /* запасное значение */
+  opacity:clamp(0, min( calc((var(--ks-p) - var(--ks-a)) * var(--ks-in)),
+                        calc((var(--ks-d) - var(--ks-p)) * var(--ks-out)) ), 1);
+}
+.ks-cap-1{ --ks-a:-.05; --ks-in:20;   --ks-d:.30; --ks-out:12.5 }  /* виден уже при p=0 */
+.ks-cap-2{ --ks-a:.34; --ks-in:12.5; --ks-d:.66; --ks-out:12.5 }
+.ks-cap-3{ --ks-a:.70; --ks-in:12.5; --ks-d:1.2; --ks-out:5 }
+/* если браузер не знает min()/clamp() - просто показываем первый кадр */
+@supports not (width: min(1px, 2px)){
+  .ks-cap{ opacity:0 }
+  .ks-cap-1{ opacity:1 }
+}
+/* Кликается только та подпись, которая сейчас ВИДНА. Класс ks-cap-on ставит
+   скрипт по той же формуле, что задаёт прозрачность, - поэтому «прозрачная,
+   но ловит клики» подписи больше не бывает. */
+.ks-cap.ks-cap-on{ pointer-events:auto }
+
+.ks-kick{ margin:0 0 .5em; font-size:clamp(12px,1.1vw,16px); letter-spacing:.22em;
+  text-transform:uppercase; color:rgb(var(--ks-lilac)); opacity:.9 }
+.ks-h1{ margin:0; font-size:clamp(30px,5.4vw,86px); line-height:1.02; font-weight:700;
+  color:#F3F6FF; text-shadow:0 2px 30px rgba(4,8,26,.7) }
+.ks-sub{ margin:.7em auto 0; max-width:60ch; font-size:clamp(14px,1.5vw,22px);
+  line-height:1.45; color:#C4CFEA }
+.ks-cta{ display:inline-block; margin-top:1.4em; padding:.85em 1.9em; border-radius:999px;
+  font-size:clamp(14px,1.3vw,18px); font-weight:700; text-decoration:none; color:#12162B;
+  background:linear-gradient(180deg,#FFE9B8,#E9BE63);
+  box-shadow:0 12px 34px rgba(216,150,66,.32) }
+.ks-cta:focus-visible{ outline:3px solid #FFE9B8; outline-offset:3px }
+
+/* 11 · виньетка ---------------------------------------------------------- */
+.ks-vig{
+  z-index:11; --ks-depth:0;
+  background:
+    radial-gradient(128% 92% at 50% 46%, transparent 60%, rgba(2,4,10,.42) 100%),
+    linear-gradient(180deg, rgba(4,7,15,.42) 0%, transparent 20%, transparent 78%, rgba(4,7,15,.6) 100%);
+}
+
+/* 12 · кулисы: сходятся к концу третьего экрана --------------------------
+   Ширина 64% и плотная часть градиента до 76% - чтобы в сомкнутом виде
+   шторы перекрыли и середину. При ширине 55% и спаде до нуля к краю
+   посередине оставалась светлая щель: кадр не гас. */
+.ks-curtain{
+  position:absolute; top:-2%; bottom:-2%; width:64%; z-index:12; pointer-events:none;
+}
+.ks-curtain-l{ left:-3%;
+  background:linear-gradient(90deg, rgba(5,9,28,.94) 0%, rgba(5,9,28,.92) 76%, rgba(5,9,28,0) 100%);
+  transform:translate3d(calc(-100% + var(--ks-p) * var(--ks-p) * 100%),0,0) }
+.ks-curtain-r{ right:-3%;
+  background:linear-gradient(270deg, rgba(5,9,28,.94) 0%, rgba(5,9,28,.92) 76%, rgba(5,9,28,0) 100%);
+  transform:translate3d(calc(100% - var(--ks-p) * var(--ks-p) * 100%),0,0) }
+
+/* подсказка «крути вниз» */
+.ks-hint{
+  position:absolute; left:50%; bottom:22px; z-index:13; transform:translateX(-50%);
+  font-size:13px; letter-spacing:.16em; text-transform:uppercase; color:#9FB0D6;
+  opacity:clamp(0, calc(1 - var(--ks-p) * 8), 1);
+}
+
+/* ============================== ПРОКРУТКА =============================== */
+/* Основной путь - сам браузер (анимация по прокрутке), без участия скрипта.
+   Скрипт ставит .ks-js на <html>; если этот путь недоступен, добавляет
+   .ks-js-progress и ведёт прогресс сам. Без скрипта сцена стоит кадром. */
+@supports (animation-timeline: view()){
+  @media (prefers-reduced-motion:no-preference){
+    html.ks-js:not(.ks-js-progress) .ks-hero{
+      animation:ks-progress linear both;
+      animation-timeline:view();
+      animation-range:contain 0% contain 100%;
+    }
+  }
+}
+@keyframes ks-progress{ from{ --ks-p:0 } to{ --ks-p:1 } }
+
+/* ============================ БЕРЕЖНЫЙ РЕЖИМ ============================
+   Движения нет - значит и трёх экранов прокрутки быть не должно: иначе
+   человек листает три одинаковых пустых экрана, а последняя подпись
+   с кнопкой «Забронировать место» не показывается вообще никогда.
+   Сжимаем сцену в один экран и ставим подписи 1 и 3 обычной колонкой. */
+@media (prefers-reduced-motion:reduce){
+  .ks-hero{ height:auto; --ks-p:.12; --ks-tx:0; --ks-ty:0 }
+  .ks-stage{ position:relative; height:auto; min-height:100vh; min-height:100svh }
+  .ks-hero *, .ks-hero *::before, .ks-hero *::after{
+    animation:none !important; transition:none !important;
+  }
+  .ks-text{
+    position:relative; top:auto; right:auto; bottom:auto; left:auto;
+    box-sizing:border-box; transform:none;
+    flex-direction:column; gap:clamp(24px,5vh,56px);
+    min-height:100vh; min-height:100svh;
+    padding:10vh clamp(16px,3vw,56px);
+  }
+  .ks-cap{ position:relative; opacity:1; pointer-events:auto }
+  .ks-cap-2{ display:none }
+  .ks-curtain, .ks-hint{ display:none }
+}
+
+/* слабое устройство или экономия трафика: снимаем самое дорогое */
+.ks-lite .ks-snow{ display:none }
+.ks-lite .ks-neb i{ filter:blur(46px) }
+.ks-lite .ks-tilt{ transform:none }
+.ks-lite .ks-stage.ks-live .ks-tilt{ will-change:auto }
+
+@media (max-width:767px){
+  .ks-hero{ height:280vh }
+  .ks-tilt{ transform:none }                     /* на телефоне разворота нет */
+  .ks-neb i{ filter:blur(56px) }
+  .ks-comet img{ left:42%; width:58%; top:3% }
+  .ks-rover img{ left:2%;  width:56%; bottom:4% }
+  .ks-dish  img{ left:46%; width:62%; margin-left:0; bottom:16% }
+  /* на телефоне держим не больше трёх «поднятых» слоёв:
+     каждый такой слой - отдельная картинка в памяти видеочипа */
+  .ks-stage.ks-live .ks-move,
+  .ks-stage.ks-live .ks-tilt{ will-change:auto }
+  .ks-stage.ks-live .ks-rover,
+  .ks-stage.ks-live .ks-snow,
+  .ks-stage.ks-live .ks-text{ will-change:transform }
+}
+@media (prefers-reduced-motion:reduce){
+  .ks-hero{ height:auto }                        /* перебиваем мобильные 280vh */
+}
+</style>
+
+<section class="ks-hero" id="ksHero" aria-label="Звёздная смена, сезон 2026-2027">
+  <div class="ks-stage ks-ph1" id="ksStage">
+
+    <!-- плита с дальними слоями: только она разворачивается за мышью -->
+    <div class="ks-tilt" id="ksTilt">
+
+      <!-- 0 · небо -->
+      <div class="ks-layer ks-sky" aria-hidden="true"></div>
+
+      <!-- 1 · дальние звёзды - СЛОТ «живой фон» -->
+      <canvas class="ks-layer ks-flat ks-stars" id="ksStars" aria-hidden="true"></canvas>
+
+      <!-- 2 · туманность -->
+      <div class="ks-layer ks-neb" id="ksNeb" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+      <!-- 3 · ближняя пыль -->
+      <div class="ks-layer ks-dust" aria-hidden="true"></div>
+
+      <!-- 4 · дальняя комета - СЛОТ «летящая комета» -->
+      <div class="ks-layer ks-move ks-comet" id="ksComet" aria-hidden="true">
+        <img src="comet.png" alt="" width="1510" height="1045" decoding="async" draggable="false">
+      </div>
+
+      <!-- 5 · дымка горизонта -->
+      <div class="ks-layer ks-horizon" aria-hidden="true"></div>
+
+      <!-- 6 · тарелка - СЛОТ «оживающая тарелка» -->
+      <div class="ks-layer ks-dish" id="ksDish" aria-hidden="true">
+        <img src="dish.jpg" alt="" width="1536" height="1024" decoding="async" draggable="false">
+      </div>
+
+      <!-- 7 · свечение тарелки -->
+      <div class="ks-layer ks-glow" id="ksGlow" aria-hidden="true"></div>
+
+      <!-- 8 · ровер - СЛОТ «едущий ровер» и «мигающая гирлянда» -->
+      <div class="ks-layer ks-move ks-rover" id="ksRover" aria-hidden="true">
+        <img src="rover.png" alt="" width="1380" height="1130" decoding="async" draggable="false">
+      </div>
+
+      <!-- 9 · ближний снег - СЛОТ -->
+      <canvas class="ks-layer ks-flat ks-move ks-snow" id="ksSnow" aria-hidden="true"></canvas>
+    </div>
+
+    <!-- 10 · текст: три кадра раскадровки.
+         Заголовок h1 на странице ровно один - «Звёздная смена».
+         Второй и третий кадр это реплики сюжета, а не разделы страницы,
+         поэтому они помечены как абзацы с тем же начертанием.
+         Невидимые кадры закрыты от голосового чтения (aria-hidden) и убраны
+         из обхода по Tab (tabindex=-1) - скрипт снимает это, когда кадр виден. -->
+    <div class="ks-layer ks-move ks-text" id="ksText">
+      <div class="ks-cap ks-cap-1">
+        <p class="ks-kick">Сезон 2026 - 2027</p>
+        <h1 class="ks-h1">Звёздная смена</h1>
+        <p class="ks-sub">Экскурсия-шоу в Министерство новогодних дел. Нижний Новгород, Ольгино 62.</p>
+        <a class="ks-cta" href="#next">Выбрать город</a>
+      </div>
+      <div class="ks-cap ks-cap-2" aria-hidden="true">
+        <p class="ks-kick">Сигнал принят</p>
+        <p class="ks-h1">Тарелка поймала письмо</p>
+        <p class="ks-sub">Оно шло с орбиты четыре дня. Внутри - список детей, которые ждут чуда.</p>
+      </div>
+      <div class="ks-cap ks-cap-3" aria-hidden="true">
+        <p class="ks-kick">27 ноября - 10 января</p>
+        <p class="ks-h1">Детям 4+</p>
+        <a class="ks-cta" href="#next" tabindex="-1">Забронировать место</a>
+      </div>
+    </div>
+
+    <!-- 11 · виньетка -->
+    <div class="ks-layer ks-vig" aria-hidden="true"></div>
+
+    <!-- 12 · кулисы -->
+    <div class="ks-curtain ks-curtain-l" aria-hidden="true"></div>
+    <div class="ks-curtain ks-curtain-r" aria-hidden="true"></div>
+
+    <div class="ks-hint" aria-hidden="true">Крути вниз</div>
+  </div>
+</section>
+
+<script>
+/* ===========================================================================
+   Пульт сцены. Один requestAnimationFrame на всё.
+   Наружу отдаёт window.KS: прогресс, мышь, акт, подписка на кадр, помощник canvas.
+   =========================================================================== */
+(function(){
+  'use strict';
+
+  var hero  = document.getElementById('ksHero');
+  var stage = document.getElementById('ksStage');
+  if(!hero || !stage) return;                    /* без разметки не запускаемся */
+
+  var root = document.documentElement;
+  var mq = window.matchMedia ? function(q){ return window.matchMedia(q); } : function(){ return null; };
+
+  root.classList.add('ks-js');                   // без скрипта сцена стоит кадром
+
+  var mqReduce = mq('(prefers-reduced-motion: reduce)');
+  var mqFine   = mq('(hover: hover) and (pointer: fine)');
+
+  /* --- «слабое устройство»: экономия трафика или ДВА признака слабости ---
+     Раньше хватало одного: hardwareConcurrency <= 4. Под это правило попадают
+     почти все айфоны и любой четырёхъядерный ноутбук - у них молча пропадал
+     слой снега. Теперь режем только явно слабые машины. */
+  var conn = navigator.connection || navigator.webkitConnection || null;
+  var mem  = typeof navigator.deviceMemory === 'number' ? navigator.deviceMemory : 0;
+  var cpu  = typeof navigator.hardwareConcurrency === 'number' ? navigator.hardwareConcurrency : 0;
+  var lite = !!(
+    (conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ''))) ||
+    (mem > 0 && mem <= 2) ||
+    (cpu > 0 && cpu <= 2) ||
+    (mem > 0 && mem <= 4 && cpu > 0 && cpu <= 4)
+  );
+  if(lite) root.classList.add('ks-lite');
+
+  /* --- умеет ли браузер вести прогресс сам --- */
+  var cssScroll = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline', 'view()'));
+  if(!cssScroll) root.classList.add('ks-js-progress');   // тогда прогресс пишет скрипт
+
+  var KS = {
+    p: 0,             // прогресс прокрутки 0..1
+    phase: 1,         // акт раскадровки: 1, 2 или 3
+    mx: 0, my: 0,     // мышь -1..1, уже сглаженная
+    w: 0, h: 0,       // размер сцены в обычных пикселях
+    lite: lite,
+    reduced: !!(mqReduce && mqReduce.matches),
+    active: false
+  };
+  window.KS = KS;
+
+  /* -------------------------------------------- подписка на общий кадр */
+  var subs = [], runBuf = [];
+  KS.on  = function(fn){ if(typeof fn === 'function' && subs.indexOf(fn) < 0) subs.push(fn); };
+  KS.off = function(fn){ var i = subs.indexOf(fn); if(i >= 0) subs.splice(i, 1); };
+
+  /* -------------------------------------------- помощник для canvas-слоёв */
+  KS.canvas = function(el, onResize){
+    if(!el || !el.getContext) return null;
+    var ctx = el.getContext('2d');
+    if(!ctx) return null;
+    var ro = null;
+    function fit(){
+      /* размер берём по вёрстке, а не через getBoundingClientRect:
+         сцена бывает повёрнута, и «видимый» прямоугольник соврал бы */
+      var cw = el.offsetWidth  || el.clientWidth  || 1;
+      var ch = el.offsetHeight || el.clientHeight || 1;
+      var d  = Math.min(2, window.devicePixelRatio || 1);   // выше 2 не поднимаемся
+      var w  = Math.max(1, Math.round(cw * d));
+      var h  = Math.max(1, Math.round(ch * d));
+      if(el.width !== w || el.height !== h){ el.width = w; el.height = h; }
+      ctx.setTransform(d, 0, 0, d, 0, 0);                   // рисуем в обычных пикселях
+      if(typeof onResize === 'function') onResize(cw, ch, d);
+    }
+    if(window.ResizeObserver){ ro = new ResizeObserver(fit); ro.observe(el); }
+    else{ window.addEventListener('resize', fit); }
+    fit();
+    return {
+      ctx: ctx, fit: fit,
+      destroy: function(){
+        if(ro){ ro.disconnect(); ro = null; }
+        else window.removeEventListener('resize', fit);
+      }
+    };
+  };
+
+  /* ------------------------------------------------ прогресс прокрутки
+     Оба прямоугольника читаем ОДИН раз за кадр и только в начале кадра -
+     до любой записи в стили. Тогда браузер не пересчитывает вёрстку заново. */
+  var sLeft = 0, sTop = 0;
+  function measure(){
+    var hr = hero.getBoundingClientRect();
+    var sr = stage.getBoundingClientRect();
+    sLeft = sr.left; sTop = sr.top;
+    KS.w = sr.width; KS.h = sr.height;
+    var travel = hr.height - KS.h;                // сколько сцена «висит» приклеенной
+    var p = travel > 0 ? (-hr.top) / travel : 0;
+    KS.p = p < 0 ? 0 : (p > 1 ? 1 : p);
+  }
+
+  var phase = 1;
+  function setPhase(){
+    var n = KS.p < 0.33 ? 1 : (KS.p < 0.68 ? 2 : 3);
+    if(n === phase) return;
+    stage.classList.remove('ks-ph' + phase);
+    stage.classList.add('ks-ph' + n);
+    phase = n; KS.phase = n;
+  }
+
+  /* --------------- подписи: кликается и читается только видимая ----------
+     Числа берём из тех же переменных вёрстки, что задают прозрачность,
+     поэтому «прозрачная, но ловит клик» ситуация невозможна по построению. */
+  var caps = [];
+  (function(){
+    var list = hero.querySelectorAll('.ks-cap');
+    for(var i = 0; i < list.length; i++){
+      var el = list[i], cs = getComputedStyle(el);
+      caps.push({
+        el: el,
+        a:   parseFloat(cs.getPropertyValue('--ks-a'))   || 0,
+        inn: parseFloat(cs.getPropertyValue('--ks-in'))  || 1,
+        d:   parseFloat(cs.getPropertyValue('--ks-d'))   || 1,
+        out: parseFloat(cs.getPropertyValue('--ks-out')) || 1,
+        foci: el.querySelectorAll('a[href], button, input, select, textarea'),
+        on: null
+      });
+    }
+  })();
+
+  function setCaps(){
+    for(var i = 0; i < caps.length; i++){
+      var c = caps[i];
+      var op = Math.min((KS.p - c.a) * c.inn, (c.d - KS.p) * c.out);
+      var on = op >= 0.5;                        // «видна больше чем наполовину»
+      if(on === c.on) continue;
+      c.on = on;
+      c.el.classList.toggle('ks-cap-on', on);
+      if(on) c.el.removeAttribute('aria-hidden');
+      else   c.el.setAttribute('aria-hidden', 'true');
+      if(!on && c.el.contains(document.activeElement) && document.activeElement.blur)
+        document.activeElement.blur();           // не прячем от читалки то, что в фокусе
+      for(var k = 0; k < c.foci.length; k++){
+        if(on) c.foci[k].removeAttribute('tabindex');
+        else   c.foci[k].setAttribute('tabindex', '-1');
+      }
+    }
+  }
+
+  /* ----------------------------------------------- разворот за мышью */
+  var txT = 0, tyT = 0, tx = 0, ty = 0;
+  var mCX = 0, mCY = 0, mHave = false;
+  var TILT = 2;                                   // максимум градусов; больше - укачивает
+
+  function pointerOn(){ return !!(mqFine && mqFine.matches) && !lite && !KS.reduced; }
+
+  /* В обработчике НИЧЕГО не меряем: запоминаем координаты, считаем в кадре.
+     Иначе каждое движение мыши (сотни раз в секунду, на всей странице и даже
+     когда сцена давно уехала) заставляло браузер пересчитывать геометрию. */
+  function onMove(e){
+    if(!KS.active) return;
+    mCX = e.clientX; mCY = e.clientY; mHave = true;
+  }
+  function onLeave(){ txT = 0; tyT = 0; mHave = false; }
+
+  document.addEventListener('mousemove', onMove, { passive: true });
+  root.addEventListener('mouseleave', onLeave);   /* именно leave: out всплывает и сбрасывал бы */
+  window.addEventListener('blur', onLeave);
+
+  function aimTilt(){
+    if(!mHave || !pointerOn() || !KS.w || !KS.h) return;
+    var nx = (mCX - sLeft) / KS.w * 2 - 1;
+    var ny = (mCY - sTop)  / KS.h * 2 - 1;
+    txT = nx < -1 ? -1 : (nx > 1 ? 1 : nx);
+    tyT = ny < -1 ? -1 : (ny > 1 ? 1 : ny);
+  }
+
+  /* ------------------------------------------------------- запись вниз
+     Пишем ТОЛЬКО изменившиеся значения. Раньше пульт слал в стили четыре-пять
+     чисел каждый кадр даже на полностью неподвижной странице - это около 200
+     перерасчётов стиля в секунду впустую (замерено). */
+  var lastP = '', lastMx = '', lastMy = '';
+  function write(){
+    var s = hero.style;
+    if(cssScroll || KS.reduced){
+      /* в бережном режиме прогресс задаёт вёрстка (--ks-p:.12);
+         строчный стиль сильнее правила из таблицы, поэтому его надо снять */
+      if(lastP !== ''){ s.removeProperty('--ks-p'); lastP = ''; }
+    } else {
+      var vp = KS.p.toFixed(4);
+      if(vp !== lastP){ s.setProperty('--ks-p', vp); lastP = vp; }
+    }
+    var vx = KS.mx.toFixed(3);
+    if(vx !== lastMx){
+      s.setProperty('--ks-mx', vx);
+      s.setProperty('--ks-tx', (KS.mx * TILT).toFixed(3));
+      lastMx = vx;
+    }
+    var vy = KS.my.toFixed(3);
+    if(vy !== lastMy){
+      s.setProperty('--ks-my', vy);
+      s.setProperty('--ks-ty', (KS.my * -TILT).toFixed(3));
+      lastMy = vy;
+    }
+  }
+
+  /* -------------------------------------------------------- общий кадр */
+  var raf = 0, last = 0;
+
+  function tick(t){
+    raf = 0;
+    if(!KS.active) return;
+    var dt = last ? Math.min(64, t - last) : 16;   // после паузы не отдаём слоям скачок
+    last = t;
+
+    measure();
+    setPhase();
+    setCaps();
+    aimTilt();
+
+    // инерция: тянемся к цели, а не прыгаем в неё
+    var k = 1 - Math.pow(0.86, dt / 16.7);
+    tx += (txT - tx) * k;
+    ty += (tyT - ty) * k;
+    if(Math.abs(txT - tx) < 0.0005) tx = txT;      // добираем хвост, чтобы не дрожало
+    if(Math.abs(tyT - ty) < 0.0005) ty = tyT;
+    KS.mx = tx; KS.my = ty;
+
+    write();
+
+    /* по подписчикам идём по копии в постоянном буфере: список может
+       поменяться прямо во время обхода, а нового массива каждый кадр не создаём */
+    runBuf.length = 0;
+    for(var i = 0; i < subs.length; i++) runBuf.push(subs[i]);
+    for(var j = 0; j < runBuf.length; j++){
+      try{ runBuf[j](dt, KS.p); }
+      catch(err){ KS.off(runBuf[j]); }             // сломанный слой снимаем, сцену не роняем
+    }
+
+    raf = requestAnimationFrame(tick);
+  }
+
+  function start(){
+    if(KS.active || KS.reduced) return;
+    KS.active = true; last = 0;
+    stage.classList.add('ks-live');                // will-change поднимаем только сейчас
+    raf = requestAnimationFrame(tick);
+  }
+  function stop(){
+    if(!KS.active) return;
+    KS.active = false;
+    if(raf){ cancelAnimationFrame(raf); raf = 0; }
+    stage.classList.remove('ks-live');
+  }
+
+  /* ------------------------------------- пауза, когда сцены не видно */
+  var inView = true, io = null;
+  function sync(){ if(inView && !document.hidden) start(); else stop(); }
+
+  if(window.IntersectionObserver){
+    io = new IntersectionObserver(function(list){
+      inView = list[list.length - 1].isIntersecting;
+      sync();
+    }, { threshold: 0 });
+    io.observe(hero);
+  }
+  document.addEventListener('visibilitychange', sync);
+
+  /* размер окна мог измениться, пока цикл стоял (поворот телефона, вкладка) */
+  function onResize(){ if(!KS.active){ measure(); setPhase(); setCaps(); write(); } }
+  window.addEventListener('resize', onResize, { passive: true });
+
+  /* ------------------------------------- система переключила «меньше движения» */
+  function onReduce(){
+    KS.reduced = !!(mqReduce && mqReduce.matches);
+    if(KS.reduced){
+      stop();
+      txT = tyT = tx = ty = 0; KS.mx = KS.my = 0; mHave = false;
+      lastMx = lastMy = '';
+      write();                                     // снимет строчный --ks-p
+    } else {
+      for(var i = 0; i < caps.length; i++) caps[i].on = null;   // пересчитать подписи
+      sync();
+    }
+  }
+  if(mqReduce){
+    if(mqReduce.addEventListener) mqReduce.addEventListener('change', onReduce);
+    else if(mqReduce.addListener) mqReduce.addListener(onReduce);
+  }
+
+  /* ------------------------------------- битая картинка не должна ломать кадр */
+  var imgs = hero.getElementsByTagName('img');
+  function hideBroken(){ this.style.display = 'none'; }
+  for(var j = 0; j < imgs.length; j++){
+    imgs[j].addEventListener('error', hideBroken);
+    /* если ошибка успела случиться до нас (картинка была в кэше как битая) */
+    if(imgs[j].complete && imgs[j].naturalWidth === 0) imgs[j].style.display = 'none';
+  }
+
+  /* --------------------------------------- полная разборка, если понадобится */
+  KS.destroy = function(){
+    stop();
+    if(io){ io.disconnect(); io = null; }
+    document.removeEventListener('mousemove', onMove);
+    root.removeEventListener('mouseleave', onLeave);
+    window.removeEventListener('blur', onLeave);
+    window.removeEventListener('resize', onResize);
+    document.removeEventListener('visibilitychange', sync);
+    if(mqReduce){
+      if(mqReduce.removeEventListener) mqReduce.removeEventListener('change', onReduce);
+      else if(mqReduce.removeListener) mqReduce.removeListener(onReduce);
+    }
+    subs.length = 0;
+  };
+
+  measure(); setPhase();                           // первый кадр рисуем сразу
+  if(!KS.reduced) setCaps();
+  write();
+  sync();
+})();
+</script>
+</body></html>

@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Марсоход едет</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#05070f;color:#dfe7f7;
+    font:400 16px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    overflow:hidden;-webkit-font-smoothing:antialiased}
+  /* корневой блок приёма всегда занимает весь кадр */
+  body>section{width:100%;height:100%;min-height:100%}
+</style>
+</head><body>
+<style>
+/* ============ СЦЕНА «МАРСОХОД ЕДЕТ» ============ */
+.ks-scene{
+  --ks-img: url(rover.png);      /* путь к картинке - менять здесь и в src ниже */
+  --ks-ground: 22%;              /* высота снежной «земли» от низа сцены */
+  --ks-car: clamp(190px, 32vw, 440px); /* ширина марсохода */
+  position:relative; overflow:hidden; isolation:isolate;
+  min-height:clamp(420px, 74vh, 780px);
+  min-height:clamp(420px, 74svh, 780px);   /* iOS: без скачка при появлении панелей */
+  background:linear-gradient(180deg,#04060f 0%,#080e2c 38%,#111749 70%,#1a1c52 100%);
+  color:#dfe8ff;
+}
+
+/* --- фон: размытые отблески синего, пурпура и лилового --- */
+.ks-glow{
+  position:absolute; inset:-22%; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(38% 30% at 22% 32%, rgba(126, 88, 226, .42), rgba(126,88,226,0) 70%),
+    radial-gradient(30% 24% at 76% 24%, rgba(186,110,226,.30), rgba(186,110,226,0) 70%),
+    radial-gradient(52% 34% at 52% 96%, rgba( 62,116,224,.34), rgba(62,116,224,0) 72%);
+  filter:blur(28px);
+  animation:ks-drift 28s ease-in-out infinite alternate;
+  will-change:transform;
+}
+/* --- звёздная крошка --- */
+.ks-stars{
+  position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.55;
+  background-image:
+    radial-gradient(1.4px 1.4px at 22px 30px, rgba(226,236,255,.95), rgba(255,255,255,0)),
+    radial-gradient(1.1px 1.1px at 130px 80px, rgba(206,190,255,.85), rgba(255,255,255,0)),
+    radial-gradient(1.6px 1.6px at 190px 26px, rgba(255,255,255,.75), rgba(255,255,255,0)),
+    radial-gradient(1.1px 1.1px at 70px 150px, rgba(190,214,255,.8), rgba(255,255,255,0));
+  background-size:240px 200px, 240px 200px, 240px 200px, 240px 200px;
+  animation:ks-twinkle 7s ease-in-out infinite alternate;
+}
+
+/* --- снежная «земля» --- */
+.ks-ground{
+  position:absolute; left:0; right:0; bottom:0; height:var(--ks-ground); z-index:1;
+  background:linear-gradient(180deg, rgba(190,214,255,0) 0%, rgba(172,200,255,.10) 16%, rgba(206,224,255,.20) 100%);
+}
+.ks-ground::before{
+  content:""; position:absolute; left:0; right:0; top:0; height:2px;
+  background:linear-gradient(90deg, rgba(206,224,255,0), rgba(220,236,255,.5) 40%, rgba(206,224,255,0));
+  filter:blur(1px);
+}
+
+/* --- слои частиц (снег сзади и снег спереди) --- */
+.ks-fx{position:absolute; inset:0; pointer-events:none; display:block}
+.ks-fx--back{z-index:2}
+.ks-fx--front{z-index:4}
+
+/* --- дорожка, по которой едет марсоход --- */
+.ks-track{position:absolute; inset:0; z-index:3; pointer-events:none}
+.ks-rig{
+  position:absolute; left:0; bottom:0; width:100%; height:100%;
+  transform:translate3d(-35%,0,0);
+  will-change:transform;
+}
+.ks-car{
+  position:absolute; left:0; bottom:16%;
+  width:var(--ks-car);
+}
+
+/* Порядок слоёв внутри машины задан числами явно, чтобы он не зависел от того,
+   есть ли сейчас у .ks-bob трансформация (в режиме «без движения» её нет). */
+.ks-trail, .ks-pool, .ks-shadow{z-index:0}
+.ks-contact{z-index:1}
+.ks-bob{position:relative; z-index:2}
+
+/* след на снегу позади */
+.ks-trail{
+  position:absolute; right:52%; bottom:-1%; width:62vw; height:2.6%;
+  background:linear-gradient(90deg, rgba(140,172,236,0) 0%, rgba(126,156,224,.14) 55%, rgba(104,136,212,.30) 100%);
+  filter:blur(2.5px); border-radius:50%;
+}
+/* мягкая тень-«подушка» */
+.ks-shadow{
+  position:absolute; left:50%; bottom:-4%; width:94%; height:11%;
+  transform:translate3d(-50%,0,0);
+  background:radial-gradient(50% 50% at 50% 50%, rgba(2,5,20,.66), rgba(2,5,20,0) 72%);
+  filter:blur(3px);
+  animation:ks-shadow 2.6s ease-in-out infinite;
+}
+/* контактная тень - узкая и тёмная, прямо под колёсами */
+.ks-contact{
+  position:absolute; left:50%; bottom:0; width:60%; height:3.4%;
+  transform:translate3d(-50%,0,0);
+  background:radial-gradient(50% 50% at 50% 50%, rgba(0,2,12,.78), rgba(0,2,12,0) 70%);
+  filter:blur(1.5px);
+  animation:ks-contact 2.6s ease-in-out infinite;
+}
+/* пятно света от фар на снегу */
+.ks-pool{
+  position:absolute; left:92%; bottom:-3%; width:130%; height:15%;
+  background:radial-gradient(50% 50% at 22% 50%, rgba(255,234,186,.24), rgba(255,234,186,0) 72%);
+  filter:blur(6px);
+  animation:ks-pool 2.9s ease-in-out infinite;
+}
+
+/* качка корпуса и микро-тряска - два вложенных слоя */
+.ks-bob{display:block; animation:ks-rock 2.6s ease-in-out infinite}
+.ks-shake{
+  position:relative; display:block; isolation:isolate;
+  animation:ks-shake .38s ease-in-out infinite; will-change:transform;
+}
+
+.ks-rover{
+  position:relative; z-index:1; display:block; width:100%; height:auto;
+  /* цветовая подгонка под ночную сцену + маленькая контактная тень */
+  filter:saturate(.9) brightness(.95) contrast(1.04) hue-rotate(-4deg)
+         drop-shadow(0 6px 10px rgba(3,6,22,.5));
+}
+
+/* конус света фар */
+.ks-beam{
+  position:absolute; left:80%; bottom:17%; width:80%; height:40%; z-index:0;
+  transform-origin:0% 50%;
+  background:linear-gradient(90deg, rgba(255,240,205,.52) 0%, rgba(255,228,172,.14) 26%, rgba(255,220,160,0) 64%);
+  -webkit-clip-path:polygon(0% 44%, 0% 56%, 100% 92%, 100% 12%);
+          clip-path:polygon(0% 44%, 0% 56%, 100% 92%, 100% 12%);
+  filter:blur(10px); opacity:.8;
+  animation:ks-beam 2.9s ease-in-out infinite;
+}
+/* тёплое ядро у самих ламп */
+.ks-lamp{
+  position:absolute; left:72%; bottom:30%; width:28%; height:28%; z-index:2;
+  background:radial-gradient(50% 50% at 50% 50%, rgba(255,248,222,.72), rgba(255,236,180,0) 70%);
+  filter:blur(5px); pointer-events:none;
+  animation:ks-pool 2.9s ease-in-out infinite;
+}
+
+/* цветовая подстройка силуэта под фон - через маску из той же картинки.
+   Если маски не поддерживаются, слои просто не показываются. */
+.ks-tint,.ks-rim{display:none}
+@supports ((-webkit-mask-image:url(#a)) or (mask-image:url(#a))){
+  .ks-tint,.ks-rim{
+    display:block; position:absolute; inset:0; z-index:2; pointer-events:none;
+    -webkit-mask-image:var(--ks-img);        mask-image:var(--ks-img);
+    -webkit-mask-size:100% 100%;             mask-size:100% 100%;
+    -webkit-mask-repeat:no-repeat;           mask-repeat:no-repeat;
+    -webkit-mask-position:center;            mask-position:center;
+  }
+  .ks-tint{
+    background:linear-gradient(165deg, rgba(150,110,230,.40) 0%, rgba(74,110,232,.26) 46%, rgba(8,14,46,.55) 100%);
+    mix-blend-mode:soft-light; opacity:.9;
+  }
+  .ks-rim{
+    background:linear-gradient(200deg, rgba(196,158,255,.34) 0%, rgba(196,158,255,0) 42%);
+    mix-blend-mode:screen; opacity:.8;
+  }
+}
+
+/* снежная дымка у земли - «топит» нижний край машины в сцене */
+.ks-haze{
+  position:absolute; left:0; right:0; bottom:0; height:17%; z-index:5; pointer-events:none;
+  background:linear-gradient(180deg, rgba(22,32,84,0) 0%, rgba(26,36,92,.34) 55%, rgba(30,40,100,.60) 100%);
+  filter:blur(2px);
+}
+/* виньетка */
+.ks-vig{
+  position:absolute; inset:0; z-index:6; pointer-events:none;
+  background:radial-gradient(78% 66% at 50% 46%, rgba(0,0,0,0) 55%, rgba(3,5,18,.55) 100%);
+}
+
+/* ============ КЛЮЧЕВЫЕ КАДРЫ ============ */
+@keyframes ks-drive{ from{transform:translate3d(-35%,0,0)} to{transform:translate3d(105%,0,0)} }
+@keyframes ks-drift{ from{transform:translate3d(-1.5%,0,0) scale(1)} to{transform:translate3d(2%,-1.5%,0) scale(1.06)} }
+@keyframes ks-twinkle{ from{opacity:.42} to{opacity:.7} }
+
+/* качка: наклон вперёд-назад в пределах полуградуса */
+@keyframes ks-rock{
+  0%  {transform:rotate(-.50deg) translate3d(0,.4px,0)}
+  30% {transform:rotate( .35deg) translate3d(0,-.8px,0)}
+  55% {transform:rotate(-.20deg) translate3d(0,.6px,0)}
+  78% {transform:rotate( .50deg) translate3d(0,-.5px,0)}
+  100%{transform:rotate(-.50deg) translate3d(0,.4px,0)}
+}
+/* микро-тряска: не больше 1,1 px, мягко - чтобы читалось как езда, а не дрожь */
+@keyframes ks-shake{
+  0%  {transform:translate3d(0,0,0)}
+  20% {transform:translate3d(.3px,-1.1px,0)}
+  40% {transform:translate3d(-.2px,.5px,0)}
+  60% {transform:translate3d(.2px,-.7px,0)}
+  80% {transform:translate3d(-.3px,.9px,0)}
+  100%{transform:translate3d(0,0,0)}
+}
+/* тень дышит в такт качке: корпус вверх - тень уже и светлее */
+@keyframes ks-shadow{
+  0%  {transform:translate3d(-50%,0,0) scaleX(1);   opacity:.85}
+  30% {transform:translate3d(-50%,0,0) scaleX(.90); opacity:.60}
+  55% {transform:translate3d(-50%,0,0) scaleX(1.04);opacity:.92}
+  78% {transform:translate3d(-50%,0,0) scaleX(.92); opacity:.66}
+  100%{transform:translate3d(-50%,0,0) scaleX(1);   opacity:.85}
+}
+@keyframes ks-contact{
+  0%  {transform:translate3d(-50%,0,0) scaleX(1);   opacity:.9}
+  30% {transform:translate3d(-50%,0,0) scaleX(.86); opacity:.62}
+  55% {transform:translate3d(-50%,0,0) scaleX(1.05);opacity:.95}
+  78% {transform:translate3d(-50%,0,0) scaleX(.88); opacity:.68}
+  100%{transform:translate3d(-50%,0,0) scaleX(1);   opacity:.9}
+}
+@keyframes ks-beam{
+  0%  {transform:rotate(0deg);   opacity:.80}
+  35% {transform:rotate(-.6deg); opacity:.95}
+  70% {transform:rotate(.5deg);  opacity:.74}
+  100%{transform:rotate(0deg);   opacity:.80}
+}
+@keyframes ks-pool{
+  0%  {opacity:.75} 35%{opacity:.95} 70%{opacity:.7} 100%{opacity:.75}
+}
+
+/* ============ ПРОКРУТКА ДВИГАЕТ МАРСОХОД (современные браузеры) ============ */
+@supports (animation-timeline: view()){
+  .ks-scene{ view-timeline-name:--ks-view; view-timeline-axis:block; }
+  .ks-rig{
+    animation:ks-drive linear both;   /* сначала сокращённая запись */
+    animation-timeline:--ks-view;     /* потом привязка к прокрутке */
+    animation-range:cover 0% cover 100%;
+  }
+}
+
+/* ============ ПАУЗА, КОГДА БЛОК НЕ ВИДЕН ============ */
+/* .ks-rig намеренно не трогаем: он привязан к прокрутке, его пауза не нужна */
+.ks-paused .ks-glow, .ks-paused .ks-stars, .ks-paused .ks-bob,
+.ks-paused .ks-shake, .ks-paused .ks-shadow, .ks-paused .ks-contact,
+.ks-paused .ks-beam, .ks-paused .ks-pool, .ks-paused .ks-lamp{animation-play-state:paused}
+
+/* ============ СТОИМ НА МЕСТЕ ============ */
+/* дорожная тряска выключается, качка-«дыхание» остаётся */
+.ks-idle .ks-shake{animation-play-state:paused}
+
+/* ============ РЕЖИМ «БЕЗ ДВИЖЕНИЯ» ============ */
+@media (prefers-reduced-motion: reduce){
+  .ks-scene *{animation:none !important}
+  .ks-rig{transform:translate3d(38%,0,0) !important}
+  .ks-fx{display:none}
+  .ks-glow{transform:none}
+}
+</style>
+
+<section class="ks-scene ks-idle" id="ksScene" aria-label="Марсоход едет по снегу">
+  <div class="ks-glow"></div>
+  <div class="ks-stars"></div>
+  <div class="ks-ground"></div>
+
+  <canvas class="ks-fx ks-fx--back" id="ksBack" aria-hidden="true"></canvas>
+
+  <div class="ks-track">
+    <div class="ks-rig" id="ksRig">
+      <div class="ks-car" id="ksCar">
+        <div class="ks-trail"></div>
+        <div class="ks-pool"></div>
+        <div class="ks-shadow"></div>
+        <div class="ks-contact"></div>
+        <div class="ks-bob">
+          <div class="ks-shake">
+            <div class="ks-beam"></div>
+            <div class="ks-lamp"></div>
+            <!-- width и height ОБЯЗАТЕЛЬНЫ: это настоящий размер файла rover.png в пикселях.
+                 Без них коробка машины до загрузки картинки имеет нулевую высоту,
+                 и тени, фары и подтон скачут на место в момент подгрузки. -->
+            <img class="ks-rover" id="ksRover" src="rover.png" alt="" draggable="false"
+                 width="800" height="420" decoding="async" fetchpriority="high">
+            <div class="ks-tint"></div>
+            <div class="ks-rim"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <canvas class="ks-fx ks-fx--front" id="ksFront" aria-hidden="true"></canvas>
+  <div class="ks-haze"></div>
+  <div class="ks-vig"></div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+
+  var scene = document.getElementById('ksScene');
+  // защита от второго запуска: если код вставили дважды - второй раз ничего не делаем
+  if (!scene || scene.getAttribute('data-ks-init') === '1') return;
+  scene.setAttribute('data-ks-init', '1');
+
+  var rig   = document.getElementById('ksRig');
+  var car   = document.getElementById('ksCar');
+  var rover = document.getElementById('ksRover');
+  var cvB   = document.getElementById('ksBack');
+  var cvF   = document.getElementById('ksFront');
+  if (!rig || !car || !rover || !cvB || !cvF) return;
+
+  var ctxB = cvB.getContext('2d');
+  var ctxF = cvF.getContext('2d');
+  if (!ctxB || !ctxF) return;
+
+  // «без движения»: не выходим из скрипта совсем, а слушаем настройку -
+  // человек может включить и выключить её прямо во время просмотра
+  var mqReduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var reduced  = !!(mqReduce && mqReduce.matches);
+
+  // умеет ли браузер привязывать анимацию к прокрутке
+  var hasTimeline = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline', 'view()'));
+
+  // --- мягкая точка-спрайт: рисуем её вместо кругов, так быстрее ---
+  var SP = 32, sprite = document.createElement('canvas');
+  sprite.width = SP; sprite.height = SP;
+  var sctx = sprite.getContext('2d');
+  if (!sctx) return;
+  var grad = sctx.createRadialGradient(SP/2, SP/2, 0, SP/2, SP/2, SP/2);
+  grad.addColorStop(0,   'rgba(255,255,255,1)');
+  grad.addColorStop(0.35,'rgba(226,238,255,.72)');
+  grad.addColorStop(1,   'rgba(186,212,255,0)');
+  sctx.fillStyle = grad;
+  sctx.fillRect(0, 0, SP, SP);
+
+  var W = 1, H = 1, dpr = 1;
+  var carX = 0, carY = 0, carW = 1, carH = 1;
+  var snowB = [], snowF = [], dust = [], pool = [];
+  var DUST_MAX = 110;
+
+  function rnd(a, b){ return a + Math.random() * (b - a); }
+
+  function makeFlake(big){
+    return {
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: big ? rnd(2.2, 4.6) : rnd(0.9, 2.4),
+      vy: big ? rnd(16, 34) : rnd(9, 22),
+      vx: rnd(-10, -2),
+      a:  big ? rnd(0.20, 0.42) : rnd(0.28, 0.62),
+      ph: Math.random() * 6.28,
+      sw: rnd(0.4, 1.1)
+    };
+  }
+
+  function seedSnow(){
+    var area = W * H;
+    var nB = Math.max(12, Math.min(46, Math.round(area / 26000)));
+    var nF = Math.max(5,  Math.min(18, Math.round(area / 78000)));
+    snowB.length = 0; snowF.length = 0;
+    for (var i = 0; i < nB; i++) snowB.push(makeFlake(false));
+    for (var j = 0; j < nF; j++) snowF.push(makeFlake(true));
+  }
+
+  // Размеры и положение машины меряем ТОЛЬКО здесь, а не в каждом кадре.
+  // offsetTop/offsetLeft считаются от .ks-rig, то есть от левого верхнего угла сцены.
+  function measureCar(){
+    carW = car.offsetWidth  || 1;
+    carH = car.offsetHeight || 1;
+    carX = car.offsetLeft;
+    carY = car.offsetTop;
+  }
+
+  function resize(){
+    var r = scene.getBoundingClientRect();
+    var w = Math.max(1, Math.round(r.width));
+    var h = Math.max(1, Math.round(r.height));
+    var d = Math.min(2, window.devicePixelRatio || 1);
+    if (w !== W || h !== H || d !== dpr){
+      W = w; H = h; dpr = d;
+      cvB.width  = cvF.width  = Math.round(W * dpr);
+      cvB.height = cvF.height = Math.round(H * dpr);
+      cvB.style.width  = cvF.style.width  = W + 'px';
+      cvB.style.height = cvF.style.height = H + 'px';
+      ctxB.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctxF.setTransform(dpr, 0, 0, dpr, 0, 0);
+      DUST_MAX = Math.max(45, Math.min(110, Math.round(W * H / 9000)));
+      seedSnow();
+    }
+    measureCar();
+  }
+
+  function clearCanvases(){
+    ctxB.clearRect(0, 0, W, H);
+    ctxF.clearRect(0, 0, W, H);
+  }
+
+  function dot(ctx, x, y, r, a){
+    if (a <= 0) return;
+    ctx.globalAlpha = a > 1 ? 1 : a;
+    ctx.drawImage(sprite, x - r, y - r, r * 2, r * 2);
+  }
+
+  // --- положение марсохода: 0 - слева за кадром, 1 - справа за кадром.
+  // Формула повторяет диапазон cover 0%..100% из CSS, поэтому оба пути совпадают. ---
+  function scrollProgress(){
+    var r = scene.getBoundingClientRect();
+    var vh = window.innerHeight || document.documentElement.clientHeight || 1;
+    var total = vh + r.height;
+    var p = total > 0 ? (vh - r.top) / total : 0;
+    return p < 0 ? 0 : (p > 1 ? 1 : p);
+  }
+
+  var pos = 0, prevX = null, emit = 0, moving = false, lastMove = -1e9;
+
+  // частицы берём из запаса, а не создаём заново каждый раз - меньше мусора для сборщика
+  function spawnDust(wx, wy, dir, speed){
+    if (dust.length >= DUST_MAX) return;
+    var p = pool.length ? pool.pop() : {x:0,y:0,vx:0,vy:0,r:0,t:0,max:0,front:false};
+    p.x = wx + rnd(-4, 4);
+    p.y = wy + rnd(-2, 4);
+    p.vx = -dir * rnd(30, 150) + speed * 0.10;
+    p.vy = -rnd(10, 80);
+    p.r = rnd(1.2, 3.4);
+    p.t = 0;
+    p.max = rnd(0.5, 1.15);
+    p.front = Math.random() < 0.3;
+    dust.push(p);
+  }
+
+  function step(dt, now){
+    // 1) СНАЧАЛА все замеры, и только один - положение сцены на экране.
+    //    Размеры машины не меряем: они в кэше. Иначе браузер пересчитывал бы вёрстку
+    //    после того, как мы уже записали новое смещение - самое дорогое место в цикле.
+    var sr = scene.getBoundingClientRect();
+    var vh = window.innerHeight || document.documentElement.clientHeight || 1;
+    var total = vh + sr.height;
+    var target = total > 0 ? (vh - sr.top) / total : 0;
+    if (target < 0) target = 0; else if (target > 1) target = 1;
+
+    if (hasTimeline){
+      pos = target;
+    } else {
+      pos += (target - pos) * Math.min(1, dt * 6);
+    }
+
+    // 2) где сейчас колёса - считаем арифметикой, без вопросов к браузеру
+    var rigPx = (-35 + 140 * pos) * W / 100;
+    var cx    = rigPx + carX + carW / 2;
+    var baseY = carY + carH * 0.93;
+    var w1    = rigPx + carX + carW * 0.22;
+    var w2    = rigPx + carX + carW * 0.78;
+
+    var vx = 0;
+    if (prevX !== null && dt > 0) vx = (cx - prevX) / dt;
+    prevX = cx;
+    var dir = vx >= 0 ? 1 : -1;
+    var sp  = Math.abs(vx);
+
+    // 3) снежная пыль из-под колёс - только когда реально едем
+    if (sp > 12){
+      emit += Math.min(1, sp / 600) * 95 * dt;
+      while (emit >= 1){
+        emit -= 1;
+        spawnDust(Math.random() < 0.5 ? w1 : w2, baseY, dir, vx);
+      }
+    } else {
+      emit = 0;
+    }
+
+    // 4) чистим холсты
+    clearCanvases();
+
+    // 5) снег сзади и спереди
+    var t = now * 0.001;
+    var i, p;
+    for (i = 0; i < snowB.length; i++){
+      p = snowB[i];
+      p.y += p.vy * dt;
+      p.x += (p.vx + Math.sin(t * p.sw + p.ph) * 9) * dt;
+      if (p.y > H + 6){ p.y = -6; p.x = Math.random() * W; }
+      if (p.x < -8) p.x = W + 8;
+      dot(ctxB, p.x, p.y, p.r, p.a);
+    }
+    for (i = 0; i < snowF.length; i++){
+      p = snowF[i];
+      p.y += p.vy * dt;
+      p.x += (p.vx + Math.sin(t * p.sw + p.ph) * 14) * dt;
+      if (p.y > H + 8){ p.y = -8; p.x = Math.random() * W; }
+      if (p.x < -10) p.x = W + 10;
+      dot(ctxF, p.x, p.y, p.r, p.a);
+    }
+
+    // 6) пыль: летит назад и вниз, гаснет
+    var drag = Math.max(0, 1 - 1.8 * dt);
+    for (i = dust.length - 1; i >= 0; i--){
+      p = dust[i];
+      p.t += dt;
+      if (p.t >= p.max){
+        var lastP = dust.pop();
+        if (i < dust.length) dust[i] = lastP;
+        if (pool.length < DUST_MAX) pool.push(p);
+        continue;
+      }
+      p.vy += 140 * dt;
+      p.vx *= drag;
+      p.x  += p.vx * dt;
+      p.y  += p.vy * dt;
+      var k2 = p.t / p.max;
+      var a  = (1 - k2) * (k2 < 0.15 ? k2 / 0.15 : 1) * 0.8;
+      dot(p.front ? ctxF : ctxB, p.x, p.y, p.r * (1 + k2 * 0.9), a);
+    }
+
+    ctxB.globalAlpha = 1;
+    ctxF.globalAlpha = 1;
+
+    // 7) ЗАПИСИ - в самом конце кадра, после всех замеров
+    if (!hasTimeline){
+      rig.style.transform = 'translate3d(' + (-35 + 140 * pos).toFixed(3) + '%,0,0)';
+    }
+    // стоим - выключаем дорожную тряску, качка-«дыхание» остаётся
+    if (sp > 14) lastMove = now;
+    var nowMoving = (now - lastMove) < 260;   // держим «едем» ещё четверть секунды
+    if (nowMoving !== moving){
+      moving = nowMoving;
+      if (moving) scene.classList.remove('ks-idle');
+      else        scene.classList.add('ks-idle');
+    }
+  }
+
+  // --- цикл с паузой ---
+  var running = false, raf = 0, last = 0, visible = false;
+
+  function frame(now){
+    if (!running) return;
+    raf = window.requestAnimationFrame(frame);
+    var dt = last ? (now - last) / 1000 : 0.016;
+    last = now;
+    if (dt > 0.05) dt = 0.05;   // после паузы не прыгаем
+    step(dt, now);
+  }
+
+  function stopLoop(){
+    if (!running) return;
+    running = false;
+    if (raf) window.cancelAnimationFrame(raf);
+    raf = 0;
+  }
+
+  function sync(){
+    var should = !reduced && visible && !document.hidden;
+    if (should && !running){
+      resize();                       // вдруг блок только что показали
+      pos = scrollProgress();         // без «догоняющего» рывка при входе в экран
+      prevX = null; last = 0; emit = 0; lastMove = -1e9; moving = false;
+      dust.length = 0;
+      running = true;
+      scene.classList.remove('ks-paused');
+      if (!hasTimeline){
+        rig.style.transform = 'translate3d(' + (-35 + 140 * pos).toFixed(3) + '%,0,0)';
+      }
+      raf = window.requestAnimationFrame(frame);
+    } else if (!should){
+      stopLoop();
+      scene.classList.add('ks-paused');
+      scene.classList.add('ks-idle');
+      if (reduced){
+        dust.length = 0;
+        clearCanvases();
+        rig.style.transform = '';
+      }
+    }
+  }
+
+  function onReduceChange(e){
+    reduced = e && typeof e.matches === 'boolean' ? e.matches : !!(mqReduce && mqReduce.matches);
+    sync();
+  }
+
+  resize();
+
+  var ro = null, io = null;
+
+  if (window.ResizeObserver){
+    ro = new ResizeObserver(function(){ resize(); });
+    ro.observe(scene);
+    ro.observe(car);
+  }
+  // слушатель окна ставим ВСЕГДА: смена монитора и масштаба меняет плотность пикселей,
+  // а размер блока при этом остаётся прежним, и наблюдатель за размером молчит
+  window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', resize);
+  rover.addEventListener('load', resize);
+
+  if (window.IntersectionObserver){
+    io = new IntersectionObserver(function(entries){
+      visible = entries[entries.length - 1].isIntersecting;   // берём самое свежее сообщение
+      sync();
+    }, { threshold: 0, rootMargin: '15% 0px' });
+    io.observe(scene);
+  } else {
+    visible = true;
+  }
+
+  document.addEventListener('visibilitychange', sync);
+  window.addEventListener('pageshow', sync);
+  window.addEventListener('pagehide', stopLoop);
+
+  if (mqReduce){
+    if (mqReduce.addEventListener) mqReduce.addEventListener('change', onReduceChange);
+    else if (mqReduce.addListener) mqReduce.addListener(onReduceChange);
+  }
+
+  // для одностраничных сайтов: перед удалением блока из вёрстки вызвать
+  // document.getElementById('ksScene').ksDestroy() - иначе наблюдатели
+  // и слушатели останутся висеть в памяти
+  scene.ksDestroy = function(){
+    stopLoop();
+    if (ro) ro.disconnect();
+    if (io) io.disconnect();
+    window.removeEventListener('resize', resize);
+    window.removeEventListener('orientationchange', resize);
+    rover.removeEventListener('load', resize);
+    document.removeEventListener('visibilitychange', sync);
+    window.removeEventListener('pageshow', sync);
+    window.removeEventListener('pagehide', stopLoop);
+    if (mqReduce){
+      if (mqReduce.removeEventListener) mqReduce.removeEventListener('change', onReduceChange);
+      else if (mqReduce.removeListener) mqReduce.removeListener(onReduceChange);
+    }
+    scene.removeAttribute('data-ks-init');
+  };
+
+  sync();
+})();
+</script>
+</body></html>

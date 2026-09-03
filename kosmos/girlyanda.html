@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Живая гирлянда</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#05070f;color:#dfe7f7;
+    font:400 16px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    overflow:hidden;-webkit-font-smoothing:antialiased}
+  /* корневой блок приёма всегда занимает весь кадр */
+  body>section{width:100%;height:100%;min-height:100%}
+</style>
+</head><body>
+<style>
+/* ===== Живая гирлянда: свет достаётся из самой картинки ===== */
+.ks-scene{
+  /* палитра сцены */
+  --ks-ink:#060a1e;      /* самый тёмный синий */
+  --ks-deep:#0a1236;     /* основной фон */
+  position:relative;
+  isolation:isolate;     /* свет смешивается только внутри сцены */
+  overflow:hidden;
+  contain:paint;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;min-height:100svh;
+  padding:clamp(16px,4vw,56px);
+  box-sizing:border-box;
+  color:#e8ecff;
+  font:400 15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(120% 85% at 18% 8%, rgba(22,38,95,.95) 0%, rgba(10,18,54,0) 58%),
+    radial-gradient(95% 80% at 86% 22%, rgba(75,34,136,.85) 0%, rgba(10,18,54,0) 62%),
+    radial-gradient(80% 70% at 60% 105%, rgba(168,53,143,.45) 0%, rgba(10,18,54,0) 60%),
+    linear-gradient(165deg, var(--ks-ink) 0%, var(--ks-deep) 48%, #0d1a44 100%);
+}
+
+/* размытые отблески фона */
+.ks-sky{position:absolute;inset:-10%;pointer-events:none;}
+.ks-orb{position:absolute;display:block;border-radius:50%;opacity:.55;will-change:transform;}
+.ks-orb--v{width:46vmax;height:46vmax;left:-8%;top:-14%;
+  background:radial-gradient(circle,rgba(90,60,220,.72) 0%,rgba(90,60,220,.28) 38%,rgba(90,60,220,0) 72%);
+  animation:ks-drift-a 26s ease-in-out infinite;}
+.ks-orb--m{width:38vmax;height:38vmax;right:-10%;top:6%;
+  background:radial-gradient(circle,rgba(200,60,170,.55) 0%,rgba(200,60,170,.2) 40%,rgba(200,60,170,0) 74%);
+  animation:ks-drift-b 34s ease-in-out infinite;}
+.ks-orb--c{width:52vmax;height:52vmax;left:22%;bottom:-26%;
+  background:radial-gradient(circle,rgba(40,110,255,.48) 0%,rgba(40,110,255,.18) 40%,rgba(40,110,255,0) 74%);
+  animation:ks-drift-a 41s ease-in-out infinite reverse;}
+
+/* холст с редкими искрами */
+.ks-sparks{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.85;}
+
+.ks-stage{position:relative;width:min(94vw,1100px);display:flex;flex-direction:column;align-items:center;gap:clamp(14px,2.4vw,28px);}
+
+/* ---- фигура ---- */
+.ks-art{position:relative;margin:0;width:min(88vw,860px);}
+.ks-art__base{
+  display:block;width:100%;height:auto;position:relative;z-index:1;
+  /* общее зарево: объект сам светит, а не наклеен поверх фона */
+  filter:
+    drop-shadow(0 0 18px rgba(120,90,255,.45))
+    drop-shadow(0 10px 52px rgba(120,80,220,.28));
+}
+.ks-halo{
+  position:absolute;left:-12%;right:-12%;top:-8%;bottom:-14%;z-index:0;
+  border-radius:50%;pointer-events:none;
+  background:radial-gradient(52% 48% at 50% 56%,
+    rgba(140,110,255,.42) 0%, rgba(90,70,220,.22) 42%, rgba(10,18,54,0) 72%);
+  animation:ks-halo 7.5s ease-in-out infinite;
+  will-change:transform,opacity;
+}
+
+/* ---- слои свечения: та же картинка через фильтр ----
+   ВАЖНО. Свечению нужно выходить за край снимка. Но любая CSS-маска режет
+   отрисовку по границе своего блока (mask-clip по умолчанию border-box),
+   поэтому блок свечения делаем на 15% крупнее снимка с каждой стороны -
+   ровно на столько же расширен регион SVG-фильтра (130%). Сама картинка
+   внутри ставится обратно в размер и позицию оригинала.
+   will-change тут НЕ ставим: принудительный слой у элемента с mix-blend-mode
+   в WebKit гасит смешивание - вместо света появляется тёмный прямоугольник. */
+.ks-glow{
+  position:absolute;inset:-15%;z-index:2;pointer-events:none;
+  mix-blend-mode:screen;   /* светлое складывается, тёмное исчезает */
+  opacity:.72;
+}
+.ks-glow img{
+  position:absolute;left:11.53846%;top:11.53846%;width:76.92308%;height:auto;
+  display:block;filter:url(#ksHotFilter);
+}
+/* маску всегда задаём целиком: без no-repeat градиент размножается плитками */
+.ks-glow{
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;
+  -webkit-mask-position:0 0;mask-position:0 0;}
+/* фотография с чёрным фоном (тарелка): чёрное растворяется в сцене,
+   а мягкий край прячет прямоугольник снимка */
+.ks-art--photo .ks-art__base{
+  mix-blend-mode:screen;filter:none;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  -webkit-mask-image:radial-gradient(74% 74% at 50% 50%,#000 52%,rgba(0,0,0,0) 100%);
+          mask-image:radial-gradient(74% 74% at 50% 50%,#000 52%,rgba(0,0,0,0) 100%);}
+.ks-art--photo .ks-halo{opacity:.7;}
+.ks-noblend .ks-art--photo .ks-art__base{mix-blend-mode:normal;}
+/* браузер без смешивания - свет просто ложится сверху */
+.ks-noblend .ks-glow{mix-blend-mode:normal;opacity:.55;}
+
+/* три вертикальные зоны: волна идёт слева направо.
+   Проценты пересчитаны под блок 130%: снимок занимает 11.54%...88.46%,
+   поэтому p_снимка -> 11.538 + p * 0.76923 */
+.ks-glow--a{
+  -webkit-mask-image:linear-gradient(102deg,#000 0%,#000 26.9%,rgba(0,0,0,0) 46.9%);
+          mask-image:linear-gradient(102deg,#000 0%,#000 26.9%,rgba(0,0,0,0) 46.9%);}
+.ks-glow--b{
+  -webkit-mask-image:linear-gradient(102deg,rgba(0,0,0,0) 23.8%,#000 40.8%,#000 56.2%,rgba(0,0,0,0) 73.1%);
+          mask-image:linear-gradient(102deg,rgba(0,0,0,0) 23.8%,#000 40.8%,#000 56.2%,rgba(0,0,0,0) 73.1%);}
+.ks-glow--c{
+  -webkit-mask-image:linear-gradient(102deg,rgba(0,0,0,0) 53.1%,#000 71.5%,#000 100%);
+          mask-image:linear-gradient(102deg,rgba(0,0,0,0) 53.1%,#000 71.5%,#000 100%);}
+/* нет масок - остаётся один общий слой */
+.ks-nomask .ks-glow--b,.ks-nomask .ks-glow--c{display:none;}
+.ks-nomask .ks-glow--a{-webkit-mask-image:none;mask-image:none;}
+
+/* режим 1: спокойное дыхание, один слой на всю фигуру */
+.ks-mode-calm .ks-glow--b,.ks-mode-calm .ks-glow--c{display:none;}
+.ks-mode-calm .ks-glow--a{
+  -webkit-mask-image:none;mask-image:none;
+  animation:
+    ks-breathe 6.4s ease-in-out infinite,
+    ks-hue 17s steps(20,end) infinite,
+    ks-swell 6.4s ease-in-out infinite;
+}
+/* режим 2: живое мигание тремя несинхронными группами.
+   Вспышка ks-blink приходится на 10% цикла. Чтобы волна шла ИМЕННО слева
+   направо (a - левая треть, b - середина, c - правая), задержки должны
+   расти от a к c: 0 -> -1.933s -> -0.967s. Отрицательная задержка сдвигает
+   фазу вперёд, поэтому порядок чисел обратный порядку вспышек. */
+.ks-mode-blink .ks-glow--a{animation:ks-blink 2.9s ease-in-out 0s infinite, ks-swell 5.2s ease-in-out infinite;}
+.ks-mode-blink .ks-glow--b{animation:ks-blink 2.9s ease-in-out -1.933s infinite, ks-hue 13s steps(18,end) infinite;}
+.ks-mode-blink .ks-glow--c{animation:ks-blink 2.9s ease-in-out -0.967s infinite, ks-swell 6.1s ease-in-out -2s infinite;}
+/* слабое устройство: перелив цвета выключен, он самый дорогой */
+.ks-lite.ks-mode-calm .ks-glow--a{animation:ks-breathe 6.4s ease-in-out infinite, ks-swell 6.4s ease-in-out infinite;}
+.ks-lite.ks-mode-blink .ks-glow--b{animation:ks-blink 2.9s ease-in-out -1.933s infinite;}
+
+@keyframes ks-breathe{0%,100%{opacity:.42}50%{opacity:.98}}
+@keyframes ks-blink{
+  0%{opacity:.30}10%{opacity:1}24%{opacity:.48}38%{opacity:.90}
+  56%{opacity:.36}74%{opacity:.70}100%{opacity:.30}}
+/* дыхание ореола: слой чуть расширяется */
+@keyframes ks-swell{0%,100%{transform:scale(1)}50%{transform:scale(1.012)}}
+/* медленный перелив цвета: шагами, иначе фильтр пересчитывается каждый кадр */
+@keyframes ks-hue{
+  0%{filter:hue-rotate(-16deg) saturate(1.1)}
+  50%{filter:hue-rotate(18deg) saturate(1.35)}
+  100%{filter:hue-rotate(-16deg) saturate(1.1)}}
+@keyframes ks-halo{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:.92;transform:scale(1.05)}}
+@keyframes ks-drift-a{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(4%,-3%,0) scale(1.09)}}
+@keyframes ks-drift-b{0%,100%{transform:translate3d(0,0,0) scale(1.05)}50%{transform:translate3d(-5%,4%,0) scale(1)}}
+
+/* блок вне экрана или вкладка спрятана - всё замирает */
+.ks-off .ks-glow,.ks-off .ks-halo,.ks-off .ks-orb{animation-play-state:paused;}
+
+/* ---- панель настройки ----
+   backdrop-filter тут был бы дорогой ошибкой: под панелью каждый кадр
+   меняются искры и мигание, и браузер пересчитывал бы размытие фона
+   на каждом кадре. Берём чуть более плотную заливку. */
+.ks-panel{
+  position:relative;z-index:3;   /* панель выше слоёв свечения */
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;
+  padding:10px 16px;border-radius:999px;
+  background:rgba(12,20,58,.82);
+  border:1px solid rgba(150,170,255,.22);
+  box-shadow:inset 0 1px 0 rgba(190,205,255,.14), 0 6px 24px rgba(4,8,28,.45);}
+.ks-btn{
+  appearance:none;-webkit-appearance:none;cursor:pointer;
+  padding:8px 16px;border-radius:999px;font:inherit;font-size:14px;
+  color:#dfe6ff;background:rgba(255,255,255,.06);border:1px solid rgba(150,170,255,.28);
+  transition:background .2s ease,border-color .2s ease;}
+.ks-btn:hover{background:rgba(255,255,255,.12);}
+.ks-btn:focus-visible{outline:2px solid #b98bff;outline-offset:2px;}
+.ks-btn[aria-pressed="true"]{background:rgba(150,110,255,.42);border-color:rgba(190,160,255,.7);color:#fff;}
+.ks-field{display:flex;align-items:center;gap:8px;font-size:13px;color:#c6d0ff;}
+.ks-field input[type="range"]{width:150px;accent-color:#b98bff;}
+.ks-field output{min-width:2.6em;font-variant-numeric:tabular-nums;color:#fff;}
+
+/* ---- бережный режим: движение выключено, картинка остаётся ---- */
+@media (prefers-reduced-motion: reduce){
+  .ks-glow,.ks-halo,.ks-orb{animation:none !important;}
+  .ks-glow--a{opacity:.80;}
+  .ks-glow--b{opacity:.64;}
+  .ks-glow--c{opacity:.72;}
+  /* без этих двух строк ореол и орбы застывают в своём CSS-значении
+     (opacity 1 / scale 1), то есть заметно тяжелее, чем в движении */
+  .ks-halo{opacity:.62;transform:scale(1.02);}
+  .ks-orb--m{transform:scale(1.03);}
+  .ks-sparks{display:none;}
+}
+@media (max-width:640px){.ks-field input[type="range"]{width:110px;}}
+</style>
+
+<section class="ks-scene" id="ksScene"
+         data-ks-threshold="0.70" data-ks-hardness="11" data-ks-sat="1.6"
+         data-ks-colorpick="0.50" data-ks-gain="2.2" data-ks-glow="1" data-ks-mode="blink">
+
+  <div class="ks-sky" aria-hidden="true">
+    <span class="ks-orb ks-orb--v"></span>
+    <span class="ks-orb ks-orb--m"></span>
+    <span class="ks-orb ks-orb--c"></span>
+  </div>
+
+  <canvas class="ks-sparks" id="ksSparks" aria-hidden="true"></canvas>
+
+  <div class="ks-stage">
+    <!-- width/height у картинки поставить по реальному размеру файла:
+         без них четыре копии не резервируют высоту и страница прыгает -->
+    <figure class="ks-art" id="ksArt">
+      <span class="ks-halo" aria-hidden="true"></span>
+      <img class="ks-art__base" id="ksBase" src="rover.png" decoding="async" fetchpriority="high"
+           alt="Марсоход, украшенный новогодней гирляндой">
+      <span class="ks-glow ks-glow--a" aria-hidden="true"><img src="rover.png" alt="" decoding="async"></span>
+      <span class="ks-glow ks-glow--b" aria-hidden="true"><img src="rover.png" alt="" decoding="async"></span>
+      <span class="ks-glow ks-glow--c" aria-hidden="true"><img src="rover.png" alt="" decoding="async"></span>
+    </figure>
+
+    <div class="ks-panel">
+      <div role="group" aria-label="Манера свечения" style="display:flex;gap:10px">
+        <button type="button" class="ks-btn" id="ksBtnCalm" aria-pressed="false">Спокойно</button>
+        <button type="button" class="ks-btn" id="ksBtnBlink" aria-pressed="true">Живо</button>
+      </div>
+      <label class="ks-field" for="ksThreshold">
+        Порог
+        <input type="range" id="ksThreshold" min="0.30" max="0.95" step="0.01" value="0.70">
+        <output id="ksThresholdOut">0.70</output>
+      </label>
+    </div>
+  </div>
+
+  <!-- фильтр: из картинки вырезаются только горячие точки и превращаются в свет.
+       Регион 130% - ровно столько, сколько занимает дальнее размытие (3 сигмы
+       это ~11% ширины). Прежние 160% зря гоняли на треть больше пикселей. -->
+  <svg class="ks-defs" width="0" height="0" aria-hidden="true" focusable="false"
+       style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none"
+       xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id="ksHotFilter" x="-15%" y="-15%" width="130%" height="130%"
+              color-interpolation-filters="sRGB">
+        <!-- 1. цвет будущего света: подняли насыщенность -->
+        <feColorMatrix id="ksSat" type="saturate" values="1.6" in="SourceGraphic" result="ksColor"/>
+        <!-- 2. для отбора гасим бесцветное: снег, металл, серую пыль -->
+        <feColorMatrix id="ksPick" type="matrix" in="ksColor" result="ksPicked"
+          values="0.8333 -0.1667 -0.1667 0 0
+                  -0.1667 0.8333 -0.1667 0 0
+                  -0.1667 -0.1667 0.8333 0 0
+                  0 0 0 1 0"/>
+        <!-- 3. жёсткий порог: всё темнее порога уходит в ноль -->
+        <feComponentTransfer in="ksPicked" result="ksHot">
+          <feFuncR id="ksFuncR" type="linear" slope="11" intercept="-6.42"/>
+          <feFuncG id="ksFuncG" type="linear" slope="11" intercept="-6.42"/>
+          <feFuncB id="ksFuncB" type="linear" slope="11" intercept="-6.42"/>
+        </feComponentTransfer>
+        <!-- 4. горячие точки превращаем в маску (яркость -> прозрачность) -->
+        <feColorMatrix in="ksHot" type="matrix" result="ksMask"
+          values="0 0 0 0 0
+                  0 0 0 0 0
+                  0 0 0 0 0
+                  0.85 0.85 0.85 0 0"/>
+        <!-- 5. берём ЧИСТЫЙ цвет лампочки по этой маске, чтобы оттенок не поехал -->
+        <feComposite in="ksColor" in2="ksMask" operator="in" result="ksCore0"/>
+        <!-- 6. обрезаем по силуэту исходника -->
+        <feComposite in="ksCore0" in2="SourceAlpha" operator="in" result="ksCore"/>
+        <!-- 7. ближний ореол -->
+        <feGaussianBlur id="ksBlur" in="ksCore" stdDeviation="8" result="ksNear0"/>
+        <feComponentTransfer in="ksNear0" result="ksNear">
+          <feFuncA id="ksFuncA" type="linear" slope="2.2"/>
+        </feComponentTransfer>
+        <!-- 8. дальнее зарево -->
+        <feGaussianBlur id="ksBlurWide" in="ksCore" stdDeviation="24" result="ksFar0"/>
+        <feComponentTransfer in="ksFar0" result="ksFar">
+          <feFuncA id="ksFuncAW" type="linear" slope="1.3"/>
+        </feComponentTransfer>
+        <!-- 9. зарево + ореол + резкое ядро лампочки -->
+        <feMerge>
+          <feMergeNode in="ksFar"/>
+          <feMergeNode in="ksNear"/>
+          <feMergeNode in="ksCore"/>
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
+</section>
+
+<script>
+(function () {
+  'use strict';
+  var root = document.getElementById('ksScene');
+  if (!root || root.getAttribute('data-ks-ready') === '1') return;
+  root.setAttribute('data-ks-ready', '1');
+
+  var art      = document.getElementById('ksArt');
+  var base     = document.getElementById('ksBase');
+  var fSat     = document.getElementById('ksSat');
+  var fPick    = document.getElementById('ksPick');
+  var fBlur    = document.getElementById('ksBlur');
+  var fBlurW   = document.getElementById('ksBlurWide');
+  var fGain    = document.getElementById('ksFuncA');
+  var fGainW   = document.getElementById('ksFuncAW');
+  var fRGB     = [document.getElementById('ksFuncR'),
+                  document.getElementById('ksFuncG'),
+                  document.getElementById('ksFuncB')];
+  var cv       = document.getElementById('ksSparks');
+  var slider   = document.getElementById('ksThreshold');
+  var out      = document.getElementById('ksThresholdOut');
+  var btnCalm  = document.getElementById('ksBtnCalm');
+  var btnBlink = document.getElementById('ksBtnBlink');
+
+  function num(name, def) {
+    var v = parseFloat(root.getAttribute('data-ks-' + name));
+    return isFinite(v) ? v : def;
+  }
+  function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+
+  /* --- настройка фильтра: главный регулятор - порог --- */
+  function applyLook() {
+    var t    = clamp(num('threshold', 0.70), 0.05, 0.98);
+    var hard = clamp(num('hardness', 11), 2, 40);
+    var sat  = clamp(num('sat', 1.6), 0, 6);
+    var pick = clamp(num('colorpick', 0.50), 0, 1);
+    var gain = clamp(num('gain', 2.2), 0.2, 6);
+
+    if (fSat) fSat.setAttribute('values', sat.toFixed(4));
+    var k = pick / 3, m = 1 - k;
+    if (fPick) {
+      var kk = (-k).toFixed(5), mm = m.toFixed(5);
+      fPick.setAttribute('values',
+        mm + ' ' + kk + ' ' + kk + ' 0 0 ' +
+        kk + ' ' + mm + ' ' + kk + ' 0 0 ' +
+        kk + ' ' + kk + ' ' + mm + ' 0 0 ' +
+        '0 0 0 1 0');
+    }
+    /* отсев бесцветного слегка притемняет картинку - порог подстраиваем сами */
+    var tEff = t * m;
+    for (var i = 0; i < fRGB.length; i++) {
+      if (!fRGB[i]) continue;
+      fRGB[i].setAttribute('slope', hard.toFixed(4));
+      fRGB[i].setAttribute('intercept', (-tEff * hard).toFixed(4));
+    }
+    if (fGain)  fGain.setAttribute('slope', gain.toFixed(3));
+    if (fGainW) fGainW.setAttribute('slope', (gain * 0.6).toFixed(3));
+    if (out) out.textContent = t.toFixed(2);
+    if (slider) {
+      /* значение ползунка держим в его же границах, иначе цифра и ручка разойдутся */
+      var lo = parseFloat(slider.min), hi = parseFloat(slider.max);
+      var sv = clamp(t, isFinite(lo) ? lo : 0, isFinite(hi) ? hi : 1);
+      if (Math.abs(parseFloat(slider.value) - sv) > 0.005) slider.value = String(sv);
+    }
+  }
+
+  /* Пересчёт SVG-фильтра - самая дорогая операция на странице (два больших
+     размытия на трёх копиях снимка). При таскании ползунка событие input
+     прилетает до 60 раз в секунду, поэтому склеиваем вызовы в один кадр. */
+  var lookRaf = 0;
+  function scheduleLook() {
+    if (lookRaf) return;
+    lookRaf = requestAnimationFrame(function () { lookRaf = 0; applyLook(); });
+  }
+
+  /* радиус ореола зависит от того, насколько крупно показана картинка */
+  function applyBlurRadius() {
+    if (!fBlur || !art) return;
+    var w = art.clientWidth || 600;
+    var r = clamp(w * 0.013 * clamp(num('glow', 1), 0.2, 3), 2, 22);
+    fBlur.setAttribute('stdDeviation', r.toFixed(2));
+    if (fBlurW) fBlurW.setAttribute('stdDeviation', (r * 2.9).toFixed(2));
+  }
+
+  /* --- режимы --- */
+  function setMode(mode) {
+    var blink = (mode === 'blink');
+    root.classList.toggle('ks-mode-blink', blink);
+    root.classList.toggle('ks-mode-calm', !blink);
+    root.setAttribute('data-ks-mode', blink ? 'blink' : 'calm');
+    if (btnCalm)  btnCalm.setAttribute('aria-pressed', String(!blink));
+    if (btnBlink) btnBlink.setAttribute('aria-pressed', String(blink));
+  }
+
+  /* --- слабое устройство ---
+     Раньше одна и та же проверка и убавляла искры, и НАСОВСЕМ выключала волну.
+     Порог «ядер не больше четырёх» ловит половину обычных ноутбуков и айфонов,
+     то есть главный приём у них просто никогда не показывался. Развели два
+     решения: «полегче» (меньше искр, без перелива цвета) и «совсем слабо». */
+  var lite = false, tiny = false;
+  try {
+    var mem = navigator.deviceMemory, cores = navigator.hardwareConcurrency;
+    if ((typeof mem === 'number' && mem <= 4) || (typeof cores === 'number' && cores <= 4)) lite = true;
+    if ((typeof mem === 'number' && mem <= 2) || (typeof cores === 'number' && cores <= 2)) tiny = true;
+  } catch (e) { lite = false; tiny = false; }
+  /* на узком экране три вертикальные зоны всё равно не читаются */
+  if (window.matchMedia && window.matchMedia('(max-width: 640px)').matches) tiny = true;
+  if (lite) root.classList.add('ks-lite');
+
+  /* --- запасные пути --- */
+  var can = (window.CSS && CSS.supports) ? function (p, v) { return CSS.supports(p, v); } : null;
+  if (can && !(can('mask-image', 'linear-gradient(#000,#000)') ||
+               can('-webkit-mask-image', 'linear-gradient(#000,#000)'))) {
+    root.classList.add('ks-nomask');
+  }
+  if (can && !can('mix-blend-mode', 'screen')) root.classList.add('ks-noblend');
+
+  var mqReduce = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  function reduced() { return !!(mqReduce && mqReduce.matches); }
+
+  /* --- холст с искрами --- */
+  var ctx = (cv && cv.getContext) ? cv.getContext('2d') : null;
+  var palette = [[255,214,140],[255,120,200],[150,190,255],[190,150,255],[255,150,120]];
+  var sprites = [], parts = [], cw = 0, ch = 0, raf = 0, last = 0, tsec = 0, running = false;
+
+  function makeSprite(rgb) {
+    var s = document.createElement('canvas');
+    s.width = 64; s.height = 64;
+    var c = s.getContext('2d');
+    var g = c.createRadialGradient(32, 32, 0, 32, 32, 32);
+    var base3 = rgb[0] + ',' + rgb[1] + ',' + rgb[2];
+    g.addColorStop(0, 'rgba(' + base3 + ',0.95)');
+    g.addColorStop(0.35, 'rgba(' + base3 + ',0.30)');
+    g.addColorStop(1, 'rgba(' + base3 + ',0)');
+    c.fillStyle = g;
+    c.fillRect(0, 0, 64, 64);
+    return s;
+  }
+  function buildParts() {
+    var n = lite ? 16 : 34;
+    parts = [];
+    for (var i = 0; i < n; i++) {
+      parts.push({
+        x: Math.random(), y: Math.random(),
+        r: 3 + Math.random() * 9,
+        vx: (Math.random() - 0.5) * 0.012,
+        vy: -(0.012 + Math.random() * 0.04),
+        ph: Math.random() * 6.283,
+        sp: 0.5 + Math.random() * 1.3,
+        s: Math.floor(Math.random() * palette.length)
+      });
+    }
+  }
+  /* спрайты и частицы строим лениво: при «уменьшить движение» они не нужны */
+  function ensureParticles() {
+    if (!ctx) return false;
+    if (!sprites.length) {
+      for (var s = 0; s < palette.length; s++) sprites.push(makeSprite(palette[s]));
+    }
+    if (!parts.length) buildParts();
+    return true;
+  }
+  function resizeCanvas() {
+    if (!ctx || !cv) return;
+    var r = cv.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2); /* выше 2 не поднимаемся */
+    cw = r.width; ch = r.height;
+    cv.width  = Math.max(1, Math.round(cw * dpr));
+    cv.height = Math.max(1, Math.round(ch * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function frame(now) {
+    raf = 0;
+    if (!ctx || !running) return;
+    /* холст обновляем не чаще 32 раз в секунду - для медленных искр это незаметно */
+    if (last && now - last < 30) { raf = requestAnimationFrame(frame); return; }
+    var dt = last ? Math.min((now - last) / 1000, 0.05) : 0.016;
+    last = now; tsec += dt;
+    ctx.clearRect(0, 0, cw, ch);
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = 0; i < parts.length; i++) {
+      var p = parts[i];
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.y < -0.06) { p.y = 1.06; p.x = Math.random(); }
+      if (p.x < -0.06) p.x = 1.06; else if (p.x > 1.06) p.x = -0.06;
+      var a = 0.18 + 0.34 * Math.sin(tsec * p.sp + p.ph);
+      if (a <= 0.01) continue;
+      var size = p.r * 3;
+      ctx.globalAlpha = a;
+      ctx.drawImage(sprites[p.s], p.x * cw - size / 2, p.y * ch - size / 2, size, size);
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    raf = requestAnimationFrame(frame);
+  }
+  function startLoop() {
+    if (running || !ctx || reduced()) return;
+    if (!ensureParticles()) return;
+    if (!cw || !ch) resizeCanvas();   /* холст мог быть спрятан - меряем заново */
+    if (!cw || !ch) return;
+    running = true; last = 0;
+    raf = requestAnimationFrame(frame);
+  }
+  function stopLoop() {
+    running = false;
+    if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    if (ctx && cw && ch) ctx.clearRect(0, 0, cw, ch);
+  }
+
+  /* --- пауза вне экрана и при спрятанной вкладке --- */
+  var onScreen = true, io = null, ro = null;
+  function sync() {
+    var on = onScreen && !document.hidden;
+    root.classList.toggle('ks-off', !on);
+    if (on) startLoop(); else stopLoop();
+  }
+  if ('IntersectionObserver' in window) {
+    io = new IntersectionObserver(function (entries) {
+      for (var i = 0; i < entries.length; i++) onScreen = entries[i].isIntersecting;
+      sync();
+    }, { threshold: 0.01 });
+    io.observe(root);
+  }
+  document.addEventListener('visibilitychange', sync);
+  var onMq = function () { if (reduced()) stopLoop(); else sync(); };
+  if (mqReduce) {
+    if (mqReduce.addEventListener) mqReduce.addEventListener('change', onMq);
+    else if (mqReduce.addListener) mqReduce.addListener(onMq);
+  }
+
+  /* --- ресайз --- */
+  function onResize() { resizeCanvas(); applyBlurRadius(); }
+  if ('ResizeObserver' in window) {
+    ro = new ResizeObserver(onResize);
+    if (cv) ro.observe(cv);
+    if (art) ro.observe(art);
+  } else {
+    window.addEventListener('resize', onResize);
+  }
+  /* пока картинка не загрузилась, у фигуры нет высоты - пересчитаем после */
+  if (base) base.addEventListener('load', onResize);
+
+  /* --- управление --- */
+  function onSlider() { root.setAttribute('data-ks-threshold', slider.value); scheduleLook(); }
+  function onCalm()  { setMode('calm'); }
+  function onBlink() { setMode('blink'); }
+  if (slider)   slider.addEventListener('input', onSlider);
+  if (btnCalm)  btnCalm.addEventListener('click',  onCalm);
+  if (btnBlink) btnBlink.addEventListener('click', onBlink);
+
+  /* --- старт --- */
+  resizeCanvas();
+  applyLook();
+  applyBlurRadius();
+  /* спокойный режим ставим только на совсем слабом устройстве или узком
+     экране; кнопка «Живо» всё равно доступна и включает волну вручную */
+  setMode((root.getAttribute('data-ks-mode') === 'calm' || tiny) ? 'calm' : 'blink');
+  sync();
+  function onLoad() { onResize(); }
+  if (document.readyState === 'complete') onLoad();
+  else window.addEventListener('load', onLoad);
+
+  /* Уборка. Без неё в одностраничном приложении после удаления секции
+     остаются слушатели, два наблюдателя и цикл отрисовки. */
+  function destroy() {
+    stopLoop();
+    if (lookRaf) { cancelAnimationFrame(lookRaf); lookRaf = 0; }
+    if (io) { io.disconnect(); io = null; }
+    if (ro) { ro.disconnect(); ro = null; }
+    document.removeEventListener('visibilitychange', sync);
+    window.removeEventListener('resize', onResize);
+    window.removeEventListener('load', onLoad);
+    if (base) base.removeEventListener('load', onResize);
+    if (mqReduce) {
+      if (mqReduce.removeEventListener) mqReduce.removeEventListener('change', onMq);
+      else if (mqReduce.removeListener) mqReduce.removeListener(onMq);
+    }
+    if (slider)   slider.removeEventListener('input', onSlider);
+    if (btnCalm)  btnCalm.removeEventListener('click', onCalm);
+    if (btnBlink) btnBlink.removeEventListener('click', onBlink);
+    sprites = []; parts = [];
+    root.removeAttribute('data-ks-ready');
+    if (window.ksGlow && window.ksGlow.el === root) { try { delete window.ksGlow; } catch (e) { window.ksGlow = null; } }
+  }
+
+  /* одно число меняет силу эффекта: ksGlow.setThreshold(0.8) */
+  window.ksGlow = {
+    el: root,
+    setThreshold: function (v) { root.setAttribute('data-ks-threshold', v); scheduleLook(); },
+    set: function (name, v) { root.setAttribute('data-ks-' + name, v); scheduleLook(); applyBlurRadius(); },
+    mode: setMode,
+    destroy: destroy
+  };
+})();
+</script>
+</body></html>

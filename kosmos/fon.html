@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Живое небо</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#05070f;color:#dfe7f7;
+    font:400 16px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    overflow:hidden;-webkit-font-smoothing:antialiased}
+  /* корневой блок приёма всегда занимает весь кадр */
+  body>section{width:100%;height:100%;min-height:100%}
+</style>
+</head><body>
+<style>
+/* ================= Живой космический фон (всё с префиксом ks-) ================= */
+
+.ks-stage{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;                 /* смешивание слоёв не вылезает наружу */
+  min-height:100vh;
+  min-height:100svh;                 /* честная высота экрана на iOS */
+  color:#e9eeff;
+  font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  /* основа: глубокий тёмно-синий с переливом */
+  background-color:#02040a;          /* подложка на случай, если градиент не отрисуется */
+  background-image:
+    radial-gradient(115% 85% at 50% -10%, #16205a 0%, #0a1032 30%, #05081c 60%, #020409 100%);
+}
+
+/* общие слои */
+.ks-nebula,.ks-grain,.ks-vignette,.ks-layer{
+  position:absolute; left:0; top:0; right:0; bottom:0;
+  pointer-events:none;
+}
+
+/* ---- туманность: размытые цветные пятна ---- */
+.ks-nebula{will-change:transform}
+.ks-blob{
+  position:absolute; display:block; border-radius:50%;
+  mix-blend-mode:screen;             /* пятна складываются светом, а не грязью */
+  will-change:transform,opacity;
+}
+/* Размер каждого пятна обрезан ровно до точки, где градиент уходит в ноль
+   (для этого явно задан closest-side — по умолчанию отсчёт идёт от УГЛА рамки,
+   а не от середины стороны). Картинка та же, слой в памяти на ~27% меньше. */
+.ks-b1{left:calc(-20% + 7vmax); top:calc(-26% + 7vmax); width:66vmax; height:66vmax;
+  background:radial-gradient(closest-side circle at 50% 50%,
+    rgba(104,78,240,.42) 0%, rgba(78,58,205,.14) 51%, rgba(60,45,160,0) 100%);
+  animation:ks-drift1 58s ease-in-out infinite alternate}
+.ks-b2{right:calc(-26% + 5.5vmax); top:calc(-32% + 5.5vmax); width:61vmax; height:61vmax;
+  background:radial-gradient(closest-side circle at 50% 50%,
+    rgba(178,104,255,.34) 0%, rgba(140,80,230,.11) 53%, rgba(120,70,200,0) 100%);
+  animation:ks-drift2 76s ease-in-out infinite alternate}
+.ks-b3{left:calc(22% + 6vmax); bottom:calc(-40% + 6vmax); width:84vmax; height:84vmax;
+  background:radial-gradient(closest-side circle at 50% 50%,
+    rgba(40,116,245,.30) 0%, rgba(28,78,200,.10) 55%, rgba(20,60,160,0) 100%);
+  animation:ks-drift3 92s ease-in-out infinite alternate}
+.ks-b4{left:calc(-14% + 4.5vmax); bottom:calc(-24% + 4.5vmax); width:49vmax; height:49vmax;
+  background:radial-gradient(closest-side circle at 50% 50%,
+    rgba(230,88,192,.20) 0%, rgba(180,70,160,.06) 54%, rgba(150,60,140,0) 100%);
+  animation:ks-drift4 64s ease-in-out infinite alternate}
+.ks-b5{right:calc(6% + 2.5vmax); top:calc(34% + 2.5vmax); width:37vmax; height:37vmax;
+  background:radial-gradient(closest-side circle at 50% 50%,
+    rgba(92,208,255,.16) 0%, rgba(70,160,220,.05) 55%, rgba(60,140,200,0) 100%);
+  animation:ks-drift5 48s ease-in-out infinite alternate}
+
+@keyframes ks-drift1{
+  0%  {transform:translate3d(0,0,0) scale(1);      opacity:.55}
+  50% {transform:translate3d(4vw,3vh,0) scale(1.14);opacity:.85}
+  100%{transform:translate3d(-3vw,-2vh,0) scale(1.02);opacity:.6}
+}
+@keyframes ks-drift2{
+  0%  {transform:translate3d(0,0,0) scale(1.06);    opacity:.5}
+  50% {transform:translate3d(-5vw,4vh,0) scale(.94); opacity:.8}
+  100%{transform:translate3d(2vw,-3vh,0) scale(1.1); opacity:.55}
+}
+@keyframes ks-drift3{
+  0%  {transform:translate3d(0,0,0) scale(1);       opacity:.5}
+  50% {transform:translate3d(-4vw,-3vh,0) scale(1.1);opacity:.75}
+  100%{transform:translate3d(5vw,2vh,0) scale(1.02); opacity:.55}
+}
+@keyframes ks-drift4{
+  0%  {transform:translate3d(0,0,0) scale(1.05);    opacity:.4}
+  50% {transform:translate3d(6vw,-4vh,0) scale(.9);  opacity:.7}
+  100%{transform:translate3d(-2vw,3vh,0) scale(1.08);opacity:.45}
+}
+@keyframes ks-drift5{
+  0%  {transform:translate3d(0,0,0) scale(.95);     opacity:.35}
+  50% {transform:translate3d(-3vw,5vh,0) scale(1.15);opacity:.6}
+  100%{transform:translate3d(3vw,-2vh,0) scale(1);   opacity:.4}
+}
+
+/* ---- холсты со звёздами ---- */
+.ks-layer{opacity:0; transition:opacity 1s ease}
+.ks-stage.ks-ready .ks-layer{opacity:1}
+.ks-layer--far{right:auto; bottom:auto; will-change:transform}
+.ks-layer--sky{width:100%; height:100%}
+
+/* ---- плёночное зерно: убивает полосы на градиентах ----
+   Картинку рисует скрипт (см. makeGrain) — SVG-шум через feTurbulence
+   на замере не давал ничего: +0,01 уровня яркости из 255.
+   mix-blend-mode тут не нужен и стоил ~35% кадрового бюджета. */
+.ks-grain{
+  background-size:128px 128px;
+  image-rendering:-webkit-optimize-contrast;
+  image-rendering:pixelated;
+}
+
+/* ---- виньетка: края темнее, центр чище ---- */
+.ks-vignette{
+  background:
+    radial-gradient(105% 80% at 50% 34%, rgba(2,4,12,0) 34%, rgba(2,4,12,.42) 66%, rgba(1,2,8,.9) 100%),
+    linear-gradient(180deg, rgba(2,4,12,.5) 0%, rgba(2,4,12,0) 26%, rgba(2,4,12,0) 58%, rgba(2,4,12,.8) 100%);
+}
+
+/* ---- место под ваш контент первого экрана ---- */
+.ks-content{
+  position:relative; z-index:2;
+  box-sizing:border-box;
+  min-height:100vh; min-height:100svh;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center; gap:18px;
+  padding:clamp(24px,6vw,80px);
+}
+.ks-title{
+  margin:0; font-weight:800; letter-spacing:-.02em; line-height:1.05;
+  font-size:clamp(34px,7vw,86px);
+  color:#eef2ff;
+}
+/* градиентная заливка букв — только там, где браузер это умеет */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .ks-title{
+    background:linear-gradient(180deg,#ffffff 0%,#cfd8ff 60%,#a9b6f5 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+}
+/* режим высокой контрастности: возвращаем буквам сплошной цвет, иначе заголовок пропадёт */
+@media (forced-colors: active){
+  .ks-title{background:none; color:CanvasText; -webkit-text-fill-color:currentColor}
+}
+.ks-sub{margin:0; max-width:52ch; font-size:clamp(15px,1.7vw,20px); line-height:1.5; color:#b9c4ec}
+
+/* ---- бережный режим: движение выключено, картинка остаётся ---- */
+@media (prefers-reduced-motion: reduce){
+  .ks-blob{animation:none !important; will-change:auto}
+  .ks-layer{transition:none !important}
+  .ks-layer--far,.ks-nebula{transform:none !important; will-change:auto}
+}
+</style>
+
+<section class="ks-stage" id="ksStage">
+  <div class="ks-nebula" id="ksNebula" aria-hidden="true">
+    <span class="ks-blob ks-b1"></span>
+    <span class="ks-blob ks-b2"></span>
+    <span class="ks-blob ks-b3"></span>
+    <span class="ks-blob ks-b4"></span>
+    <span class="ks-blob ks-b5"></span>
+  </div>
+
+  <canvas class="ks-layer ks-layer--far" id="ksFar" aria-hidden="true"></canvas>
+  <canvas class="ks-layer ks-layer--sky" id="ksSky" aria-hidden="true"></canvas>
+
+  <div class="ks-vignette" aria-hidden="true"></div>
+  <div class="ks-grain" aria-hidden="true"></div>
+
+  <div class="ks-content">
+    <h1 class="ks-title">Звёздная смена</h1>
+    <p class="ks-sub">Новогоднее приключение для школьников: марсоход в гирляндах, ледяная комета и настоящая большая тарелка, которая ловит сигнал с Земли.</p>
+  </div>
+</section>
+
+<script>
+(function(){
+  'use strict';
+
+  var stage = document.getElementById('ksStage');
+  var far   = document.getElementById('ksFar');
+  var sky   = document.getElementById('ksSky');
+  var neb   = document.getElementById('ksNebula');
+  if(!stage || !far || !sky || !far.getContext || !sky.getContext) return;
+  if(stage.__ksInit) return;          /* защита от повторной вставки сниппета */
+  stage.__ksInit = 1;
+
+  var fx = far.getContext('2d');
+  var sx = sky.getContext('2d');
+  if(!fx || !sx) return;
+
+  /* ---------- состояние ---------- */
+  var OVER = 48;                 /* запас по краям дальнего холста, px */
+  var MARG = 110;                /* запас за краями экрана для живых слоёв */
+  var BUDGET = 16e6;             /* потолок суммарной площади холстов в точках устройства */
+  var W = 0, H = 0, dpr = 1, built = false;
+  var farStars = [], midStars = [], nearStars = [];
+  var shoot = null, nextShoot = 6;
+  var t = 0, last = 0, raf = 0, waitResize = 0;
+  var onScreen = true, pageVisible = true, reduced = false;
+  var ptX = 0, ptY = 0, curX = 0, curY = 0;   /* цель и текущее положение указателя */
+  var scrollShift = 0, stageTop = 0;
+  var sprites = [], flares = [];
+  var lastFarT = '', lastNebT = '';           /* последние записанные transform */
+  var io = null, ro = null;
+
+  /* белый, ледяной голубой, лиловый, тёплый */
+  var COLORS = ['255,255,255','198,214,255','182,152,255','255,222,186'];
+
+  /* ---------- заготовки картинок звёзд (рисуем один раз) ---------- */
+  function makeGlow(rgb){
+    var s = 64, c = document.createElement('canvas');
+    c.width = s; c.height = s;
+    var g = c.getContext('2d');
+    if(!g) return null;
+    var grd = g.createRadialGradient(s/2,s/2,0,s/2,s/2,s/2);
+    grd.addColorStop(0,    'rgba('+rgb+',1)');
+    grd.addColorStop(0.10, 'rgba('+rgb+',0.82)');
+    grd.addColorStop(0.26, 'rgba('+rgb+',0.26)');
+    grd.addColorStop(0.55, 'rgba('+rgb+',0.06)');
+    grd.addColorStop(1,    'rgba('+rgb+',0)');
+    g.fillStyle = grd; g.fillRect(0,0,s,s);
+    return c;
+  }
+  function makeFlare(rgb){        /* четырёхлучевая искра */
+    var s = 128, c = document.createElement('canvas');
+    c.width = s; c.height = s;
+    var g = c.getContext('2d');
+    if(!g) return null;
+    g.translate(s/2,s/2);
+    var grd = g.createRadialGradient(0,0,0,0,0,s/2);
+    grd.addColorStop(0,   'rgba('+rgb+',0.85)');
+    grd.addColorStop(0.25,'rgba('+rgb+',0.14)');
+    grd.addColorStop(1,   'rgba('+rgb+',0)');
+    g.fillStyle = grd;
+    g.save(); g.scale(1,0.055); g.beginPath(); g.arc(0,0,s/2,0,Math.PI*2); g.fill(); g.restore();
+    g.save(); g.scale(0.055,1); g.beginPath(); g.arc(0,0,s/2,0,Math.PI*2); g.fill(); g.restore();
+    return c;
+  }
+  for(var ci=0; ci<COLORS.length; ci++){
+    sprites.push(makeGlow(COLORS[ci]));
+    flares.push(makeFlare(COLORS[ci]));
+  }
+  if(!sprites[0] || !flares[0]) return;
+
+  /* ---------- плёночное зерно: настоящий шум, а не SVG-фильтр ---------- */
+  var grain = stage.querySelector('.ks-grain');
+  (function makeGrain(){
+    if(!grain) return;
+    var s = 128, c = document.createElement('canvas');
+    c.width = s; c.height = s;
+    var g = c.getContext('2d');
+    if(!g) return;
+    var img = g.createImageData(s,s), d = img.data, i;
+    for(i=0;i<d.length;i+=4){
+      d[i] = d[i+1] = d[i+2] = 255;
+      d[i+3] = (Math.random()*5)|0;   /* 0..4: подмешивает ~1 уровень яркости — ровно чтобы сбить полосы */
+    }
+    g.putImageData(img,0,0);
+    try{ grain.style.backgroundImage = 'url(' + c.toDataURL('image/png') + ')'; }catch(e){}
+  })();
+
+  /* ---------- мелкая математика ---------- */
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function gauss(){ return (Math.random()+Math.random()+Math.random()-1.5)/1.5; }
+  function clamp(v,a,b){ return v<a ? a : (v>b ? b : v); }
+
+  /* наклон звёздной полосы: доля ВЫСОТЫ экрана, набегающая на всю ширину.
+     Так полоса одинаково красиво пересекает и телефон, и широкий монитор. */
+  var BAND = -0.40;
+  function bandY(x){ return H*(0.46 + BAND*(x/W - 0.5)); }
+  function bandAngle(){ return Math.atan(BAND*H/W); }
+
+  /* сгущения вдоль наклонной полосы — как рукав млечного пути */
+  function makeClusters(){
+    var n = W > 900 ? 7 : 5, out = [], i, x, y;
+    var small = Math.min(W,H);
+    for(i=0;i<n;i++){
+      /* по одному сгущению на вертикальную полосу — чтобы не сбились в кучу */
+      x = (-0.1 + 1.2*(i + rnd(0.15,0.85))/n) * W;
+      y = bandY(x) + rnd(-0.16,0.16)*H;
+      out.push({ x:x, y:y, r:small*rnd(0.14,0.32) });
+    }
+    return out;
+  }
+  /* пустоты — чтобы россыпь не была равномерной */
+  function makeVoids(){
+    var small = Math.min(W,H), out = [], i;
+    for(i=0;i<2;i++){
+      out.push({ x:rnd(0,1)*W, y:rnd(0,1)*H, r:small*rnd(0.14,0.24) });
+    }
+    return out;
+  }
+  function inVoid(x,y,voids){
+    for(var i=0;i<voids.length;i++){
+      var dx = x-voids[i].x, dy = y-voids[i].y;
+      if(dx*dx + dy*dy < voids[i].r*voids[i].r) return true;
+    }
+    return false;
+  }
+  function pickPoint(m,clusters,voids){
+    var k, p;
+    for(k=0;k<8;k++){
+      if(Math.random() < 0.52 && clusters.length){
+        var c = clusters[(Math.random()*clusters.length)|0];
+        var a = Math.random()*Math.PI*2;
+        var r = Math.abs(gauss())*c.r;
+        p = { x:c.x + Math.cos(a)*r, y:c.y + Math.sin(a)*r };
+      } else {
+        p = { x:rnd(-m, W+m), y:rnd(-m, H+m) };
+      }
+      if(p.x < -m || p.x > W+m || p.y < -m || p.y > H+m) continue;
+      if(inVoid(p.x,p.y,voids) && Math.random() < 0.88) continue;
+      return p;
+    }
+    return { x:rnd(-m, W+m), y:rnd(-m, H+m) };
+  }
+
+  /* ---------- сборка звёзд ---------- */
+  function makeStar(kind,m,clusters,voids){
+    var p = pickPoint(m,clusters,voids);
+    var s = { x:p.x, y:p.y, c:0, d:2, a:1, sp:0, ph:Math.random()*6.283, tw:0,
+              fl:0, fT:0, fd:1.6, fp:-1 };
+    var r = Math.random();
+    s.c = r < 0.60 ? 0 : (r < 0.83 ? 1 : (r < 0.95 ? 2 : 3));
+    if(kind === 0){                       /* дальний слой: мелкий, мягкий, без мерцания */
+      s.d = rnd(2.4,4.6); s.a = rnd(0.18,0.52);
+    } else if(kind === 1){                /* средний */
+      s.d = rnd(3.2,6.8); s.a = rnd(0.34,0.78);
+      s.sp = rnd(0.5,1.7); s.tw = rnd(0.15,0.45);
+    } else {                              /* ближний: крупный и яркий */
+      s.d = rnd(6,13.5); s.a = rnd(0.6,1);
+      s.sp = rnd(0.3,1.1); s.tw = rnd(0.2,0.5);
+    }
+    return s;
+  }
+  function countFor(m,density,cap){
+    var n = Math.round(((W + m*2) * (H + m*2)) / density);
+    return clamp(n, 24, cap);
+  }
+  function buildAll(){
+    var clusters = makeClusters(), voids = makeVoids(), i;
+    makeDust();
+    farStars = []; midStars = []; nearStars = [];
+    var nFar  = countFor(OVER, 2100, 1000);
+    var nMid  = countFor(MARG, 5200, 460);
+    var nNear = countFor(MARG, 19000, 130);
+    for(i=0;i<nFar;i++)  farStars.push(makeStar(0,OVER,clusters,voids));
+    for(i=0;i<nMid;i++)  midStars.push(makeStar(1,MARG,clusters,voids));
+    for(i=0;i<nNear;i++) nearStars.push(makeStar(2,MARG,clusters,voids));
+    /* редкие искры: единицы звёзд на весь экран, иначе получается ёлочная гирлянда */
+    seedFlares(nearStars, Math.max(2, Math.round(nearStars.length*0.05)));
+    seedFlares(midStars,  Math.max(1, Math.round(midStars.length*0.008)));
+  }
+  function seedFlares(list,n){
+    var got = 0, tries = 0, s;
+    while(got < n && tries < n*8 && list.length){
+      tries++;
+      s = list[(Math.random()*list.length)|0];
+      if(s.fl) continue;                /* одна и та же звезда не считается дважды */
+      s.fl = 1; s.fT = rnd(2,30); s.fd = rnd(1.2,2.6); s.fp = -1;
+      got++;
+    }
+  }
+
+  /* ---------- отрисовка ---------- */
+  var DUST = ['170,150,255','120,170,255','200,150,255','120,200,255'];
+  var dust = [];
+  function makeDust(){          /* доли, а не пиксели: переживают смену размера */
+    dust = [];
+    for(var i=0;i<4;i++) dust.push({ dy:rnd(-0.06,0.06), k:rnd(0.45,0.75) });
+  }
+  function drawDust(){          /* еле заметная пыль вдоль полосы: даёт объём */
+    var ang = bandAngle(), small = Math.min(W,H), i, n = dust.length;
+    for(i=0;i<n;i++){
+      var x = (0.05 + 0.9*(i + 0.5)/n) * W + OVER;
+      var y = bandY(x - OVER) + dust[i].dy*H + OVER;
+      var r = small*dust[i].k;
+      fx.save();
+      fx.translate(x,y);
+      fx.rotate(ang);
+      fx.scale(1,0.34);
+      var g = fx.createRadialGradient(0,0,0,0,0,r);
+      var c = DUST[i % DUST.length];
+      g.addColorStop(0,   'rgba('+c+',0.075)');
+      g.addColorStop(0.45,'rgba('+c+',0.028)');
+      g.addColorStop(1,   'rgba('+c+',0)');
+      fx.fillStyle = g;
+      fx.beginPath(); fx.arc(0,0,r,0,Math.PI*2); fx.fill();
+      fx.restore();
+    }
+  }
+
+  function drawFar(){
+    fx.clearRect(0,0,W+OVER*2,H+OVER*2);
+    fx.globalCompositeOperation = 'lighter';
+    drawDust();
+    for(var i=0;i<farStars.length;i++){
+      var s = farStars[i], d = s.d;
+      fx.globalAlpha = s.a;
+      fx.drawImage(sprites[s.c], s.x+OVER-d/2, s.y+OVER-d/2, d, d);
+    }
+    fx.globalAlpha = 1;
+    fx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawLayer(list,ox,oy,dt){
+    var i, s, a, d, env, fd;
+    for(i=0;i<list.length;i++){
+      s = list[i];
+      if(reduced){
+        a = s.a;
+      } else {
+        a = s.a * (1 - s.tw*(0.5 - 0.5*Math.sin(t*s.sp + s.ph)));
+      }
+      d = s.d;
+      sx.globalAlpha = a;
+      sx.drawImage(sprites[s.c], s.x+ox-d/2, s.y+oy-d/2, d, d);
+
+      /* признак «эта звезда умеет вспыхивать» — отдельный флаг.
+         Раньше проверялось s.fT >= 0, а отсчёт уводил fT в минус,
+         и вспышка не начиналась уже никогда. */
+      if(s.fl && !reduced){
+        if(s.fp >= 0){                       /* идёт вспышка */
+          s.fp += dt / s.fd;
+          if(s.fp >= 1){ s.fp = -1; s.fT = rnd(14,48); }
+          else {
+            env = Math.sin(Math.PI*s.fp);
+            fd = d*4.6;
+            sx.globalAlpha = a*env*0.5;
+            sx.drawImage(flares[s.c], s.x+ox-fd/2, s.y+oy-fd/2, fd, fd);
+            sx.globalAlpha = a*env*0.45;
+            sx.drawImage(sprites[s.c], s.x+ox-d*0.9, s.y+oy-d*0.9, d*1.8, d*1.8);
+          }
+        } else {
+          s.fT -= dt;
+          if(s.fT <= 0) s.fp = 0;
+        }
+      }
+    }
+  }
+
+  function drawShoot(){
+    var p  = shoot.p;
+    var env = Math.sin(Math.PI*clamp(p,0,1));
+    var hx = shoot.x + shoot.dx*p*shoot.len;
+    var hy = shoot.y + shoot.dy*p*shoot.len;
+    var tx = hx - shoot.dx*shoot.tail;
+    var ty = hy - shoot.dy*shoot.tail;
+    sx.globalAlpha = 1;
+    sx.lineCap = 'round';
+    /* широкое мягкое свечение следа */
+    var g1 = sx.createLinearGradient(tx,ty,hx,hy);
+    g1.addColorStop(0,   'rgba(120,150,255,0)');
+    g1.addColorStop(0.7, 'rgba(150,180,255,'+(0.10*env).toFixed(3)+')');
+    g1.addColorStop(1,   'rgba(200,220,255,'+(0.22*env).toFixed(3)+')');
+    sx.strokeStyle = g1; sx.lineWidth = 6;
+    sx.beginPath(); sx.moveTo(tx,ty); sx.lineTo(hx,hy); sx.stroke();
+    /* тонкое яркое ядро следа */
+    var g2 = sx.createLinearGradient(tx,ty,hx,hy);
+    g2.addColorStop(0,   'rgba(160,190,255,0)');
+    g2.addColorStop(0.6, 'rgba(214,226,255,'+(0.45*env).toFixed(3)+')');
+    g2.addColorStop(1,   'rgba(255,255,255,'+(0.95*env).toFixed(3)+')');
+    sx.strokeStyle = g2; sx.lineWidth = 2;
+    sx.beginPath(); sx.moveTo(tx,ty); sx.lineTo(hx,hy); sx.stroke();
+    sx.globalAlpha = env;
+    sx.drawImage(sprites[0], hx-13, hy-13, 26, 26);   /* головка */
+    sx.globalAlpha = env*0.9;
+    sx.drawImage(sprites[1], hx-5, hy-5, 10, 10);
+  }
+
+  function spawnShoot(){
+    var toRight = Math.random() < 0.5;
+    var ang = toRight ? rnd(0.30,0.62) : (Math.PI - rnd(0.30,0.62));
+    var diag = Math.sqrt(W*W + H*H);
+    shoot = {
+      x: toRight ? rnd(-0.15,0.45)*W : rnd(0.55,1.15)*W,
+      y: rnd(-0.05,0.42)*H,
+      dx: Math.cos(ang), dy: Math.sin(ang),
+      len: diag*rnd(0.45,0.8),
+      tail: Math.min(W,H)*rnd(0.16,0.28),
+      dur: rnd(0.9,1.5),
+      p: 0
+    };
+  }
+
+  function drawSky(dt){
+    sx.clearRect(0,0,W,H);
+    sx.globalCompositeOperation = 'lighter';
+    /* ход от прокрутки ограничен, чтобы слой не уехал за свой запас */
+    var sc  = scrollShift;
+    var mY  = clamp(sc*0.045, -34, 34);
+    var nX  = clamp(sc*0.02,  -24, 24);
+    var nY  = clamp(sc*0.12,  -80, 80);
+    drawLayer(midStars,  curX*10,       curY*10 + mY, dt);
+    drawLayer(nearStars, curX*24 + nX,  curY*24 + nY, dt);
+    if(shoot) drawShoot();
+    sx.globalAlpha = 1;
+    sx.globalCompositeOperation = 'source-over';
+  }
+
+  /* transform пишем только когда строка реально изменилась:
+     на телефоне указателя нет, значение стоит на месте — и мы не трогаем стиль */
+  function applyParallax(){
+    var sc = scrollShift;
+    var fY = clamp(sc*0.018, -30, 30);
+    var bY = clamp(sc*0.07,  -90, 90);
+    var a = 'translate3d(' + (curX*4).toFixed(1) + 'px,' + (curY*4 + fY).toFixed(1) + 'px,0)';
+    if(a !== lastFarT){ far.style.transform = a; lastFarT = a; }
+    if(neb){
+      var b = 'translate3d(' + (curX*16).toFixed(1) + 'px,' + (curY*16 + bY).toFixed(1) + 'px,0)';
+      if(b !== lastNebT){ neb.style.transform = b; lastNebT = b; }
+    }
+  }
+
+  /* ---------- цикл ---------- */
+  function alive(){ return onScreen && pageVisible && !reduced && built; }
+
+  function frame(now){
+    raf = 0;
+    if(!last) last = now;
+    var dt = (now - last)/1000;
+    last = now;
+    if(dt > 0.05) dt = 0.05;
+    if(dt < 0) dt = 0;
+    t += dt;
+
+    var k = Math.min(1, dt*3);        /* плавное догоняние указателя */
+    curX += (ptX - curX)*k;
+    curY += (ptY - curY)*k;
+
+    if(shoot){
+      shoot.p += dt/shoot.dur;
+      if(shoot.p >= 1){ shoot = null; nextShoot = t + rnd(15,30); }
+    } else if(t >= nextShoot){
+      spawnShoot();
+    }
+
+    applyParallax();
+    drawSky(dt);
+
+    if(alive()) raf = requestAnimationFrame(frame);
+  }
+
+  function pulse(){
+    if(alive()){
+      if(!raf){ last = 0; raf = requestAnimationFrame(frame); }
+    } else if(raf){
+      cancelAnimationFrame(raf); raf = 0; last = 0;
+    }
+  }
+
+  /* ---------- размеры ---------- */
+  function updateScroll(){
+    var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+    scrollShift = y - stageTop;
+  }
+
+  function doResize(){
+    waitResize = 0;
+    var rect = stage.getBoundingClientRect();
+    var w = Math.max(1, Math.round(rect.width));
+    var h = Math.max(1, Math.round(rect.height));
+    stageTop = rect.top + (window.pageYOffset || document.documentElement.scrollTop || 0);
+
+    /* плотность точек: не выше 2, и не выше того, что влезает в бюджет памяти —
+       на 4K и ультраширокой панели два холста по 2x съедали бы больше 150 МБ */
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var need = (w + OVER*2)*(h + OVER*2) + w*h;
+    if(need*dpr*dpr > BUDGET) dpr = Math.max(1, Math.sqrt(BUDGET/need));
+
+    /* высоту терпим только в пределах запаса дальнего холста,
+       иначе внизу появляется полоса без мелких звёзд */
+    var rebuild = (!built || Math.abs(w - W) > 1 || Math.abs(h - H) > OVER);
+    W = w; H = h;
+
+    sky.width  = Math.round(W*dpr);
+    sky.height = Math.round(H*dpr);
+    sx.setTransform(dpr,0,0,dpr,0,0);
+
+    far.style.left   = (-OVER) + 'px';
+    far.style.top    = (-OVER) + 'px';
+    far.style.width  = (W + OVER*2) + 'px';
+    far.style.height = (H + OVER*2) + 'px';
+    far.width  = Math.round((W + OVER*2)*dpr);
+    far.height = Math.round((H + OVER*2)*dpr);
+    fx.setTransform(dpr,0,0,dpr,0,0);
+
+    if(rebuild){ buildAll(); built = true; }
+    drawFar();
+    updateScroll();
+    lastFarT = lastNebT = '';        /* размеры сменились — сбрасываем кэш transform */
+    applyParallax();
+    drawSky(0);
+    if(stage.classList) stage.classList.add('ks-ready');
+    else if(stage.className.indexOf('ks-ready') < 0) stage.className += ' ks-ready';
+    pulse();
+  }
+
+  function onResize(){
+    if(waitResize) clearTimeout(waitResize);
+    waitResize = setTimeout(doResize, 150);
+  }
+
+  /* ---------- бережный режим ---------- */
+  var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  function readMotion(){
+    reduced = !!(mq && mq.matches);
+    if(reduced){
+      ptX = ptY = curX = curY = 0;
+      shoot = null;
+      far.style.transform = '';
+      if(neb) neb.style.transform = '';
+      lastFarT = lastNebT = '';
+      if(built) drawSky(0);
+    }
+    pulse();
+  }
+  reduced = !!(mq && mq.matches);
+  if(mq){
+    if(mq.addEventListener) mq.addEventListener('change', readMotion);
+    else if(mq.addListener) mq.addListener(readMotion);
+  }
+
+  /* ---------- события ---------- */
+  function onPointer(e){
+    if(reduced) return;
+    if(e.pointerType && e.pointerType !== 'mouse') return;   /* палец не двигает звёзды */
+    var vw = window.innerWidth  || 1;
+    var vh = window.innerHeight || 1;
+    ptX = clamp((e.clientX/vw)*2 - 1, -1, 1);
+    ptY = clamp((e.clientY/vh)*2 - 1, -1, 1);
+  }
+  function onVisibility(){
+    pageVisible = !document.hidden;
+    pulse();
+  }
+
+  var usePointer = !!window.PointerEvent;
+  if(usePointer) window.addEventListener('pointermove', onPointer, {passive:true});
+  else window.addEventListener('mousemove', onPointer, {passive:true});
+
+  window.addEventListener('scroll', updateScroll, {passive:true});
+  document.addEventListener('visibilitychange', onVisibility);
+
+  if(window.IntersectionObserver){
+    io = new IntersectionObserver(function(entries){
+      onScreen = entries[entries.length-1].isIntersecting;
+      pulse();
+    }, {threshold:0});
+    io.observe(stage);
+  }
+
+  if(window.ResizeObserver){
+    /* первый вызов наблюдатель делает сразу — его пропускаем,
+       размеры мы и так считаем вручную ниже */
+    var firstRO = true;
+    ro = new ResizeObserver(function(){
+      if(firstRO){ firstRO = false; return; }
+      onResize();
+    });
+    ro.observe(stage);
+  } else {
+    window.addEventListener('resize', onResize);
+    window.addEventListener('orientationchange', onResize);
+  }
+
+  /* ---------- уборка за собой ----------
+     на обычном лендинге не нужна, но если секцию удаляет фреймворк
+     (React/Next, предпросмотр в конструкторе) — вызовите ksStage.ksDestroy() */
+  function destroy(){
+    if(raf){ cancelAnimationFrame(raf); raf = 0; }
+    if(waitResize){ clearTimeout(waitResize); waitResize = 0; }
+    if(usePointer) window.removeEventListener('pointermove', onPointer);
+    else window.removeEventListener('mousemove', onPointer);
+    window.removeEventListener('scroll', updateScroll);
+    window.removeEventListener('resize', onResize);
+    window.removeEventListener('orientationchange', onResize);
+    document.removeEventListener('visibilitychange', onVisibility);
+    if(mq){
+      if(mq.removeEventListener) mq.removeEventListener('change', readMotion);
+      else if(mq.removeListener) mq.removeListener(readMotion);
+    }
+    if(io){ io.disconnect(); io = null; }
+    if(ro){ ro.disconnect(); ro = null; }
+    farStars = midStars = nearStars = dust = [];
+    stage.__ksInit = 0;
+  }
+  stage.ksDestroy = destroy;
+
+  doResize();
+})();
+</script>
+</body></html>

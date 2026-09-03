@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Комета</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#05070f;color:#dfe7f7;
+    font:400 16px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    overflow:hidden;-webkit-font-smoothing:antialiased}
+  /* корневой блок приёма всегда занимает весь кадр */
+  body>section{width:100%;height:100%;min-height:100%}
+</style>
+</head><body>
+<!-- ===================== НЕБО С КОМЕТАМИ (вставлять целиком) ===================== -->
+<!-- Путь к картинке ниже указан как comet.png (4 места) - поправьте под себя. -->
+<style>
+/* ---------- сцена: тёмно-синее небо с переливом ---------- */
+.ks-sky{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;                 /* свечения не вылезают на остальную страницу */
+  min-height:100vh;
+  min-height:100svh;                 /* на телефоне без прыжков адресной строки */
+  color:#e9efff;
+  background:
+    radial-gradient(110% 85% at 18% 12%, #23317c 0%, rgba(35,49,124,0) 62%),
+    radial-gradient(85% 65% at 82% 16%, #46226f 0%, rgba(70,34,111,0) 58%),
+    radial-gradient(120% 90% at 55% 106%, #16265f 0%, rgba(22,38,95,0) 60%),
+    linear-gradient(180deg,#050a20 0%,#0a1140 48%,#060c26 100%);
+}
+
+/* общий слой во всю сцену */
+.ks-layer{ position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; }
+
+/* ---------- размытые отблески ---------- */
+.ks-glow{ position:absolute; border-radius:50%; will-change:transform,opacity; }
+.ks-glow--1{ left:-16vw; top:-22vw; width:64vw; height:64vw;
+  background:radial-gradient(circle closest-side, rgba(92,124,255,.50), rgba(92,124,255,0));
+  animation:ks-drift1 30s ease-in-out infinite alternate; }
+.ks-glow--2{ right:-14vw; top:4vh; width:56vw; height:56vw;
+  background:radial-gradient(circle closest-side, rgba(158,98,255,.40), rgba(158,98,255,0));
+  animation:ks-drift2 38s ease-in-out infinite alternate; }
+.ks-glow--3{ left:18vw; bottom:-36vw; width:72vw; height:72vw;
+  background:radial-gradient(circle closest-side, rgba(64,150,255,.30), rgba(64,150,255,0));
+  animation:ks-drift3 44s ease-in-out infinite alternate; }
+@keyframes ks-drift1{ from{ transform:translate3d(0,0,0) scale(1); opacity:.75 }
+                      to  { transform:translate3d(6vw,4vh,0) scale(1.14); opacity:1 } }
+@keyframes ks-drift2{ from{ transform:translate3d(0,0,0) scale(1.06); opacity:.6 }
+                      to  { transform:translate3d(-5vw,6vh,0) scale(.94); opacity:.95 } }
+@keyframes ks-drift3{ from{ transform:translate3d(0,0,0) scale(.96); opacity:.55 }
+                      to  { transform:translate3d(4vw,-5vh,0) scale(1.12); opacity:.9 } }
+
+/* ---------- искры (canvas) ---------- */
+.ks-sparks{ position:absolute; left:0; top:0; width:100%; height:100%;
+  display:block; pointer-events:none; mix-blend-mode:screen; }
+
+/* ---------- комета ---------- */
+/* .ks-comet - это точка размером 0x0, которая едет по кривой.
+   Всё остальное висит на ней и поэтому крутится вместе с траекторией. */
+.ks-comet{
+  position:absolute; left:0; top:0; width:0; height:0;
+  opacity:0;                       /* видна только в полёте */
+  offset-rotate:auto;              /* разворот по касательной к кривой */
+  isolation:isolate;               /* фиксируем группу наложения: свечения внутри
+                                      кометы ведут себя одинаково при любой прозрачности */
+  /* --ks-len - длина кометы, --ks-cx/--ks-cy - где на картинке ядро,
+     --ks-turn - доворот картинки, чтобы хвост смотрел строго назад.
+     ВАЖНО: 180deg = хвост строго по касательной. Любое отклонение от 180
+     скрипт читает отсюда же и разворачивает след искр так же. */
+  --ks-len:380px;
+  --ks-cx:13%;
+  --ks-cy:72%;
+  --ks-turn:200deg;
+}
+/* слой под комету заводим только на время полёта, а не на все 30 секунд ожидания */
+.ks-comet.is-flying{ will-change:transform,opacity }
+.ks-comet.is-flying .ks-comet__shine{ will-change:opacity }
+
+.ks-comet__body{
+  position:absolute; left:0; top:0;
+  width:var(--ks-len);                             /* высота придёт от самой картинки */
+  transform-origin:var(--ks-cx) var(--ks-cy);
+  transform:translate(calc(-1 * var(--ks-cx)), calc(-1 * var(--ks-cy))) rotate(var(--ks-turn));
+}
+.ks-comet__img{
+  display:block; width:100%; height:auto;
+  -webkit-user-select:none; user-select:none;
+}
+/* вторая копия хвоста: размытая, дышит прозрачностью.
+   Масштаб здесь НЕ анимируем: связка blur + mix-blend-mode + scale заставляет
+   WebKit пересчитывать размытие в каждом кадре. Меняем только прозрачность. */
+.ks-comet__shine{
+  position:absolute; left:0; top:0; width:100%; height:100%;
+  opacity:.42;                                     /* значение на случай выключенной анимации */
+  filter:blur(8px) brightness(1.25) saturate(1.3);
+  mix-blend-mode:screen;
+  animation:ks-breath 4.2s ease-in-out infinite;
+}
+@keyframes ks-breath{
+  0%,100%{ opacity:.26 }
+  50%    { opacity:.62 }
+}
+/* мягкий ореол ровно на ядре */
+.ks-comet__core{
+  position:absolute; left:0; top:0;
+  width:calc(var(--ks-len) * .19); height:calc(var(--ks-len) * .19);
+  margin-left:calc(var(--ks-len) * -.095); margin-top:calc(var(--ks-len) * -.095);
+  border-radius:50%;
+  background:radial-gradient(circle closest-side,
+    rgba(255,255,255,.85), rgba(200,170,255,.40) 42%, rgba(126,96,255,0) 100%);
+  mix-blend-mode:screen;
+  animation:ks-pulse 2.8s ease-in-out infinite;
+}
+@keyframes ks-pulse{
+  0%,100%{ opacity:.7;  transform:scale(.92) }
+  50%    { opacity:1;   transform:scale(1.12) }
+}
+/* дальняя комета: мельче, тусклее, чуть размыта - отсюда ощущение глубины */
+.ks-comet--far .ks-comet__body{ filter:blur(1px) saturate(.75) brightness(.85) }
+.ks-comet--far .ks-comet__shine{ animation-duration:6.5s }
+.ks-comet--far .ks-comet__core{ animation-duration:4.4s }
+
+/* этажи */
+.ks-sky__glows { z-index:1 }
+.ks-comet--far { z-index:2 }
+.ks-sparks     { z-index:3 }
+.ks-comet--near{ z-index:4 }
+.ks-sky__content{ position:relative; z-index:5 }
+
+/* ---------- блок уехал с экрана или вкладка свёрнута ----------
+   скрипт вешает этот класс: тогда замирают и CSS-анимации,
+   иначе отблески и «дыхание» хвоста крутились бы вечно вхолостую */
+.ks-sky--idle .ks-glow,
+.ks-sky--idle .ks-comet__shine,
+.ks-sky--idle .ks-comet__core{ animation-play-state:paused }
+
+/* на телефоне размытие полегче - экономим силы */
+@media (max-width: 640px){
+  .ks-comet__shine{ filter:blur(5px) brightness(1.25) saturate(1.3) }
+}
+
+/* ---------- режим «меньше движения»: всё замирает, картинка остаётся ---------- */
+@media (prefers-reduced-motion: reduce){
+  .ks-glow, .ks-comet__shine, .ks-comet__core{ animation:none !important }
+}
+</style>
+
+<section class="ks-sky" id="ksSky">
+  <!-- отблески -->
+  <div class="ks-layer ks-sky__glows" aria-hidden="true">
+    <span class="ks-glow ks-glow--1"></span>
+    <span class="ks-glow ks-glow--2"></span>
+    <span class="ks-glow ks-glow--3"></span>
+  </div>
+
+  <!-- сцена комет: канвас и сами кометы лежат в одной системе координат -->
+  <div class="ks-layer" id="ksStage" aria-hidden="true">
+    <div class="ks-comet ks-comet--far" id="ksCometFar">
+      <div class="ks-comet__body">
+        <img class="ks-comet__img" src="comet.png" alt="" decoding="async" fetchpriority="high" draggable="false">
+        <img class="ks-comet__img ks-comet__shine" src="comet.png" alt="" decoding="async" draggable="false">
+      </div>
+      <span class="ks-comet__core"></span>
+    </div>
+
+    <canvas class="ks-sparks" id="ksSparks"></canvas>
+
+    <div class="ks-comet ks-comet--near" id="ksCometNear">
+      <div class="ks-comet__body">
+        <img class="ks-comet__img" src="comet.png" alt="" decoding="async" draggable="false">
+        <img class="ks-comet__img ks-comet__shine" src="comet.png" alt="" decoding="async" draggable="false">
+      </div>
+      <span class="ks-comet__core"></span>
+    </div>
+  </div>
+
+  <!-- сюда ваш заголовок и кнопки -->
+  <div class="ks-sky__content"></div>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  var sky    = document.getElementById('ksSky');
+  var stage  = document.getElementById('ksStage');
+  var canvas = document.getElementById('ksSparks');
+  var elFar  = document.getElementById('ksCometFar');
+  var elNear = document.getElementById('ksCometNear');
+  if (!sky || !stage || !canvas || !elFar || !elNear || !canvas.getContext) { return; }
+  var ctx = canvas.getContext('2d');
+  if (!ctx) { return; }
+
+  /* ---------- что умеет браузер ---------- */
+  var hasPath = !!(window.CSS && window.CSS.supports &&
+    CSS.supports('offset-path', 'path("M 0 0 L 10 10")') &&
+    CSS.supports('offset-rotate', 'auto'));
+
+  var mq = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+  var calm = mq ? mq.matches : false;          /* просят не двигать */
+  var useCss = hasPath && !calm;               /* едем на CSS-траектории */
+
+  var W = 1, H = 1, dpr = 1;
+  var SEG = 96;                                /* на столько кусочков режем кривую */
+
+  /* черновики под точку и направление: чтобы не плодить объекты в каждом кадре */
+  var _pt = { x:0, y:0 }, _dr = { x:0, y:0 }, _m1 = { x:0, y:0 }, _m2 = { x:0, y:0 };
+
+  /* ---------- кривая Безье: точка, направление, длина ---------- */
+  function pointAt(p, t, o) {
+    var u = 1 - t, a = u*u*u, b = 3*u*u*t, c = 3*u*t*t, d = t*t*t;
+    o.x = a*p[0].x + b*p[1].x + c*p[2].x + d*p[3].x;
+    o.y = a*p[0].y + b*p[1].y + c*p[2].y + d*p[3].y;
+    return o;
+  }
+  function dirAt(p, t, o) {
+    var u = 1 - t, a = 3*u*u, b = 6*u*t, c = 3*t*t;
+    o.x = a*(p[1].x-p[0].x) + b*(p[2].x-p[1].x) + c*(p[3].x-p[2].x);
+    o.y = a*(p[1].y-p[0].y) + b*(p[2].y-p[1].y) + c*(p[3].y-p[2].y);
+    return o;
+  }
+  /* таблица «пройденный путь -> параметр кривой»: чтобы скорость была ровной,
+     как её считает сам браузер в offset-distance */
+  function measure(fl) {
+    var p = fl.p, tab = fl.tab, i, dx, dy, acc = 0, prev = _m1, cur = _m2, sw;
+    pointAt(p, 0, prev);
+    tab.length = 0; tab.push(0);
+    for (i = 1; i <= SEG; i++) {
+      pointAt(p, i / SEG, cur);
+      dx = cur.x - prev.x; dy = cur.y - prev.y;
+      acc += Math.sqrt(dx*dx + dy*dy);
+      tab.push(acc);
+      sw = prev; prev = cur; cur = sw;
+    }
+    fl.len = acc || 1;
+  }
+  function tOf(fl, s) {
+    var tab = fl.tab, lo = 0, hi = SEG, mid, seg;
+    if (s <= 0) { return 0; }
+    if (s >= fl.len) { return 1; }
+    while (hi - lo > 1) { mid = (lo + hi) >> 1; if (tab[mid] <= s) { lo = mid; } else { hi = mid; } }
+    seg = tab[hi] - tab[lo];
+    return (lo + (seg > 0 ? (s - tab[lo]) / seg : 0)) / SEG;
+  }
+  function rnd(v) { return Math.round(v * 10) / 10; }
+  function pathText(fl) {
+    var p = fl.p;
+    return 'path("M ' + rnd(p[0].x) + ' ' + rnd(p[0].y) +
+           ' C ' + rnd(p[1].x) + ' ' + rnd(p[1].y) +
+           ', '  + rnd(p[2].x) + ' ' + rnd(p[2].y) +
+           ', '  + rnd(p[3].x) + ' ' + rnd(p[3].y) + '")';
+  }
+  /* кривую храним в долях экрана - тогда при повороте телефона
+     полёт не обрывается, а просто пересчитывается */
+  function toPx(fl) {
+    for (var i = 0; i < 4; i++) { fl.p[i].x = fl.n[i].x * W; fl.p[i].y = fl.n[i].y * H; }
+    measure(fl);
+  }
+  function newCurve(c) {
+    var right = Math.random() < 0.5;                     /* куда летим */
+    var x0 = right ? -0.30 : 1.30, x1 = right ? 1.30 : -0.30;
+    var y0 = c.yTop + Math.random() * c.ySpread;
+    var y1 = y0 + c.drop + Math.random() * c.dropSpread;
+    if (y1 > 1.05) { y1 = 1.05; }
+    var bow = (c.bow + Math.random() * c.bowSpread) * (Math.random() < 0.5 ? 1 : -1);
+    var dx = x1 - x0, dy = y1 - y0;
+    /* держим вершину дуги в кадре: без этого прогиб вверх при низком входе
+       уводит комету за верхний край ровно там, где она ярче всего.
+       Середина кривой = середина между концами + 0.75 * прогиб. */
+    var mid = y0 + dy / 2 + 0.75 * bow;
+    if (mid < 0.08)      { bow += (0.08 - mid) / 0.75; }
+    else if (mid > 0.92) { bow -= (mid - 0.92) / 0.75; }
+    return {
+      n: [ { x: x0,             y: y0 },
+           { x: x0 + dx / 3,     y: y0 + dy / 3 + bow },
+           { x: x0 + dx * 2 / 3, y: y0 + dy * 2 / 3 + bow },
+           { x: x1,             y: y1 } ],
+      p: [ {x:0,y:0},{x:0,y:0},{x:0,y:0},{x:0,y:0} ],
+      tab: [], len: 1
+    };
+  }
+  /* плавный вход и уход: у краёв прозрачность гасится.
+     Путь начинается за кадром (x = -0.30) и кончается за кадром (x = 1.30),
+     то есть первые и последние ~0.19 пути комета всё равно не видна.
+     Поэтому окна разгорания шире этой доли - иначе комета «включается»
+     за кадром и въезжает в экран уже на полной яркости. */
+  function fade(p) {
+    var a = p / 0.24, b = (1 - p) / 0.26, e = a < b ? a : b;
+    if (e < 0) { e = 0; } if (e > 1) { e = 1; }
+    return e * e * (3 - 2 * e);
+  }
+
+  /* ---------- искры: общий запас точек ---------- */
+  var MAX = 320, pool = [], head = 0, i;
+  for (i = 0; i < MAX; i++) { pool.push({ x:0,y:0,vx:0,vy:0,life:0,max:1,r:1,a:1,s:null }); }
+  /* берём по кругу, но стараемся не затирать ещё живую искру */
+  function take() {
+    var q, n = 0;
+    do { q = pool[head]; head = (head + 1) % MAX; n++; } while (q.life > 0 && n < 8);
+    return q;
+  }
+
+  function sprite(rgb) {                       /* заранее нарисованная искорка */
+    var c = document.createElement('canvas'), g, gr;
+    c.width = 64; c.height = 64;
+    g = c.getContext('2d');
+    gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0,    'rgba(' + rgb + ',1)');
+    gr.addColorStop(0.28, 'rgba(' + rgb + ',0.5)');
+    gr.addColorStop(1,    'rgba(' + rgb + ',0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    return c;
+  }
+  var dots = [ sprite('255,255,255'), sprite('188,214,255'),
+               sprite('198,162,255'), sprite('146,120,255') ];
+
+  /* ---------- ждём картинку ----------
+     без этого первый пролёт (через 2-4 секунды) на медленном телефоне
+     проходит пустым: летит невидимая точка, зрителю достаются одни искры */
+  var imgs = stage.querySelectorAll('.ks-comet__img');
+  var ready = true;
+  function checkImgs() {
+    var k, all = true;
+    for (k = 0; k < imgs.length; k++) { if (!imgs[k].complete) { all = false; } }
+    ready = all;
+  }
+  checkImgs();
+  if (!ready) {
+    for (i = 0; i < imgs.length; i++) {
+      imgs[i].addEventListener('load', checkImgs, false);
+      imgs[i].addEventListener('error', checkImgs, false);
+    }
+    setTimeout(function () { ready = true; }, 8000);   /* битая картинка не должна вешать сцену навсегда */
+  }
+
+  /* ---------- комета ---------- */
+  function Comet(el, cfg) {
+    this.el = el; this.cfg = cfg;
+    /* доворот картинки берём прямо из CSS, чтобы число было в одном месте:
+       искры должны сыпаться вдоль НАРИСОВАННОГО хвоста, а не вдоль голой
+       касательной, иначе след и хвост расходятся веером */
+    this.turn = (parseFloat(getComputedStyle(el).getPropertyValue('--ks-turn')) || 180) * Math.PI / 180;
+    this.fl = null; this.t = 0; this.dur = 1; this.len = 300;
+    this.flying = false; this.wait = cfg.first + Math.random() * cfg.firstSpread;
+    this.rest = 0;
+    this.x = 0; this.y = 0; this.ang = 0; this.speed = 0; this.env = 0;
+  }
+  Comet.prototype.size = function () {
+    /* мерим от «большей стороны», иначе на узком телефоне комета выходит крошечной */
+    var base = W > H * 0.62 ? W : H * 0.62;
+    var v = base * (this.cfg.size + Math.random() * this.cfg.sizeSpread);
+    if (v < this.cfg.minLen) { v = this.cfg.minLen; }
+    if (v > this.cfg.maxLen) { v = this.cfg.maxLen; }
+    this.len = v;
+    this.el.style.setProperty('--ks-len', Math.round(v) + 'px');
+  };
+  Comet.prototype.start = function () {
+    this.fl = newCurve(this.cfg);
+    toPx(this.fl);
+    this.size();
+    this.dur = this.cfg.dur + Math.random() * this.cfg.durSpread;
+    this.t = 0; this.rest = 0; this.flying = true;
+    this.el.classList.add('is-flying');
+    if (useCss) { this.el.style.setProperty('offset-path', pathText(this.fl)); }
+    this.place(0);
+  };
+  Comet.prototype.stop = function () {
+    this.flying = false;
+    this.el.style.opacity = '0';
+    this.el.classList.remove('is-flying');           /* отпускаем слой видеокарты до следующего полёта */
+    this.el.style.removeProperty('offset-path');
+    this.wait = this.cfg.gap + Math.random() * this.cfg.gapSpread;
+  };
+  Comet.prototype.place = function (p) {
+    var fl = this.fl, t = tOf(fl, p * fl.len);
+    var pt = pointAt(fl.p, t, _pt), dr = dirAt(fl.p, t, _dr);
+    this.x = pt.x; this.y = pt.y;
+    this.ang = Math.atan2(dr.y, dr.x);
+    this.speed = fl.len / this.dur;
+    this.env = fade(p);
+    this.el.style.opacity = (this.env * this.cfg.alpha).toFixed(3);
+    if (useCss) {
+      this.el.style.setProperty('offset-distance', (p * 100).toFixed(3) + '%');
+    } else {
+      /* запасной путь: та же кривая, только позицию и разворот считаем сами */
+      this.el.style.transform = 'translate3d(' + pt.x.toFixed(2) + 'px,' + pt.y.toFixed(2) +
+        'px,0) rotate(' + (this.ang * 180 / Math.PI).toFixed(2) + 'deg)';
+    }
+  };
+  /* искры отваливаются позади ядра, вдоль оси нарисованного хвоста,
+     а скорость наследуют от движения кометы - поэтому отстают и остаются в следе */
+  Comet.prototype.spark = function (dt) {
+    var c = this.cfg, n, k, q, back, side, keep;
+    var fx = Math.cos(this.ang), fy = Math.sin(this.ang);   /* куда летит комета */
+    var ta = this.ang + this.turn;                          /* ось нарисованного хвоста */
+    var tx = Math.cos(ta), ty = Math.sin(ta);
+    var nx = -fy, ny = fx;                                  /* вбок от движения */
+    /* на маленьком экране искр нужно меньше */
+    this.rest += c.rate * this.env * dt * (0.55 + 0.45 * (W < 1200 ? W / 1200 : 1));
+    n = this.rest | 0;
+    if (n <= 0) { return; }
+    if (n > 14) { n = 14; }
+    this.rest -= n;
+    for (k = 0; k < n; k++) {
+      q = take();
+      back = this.len * c.tail * (0.08 + Math.random());
+      side = (Math.random() - 0.5) * this.len * c.side;
+      q.x = this.x + tx * back + nx * side;                /* назад по оси хвоста */
+      q.y = this.y + ty * back + ny * side;
+      keep = c.keep * (0.35 + Math.random() * 0.55);        /* доля скорости кометы */
+      q.vx = fx * this.speed * keep + nx * (Math.random() - 0.5) * c.jitter;
+      q.vy = fy * this.speed * keep + ny * (Math.random() - 0.5) * c.jitter;
+      q.max = c.life + Math.random() * c.lifeSpread;
+      q.life = q.max;
+      q.r = c.dot + Math.random() * c.dotSpread;
+      q.a = c.sparkA * this.env;
+      q.s = dots[(Math.random() * dots.length) | 0];
+    }
+  };
+
+  var far = new Comet(elFar, {
+    size:0.17, sizeSpread:0.07, minLen:110, maxLen:380,
+    yTop:0.04, ySpread:0.22, drop:0.04, dropSpread:0.18,
+    bow:0.05, bowSpread:0.10,
+    dur:11, durSpread:5, first:2.5, firstSpread:2, gap:5, gapSpread:4,   /* демо: чаще, чем на боевой (там 26+18) */
+    alpha:0.40,
+    rate:22, tail:0.10, side:0.012, keep:0.35, jitter:14,
+    life:0.9, lifeSpread:1.1, dot:0.7, dotSpread:0.9, sparkA:0.30
+  });
+  var near = new Comet(elNear, {
+    size:0.40, sizeSpread:0.16, minLen:260, maxLen:900,
+    yTop:0.05, ySpread:0.28, drop:0.10, dropSpread:0.32,
+    bow:0.11, bowSpread:0.17,
+    dur:5.4, durSpread:2.6, first:0.6, firstSpread:0.8, gap:3, gapSpread:3,  /* демо: чаще, чем на боевой (там 20+20) */
+    alpha:1,
+    rate:150, tail:0.13, side:0.022, keep:0.42, jitter:55,
+    life:0.55, lifeSpread:0.9, dot:1.1, dotSpread:1.7, sparkA:0.7
+  });
+  var list = [far, near];
+
+  /* ---------- размер сцены и чёткость канваса ---------- */
+  function resize() {
+    var r = stage.getBoundingClientRect(), k;
+    W = Math.max(1, Math.round(r.width));
+    H = Math.max(1, Math.round(r.height));
+    dpr = Math.min(2, window.devicePixelRatio || 1);       /* выше 2 не берём: телефон не потянет */
+    canvas.width  = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    drawn = false;                                         /* смена размера уже очистила канвас */
+    for (k = 0; k < list.length; k++) {
+      if (list[k].fl) {
+        toPx(list[k].fl);
+        if (useCss && list[k].flying) {
+          list[k].el.style.setProperty('offset-path', pathText(list[k].fl));
+        }
+      }
+    }
+    if (calm) { pose(); }
+  }
+
+  var drawn = false;                                       /* было ли что-то на канвасе */
+
+  /* ---------- покой: комета просто висит в кадре ---------- */
+  function pose() {
+    var k, f, at = [0.60, 0.42];
+    ctx.clearRect(0, 0, W, H);
+    drawn = false;
+    for (k = 0; k < list.length; k++) {
+      f = list[k];
+      if (!f.fl) { f.fl = newCurve(f.cfg); f.size(); }
+      toPx(f.fl);
+      f.flying = false;
+      f.el.classList.remove('is-flying');
+      f.el.style.removeProperty('offset-path');
+      f.dur = 1;
+      f.place(at[k]);
+      f.el.style.opacity = String(f.cfg.alpha);
+    }
+  }
+
+  /* ---------- рисуем искры ---------- */
+  function sparks(dt) {
+    var k, q, a, rr, any = false, damp = Math.exp(-1.9 * dt);
+    for (k = 0; k < MAX; k++) { if (pool[k].life > 0) { any = true; break; } }
+    if (!any && !drawn) { return; }                        /* в паузе канвас не трогаем */
+    ctx.clearRect(0, 0, W, H);
+    drawn = false;
+    ctx.globalCompositeOperation = 'lighter';
+    for (k = 0; k < MAX; k++) {
+      q = pool[k];
+      if (q.life <= 0) { continue; }
+      q.life -= dt;
+      if (q.life <= 0) { continue; }
+      q.x += q.vx * dt; q.y += q.vy * dt;
+      q.vx *= damp; q.vy *= damp;                          /* тормозят */
+      a = (q.life / q.max);
+      a = a * a * q.a;                                     /* и гаснут */
+      if (a < 0.004) { continue; }
+      rr = q.r * (0.45 + 0.55 * (q.life / q.max)) * 4;
+      ctx.globalAlpha = a;
+      ctx.drawImage(q.s, q.x - rr, q.y - rr, rr * 2, rr * 2);
+      drawn = true;
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  /* ---------- ход времени ---------- */
+  var raf = 0, last = 0, live = false;
+  function tick(now) {
+    raf = requestAnimationFrame(tick);
+    var dt = (now - last) / 1000, k, f, p;
+    last = now;
+    if (!(dt > 0)) { dt = 0; }
+    if (dt > 0.1) { dt = 0.1; }                            /* после паузы без рывка */
+    for (k = 0; k < list.length; k++) {
+      f = list[k];
+      if (!f.flying) {
+        if (!ready) { continue; }                          /* картинка ещё не приехала - ждём */
+        f.wait -= dt;
+        if (f.wait <= 0) { f.start(); }
+      } else {
+        f.t += dt;
+        p = f.t / f.dur;
+        if (p >= 1) { f.stop(); } else { f.place(p); f.spark(dt); }
+      }
+    }
+    sparks(dt);
+  }
+  function play() {
+    if (live || calm) { return; }
+    live = true;
+    last = (window.performance && performance.now) ? performance.now() : 0;
+    raf = requestAnimationFrame(tick);
+  }
+  function halt() {
+    if (!live) { return; }
+    live = false;
+    if (raf) { cancelAnimationFrame(raf); }
+    raf = 0;
+  }
+
+  /* ---------- когда работать ---------- */
+  var seen = true;
+  function sync() {
+    var on = seen && !document.hidden;
+    if (on) { sky.classList.remove('ks-sky--idle'); }
+    else    { sky.classList.add('ks-sky--idle'); }         /* заодно замирают и CSS-анимации */
+    if (on && !calm) { play(); } else { halt(); }
+  }
+  var io = null, ro = null;
+  if (window.IntersectionObserver) {
+    io = new IntersectionObserver(function (rows) {
+      for (var k = 0; k < rows.length; k++) { seen = rows[k].isIntersecting; }
+      sync();
+    }, { threshold: 0 });
+    io.observe(sky);
+  }
+  document.addEventListener('visibilitychange', sync, false);
+
+  if (window.ResizeObserver) { ro = new ResizeObserver(resize); ro.observe(stage); }
+  else { window.addEventListener('resize', resize, false); }
+
+  /* переключение «меньше движения» на лету */
+  function onCalm() {
+    calm = mq.matches;
+    useCss = hasPath && !calm;
+    for (var k = 0; k < list.length; k++) {
+      list[k].el.classList.remove('is-flying');
+      list[k].el.style.removeProperty('transform');
+      list[k].el.style.removeProperty('offset-path');
+      list[k].el.style.opacity = '0';
+      list[k].flying = false;
+      list[k].wait = 1 + Math.random() * 2;
+    }
+    if (calm) { halt(); pose(); } else { sync(); }
+  }
+  if (mq) {
+    if (mq.addEventListener) { mq.addEventListener('change', onCalm); }
+    else if (mq.addListener) { mq.addListener(onCalm); }
+  }
+
+  /* уход со страницы: гасим кадры. Возврат из истории (bfcache) - заводим обратно */
+  window.addEventListener('pagehide', halt, false);
+  window.addEventListener('pageshow', sync, false);
+
+  /* если блок удаляют из DOM руками (SPA) - вызвать ksSky.ksStop() */
+  sky.ksStop = function () {
+    halt();
+    if (io) { io.disconnect(); }
+    if (ro) { ro.disconnect(); } else { window.removeEventListener('resize', resize, false); }
+    document.removeEventListener('visibilitychange', sync, false);
+    window.removeEventListener('pagehide', halt, false);
+    window.removeEventListener('pageshow', sync, false);
+    for (var k = 0; k < imgs.length; k++) {
+      imgs[k].removeEventListener('load', checkImgs, false);
+      imgs[k].removeEventListener('error', checkImgs, false);
+    }
+    if (mq) {
+      if (mq.removeEventListener) { mq.removeEventListener('change', onCalm); }
+      else if (mq.removeListener) { mq.removeListener(onCalm); }
+    }
+  };
+
+  resize();
+  if (calm) { pose(); } else { sync(); }
+}());
+</script>
+<!-- =================== / НЕБО С КОМЕТАМИ =================== -->
+</body></html>

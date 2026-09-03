@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="ru"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Радиотелескоп</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#05070f;color:#dfe7f7;
+    font:400 16px/1.5 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+    overflow:hidden;-webkit-font-smoothing:antialiased}
+  /* корневой блок приёма всегда занимает весь кадр */
+  body>section{width:100%;height:100%;min-height:100%}
+</style>
+</head><body>
+<!-- ══════ Радиотелескоп: фото на чёрном фоне оживает без Фотошопа ══════ -->
+
+<style>
+/* ---------- сцена: тёмно-синий с переливом ---------- */
+.ks-dish-scene{
+  /* ─── ручки настройки, крутить здесь ─── */
+  --ks-ratio: 1.6;                      /* ШИРИНА/ВЫСОТА самой фотографии. Поставить своё! */
+  --ks-w-max: clamp(300px, 94vw, 1000px);   /* до какой ширины разрешаем расти кадру */
+  --ks-h-max: min(60vh, 620px);             /* и до какой высоты */
+  /* коробка кадра ровно в пропорциях фото -> object-fit не добавит полей,
+     значит проценты фокуса ниже не «поедут» при смене экрана */
+  --ks-w: min(var(--ks-w-max), calc(var(--ks-h-max) * var(--ks-ratio)));
+  --ks-h: calc(var(--ks-w) / var(--ks-ratio));
+  --ks-air: clamp(40px, 8vh, 120px);    /* воздух сверху и снизу от кадра */
+
+  --ks-focus-x: 50%;                    /* приёмник: проценты ОТ КАДРА, не от секции */
+  --ks-focus-y: 46%;
+  --ks-plane-x: 62deg;                  /* завал плоскости тарелки «от нас» */
+  --ks-plane-z: -10deg;                 /* доворот плоскости по часовой */
+  --ks-wave: calc(var(--ks-w) * .46);   /* поперечник поля радиоволн */
+  --ks-beam-w: calc(var(--ks-w) * .17); /* ширина луча у основания неба */
+  --ks-beam-h: calc(var(--ks-h) * .85); /* длина луча */
+  --ks-beam-angle: -11deg;              /* куда смотрит луч */
+
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;                   /* свой слой смешивания: screen не «протекает» на страницу */
+  /* высота считается от кадра, а не отдельно от экрана,
+     иначе на телефоне под тарелкой остаётся пустая половина блока */
+  min-height: max(340px, calc(var(--ks-h) + var(--ks-air) * 2));
+  color: #e9ecff;
+  background:
+    radial-gradient(120% 88% at 16% 6%,  rgba(122, 92, 255, .30), transparent 62%),
+    radial-gradient(96% 74% at 88% 82%,  rgba(186, 84, 214, .22), transparent 64%),
+    radial-gradient(70% 50% at 50% 108%, rgba(64, 108, 220, .28), transparent 70%),
+    linear-gradient(180deg, #0b1136 0%, #070c22 52%, #04060f 100%);
+}
+/* на iOS обычный vh считается по «большому» экрану (адресная строка спрятана),
+   поэтому блок оказывается выше видимой области и дёргается при прокрутке */
+@supports (height: 1svh){
+  .ks-dish-scene{
+    --ks-h-max: min(60svh, 620px);
+    --ks-air: clamp(40px, 8svh, 120px);
+  }
+}
+
+/* заголовок, кнопки и прочий контент кладём сюда - он ляжет поверх сцены */
+.ks-dish-content{ position: relative; z-index: 2; }
+
+/* звёздная пыль (canvas), самый низ */
+.ks-dish-stars{ position:absolute; left:0; top:0; width:100%; height:100%; display:block; }
+
+/* размытые отблески, еле заметно дышат */
+.ks-dish-aura{
+  position: absolute; left:-10%; top:-14%; width:70%; height:80%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 40%, rgba(150,110,255,.34), transparent 62%),
+    radial-gradient(circle at 72% 66%, rgba(96,168,255,.22), transparent 66%);
+  filter: blur(46px);
+  animation: ks-aura 34s ease-in-out infinite alternate;
+}
+/* только сдвиг: при scale браузер каждый кадр пересчитывает blur(46px) заново */
+@keyframes ks-aura{
+  0%   { transform: translate3d(0,0,0);      opacity: .9; }
+  100% { transform: translate3d(7%, 5%, 0);  opacity: 1; }
+}
+
+/* ---------- общая коробка кадра ----------
+   ВАЖНО: у неё не должно быть ни transform, ни opacity, ни filter,
+   ни mix-blend-mode - иначе она станет изолированной группой
+   и screen у дочерних слоёв перестанет доставать до фона сцены. */
+.ks-dish-anchor{
+  position: absolute; left:0; right:0; top:0; bottom:0; margin:auto;
+  width: var(--ks-w); height: var(--ks-h);
+  pointer-events: none;
+}
+
+/* ---------- луч в небо ---------- */
+/* два слоя: внутренний режет конус, внешний размывает край и мигает.
+   Порядок важен: размытие поверх обрезки, иначе у конуса будут острые грани. */
+.ks-dish-beam{
+  position: absolute;
+  left: var(--ks-focus-x);
+  margin-left: calc(var(--ks-beam-w) / -2);
+  bottom: calc(100% - var(--ks-focus-y));   /* остриё конуса ровно в фокусе тарелки */
+  width: var(--ks-beam-w);
+  height: var(--ks-beam-h);
+  filter: blur(14px);
+  /* верх луча гасим сами: иначе его срежет overflow сцены ровной линией */
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 38%, transparent 94%);
+          mask-image: linear-gradient(to top, #000 0%, #000 38%, transparent 94%);
+  mix-blend-mode: screen;
+  transform-origin: 50% 100%;
+  transform: rotate(var(--ks-beam-angle));  /* угол не анимируем -> размытие считается один раз */
+  opacity: .5;
+  animation: ks-beam 8.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.ks-dish-beam i{
+  position: absolute; left:0; top:0; width:100%; height:100%;
+  background: linear-gradient(to top,
+      rgba(168,200,255,.34) 0%,
+      rgba(126,116,255,.11) 42%,
+      rgba(126,116,255,0)   70%);
+  -webkit-clip-path: polygon(50% 100%, 100% 0, 0 0);   /* конус: остриё внизу */
+          clip-path: polygon(50% 100%, 100% 0, 0 0);
+  /* мягкие бока, чтобы не читались две прямые линии */
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 34%, #000 66%, transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 34%, #000 66%, transparent 100%);
+}
+@keyframes ks-beam{ 0%,100%{opacity:.44} 38%{opacity:.72} 62%{opacity:.52} }
+
+/* ---------- слои фотографии ---------- */
+/* все четыре копии лежат в одной коробке -> совпадают пиксель в пиксель */
+.ks-dish-layer{
+  position: absolute; left:0; top:0; width:100%; height:100%;
+  object-fit: contain; object-position: 50% 50%;
+  mix-blend-mode: screen;              /* чёрный фон фото исчезает */
+  pointer-events: none;
+  transform-origin: 50% 78%;           /* ось поворота: опора тарелки */
+  animation: ks-search 52s ease-in-out infinite;   /* медленный поиск сигнала */
+}
+/* сама фотография: гасим «серый» чёрный, чтобы не было прямоугольного ореола */
+.ks-dish-photo{
+  filter: contrast(1.34) brightness(1.03) saturate(1.08);
+  /* мягкая виньетка по краям кадра - страховка от видимой рамки */
+  -webkit-mask-image: radial-gradient(78% 78% at 50% 50%, #000 58%, rgba(0,0,0,.5) 84%, transparent 100%);
+          mask-image: radial-gradient(78% 78% at 50% 50%, #000 58%, rgba(0,0,0,.5) 84%, transparent 100%);
+}
+/* слой жёлтых огней: спокойное дыхание */
+.ks-dish-warm{
+  filter: url(#ksWarm);
+  animation: ks-search 52s ease-in-out infinite, ks-breath 6.4s ease-in-out infinite;
+}
+/* красные маячки: две половины кадра мигают вразнобой */
+.ks-dish-beacon{ filter: url(#ksBeacon); }
+.ks-dish-beacon-a{
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 38%, transparent 62%);
+          mask-image: linear-gradient(90deg, #000 0%, #000 38%, transparent 62%);
+  animation: ks-search 52s ease-in-out infinite, ks-blink-a 4.7s linear infinite;
+}
+.ks-dish-beacon-b{
+  -webkit-mask-image: linear-gradient(90deg, transparent 38%, #000 62%, #000 100%);
+          mask-image: linear-gradient(90deg, transparent 38%, #000 62%, #000 100%);
+  animation: ks-search 52s ease-in-out infinite, ks-blink-b 6.1s linear infinite;
+}
+@keyframes ks-search{           /* повороты меньше 1° и длинные паузы */
+  0%,  16%  { transform: rotate(-.55deg) skewX(0deg); }
+  29%, 47%  { transform: rotate(.42deg)  skewX(.32deg); }
+  60%, 82%  { transform: rotate(-.14deg) skewX(-.22deg); }
+  100%      { transform: rotate(-.55deg) skewX(0deg); }
+}
+@keyframes ks-breath{ 0%,100%{opacity:.62} 50%{opacity:1} }
+@keyframes ks-blink-a{ 0%,7%{opacity:.06} 2%{opacity:1} 4%{opacity:.1} 5.5%{opacity:.95} 100%{opacity:.06} }
+@keyframes ks-blink-b{ 0%,9%{opacity:.06} 3%{opacity:.9} 4.6%{opacity:.08} 6%{opacity:1} 100%{opacity:.06} }
+
+/* Телефон: поворот тарелки выключаем. Он и так меньше двух пикселей на таком
+   размере, зато заставляет Safari пересчитывать SVG-фильтры на трёх копиях
+   фотографии каждый кадр. Дыхание и вспышки (это только прозрачность) остаются. */
+@media (max-width: 700px), (pointer: coarse) and (max-width: 1024px){
+  .ks-dish-layer{ animation: none; }
+  .ks-dish-warm{ animation: ks-breath 6.4s ease-in-out infinite; }
+  .ks-dish-beacon-a{ animation: ks-blink-a 4.7s linear infinite; }
+  .ks-dish-beacon-b{ animation: ks-blink-b 6.1s linear infinite; }
+}
+
+/* ---------- радиоволны: круги в плоскости тарелки ---------- */
+.ks-dish-waves{
+  position: absolute;
+  left: var(--ks-focus-x); top: var(--ks-focus-y);
+  width: var(--ks-wave); height: var(--ks-wave);
+  margin: calc(var(--ks-wave) / -2) 0 0 calc(var(--ks-wave) / -2);
+  perspective: 620px;          /* отсюда и берётся перспектива */
+  pointer-events: none;
+}
+.ks-dish-plane{
+  position: absolute; left:0; top:0; width:100%; height:100%;
+  transform: rotateZ(var(--ks-plane-z)) rotateX(var(--ks-plane-x));
+}
+.ks-dish-ring{
+  position: absolute; left:0; top:0; width:100%; height:100%;
+  border: 2px solid rgba(186,164,255,.7);
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(140,110,255,.30), inset 0 0 14px rgba(120,150,255,.18);
+  opacity: 0;
+  transform: scale(.05);
+  /* волна выходит рывком и расплывается: ровный linear читается как значок Wi-Fi */
+  animation: ks-ring 5.6s cubic-bezier(.16,.72,.3,1) infinite;
+  will-change: transform, opacity;
+}
+.ks-dish-ring:nth-child(2){ animation-delay: 1.4s; border-color: rgba(170,180,255,.6); }
+.ks-dish-ring:nth-child(3){ animation-delay: 2.8s; border-color: rgba(196,160,255,.62); }
+.ks-dish-ring:nth-child(4){ animation-delay: 4.2s; border-color: rgba(160,190,255,.55); }
+@keyframes ks-ring{
+  0%   { transform: scale(.05); opacity: 0; }
+  10%  { opacity: .9; }
+  70%  { opacity: .3; }
+  100% { transform: scale(1);   opacity: 0; }
+}
+
+/* ---------- пауза: блок ушёл с экрана или вкладка неактивна ---------- */
+.ks-dish-scene.ks-dish-paused,
+.ks-dish-scene.ks-dish-paused *{ animation-play-state: paused !important; }
+
+/* ---------- если браузер не умеет смешивание ---------- */
+@supports not (mix-blend-mode: screen){
+  .ks-dish-photo{
+    filter: contrast(1.15) brightness(.98);
+    -webkit-mask-image: radial-gradient(66% 66% at 50% 50%, #000 42%, transparent 92%);
+            mask-image: radial-gradient(66% 66% at 50% 50%, #000 42%, transparent 92%);
+  }
+  /* важно: слой #ksWarm непрозрачный и почти весь чёрный,
+     без screen он просто закроет фотографию - поэтому прячем */
+  .ks-dish-warm, .ks-dish-beacon{ display: none; }
+  .ks-dish-beam{ opacity: .32; }
+}
+
+/* ---------- бережный режим: движение выключено, картинка на месте ---------- */
+@media (prefers-reduced-motion: reduce){
+  .ks-dish-scene, .ks-dish-scene *{ animation: none !important; transition: none !important; }
+  .ks-dish-aura{ opacity: 1; }
+  .ks-dish-warm{ opacity: .9; }
+  /* половинки маячков видны одновременно, поэтому каждая тише */
+  .ks-dish-beacon-a, .ks-dish-beacon-b{ opacity: .7; }
+  .ks-dish-beam{ opacity: .55; }
+  .ks-dish-ring{ opacity: .30; transform: scale(.55); }
+  .ks-dish-ring:nth-child(2){ opacity: .18; transform: scale(.82); }
+  .ks-dish-ring:nth-child(3), .ks-dish-ring:nth-child(4){ display: none; }
+}
+</style>
+
+<section class="ks-dish-scene" id="ksDishScene">
+  <canvas class="ks-dish-stars" id="ksDishStars" aria-hidden="true"></canvas>
+  <div class="ks-dish-aura" aria-hidden="true"></div>
+
+  <!-- всё, что должно попадать «в приёмник», живёт внутри коробки кадра -->
+  <div class="ks-dish-anchor">
+    <div class="ks-dish-beam" aria-hidden="true"><i></i></div>
+
+    <img class="ks-dish-layer ks-dish-photo" src="dish.jpg" alt="Радиотелескоп ночью" decoding="async">
+    <img class="ks-dish-layer ks-dish-warm"      src="dish.jpg" alt="" aria-hidden="true" decoding="async">
+    <img class="ks-dish-layer ks-dish-beacon ks-dish-beacon-a" src="dish.jpg" alt="" aria-hidden="true" decoding="async">
+    <img class="ks-dish-layer ks-dish-beacon ks-dish-beacon-b" src="dish.jpg" alt="" aria-hidden="true" decoding="async">
+
+    <div class="ks-dish-waves" aria-hidden="true">
+      <div class="ks-dish-plane">
+        <span class="ks-dish-ring"></span>
+        <span class="ks-dish-ring"></span>
+        <span class="ks-dish-ring"></span>
+        <span class="ks-dish-ring"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- фильтры: их нельзя прятать через display:none, иначе Safari их не найдёт -->
+  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true" focusable="false">
+    <defs>
+      <!-- жёлтые огни: оставляем только очень яркие точки и раздуваем ореол -->
+      <filter id="ksWarm" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+        <feComponentTransfer in="SourceGraphic" result="hot">
+          <feFuncR type="linear" slope="3.2" intercept="-2.05"/>
+          <feFuncG type="linear" slope="3.2" intercept="-2.05"/>
+          <feFuncB type="linear" slope="3.2" intercept="-2.05"/>
+        </feComponentTransfer>
+        <feColorMatrix in="hot" type="matrix" result="tint" values="
+          1    0.22 0    0 0
+          0.46 0.9  0    0 0
+          0    0.24 0.55 0 0
+          0    0    0    1 0"/>
+        <feGaussianBlur in="tint" stdDeviation="7" result="halo"/>
+        <feBlend in="tint" in2="halo" mode="screen"/>
+      </filter>
+
+      <!-- красные маячки: берём пиксели, где красного заметно больше остальных -->
+      <filter id="ksBeacon" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+        <feColorMatrix in="SourceGraphic" type="matrix" result="pick" values="
+          0   0     0     0 0
+          0   0     0     0 0
+          0   0     0     0 0
+          1.5 -1.35 -0.45 0 -0.08"/>
+        <feGaussianBlur in="pick" stdDeviation="5" result="soft"/>
+        <feFlood flood-color="#ff4a39" result="red"/>
+        <feComposite in="red" in2="soft" operator="in" result="glow"/>
+        <feFlood flood-color="#ffd9d2" result="white"/>
+        <feComposite in="white" in2="pick" operator="in" result="core"/>
+        <feBlend in="core" in2="glow" mode="screen"/>
+      </filter>
+
+      <!-- запасной вариант «уровней»: если серая рамка всё-таки видна,
+           поставь фотографии filter: url(#ksLevels) вместо contrast() -->
+      <filter id="ksLevels" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+        <feComponentTransfer in="SourceGraphic">
+          <feFuncR type="linear" slope="1.32" intercept="-0.1"/>
+          <feFuncG type="linear" slope="1.32" intercept="-0.1"/>
+          <feFuncB type="linear" slope="1.34" intercept="-0.09"/>
+        </feComponentTransfer>
+      </filter>
+    </defs>
+  </svg>
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  function init() {
+    var scene = document.getElementById('ksDishScene');
+    if (!scene || scene.dataset.ksReady === '1') return;   // второй запуск скрипта ничего не ломает
+    scene.dataset.ksReady = '1';
+
+    var canvas = document.getElementById('ksDishStars');
+    var ctx    = (canvas && canvas.getContext) ? canvas.getContext('2d') : null;
+    var mq     = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
+
+    var stars = [], w = 0, h = 0, lastW = 0, lastH = 0;
+    var raf = 0, last = 0, seen = false, dead = false, io = null, ro = null;
+
+    function calm()    { return !!(mq && mq.matches); }            // бережный режим
+    function running() { return !dead && seen && !document.hidden && !calm(); }
+
+    // размер холста: учитываем плотность экрана, но не больше 2
+    function apply(cw, ch) {
+      if (!ctx) return;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = Math.max(1, Math.round(cw));
+      h = Math.max(1, Math.round(ch));
+      var pw = Math.round(w * dpr), ph = Math.round(h * dpr);
+      if (canvas.width !== pw || canvas.height !== ph) { canvas.width = pw; canvas.height = ph; }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // мелкие скачки высоты (адресная строка на iOS) не пересыпают звёзды заново
+      if (!stars.length || Math.abs(w - lastW) > 24 || Math.abs(h - lastH) > 24) {
+        lastW = w; lastH = h; build();
+      }
+      draw(0);
+    }
+
+    // читаем размер только здесь и только вне цикла отрисовки
+    function measure() {
+      if (!canvas) return;
+      var r = canvas.getBoundingClientRect();
+      apply(r.width, r.height);
+    }
+
+    function build() {
+      // на телефоне старой формулы хватало всего на 15 точек - пыли не видно
+      var n = Math.round(Math.max(28, Math.min(90, (w * h) / 9000)));
+      stars = [];
+      for (var i = 0; i < n; i++) {
+        stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h * 0.9,
+          r: Math.random() * 1.1 + 0.35,
+          a: Math.random() * 0.5 + 0.25,
+          s: Math.random() * 0.7 + 0.25,
+          p: Math.random() * 6.283
+        });
+      }
+    }
+
+    function draw(t) {
+      if (!ctx) return;
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < stars.length; i++) {
+        var st = stars[i];
+        var k  = calm() ? 1 : (0.66 + 0.34 * Math.sin(t / 1000 * st.s + st.p));
+        var a  = st.a * k;
+        ctx.globalAlpha = a < 0 ? 0 : (a > 1 ? 1 : a);
+        ctx.fillStyle = (i % 7) ? '#dfe6ff' : '#c8b2ff';
+        ctx.beginPath();
+        ctx.arc(st.x, st.y, st.r, 0, 6.283185);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function loop(t) {
+      if (!running()) { raf = 0; return; }
+      if (t - last >= 55) { last = t; draw(t); }   // ~18 кадров в секунду, телефону легко
+      raf = requestAnimationFrame(loop);
+    }
+
+    function stop() { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+
+    function sync() {
+      if (dead) return;
+      var pause = !seen || document.hidden;
+      if (pause) scene.classList.add('ks-dish-paused');
+      else       scene.classList.remove('ks-dish-paused');
+      if (running()) { if (!raf) raf = requestAnimationFrame(loop); }
+      else { stop(); draw(0); }
+    }
+
+    function onHide() { stop(); }        // уход со страницы / bfcache
+    function onShow() { sync(); }
+
+    // блок вне экрана - всё стоит
+    if ('IntersectionObserver' in window) {
+      io = new IntersectionObserver(function (list) {
+        for (var i = 0; i < list.length; i++) seen = list[i].isIntersecting;
+        sync();
+      }, { threshold: 0.01 });
+      io.observe(scene);
+    } else {
+      seen = true;
+    }
+
+    if ('ResizeObserver' in window && canvas) {
+      // размеры берём из самого события: getBoundingClientRect внутри колбэка
+      // заставляет браузер пересчитывать вёрстку и ловит «ResizeObserver loop»
+      ro = new ResizeObserver(function (entries) {
+        var e = entries[0]; if (!e) return;
+        var box = e.contentBoxSize && (e.contentBoxSize[0] || e.contentBoxSize);
+        if (box) apply(box.inlineSize, box.blockSize);
+        else     apply(e.contentRect.width, e.contentRect.height);
+      });
+      ro.observe(canvas);
+    } else {
+      window.addEventListener('resize', measure);
+    }
+
+    document.addEventListener('visibilitychange', sync);
+    window.addEventListener('pagehide', onHide);
+    window.addEventListener('pageshow', onShow);
+    if (mq) {
+      if (mq.addEventListener) mq.addEventListener('change', sync);
+      else if (mq.addListener)  mq.addListener(sync);
+    }
+
+    // если блок живёт в SPA (React/Next) - позвать при размонтировании
+    scene.ksDishDestroy = function () {
+      if (dead) return;
+      dead = true; stop();
+      if (io) io.disconnect();
+      if (ro) ro.disconnect();
+      window.removeEventListener('resize', measure);
+      window.removeEventListener('pagehide', onHide);
+      window.removeEventListener('pageshow', onShow);
+      document.removeEventListener('visibilitychange', sync);
+      if (mq) {
+        if (mq.removeEventListener) mq.removeEventListener('change', sync);
+        else if (mq.removeListener)  mq.removeListener(sync);
+      }
+      delete scene.dataset.ksReady;
+    };
+
+    measure();
+    sync();
+  }
+
+  // скрипт можно класть куда угодно, в том числе в <head>
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
+</script>
+</body></html>

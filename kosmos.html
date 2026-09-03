@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Космос без видео — МНД</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Как оживить картинки на сайте без видеофона: пять приёмов на чистом коде.">
+<style>
+:root{
+  --ks-noch:#05070f; --ks-sin:#0a1330; --ks-lilo:#6b4bb8; --ks-purpur:#3a1a5c;
+  --ks-zoloto:#f0c66a; --ks-tekst:#dfe7f7; --ks-tusk:#93a3c6;
+  --ks-pole:clamp(16px,3vw,56px); --ks-kont:min(94vw,1720px);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--ks-noch); color:var(--ks-tekst);
+  font:400 clamp(15px,1.05vw,18px)/1.62 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+.k{width:var(--ks-kont); margin-inline:auto; padding-inline:var(--ks-pole)}
+.uzko{max-width:62ch}
+h1,h2,h3{margin:0 0 .45em; line-height:1.08; font-weight:800; letter-spacing:-.015em}
+h1{font-size:clamp(32px,4.6vw,76px)}
+h2{font-size:clamp(25px,3vw,50px)}
+h3{font-size:clamp(18px,1.5vw,26px); font-weight:700}
+p{margin:0 0 1em}
+a{color:var(--ks-zoloto)}
+strong{color:#fff}
+.tusk{color:var(--ks-tusk)}
+
+/* ---------- шапка-сцена ---------- */
+.hero{position:relative; height:100svh; min-height:520px; background:var(--ks-noch)}
+.hero iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:block}
+.badge{
+  position:absolute; left:var(--ks-pole); top:clamp(14px,2.4vw,34px); z-index:5;
+  font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--ks-zoloto);
+  background:rgba(5,7,15,.5); border:1px solid rgba(240,198,106,.35);
+  padding:7px 13px; border-radius:99px; backdrop-filter:blur(8px);
+}
+.pod-hero{
+  padding-block:clamp(18px,2.4vw,34px);
+  font-size:clamp(13px,1.05vw,17px); color:var(--ks-tusk);
+  border-bottom:1px solid rgba(147,163,198,.13); max-width:none;
+}
+
+/* ---------- разделы ---------- */
+.razdel{padding:clamp(56px,7vw,132px) 0; position:relative}
+.razdel+.razdel{border-top:1px solid rgba(147,163,198,.13)}
+.nomer{
+  display:block; color:var(--ks-zoloto); opacity:.8; letter-spacing:.2em;
+  font-size:12px; text-transform:uppercase; margin-bottom:12px;
+}
+.lid{font-size:clamp(17px,1.5vw,24px); color:#eaf0ff; max-width:62ch}
+
+/* три принципа */
+.tri{display:grid; gap:clamp(18px,2.4vw,40px); grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:clamp(28px,4vw,64px)}
+@media(max-width:860px){.tri{grid-template-columns:1fr}}
+.karta{
+  background:linear-gradient(180deg,rgba(18,33,80,.55),rgba(10,19,48,.25));
+  border:1px solid rgba(147,163,198,.16); border-radius:18px; padding:clamp(20px,2vw,32px);
+}
+.karta b{display:block; color:var(--ks-zoloto); font-size:13px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:10px}
+
+/* стенд приёма */
+.stend{display:grid; gap:clamp(20px,3vw,54px); align-items:center; grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr)}
+.stend.zerkalo{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+.stend.zerkalo .ramka{order:2}
+@media(max-width:960px){
+  .stend,.stend.zerkalo{grid-template-columns:1fr}
+  .stend.zerkalo .ramka{order:0}
+}
+.ramka{
+  position:relative; border-radius:20px; overflow:hidden; aspect-ratio:16/10;
+  background:#070c1c; box-shadow:0 40px 90px -50px #000, inset 0 0 0 1px rgba(147,163,198,.16);
+}
+.ramka iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:block}
+details{margin-top:14px; border-top:1px solid rgba(147,163,198,.16); padding-top:12px}
+summary{cursor:pointer; color:var(--ks-zoloto); font-size:14px; letter-spacing:.02em}
+details p{margin:.7em 0 0; font-size:15px; color:var(--ks-tusk)}
+
+/* таблица */
+.obertka{overflow-x:auto; margin-top:clamp(24px,3vw,48px); -webkit-overflow-scrolling:touch}
+table{width:100%; border-collapse:collapse; font-size:clamp(14px,1vw,17px); min-width:640px}
+th,td{padding:14px 16px; border-bottom:1px solid rgba(147,163,198,.14); text-align:left; vertical-align:top}
+thead th{color:var(--ks-tusk); font-weight:600; font-size:13px; letter-spacing:.08em; text-transform:uppercase}
+tbody td:first-child{color:var(--ks-tusk); width:26%}
+td.da{color:#7fe6a4} td.net{color:#ff9a8a}
+
+.spisok{margin:0; padding-left:1.15em}
+.spisok li{margin-bottom:.5em}
+
+footer{padding:clamp(40px,5vw,90px) 0 clamp(60px,7vw,120px); color:var(--ks-tusk); font-size:15px}
+</style>
+</head>
+<body>
+
+<!-- ================= ШАПКА: собранная сцена ================= -->
+<header class="hero">
+  <span class="badge">видео на странице: 0 файлов</span>
+  <iframe src="kosmos/scena.html" title="Живая космическая сцена без видео" loading="eager"></iframe>
+</header>
+<div class="pod-hero k">Всё, что на этом экране светится, летит и едет — рисует браузер прямо сейчас.
+Ни одного видеофайла на странице нет. Ниже разобрано по частям.</div>
+
+<!-- ================= В ЧЁМ ФОКУС ================= -->
+<section class="razdel k" id="fokus">
+  <span class="nomer">В чём фокус</span>
+  <h2>Картинка не двигается. Двигается то, что вокруг неё</h2>
+  <p class="lid">Фотография — это плоский файл, у неё нет ни колёс, ни лампочек, ни хвоста.
+  Но браузер умеет ровно три вещи, и их хватает, чтобы она ожила.</p>
+
+  <div class="tri">
+    <div class="karta">
+      <b>Приём первый</b>
+      <h3>Двигать её целиком</h3>
+      <p>Смещать, качать, наклонять, вести по кривой. Этим занимается видеокарта,
+      телефон почти не греется. Отсюда едущий марсоход, доворачивающаяся тарелка
+      и комета, которая летит по дуге и сама разворачивается носом вперёд.</p>
+    </div>
+    <div class="karta">
+      <b>Приём второй</b>
+      <h3>Класть поверх её же копию, пропущенную через фильтр</h3>
+      <p>Оставить только самые яркие точки, размыть их и положить сверху светом.
+      Получается слой чистого свечения. Мигаем этим слоем — и гирлянда мигает,
+      хотя картинку никто не резал на куски и лампочки руками не расставлял.</p>
+    </div>
+    <div class="karta">
+      <b>Приём третий</b>
+      <h3>Дорисовывать то, чего на картинке нет</h3>
+      <p>Снежную пыль из-под колёс, искры за кометой, радиоволны от тарелки,
+      звёзды за спиной. Это уже не картинка, а код — и он слышит прокрутку и мышь,
+      чего запечённый ролик не умеет в принципе.</p>
+    </div>
+  </div>
+
+  <p class="lid" style="margin-top:clamp(28px,3.5vw,56px)">Дальше всё держится на одном правиле:
+  <strong>движения должно быть мало, но оно должно быть постоянным и несинхронным.</strong>
+  Марсоход качается на два пикселя, лампочки мигают не разом, а волной, комета появляется раз
+  в полминуты. Именно эта мелкая неодновременность и читается как «живое», а не как гифка.</p>
+</section>
+
+<!-- ================= 1. НЕБО ================= -->
+<section class="razdel k">
+  <div class="stend">
+    <div class="ramka"><iframe src="kosmos/fon.html" title="Живое звёздное небо" loading="lazy"></iframe></div>
+    <div>
+      <span class="nomer">Приём 1 · фон</span>
+      <h2>Небо вместо видеофона</h2>
+      <p>Тёмно-синяя глубина с лиловыми и пурпурными переливами, которая медленно дышит.
+      Звёзды не насыпаны ровным ковром: они идут наклонной полосой со сгущениями и пустотами,
+      дальние мелкие и мягкие, ближние крупные и яркие, каждая мигает в своём ритме.
+      Раз в полминуты через кадр проходит падающая звезда.</p>
+      <p>Дальний слой звёзд рисуется <strong>один раз</strong> и дальше просто ездит целиком —
+      телефон его не перерисовывает. Живым остаётся только ближний. Ведёшь мышью — ближние
+      звёзды смещаются заметно, дальние почти стоят: отсюда ощущение глубины.</p>
+      <p class="tusk">Весит около 8 КБ по сети. Ролик hero.mp4 — 7900 КБ.</p>
+      <details><summary>Чего приём не умеет</summary>
+        <p>Это фон, а не сюжет: объекты кладутся отдельными слоями поверх. Рисунок звёзд
+        каждый раз новый — «звезда будет ровно вот тут» пообещать нельзя, для этого нужно
+        зафиксировать генератор. Параллакс за мышью на телефоне не работает, там остаётся
+        только параллакс от прокрутки.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 2. ГИРЛЯНДА ================= -->
+<section class="razdel k">
+  <div class="stend zerkalo">
+    <div class="ramka"><iframe src="kosmos/girlyanda.html" title="Гирлянда мигает" loading="lazy"></iframe></div>
+    <div>
+      <span class="nomer">Приём 2 · свет из картинки</span>
+      <h2>Гирлянда мигает, хотя картинку никто не резал</h2>
+      <p>Это главный фокус всей затеи. Картинка кладётся вторым слоем и прогоняется через
+      фильтр, который оставляет <strong>только очень яркие и насыщенные точки</strong> — то есть
+      ровно лампочки. Их размывает и складывает обратно поверх оригинала светом.
+      Теперь этим слоем можно мигать, менять ему цвет и заставлять дышать.</p>
+      <p>Огни мигают не разом, а волной: слой свечения разрезан на три вертикальные полосы
+      с разными фазами. Плюс вокруг всей фигуры мягкое зарево — благодаря ему марсоход выглядит
+      источником света, а не наклейкой поверх фона.</p>
+      <p>В кадре есть переключатель <em>«Спокойно / Живо»</em> и ползунок порога: подвинь его —
+      видно, как меняется, что именно считается лампочкой. Тот же приём оживляет огни на тарелке.</p>
+      <details><summary>Чего приём не умеет</summary>
+        <p>Ему нужны настоящие яркие огни на исходной картинке. Если гирлянда нарисована
+        тускло или лампочки того же цвета, что и корпус, фильтру нечего вытащить и эффекта
+        не будет. Порог подбирается под конкретный файл — одним числом, но подбирать надо.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 3. МАРСОХОД ================= -->
+<section class="razdel k">
+  <div class="stend">
+    <div class="ramka"><iframe src="kosmos/rover.html" title="Марсоход едет" loading="lazy"></iframe></div>
+    <div>
+      <span class="nomer">Приём 3 · движение</span>
+      <h2>Одна плоская картинка, которая едет</h2>
+      <p>Колёса не отделены и не крутятся — и не надо. Ощущение езды даёт совсем другое:
+      корпус потряхивает на доли пикселя и еле заметно качает вперёд-назад, под колёсами
+      дрожит и темнеет мягкая тень, из-под них вылетает и гаснет снежная пыль, впереди
+      светит узкий тёплый конус фар.</p>
+      <p>И главная мелочь против «наклейки»: <strong>снег падает и за машиной, и перед ней</strong>.
+      Один слой частиц сзади, другой спереди — и объект перестаёт быть приклеенным к фону.
+      Скорость привязана к прокрутке: крутишь вниз — едет.</p>
+      <details><summary>Чего приём не умеет</summary>
+        <p>Здесь честно: код вытягивает ровно наполовину, вторая половина — сама картинка.
+        Если марсоход нарисован плоско и без теней, никакое покачивание его не спасёт.
+        Тряску легко переборщить: два пикселя читаются как езда, пять — как дрожь.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 4. КОМЕТА ================= -->
+<section class="razdel k">
+  <div class="stend zerkalo">
+    <div class="ramka"><iframe src="kosmos/kometa.html" title="Комета летит по дуге" loading="lazy"></iframe></div>
+    <div>
+      <span class="nomer">Приём 4 · полёт по кривой</span>
+      <h2>Комета летит по дуге и сама разворачивается</h2>
+      <p>Браузеру можно задать не «сдвинься вправо», а <strong>нарисованную кривую</strong> —
+      и он проведёт по ней объект, каждый миг разворачивая его по ходу движения.
+      Ядро всегда впереди, хвост всегда сзади, на повороте она честно кренится.</p>
+      <p><em class="tusk">В этом кадре комета летит раз в несколько секунд, чтобы её было видно сразу.
+      На боевой странице интервал ставится 20-40 секунд.</em></p>
+      <p>Комета не висит на экране постоянно: раз в двадцать-сорок секунд вылетает из-за края,
+      проходит кадр и уходит за другой, мягко проявляясь и угасая. За ядром остаётся живой
+      след из искр — они отваливаются, притормаживают и гаснут. Дальняя комета поменьше
+      и потусклее летит медленнее: так получается глубина.</p>
+      <details><summary>Чего приём не умеет</summary>
+        <p>Нужен PNG с прозрачным фоном, иначе поверх неба поедет прямоугольник.
+        В старых браузерах, которые не умеют вести по кривой, включается запасной путь —
+        траектория считается вручную по той же кривой, чтобы полёт совпадал один в один.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= 5. ТАРЕЛКА ================= -->
+<section class="razdel k">
+  <div class="stend">
+    <div class="ramka"><iframe src="kosmos/tarelka.html" title="Радиотелескоп на чёрном фоне" loading="lazy"></iframe></div>
+    <div>
+      <span class="nomer">Приём 5 · фото без фотошопа</span>
+      <h2>Чёрный фон стёрся сам</h2>
+      <p>У фотографии радиотелескопа фон сплошной чёрный, а не прозрачный. Вырезать её
+      не пришлось: слой накладывается <strong>на просвет</strong> — режим, при котором чёрное
+      становится невидимым, а светлое остаётся. Прямоугольника нет, металл и огни на месте.</p>
+      <p>Дальше по той же схеме, что и с гирляндой: жёлтые лампы по ободу спокойно дышат,
+      красные маячки бьют редкими короткими вспышками вразнобой, как настоящие авиационные.
+      От приёмника в фокусе расходятся радиоволны — не плоскими кругами, а эллипсами,
+      лежащими в плоскости тарелки, иначе сразу выглядит дёшево. И вся конструкция очень
+      медленно доворачивается, будто ищет сигнал.</p>
+      <details><summary>Чего приём не умеет</summary>
+        <p>Работает, только пока сцена вокруг тёмная — на светлом фоне фокус ломается.
+        Если чёрный на фото «поднятый» (не ноль, а тёмно-серый), по краю вылезает ореол;
+        лечится подтяжкой контраста и мягкой маской по краю, в кадре это уже сделано.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= СРАВНЕНИЕ ================= -->
+<section class="razdel k" id="sravnenie">
+  <span class="nomer">Честно</span>
+  <h2>Код против видеофона</h2>
+  <p class="lid">Сейчас на первом экране лежит <strong>hero.mp4 весом 7,9 МБ</strong>
+  и отдельный <strong>hero-mob.mp4 на 1,9 МБ</strong> для телефонов. Само по себе это не плохо.
+  Но у ролика есть четыре беды, которые мы уже ловили на этом же сайте.</p>
+
+  <div class="obertka">
+  <table>
+    <thead><tr><th>Что смотрим</th><th>Видеофон</th><th>То же самое кодом</th></tr></thead>
+    <tbody>
+      <tr><td>Вес первого экрана</td><td>7,9 МБ (телефон 1,9 МБ)</td><td class="da">40-90 КБ вместе с картинками</td></tr>
+      <tr><td>Когда человек видит картинку</td><td>после загрузки ролика</td><td class="da">сразу, на первом кадре</td></tr>
+      <tr><td>Плохой мобильный интернет</td><td>постер и ожидание</td><td class="da">всё уже работает</td></tr>
+      <tr><td>Автозапуск на айфоне</td><td class="net">капризничает, лечили отдельно</td><td class="da">вопрос не стоит</td></tr>
+      <tr><td>Перемотка пальцем на iOS</td><td class="net">не работает, нужен отдельный ролик</td><td class="da">работает везде одинаково</td></tr>
+      <tr><td>Пока прокрутка стоит</td><td class="net">кадр замирает вместе со всем, что в него запечено</td><td class="da">снег и огни продолжают жить</td></tr>
+      <tr><td>Реакция на мышь и прокрутку</td><td class="net">нет</td><td class="da">есть</td></tr>
+      <tr><td>Поменять цвет гирлянды</td><td class="net">пересобрать и перезалить ролик</td><td class="da">одна строчка</td></tr>
+      <tr><td>Живые лица, мех, ткань</td><td class="da">да, и только так</td><td class="net">нет</td></tr>
+      <tr><td>Очень слабый андроид</td><td class="da">идёт ровно</td><td>нужно отключать слои</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div style="margin-top:clamp(28px,3.5vw,56px)" class="uzko">
+    <h3>Где видео честно лучше</h3>
+    <ul class="spisok tusk">
+      <li>Живая съёмка людей: лица, борода, мех, ткань. Такое кодом не нарисовать.</li>
+      <li>Сложная сцена с сотней объектов: ролик покажет её одинаково везде, а код
+      на слабом телефоне начнёт спотыкаться.</li>
+      <li>Готовый кадр от нейросети, который надо показать ровно как есть.</li>
+    </ul>
+    <p style="margin-top:1.4em">Поэтому правильный ответ не «видео или код», а
+    <strong>видео как задник, всё живое сверху</strong>. Это ровно то правило, которое уже
+    записано в плане сайта: всё, что должно жить и правиться, держим слоями в браузере,
+    а не внутри ролика. Космические объекты — как раз тот случай: они должны мигать,
+    ехать и реагировать, значит им место в слоях.</p>
+  </div>
+</section>
+
+<!-- ================= КАК ПОДСТАВИТЬ СВОИ КАРТИНКИ ================= -->
+<section class="razdel k" id="kartinki">
+  <span class="nomer">Что дальше</span>
+  <h2>Сейчас в кадре заглушки, а не твои картинки</h2>
+  <p class="lid">Марсоход, тарелка и комета на этой странице — рисованные подобия, сделанные
+  кодом за пять минут, чтобы демо не было пустым. Все приёмы настроены под настоящие файлы.</p>
+  <p class="uzko">Чтобы страница стала настоящей, надо положить три файла в папку
+  <code>kosmos/</code> рядом с этой страницей, ровно с такими именами:</p>
+  <ul class="spisok">
+    <li><code>rover.png</code> — марсоход с гирляндой, прозрачный фон</li>
+    <li><code>dish.jpg</code> — радиотелескоп, можно прямо с чёрным фоном, вырезать не нужно</li>
+    <li><code>comet.png</code> — комета, прозрачный фон</li>
+  </ul>
+  <p class="uzko tusk">Ничего больше править не придётся: имена файлов и пропорции уже прописаны.
+  Заглушки исчезнут сами.</p>
+</section>
+
+<footer class="k">
+  <p>Демо-страница проекта МНД. Ни одного видеофайла, ни одной внешней библиотеки,
+  ни одного запроса на сторону.</p>
+</footer>
+
+</body>
+</html>
