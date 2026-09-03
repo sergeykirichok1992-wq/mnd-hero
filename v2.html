@@ -416,6 +416,46 @@ body{
 .cr-lead{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(28 * var(--u)); line-height:1.4}
 @media (max-width:767px){ .cr-h2{font-size:13px} }
 
+/* ---- ГОДА НА ФОНЕ ВТОРОГО ЭКРАНА ----
+   За лентой снимков вспыхивают и сразу гаснут года прошлых сезонов: 2018 ... 2026.
+   Смысл — «мы делаем это давно», без единой лишней строки текста.
+
+   Слой лежит во всю ширину секции (не в контейнере), поэтому цифры уходят
+   к самым краям окна, как на макете. По высоте он тоже во всю секцию, но
+   цифры скрипт ставит только в полосе вокруг ленты — над заголовком и на
+   цифрах сезона фон остаётся чистым.
+
+   z-index:3 — выше сугроба (2) и ниже начинки .cr-cont (7): цифры всегда
+   позади ленты и текста, кликам не мешают.
+
+   Цвет — синий сайта на очень малой непрозрачности. Пик задаёт --o для каждой
+   цифры отдельно (0.09-0.17): одинаковая плотность у всех читалась бы узором. */
+.cr-years{
+  position:absolute; inset:0; z-index:3; overflow:hidden; pointer-events:none;
+  contain:paint;                                    /* цифры не вылезают за экран */
+}
+.cr-years b{
+  position:absolute; left:0; top:0; display:block; white-space:nowrap;
+  font-family:"CR Yeseva",Georgia,serif; font-weight:400; line-height:1;
+  color:rgb(47,49,146);
+  font-size:calc(var(--fs) * var(--u));
+  transform:translate(-50%,-50%) rotate(var(--rot)) scale(.92);
+  opacity:0;
+  animation:crYear var(--dur) ease-in-out both;
+  will-change:opacity, transform;
+}
+@keyframes crYear{
+  0%   {opacity:0;        transform:translate(-50%,-50%) rotate(var(--rot)) scale(.92)}
+  38%  {opacity:var(--o); transform:translate(-50%,-50%) rotate(var(--rot)) scale(1)}
+  62%  {opacity:var(--o); transform:translate(-50%,-50%) rotate(var(--rot)) scale(1.01)}
+  100% {opacity:0;        transform:translate(-50%,-50%) rotate(var(--rot)) scale(1.04)}
+}
+/* «уменьшить движение»: цифры остаются, но не мигают — просто лежат на фоне */
+@media (prefers-reduced-motion:reduce){
+  .cr-years b{animation:none; opacity:var(--o);
+    transform:translate(-50%,-50%) rotate(var(--rot))}
+}
+
 /* ---- лента фотографий второго экрана ----
    52 снимка в два ряда одной длинной лентой: она едет справа налево сама,
    без остановок, а пальцем или мышью её можно разогнать, отмотать назад
@@ -816,6 +856,7 @@ body{
      и компьютере. -->
 <section class="cr cr-s2" id="was" aria-labelledby="crT2">
   <div class="cr-snow" aria-hidden="true"></div>
+  <div class="cr-years" id="crYears" aria-hidden="true"></div>
   <div class="cr-cont">
 
     <div class="cr-n">
@@ -2215,6 +2256,136 @@ body{
     requestAnimationFrame(frame);
   }, {rootMargin: '0px 0px -22% 0px'});   /* пуск, когда блок зашёл в нижнюю четверть экрана */
   io.observe(items[0].el.closest('.cr-grid') || items[0].el);
+})();
+
+/* ==================== ГОДА НА ФОНЕ ВТОРОГО ЭКРАНА ====================
+   Раз в секунду-полторы на фоне вспыхивает год прошлого сезона и сразу гаснет.
+   Всё, что делает скрипт, — кладёт в слой .cr-years один <b> и убирает его,
+   когда анимация доиграла. Сама вспышка живёт в CSS (@keyframes crYear).
+
+   ПОЧЕМУ ТАК, А НЕ ЗАРАНЕЕ РАССТАВЛЕННЫЕ ЦИФРЫ. Фиксированный набор через
+   десяток проходов начинает читаться узором: глаз запоминает места. Случайная
+   точка каждый раз новая, поэтому фон не «зацикливается».
+
+   ЧТОБЫ НЕ БЫЛО ПЕРЕГРУЖЕНО:
+   1. Одновременно на экране не больше MAX цифр (по умолчанию четыре).
+   2. Новая точка ищется подальше от уже горящих — иначе цифры слипаются
+      в пятно и фон становится грязным.
+   3. Полоса, куда они ставятся, — только вокруг ленты: заголовок сверху
+      прикрыт сугробом, а цифры сезона снизу остаются на чистом белом.
+   4. Один и тот же год не появляется дважды подряд.
+
+   ЭКОНОМИЯ. Пока второй экран не в окне или вкладка спрятана, таймер стоит:
+   на первом экране и так крутится видео со снегом, лишняя работа там не нужна. */
+(function(){
+  var layer = document.getElementById('crYears');
+  var sec   = document.getElementById('was');
+  var lenta = document.getElementById('crLenta');
+  if (!layer || !sec || !lenta) return;
+
+  var YEARS = ['2018','2019','2020','2021','2022','2023','2024','2025','2026'];
+  var MAX   = 4;          /* сколько цифр может гореть одновременно */
+
+  var alive = [];         /* {x, y, r} горящих сейчас — чтобы не ставить рядом */
+  var last  = '';         /* какой год показали прошлым */
+  var timer = 0;
+
+  function rnd(a, b){ return a + Math.random() * (b - a); }
+
+  /* Полоса, в которой живут цифры, — координаты внутри секции.
+
+     СВЕРХУ её держит сугроб. Слой годов лежит выше него (3 против 2), и если
+     пустить цифры под самый верх секции, они лягут поверх гребней снега и
+     тёмной сцены первого экрана. Поэтому начинаем от нижнего края сугроба.
+
+     СНИЗУ — блок цифр сезона: на «52 000» и подписи года не заезжают.
+
+     Между этими границами — заголовок, лента и белые поля вокруг неё.
+     Саму ленту цифры не перебивают: снимки непрозрачные и лежат выше,
+     года видно в промежутках, по краям ленты и над ней. */
+  var snow = sec.querySelector('.cr-snow');
+  var grid = sec.querySelector('.cr-grid');
+  function band(){
+    var sr = sec.getBoundingClientRect(), lr = lenta.getBoundingClientRect();
+    var top = lr.top - sr.top - lr.height * 0.55;
+    var bot = lr.bottom - sr.top + lr.height * 0.55;
+    if (snow) top = Math.max(top, snow.getBoundingClientRect().bottom - sr.top);
+    if (grid) bot = Math.min(bot, grid.getBoundingClientRect().top - sr.top - 8);
+    return {w:sr.width, top:Math.max(0, top), bot:Math.min(sr.height, bot)};
+  }
+
+  function spawn(keep){
+    var b = band();
+    if (b.bot - b.top < 40 || b.w < 40) return;
+
+    /* размер цифры: от мелкой до крупной, чтобы фон не выглядел линейкой */
+    var fs = rnd(70, 190);                       /* в единицах старого сайта (--u) */
+    var u  = parseFloat(getComputedStyle(sec).getPropertyValue('--u')) || 1;
+    var px = fs * u;                             /* примерная высота цифры в пикселях */
+
+    /* ищем свободное место: до 14 попыток отойти от уже горящих цифр */
+    var x, y, ok = false;
+    for (var i = 0; i < 14 && !ok; i++){
+      x = rnd(b.w * 0.06, b.w * 0.94);
+      y = rnd(b.top + px * 0.4, b.bot - px * 0.4);
+      ok = true;
+      for (var j = 0; j < alive.length; j++){
+        var a = alive[j];
+        var need = (px + a.r) * 1.15;            /* «личное пространство» цифры */
+        if (Math.abs(x - a.x) < need * 1.6 && Math.abs(y - a.y) < need) { ok = false; break; }
+      }
+    }
+    if (!ok) return;                             /* тесно — пропускаем ход, так спокойнее */
+
+    /* год: любой, кроме показанного прошлым */
+    var year = YEARS[(Math.random() * YEARS.length) | 0];
+    if (year === last) year = YEARS[(YEARS.indexOf(year) + 1) % YEARS.length];
+    last = year;
+
+    var el = document.createElement('b');
+    el.textContent = year;
+    el.style.setProperty('--fs',  fs.toFixed(1));
+    el.style.setProperty('--rot', rnd(-7, 7).toFixed(1) + 'deg');
+    el.style.setProperty('--o',   rnd(0.09, 0.17).toFixed(3));
+    el.style.setProperty('--dur', rnd(2.8, 4.4).toFixed(2) + 's');
+    el.style.left = (x / b.w * 100).toFixed(2) + '%';
+    el.style.top  = y.toFixed(0) + 'px';
+
+    var mark = {x:x, y:y, r:px};
+    alive.push(mark);
+    layer.appendChild(el);
+
+    var off = function(){
+      var k = alive.indexOf(mark); if (k > -1) alive.splice(k, 1);
+      if (el.parentNode) el.parentNode.removeChild(el);
+    };
+    el.addEventListener('animationend', off);
+    /* страховка от зависшей цифры: если событие анимации не пришло, убираем сами.
+       В режиме «уменьшить движение» цифры лежат насовсем — там страховки нет. */
+    if (!keep) setTimeout(off, 6000);
+  }
+
+  function tick(){
+    if (!document.hidden && alive.length < MAX) spawn();
+    timer = setTimeout(tick, rnd(700, 1600));
+  }
+  function start(){ if (!timer) tick(); }
+  function stop(){ clearTimeout(timer); timer = 0; }
+
+  /* «уменьшить движение»: раскладываем пять спокойных цифр один раз и выходим */
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    for (var i = 0; i < 5; i++) spawn(true);
+    return;
+  }
+
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) stop(); else if (timer === 0) start();
+  });
+
+  if (!('IntersectionObserver' in window)) { start(); return; }
+  new IntersectionObserver(function(es){
+    if (es[0].isIntersecting) start(); else stop();
+  }, {rootMargin:'20% 0px'}).observe(sec);
 })();
 </script>
 
