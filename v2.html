@@ -610,6 +610,106 @@ body{
   .cr-city,.cr-lines path{transition:none}
   .cr-city:hover,.cr-city.on{transform:translateY(-50%)}
 }
+
+/* ==================== ЭКРАН 4: «Для кого, где и когда» ====================
+   Письмо с персонажами. Картинка одна (v2-frame.webp), текст живёт разметкой
+   поверх неё: правится строкой, читается поиском, остаётся резким на любом экране.
+   Внутри кадра всё расставлено в cqw — долях ширины самой картинки, поэтому
+   композиция не разъезжается ни на какой ширине.
+   Числа сняты с макета «референс экрана.png» (холст 1920, кадр 1526x833),
+   в комментариях — пиксели макета.
+
+   Персонажи и верх письма заходят на экран с картой — так в макете.
+   Кадр поднят отрицательным отступом на 131 px макета (8,585 % своей ширины).
+   Секция ничего не обрезает, а .cr даёт ей z-index 25, поэтому она рисуется
+   поверх карты. display:flow-root обязателен: без него отрицательный отступ
+   схлопнется с отступом секции и утянет вверх саму секцию вместе с фоном. */
+.dk{
+  position:relative; display:flow-root; color:#fff;
+  padding-bottom:min(4.43vw, 90px);                    /* 85 px макета */
+  /* фон нарисован кодом, картинки нет: поле макета посчитано попиксельно,
+     под него подобраны четыре пятна света и ночная вертикаль.
+     Расхождение с макетом — 3,4 уровня из 255.
+     Правишь числа — сверяйся замером (instrumenty/bgcmp.py), а не на глаз. */
+  background:
+    radial-gradient(41.5% 62.7% at 58.3% 42.4%, rgba(0,42,101,1), rgba(0,42,101,0) 100%),
+    radial-gradient(45.9% 23.1% at 31.3% 104.5%, rgba(0,52,130,1), rgba(0,52,130,0) 100%),
+    radial-gradient(40.4% 57.7% at 44.4% 76.7%, rgba(122,77,220,1), rgba(122,77,220,0) 100%),
+    radial-gradient(41.1% 49.2% at 49.8% 94.4%, rgba(189,195,255,1), rgba(189,195,255,0) 100%),
+    linear-gradient(180deg,
+      #000524 0%, #000829 12.5%, #000B30 25%, #000F3A 37.5%, #00184D 50%,
+      #002565 62.5%, #002A71 75%, #00296F 87.5%, #002B78 100%);
+}
+.dk-frame{position:relative; container-type:inline-size; margin-top:-8.585%}
+.dk-art{display:block; width:100%; height:auto}
+/* заголовок: верх заглавных в макете — 157 px от верха кадра, левый край 589 px.
+   top задан по верху строки, а не по верху букв: разницу (полулидинг плюс
+   выносной элемент шрифта) вычли замером, поэтому число некруглое. */
+.dk-t{
+  position:absolute; margin:0;
+  left:620px; top:163px; font-size:48px;               /* запас для браузера без cqw */
+  left:38.52cqw; top:10.16cqw; font-size:3.02cqw;
+  font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
+  line-height:1; letter-spacing:-.037em;
+  color:#001B71; text-transform:uppercase; white-space:nowrap;
+}
+/* строчки-плашки: 655x55,5 px в макете, шаг 66,8 px, левый край 585 px */
+.dk-list{
+  position:absolute; margin:0; padding:0; list-style:none;
+  left:616px; top:256px; width:690px; gap:11px;        /* запас для браузера без cqw */
+  left:38.34cqw; top:15.92cqw; width:42.92cqw; gap:.74cqw;
+  display:flex; flex-direction:column;
+}
+.dk-list li{
+  position:relative; display:flex; align-items:center;
+  height:58px; padding:7px 0 0 84px; font-size:29px;   /* запас для браузера без cqw */
+  height:3.64cqw; padding:.46cqw 0 0 5.24cqw;          /* текст — в 80 px от края плашки */
+  font-size:1.82cqw;
+  border-radius:999px; background:#fff; color:#000;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  line-height:1; letter-spacing:-.043em; white-space:nowrap;
+  /* тень в макете лежит СВЕРХУ плашки, снизу её нет — так и оставлено */
+  box-shadow:0 -2px 4px rgba(0,0,0,.13);
+  box-shadow:0 -.13cqw .26cqw rgba(0,0,0,.13);
+}
+.dk-ico{
+  position:absolute; top:50%; transform:translateY(-50%);
+  left:19px; width:39px; font-size:34px;               /* запас для браузера без cqw */
+  left:1.16cqw; width:2.4cqw; font-size:2.11cqw;
+  text-align:center; line-height:1;
+}
+.dk-cta{margin-top:2.88%; text-align:center}           /* 44 px под кадром */
+/* кнопка берёт готовый вид с сайта: золото, тёмно-коричневый текст, капитель */
+.dk-btn{
+  display:inline-block; padding:16px 34px; border:0; border-radius:3px; cursor:pointer;
+  font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
+  font-size:clamp(15px,1.15vw,21px); letter-spacing:.02em; text-transform:uppercase;
+  color:#231705; text-decoration:none; text-align:center;
+  background:linear-gradient(166deg,#FFF3CF 0%,#F3D68C 26%,#D3A244 62%,#EBCE86 100%);
+  box-shadow:inset 0 0 0 1px rgba(120,86,20,.35), 0 16px 32px -14px rgba(211,162,68,.9);
+  transition:filter .2s ease, transform .12s ease;
+}
+.dk-btn:hover{filter:brightness(1.06)}
+.dk-btn:active{transform:translateY(1px)}
+/* ВРЕМЕННО, пока не пришёл макет телефона. Порог тут свой, 1024 px, а не общие
+   для сайта 768: кегль внутри письма считается от ширины картинки, и уже на
+   900 px строчки падают до 14 px, а на 390 px поле письма — это 167 px, куда
+   текст не помещается физически. Ниже порога картинка остаётся картинкой,
+   а заголовок и список встают под ней. */
+@media (max-width:1023px){
+  .dk-frame{margin-top:-6%}
+  .dk-t,.dk-list{position:static; left:auto; top:auto; width:auto}
+  .dk-t{margin:18px 16px 12px; font-size:clamp(20px,5.6vw,30px); color:#fff;
+    letter-spacing:0; white-space:normal; line-height:1.15}
+  .dk-list{margin:0 16px; gap:8px}
+  .dk-list li{height:auto; min-height:44px; padding:11px 14px 11px 46px;
+    border-radius:14px; font-size:clamp(14px,3.9vw,17px); line-height:1.3;
+    letter-spacing:0; white-space:normal; box-shadow:0 -1px 3px rgba(0,0,0,.13)}
+  .dk-ico{left:14px; width:24px; font-size:17px}
+  .dk-cta{margin-top:22px}
+  .dk-btn{padding:14px 24px}
+}
+@media (prefers-reduced-motion:reduce){ .dk-btn{transition:none} }
 </style>
 </head>
 <body>
@@ -811,6 +911,36 @@ body{
 
     <div style="height:calc(19 * var(--u))"></div>
 
+  </div>
+</section>
+
+<!-- ==================== ЭКРАН 4: «Для кого, где и когда» ====================
+     Письмо с персонажами. Картинка — одна: v2-frame.webp (рамка с персонажами
+     из папки «новый сайт»). Текст внутри письма — живая разметка, не картинка.
+     Персонажи и верх письма заходят на экран с картой: так в макете. -->
+<section class="cr dk" id="forwhom" aria-labelledby="dkT">
+  <div class="cr-cont">
+    <div class="dk-frame">
+      <img class="dk-art" src="v2-frame.webp"
+           srcset="v2-frame-1100.webp 1100w, v2-frame.webp 1526w"
+           sizes="(max-width:1023px) 100vw, 84vw"
+           width="1526" height="833" loading="lazy" decoding="async"
+           alt="Дед Мороз с посохом и мальчик на стремянке стоят у большого письма">
+      <h2 class="dk-t" id="dkT">Для кого, где и когда:</h2>
+      <ul class="dk-list">
+        <li><span class="dk-ico" aria-hidden="true">🐣</span>Для детей от 4 до 11 лет</li>
+        <li><span class="dk-ico" aria-hidden="true">📍</span>Нижний Новгород, Ольгино 62</li>
+        <li><span class="dk-ico" aria-hidden="true">📅</span>С 27 ноября по 10 января (каждый день)</li>
+        <li><span class="dk-ico" aria-hidden="true">🕐</span>С 09:00 до 21:30</li>
+        <li><span class="dk-ico" aria-hidden="true">⏳</span>Продолжительность: 1 час 20 минут</li>
+        <li><span class="dk-ico" aria-hidden="true">🚌</span>Организованная группа - от 20 детей</li>
+        <li><span class="dk-ico" aria-hidden="true">🎁</span>Значительные бонусы и спецусловия для групп</li>
+      </ul>
+    </div>
+    <!-- кнопка стоит там, где в макете написано «тут кнопку сделай».
+         Куда она ведёт — Серёга скажет: на форму, в ВК или на телефон.
+         Пока это кнопка без действия, чтобы не уводить человека в никуда. -->
+    <div class="dk-cta"><button class="dk-btn" type="button">Оставить заявку</button></div>
   </div>
 </section>
 <script>
