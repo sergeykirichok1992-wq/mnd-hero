@@ -1025,8 +1025,15 @@ body{
   font-size:clamp(11px,.86vw,13px); font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8FA3C8}
 /* две строки: «Забронируйте лучшие даты / по стартовым ценам». Перенос
    принудительный (<br class="bk-br">), чтобы золотая часть не рвалась;
-   на телефоне перенос убран и строки раскладывает text-wrap:balance */
-.bk-t{margin:0 auto; max-width:30ch;
+   на телефоне перенос убран и строки раскладывает text-wrap:balance.
+
+   Ширину НЕ ограничивать в ch. Раньше стояло max-width:30ch, а `ch` считается
+   от того шрифта, который сейчас рисует текст: пока Blogger Sans не загрузился,
+   строку рисует запасной Golos — он шире на 21 %, в свои же 30ch не влезает,
+   и заголовок разъезжается на три строки (видно на телефоне и на медленной
+   сети). Ширину держат поля окна, а страховку от третьей строки даёт скрипт
+   экрана (fitT): если строк всё-таки три, он уменьшает кегль. */
+.bk-t{margin:0 auto;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:clamp(26px,3.7vw,68px); line-height:1.06; letter-spacing:.005em;
   text-transform:uppercase; text-wrap:balance; color:#fff}
@@ -2740,9 +2747,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* ==================== ЭКРАН 5: появление и подключение формы ====================
    Логика формы общая на весь сайт — window.zsBind из блока «Единая форма
    заявки» (маска телефона, проверка, приёмник). Здесь только: когда экран
-   доезжает до глаз — всплывает окно и выходят дети; после отправки форма
-   сменяется на «заявка принята». zsBind объявлен ниже по файлу, поэтому
-   подключаемся после разбора страницы. */
+   доезжает до глаз — всплывает окно; заголовок держится в двух строках;
+   после отправки форма сменяется на «заявка принята». zsBind объявлен ниже
+   по файлу, поэтому подключаемся после разбора страницы. */
 (function(){
   'use strict';
   var s = document.getElementById('book');
@@ -2756,6 +2763,36 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     }, {threshold:.12});
     io.observe(s);
   }
+
+  /* Заголовок всегда в две строки. Разбивку задаёт <br class="bk-br">, но
+     она держится, только пока строка помещается в ширину окна. Если Blogger
+     Sans ещё не загрузился (телефон, медленная сеть), текст рисует запасной
+     Golos — он шире на 21 %, «Забронируйте лучшие даты» перестаёт помещаться,
+     и получаются три строки. Тогда уменьшаем кегль шагами по 6 %, пока строк
+     не станет две; после загрузки шрифта считаем заново — там кегль вернётся
+     к исходному. Меряем высоту блока, а не число переносов: у строк одна
+     и та же высота, делением получаем их количество. */
+  var ttl = document.getElementById('bkT');
+  function fitT(){
+    if (!ttl) return;
+    ttl.style.fontSize = '';
+    var cs = getComputedStyle(ttl);
+    var size = parseFloat(cs.fontSize);
+    var mult = parseFloat(cs.lineHeight) / size;   /* межстрочный множитель */
+    if (!size || !mult) return;
+    for (var i = 0; i < 12; i++){
+      if (Math.round(ttl.getBoundingClientRect().height / (size * mult)) <= 2) return;
+      size *= 0.94;
+      ttl.style.fontSize = size + 'px';
+    }
+  }
+  fitT();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitT);
+  var fitTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(fitTimer);
+    fitTimer = setTimeout(fitT, 150);
+  }, {passive:true});
 
   var form = document.getElementById('bkForm'), done = document.getElementById('bkDone');
   if (!form || !done) return;
