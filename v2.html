@@ -936,6 +936,215 @@ body{
   .dk.dkrv .dk-list li{opacity:1; transform:none; transition:none}
 }
 
+/* ==================== ЭКРАН 5: бронь по стартовым ценам ====================
+   Классы `.bk-*` (бронь). От `.cr` нужны только контейнер и z-index, от
+   единого блока заявки — стили полей и кнопки (`.zs-lab .zs-inp .zs-seg
+   .zs-opt .zs-err .zs-fine .zs-btn`) и общая логика `window.zsBind`.
+   Своей валидации и своего приёмника у экрана нет — намеренно.
+
+   Что на экране: тёмное ночное небо (рецепт квиза — синяя ночь, размытые
+   пурпурные и лиловые пятна, зерно), поверх него большое «окно» заявки,
+   а под окном — фотография: Дед Мороз, помощники и дети с леденцами
+   (v2-kids.webp, вырезаны из клетки скриптом dechecker.py). Дети заходят
+   на нижнюю кромку окна так же, как персонажи заходят на письмо на экране 4.
+
+   Стык с экраном 4: его фон на широком экране кончается лиловым заревом по
+   центру низа (189,195,255) на #002B78 — верх этого экрана начинается ровно
+   с тех же цветов и гаснет вниз в ночную синь, шва нет. На телефоне экран 4
+   кончается «холмом» #000335 — там верх такой же тёмный.
+
+   Размеры не в множителе --u: это не копия старого сайта, а свой экран,
+   поэтому всё идёт через clamp() от ширины окна. */
+.bk{
+  position:relative; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(72px,7.6vw,150px) 0 clamp(18px,2.4vw,44px);
+  background:
+    radial-gradient(52vw 11vw at 50% 0%, rgba(189,195,255,.92), rgba(189,195,255,0) 100%),
+    radial-gradient(70vw 20vw at 30% 0%, rgba(0,52,130,.9), rgba(0,52,130,0) 100%),
+    linear-gradient(180deg,#002B78 0%,#0B1554 7%,#080F3E 18%,#060B2E 44%,#050922 76%,#04071A 100%);
+}
+/* отблески: синий, пурпурный, лиловый и один тёплый под детьми. Еле заметно
+   дышат — движение не должно ловиться боковым зрением, пока человек читает
+   поля. Анимируются только transform и opacity. */
+.bk-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.bk-glow i{position:absolute; display:block; border-radius:50%; filter:blur(80px); will-change:transform,opacity}
+.bk-glow i:nth-child(1){left:-18vw; top:6%; width:64vw; height:52%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5), rgba(47,49,146,0) 70%);
+  animation:bkDrift1 36s ease-in-out infinite alternate}
+.bk-glow i:nth-child(2){right:-20vw; top:-4%; width:66vw; height:56%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.36), rgba(108,43,217,0) 70%);
+  animation:bkDrift2 43s ease-in-out infinite alternate}
+.bk-glow i:nth-child(3){left:8vw; bottom:10%; width:54vw; height:48%;
+  background:radial-gradient(closest-side, rgba(176,106,224,.24), rgba(176,106,224,0) 70%);
+  animation:bkDrift3 31s ease-in-out infinite alternate}
+.bk-glow i:nth-child(4){left:50%; bottom:-6%; width:70vw; height:46%; margin-left:-35vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2), rgba(227,179,78,0) 70%);
+  animation:bkDrift2 39s ease-in-out infinite alternate-reverse}
+@keyframes bkDrift1{from{transform:translate3d(0,0,0) scale(1);    opacity:.9}
+                    to  {transform:translate3d(4%,3%,0) scale(1.08); opacity:1}}
+@keyframes bkDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
+                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.86}}
+@keyframes bkDrift3{from{transform:translate3d(0,0,0) scale(1);    opacity:.84}
+                    to  {transform:translate3d(5%,-4%,0) scale(1.1); opacity:1}}
+/* зерно: без него градиент полосит на большой тёмной плоскости */
+.bk-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+/* звёзды соседнего блока «Живое небо»: выше фона и отблесков, ниже окна */
+.bk-sky{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none}
+
+/* ---------- окно заявки ---------- */
+/* Широкое, по центру, во всю ширину контейнера до 1400 px: главный блок экрана
+   стоит посередине, а не колонкой сбоку. Стекло с золотой кромкой в толщину
+   волоса и лиловым ореолом — та же материя, что у всплывающего окна. */
+.bk-card{
+  position:relative; z-index:2; isolation:isolate; overflow:hidden;
+  width:min(100%,1400px); margin:0 auto; text-align:center;
+  padding:clamp(34px,3.4vw,60px) clamp(18px,3.8vw,72px)
+          calc(clamp(22px,2.2vw,40px) + clamp(64px,8.6vw,166px));  /* низ: запас под детей */
+  border-radius:clamp(22px,2.1vw,36px);
+  background:linear-gradient(180deg, rgba(9,16,50,.88) 0%, rgba(7,11,36,.93) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(227,179,78,.34),
+    inset 0 1px 0 rgba(255,238,190,.22),
+    0 50px 110px -40px rgba(0,0,0,.9),
+    0 0 180px -50px rgba(108,43,217,.5);
+}
+@supports ((-webkit-backdrop-filter:blur(1px)) or (backdrop-filter:blur(1px))){
+  .bk-card{background:linear-gradient(180deg, rgba(9,16,50,.76) 0%, rgba(7,11,36,.84) 100%);
+    -webkit-backdrop-filter:blur(14px) saturate(1.1); backdrop-filter:blur(14px) saturate(1.1)}
+}
+.bk-card-sky{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.bk-card-sky i{position:absolute; display:block; border-radius:50%; filter:blur(60px)}
+.bk-card-sky i:nth-child(1){left:-22%; top:-30%; width:70%; height:80%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5), rgba(47,49,146,0) 70%)}
+.bk-card-sky i:nth-child(2){right:-18%; top:-10%; width:60%; height:76%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.3), rgba(108,43,217,0) 70%)}
+.bk-card-sky i:nth-child(3){left:20%; bottom:-40%; width:60%; height:70%;
+  background:radial-gradient(closest-side, rgba(227,179,78,.13), rgba(227,179,78,0) 70%)}
+.bk-card > *:not(.bk-card-sky){position:relative; z-index:1}
+
+.bk-eyebrow{margin:0 0 clamp(12px,1.3vw,18px); font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(11px,.86vw,13px); font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8FA3C8}
+/* две строки: «Забронируйте лучшие даты / по стартовым ценам». Перенос
+   принудительный (<br class="bk-br">), чтобы золотая часть не рвалась;
+   на телефоне перенос убран и строки раскладывает text-wrap:balance */
+.bk-t{margin:0 auto; max-width:30ch;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(26px,3.7vw,68px); line-height:1.06; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff}
+/* «по стартовым ценам» — золотом: сначала плоский цвет как запас, потом
+   градиент по буквам там, где браузер умеет резать фон по тексту */
+.bk-t b{font-weight:700; color:#E3B34E}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .bk-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F1D695 38%,#E3B34E 62%,#C9922F 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
+.bk-lede{margin:clamp(14px,1.6vw,24px) auto 0; max-width:60ch;
+  font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(14.5px,1.12vw,19.5px); line-height:1.5; color:#B7C6E2}
+.bk-lede b{font-weight:600; color:#EBD3A0}
+
+/* ---------- поля ---------- */
+/* Четыре колонки: имя, телефон, город, как планируете прийти. Плитки выбора
+   шире полей — в них две строки текста. Ниже 1300 px сетка два на два
+   (плитки рядом с городом), ниже 640 всё в столбик. */
+.bk-form{margin-top:clamp(24px,2.6vw,42px); text-align:left}
+.bk-form[hidden]{display:none}
+.bk-grid{display:grid; grid-template-columns:1fr 1fr 1fr 1.45fr; gap:clamp(14px,1.5vw,24px); align-items:start}
+.bk-f{min-width:0}
+.bk-send{margin-top:clamp(22px,2.4vw,36px); display:flex; flex-direction:column; align-items:center}
+.bk-send .zs-btn{width:min(100%,480px)}
+.bk .zs-fine{max-width:72ch}
+@media (max-width:1300px){
+  .bk-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .bk-grid{grid-template-columns:1fr}
+  .bk-br{display:none}
+}
+
+/* ---------- «заявка принята» ---------- */
+.bk-done[hidden]{display:none}
+.bk-done{padding-top:clamp(6px,.8vw,12px)}
+.bk-seal{
+  width:clamp(84px,7vw,112px); height:clamp(84px,7vw,112px);
+  margin:0 auto clamp(16px,1.7vw,24px); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; color:#E3B34E;
+  border:1px solid rgba(227,179,78,.5);
+  background:radial-gradient(closest-side, rgba(227,179,78,.22), rgba(227,179,78,0) 78%);
+  box-shadow:inset 0 0 24px rgba(227,179,78,.28), 0 0 44px -8px rgba(227,179,78,.7);
+}
+.bk-seal svg{width:52%; height:52%; display:block}
+.bk-done:not([hidden]) .bk-seal{animation:bkSeal .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes bkSeal{
+  0%  {transform:scale(.6) rotate(-24deg); opacity:0}
+  60% {transform:scale(1.06) rotate(4deg); opacity:1}
+  100%{transform:none; opacity:1}
+}
+.bk-done-h{margin:0 auto; max-width:24ch;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(22px,2.4vw,42px); line-height:1.1; text-transform:uppercase; color:#fff; text-wrap:balance}
+
+/* ---------- дети ---------- */
+/* Картинка заходит на нижнюю кромку окна: в полосу захода попадают только
+   поднятые леденцы и шапка Деда Мороза, текст окна они не закрывают —
+   низ окна на ту же величину пустой (см. padding-bottom у .bk-card).
+   z-index 8 — выше контейнера .cr-cont (у него 7): сцена и окно — соседи
+   внутри секции, и без этого дети оказались бы ПОД окном.
+   pointer-events:none — чтобы прозрачные поля картинки не перекрывали кнопку. */
+.bk-stage{
+  position:relative; z-index:8; pointer-events:none;
+  width:min(100%,1560px); margin:calc(-1 * clamp(64px,8.6vw,166px)) auto 0;
+}
+.bk-kids{display:block; position:relative; z-index:2; width:100%; height:auto}
+/* пол: тёплое пятно света под ногами и тень, чтобы дети стояли, а не висели */
+.bk-floor{position:absolute; z-index:1; left:-12%; right:-12%; bottom:-3%; height:42%; pointer-events:none;
+  background:radial-gradient(50% 58% at 50% 100%, rgba(255,214,150,.4), rgba(255,214,150,0) 72%)}
+.bk-stage::after{content:''; position:absolute; z-index:1; left:5%; right:5%; bottom:-2%; height:9%;
+  background:radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.62), rgba(0,0,0,0) 70%)}
+
+/* появление: окно всплывает, дети выходят чуть позже. Прятать умеет только
+   класс .rv, его вешает скрипт — без скрипта всё видно сразу */
+.bk.rv .bk-card{opacity:0; transform:translateY(28px)}
+.bk.rv .bk-stage{opacity:0; transform:translateY(44px)}
+.bk.rv.on .bk-card{opacity:1; transform:none; transition:opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
+.bk.rv.on .bk-stage{opacity:1; transform:none; transition:opacity .8s ease .15s, transform .9s cubic-bezier(.2,.7,.2,1) .15s}
+
+/* ---------- планшет и телефон ---------- */
+/* Порог 1024, как у экрана 4: там с этой ширины начинается «холм», и верх
+   этого экрана должен быть того же цвета. Дети шире экрана: показываем
+   середину группы (Дед Мороз и дети вокруг него), края растворяются маской,
+   чтобы не резать человека пополам. */
+@media (max-width:1023px){
+  .bk{
+    padding-top:clamp(44px,8vw,80px);
+    background:
+      radial-gradient(70vw 22vw at 50% 0%, rgba(0,52,130,.6), rgba(0,52,130,0) 100%),
+      linear-gradient(180deg,#000335 0%,#03073A 14%,#060B2E 40%,#050922 76%,#04071A 100%);
+  }
+  .bk-card{padding:clamp(26px,5vw,40px) clamp(14px,3.6vw,28px) calc(clamp(18px,3vw,26px) + 52px); border-radius:22px}
+  .bk-t{font-size:clamp(24px,5.6vw,44px)}
+  .bk-lede{font-size:clamp(14px,2.4vw,17px)}
+  .bk-stage{margin-top:-52px; width:100%; overflow:hidden}
+  .bk-kids{
+    width:136%; max-width:none; left:50%; transform:translateX(-50%);
+    -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+            mask-image:linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
+  }
+  /* появление: у детей transform занят центровкой, поэтому на телефоне
+     они только проявляются, без сдвига */
+  .bk.rv .bk-stage{transform:none}
+}
+@media (max-width:600px){
+  .bk-kids{width:188%}
+  .bk-stage::after{left:0; right:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .bk-glow i{animation:none}
+  .bk.rv .bk-card,.bk.rv .bk-stage{opacity:1; transform:none; transition:none}
+  .bk-done:not([hidden]) .bk-seal{animation:none}
+}
+
 /* ==================== ЕДИНАЯ КНОПКА И ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
    Один блок на весь сайт: одна кнопка `.zs-btn` и одно окно `.zs-ov`.
    Любая кнопка с атрибутом data-zs открывает это окно — где бы она ни стояла.
@@ -1458,6 +1667,93 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
          Она общая для всего сайта (.zs-btn) и открывает общее окно заявки:
          всё, что для этого нужно, — атрибут data-zs с меткой места. -->
     <div class="dk-cta"><button class="zs-btn zs-btn--lg" type="button" data-zs="4-й экран"><span class="zs-t">Оставить заявку</span></button></div>
+  </div>
+</section>
+
+<!-- ==================== ЭКРАН 5: бронь по стартовым ценам ====================
+     Большое окно заявки поверх ночного неба, под ним — Дед Мороз, помощники
+     и дети с леденцами (v2-kids.webp). Поля и кнопка — из единого блока заявки
+     (.zs-*), логику отправки даёт window.zsBind — своей у экрана нет. -->
+<section class="cr bk" id="book" aria-labelledby="bkT">
+  <canvas class="bk-sky" id="bkSky" aria-hidden="true"></canvas>
+  <div class="bk-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="bk-grain" aria-hidden="true"></div>
+  <div class="cr-cont">
+    <div class="bk-card">
+      <div class="bk-card-sky" aria-hidden="true"><i></i><i></i><i></i></div>
+      <p class="bk-eyebrow">Сезон 2026/27 · Нижний Новгород</p>
+      <h2 class="bk-t" id="bkT">Забронируйте лучшие даты<br class="bk-br"> <b>по стартовым ценам</b></h2>
+      <p class="bk-lede">Каждого 1 числа цены растут на 100 ₽, а выходные декабря разбирают первыми.
+        Оставьте заявку - мы перезвоним в течение <b>30&nbsp;минут</b>, предложим лучшие даты
+        и цены и ответим на все вопросы.</p>
+
+      <form class="bk-form" id="bkForm" novalidate>
+        <div class="bk-grid">
+          <div class="bk-f">
+            <label class="zs-lab" for="bkName">Ваше имя</label>
+            <input class="zs-inp" id="bkName" name="name" type="text" autocomplete="given-name"
+                   placeholder="Имя" maxlength="60">
+          </div>
+          <div class="bk-f">
+            <label class="zs-lab" for="bkPhone">Ваш телефон</label>
+            <input class="zs-inp" id="bkPhone" name="phone" type="tel" inputmode="tel"
+                   autocomplete="tel" placeholder="+7 (___) ___-__-__"
+                   aria-describedby="bkErrPhone" required>
+            <p class="zs-err" id="bkErrPhone" data-for="phone" hidden>Проверьте номер: нужно 11 цифр</p>
+          </div>
+          <!-- город обязателен: от него зависит воронка в CRM. Ярославля и
+               Екатеринбурга нет намеренно — они у партнёра по франшизе -->
+          <div class="bk-f">
+            <label class="zs-lab" for="bkCity">Город</label>
+            <select class="zs-inp zs-sel" id="bkCity" name="city" aria-describedby="bkErrCity" required>
+              <option value="" disabled selected>Выберите город</option>
+              <option>Нижний Новгород</option>
+              <option>Казань</option>
+              <option>Крым</option>
+              <option>Ставрополь</option>
+              <option>Тюмень</option>
+            </select>
+            <p class="zs-err" id="bkErrCity" data-for="city" hidden>Выберите город</p>
+          </div>
+          <div class="bk-f bk-f--kind">
+            <span class="zs-lab" id="bkKindLab">Как планируете прийти</span>
+            <div class="zs-seg" role="radiogroup" aria-labelledby="bkKindLab">
+              <label class="zs-opt">
+                <input type="radio" name="visit" value="Индивидуальное">
+                Индивидуально<em>семьёй, с друзьями</em>
+              </label>
+              <label class="zs-opt">
+                <input type="radio" name="visit" value="Групповое">
+                Группой<em>класс, от 20 детей</em>
+              </label>
+            </div>
+            <p class="zs-err" data-for="visit" hidden>Выберите один из двух вариантов</p>
+          </div>
+        </div>
+        <div class="bk-send">
+          <button class="zs-btn zs-btn--lg" type="submit"><span class="zs-t">Забронировать дату</span></button>
+          <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+            и на звонок от менеджера. Телефон нужен только для связи по заявке.</p>
+        </div>
+      </form>
+
+      <div class="bk-done" id="bkDone" tabindex="-1" hidden>
+        <div class="bk-seal" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z" fill="currentColor"/></svg>
+        </div>
+        <h3 class="bk-done-h">Заявка принята!</h3>
+        <p class="bk-lede">Мы перезвоним в течение <b>30&nbsp;минут</b>, предложим лучшие даты и цены и ответим на все вопросы.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bk-stage" aria-hidden="false">
+    <div class="bk-floor" aria-hidden="true"></div>
+    <img class="bk-kids" src="v2-kids.webp"
+         srcset="v2-kids-1000.webp 1000w, v2-kids.webp 1579w"
+         sizes="(max-width:600px) 188vw, (max-width:1023px) 136vw, min(94vw, 1560px)"
+         width="1579" height="1073" loading="lazy" decoding="async"
+         alt="Дед Мороз, помощники Министерства и дети с леденцами машут в камеру">
   </div>
 </section>
 
@@ -2477,6 +2773,51 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.addEventListener('orientationchange', function(){
     clearTimeout(tmr); tmr = setTimeout(ready, 300);
   });
+})();
+</script>
+
+<script>
+/* ==================== ЭКРАН 5: появление и подключение формы ====================
+   Логика формы общая на весь сайт — window.zsBind из блока «Единая форма
+   заявки» (маска телефона, проверка, приёмник). Здесь только: когда экран
+   доезжает до глаз — всплывает окно и выходят дети; после отправки форма
+   сменяется на «заявка принята». zsBind объявлен ниже по файлу, поэтому
+   подключаемся после разбора страницы. */
+(function(){
+  'use strict';
+  var s = document.getElementById('book');
+  if (!s) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (window.IntersectionObserver && !reduce){
+    s.classList.add('rv');
+    var io = new IntersectionObserver(function(es){
+      if (es[0].isIntersecting){ s.classList.add('on'); io.disconnect(); }
+    }, {threshold:.12});
+    io.observe(s);
+  }
+
+  var form = document.getElementById('bkForm'), done = document.getElementById('bkDone');
+  if (!form || !done) return;
+  var bound = false;
+  /* пока общая логика не подключена, обычная отправка формы (перезагрузка
+     страницы с телефоном в адресе) не должна случиться */
+  form.addEventListener('submit', function(e){ if (!bound) e.preventDefault(); });
+
+  function wire(){
+    if (bound || typeof window.zsBind !== 'function') return;
+    bound = true;
+    window.zsBind(form, {
+      source: '5-й экран',
+      onDone: function(){
+        form.hidden = true;
+        done.hidden = false;
+        try { done.focus({preventScroll:true}); } catch(_){ }
+      }
+    });
+  }
+  wire();
+  if (!bound) document.addEventListener('DOMContentLoaded', wire);
 })();
 </script>
 
