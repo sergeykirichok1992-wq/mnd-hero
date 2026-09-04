@@ -1484,7 +1484,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             <input class="zs-inp" id="zsPhone" name="phone" type="tel" inputmode="tel"
                    autocomplete="tel" placeholder="+7 (___) ___-__-__"
                    aria-describedby="zsErrPhone" required>
-            <p class="zs-err" id="zsErrPhone" hidden>Проверьте номер: нужно 11 цифр</p>
+            <p class="zs-err" id="zsErrPhone" data-for="phone" hidden>Проверьте номер: нужно 11 цифр</p>
           </div>
 
           <div class="zs-f">
@@ -1499,7 +1499,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                 Группой<em>класс, от 20 детей</em>
               </label>
             </div>
-            <p class="zs-err" id="zsErrKind" hidden>Выберите один из двух вариантов</p>
+            <p class="zs-err" id="zsErrKind" data-for="visit" hidden>Выберите один из двух вариантов</p>
           </div>
 
           <div class="zs-send">
@@ -3042,132 +3042,37 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 <script>
 /* ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
-   Открывает окно любая кнопка с атрибутом data-zs — обработчик один на всю
-   страницу, поэтому новые кнопки достаточно просто поставить в разметку,
-   сюда лезть не надо.
+   Одна проверка номера и одна отправка на весь сайт. Два способа применения:
+
+   1. ОКНО ПОВЕРХ СТРАНИЦЫ. Открывает его любая кнопка с атрибутом data-zs —
+      обработчик один на всю страницу, поэтому новые кнопки достаточно просто
+      поставить в разметку, сюда лезть не надо.
+
+        <button class="zs-btn" type="button" data-zs="5-й экран">
+          <span class="zs-t">Оставить заявку</span></button>
+
+   2. ФОРМА ПРЯМО В ПОТОКЕ ЭКРАНА. Собрать <form> из тех же полей и позвать:
+
+        window.zsBind(form, {source:'5-й экран', onDone:function(lead){ ... }});
+
+      Внутри формы ищутся по ИМЕНАМ, а не по id, поэтому таких форм может быть
+      сколько угодно: input[name=phone], радио input[name=visit] внутри .zs-seg,
+      необязательный input[name=name], кнопка [type=submit] со <span class="zs-t">,
+      сообщения об ошибке .zs-err[data-for=phone] и .zs-err[data-for=visit].
+      Вернётся {reset, setSource}: reset приводит форму в исходное состояние.
+
+   ВТОРУЮ КОПИЮ ЭТОГО СКРИПТА НЕ ЗАВОДИТЬ. Две разные проверки телефона и два
+   разных адреса отправки — это ровно тот случай, когда одна из форм молча
+   перестаёт работать и никто этого не замечает.
 
    Отправлять пока некуда: страница статическая, бэкенда нет. Заявка ложится
    в window.__zsLead (видно в консоли) и в память браузера (localStorage,
-   ключ zs_leads, последние 20 штук), человек видит «спасибо».
-   Когда появится приёмник — вписать адрес в ENDPOINT, и та же заявка уедет
-   POST-запросом JSON-ом. Больше ничего править не нужно. */
+   ключ zs_leads, последние 20 штук). Когда появится приёмник — вписать адрес
+   в ENDPOINT, и та же заявка уедет POST-запросом JSON-ом. */
 (function(){
   'use strict';
 
   var ENDPOINT = '';          // '' — не отправляем, только показываем «принято»
-
-  var ov = document.getElementById('zsOv');
-  if (!ov) return;
-  var win    = document.getElementById('zsWin');
-  var form   = document.getElementById('zsForm');
-  var phone  = document.getElementById('zsPhone');
-  var seg    = document.getElementById('zsSeg');
-  var send   = document.getElementById('zsSend');
-  var step1  = document.getElementById('zsStep1');
-  var step2  = document.getElementById('zsStep2');
-  var hTitle = document.getElementById('zsH');
-  var hSub   = document.getElementById('zsSub');
-  var errPh  = document.getElementById('zsErrPhone');
-  var errKd  = document.getElementById('zsErrKind');
-  var sendT  = send.querySelector('.zs-t');
-
-  var baseTitle = hTitle.textContent;
-  var baseSub   = hSub.innerHTML;
-  var baseSend  = sendT.textContent;
-
-  var lastFocus = null, source = '', sending = false, closeTimer = 0, prev = '';
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- запирание прокрутки ---------- */
-  /* overflow:hidden на <html>, а не position:fixed на body: под окном лежит
-     липкая сцена первого экрана, и от position:fixed она бы дёрнулась.
-     Ширину исчезнувшей полосы прокрутки отдаём в CSS, чтобы страница и шапка
-     не прыгнули вправо. На маке и телефоне эта ширина ноль. */
-  function lock(){
-    var sbw = window.innerWidth - document.documentElement.clientWidth;
-    document.documentElement.style.setProperty('--zs-sbw', (sbw > 0 ? sbw : 0) + 'px');
-    document.documentElement.classList.add('zs-lock');
-  }
-  function unlock(){
-    document.documentElement.classList.remove('zs-lock');
-    document.documentElement.style.removeProperty('--zs-sbw');
-  }
-
-  /* ---------- фокус ---------- */
-  var SEL = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),' +
-            'textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
-  function tabbables(){
-    /* offsetParent===null отсеивает скрытый шаг: иначе Tab уводил бы человека
-       в невидимые поля второго экрана */
-    return Array.prototype.filter.call(win.querySelectorAll(SEL), function(el){
-      return el.offsetParent !== null;
-    });
-  }
-  function onKey(e){
-    if (e.key === 'Escape' || e.key === 'Esc'){ e.preventDefault(); e.stopPropagation(); close(); return; }
-    if (e.key !== 'Tab') return;
-    var f = tabbables();
-    if (!f.length) return;
-    var first = f[0], last = f[f.length - 1], a = document.activeElement;
-    if (e.shiftKey && (a === first || a === win || !win.contains(a))){ e.preventDefault(); last.focus(); }
-    else if (!e.shiftKey && a === last){ e.preventDefault(); first.focus(); }
-  }
-
-  /* ---------- открыть / закрыть ---------- */
-  function open(btn){
-    if (closeTimer){ clearTimeout(closeTimer); closeTimer = 0; }
-    lastFocus = btn || document.activeElement;
-    source = btn ? (btn.getAttribute('data-zs') || (btn.textContent || '').trim()) : '';
-
-    var t = btn && btn.getAttribute('data-zs-title');
-    var s = btn && btn.getAttribute('data-zs-sub');
-    hTitle.textContent = t || baseTitle;
-    if (s) hSub.textContent = s; else hSub.innerHTML = baseSub;
-
-    /* всегда открываем на шаге «форма», даже если в прошлый раз заявку уже
-       отправили: человек мог вернуться за второй датой */
-    step1.hidden = false; step2.hidden = true;
-    win.setAttribute('aria-labelledby', 'zsH');
-    sending = false; send.disabled = false; sendT.textContent = baseSend;
-    errPh.hidden = true; errKd.hidden = true;
-    phone.classList.remove('bad'); seg.classList.remove('bad');
-
-    lock();
-    ov.hidden = false;
-    win.scrollTop = 0;
-    requestAnimationFrame(function(){ ov.classList.add('on'); });
-    document.addEventListener('keydown', onKey, true);
-
-    /* на телефоне фокус в поле сразу выбрасывает клавиатуру и съедает пол-окна —
-       там фокус ставим на само окно, поле человек нажмёт сам */
-    setTimeout(function(){
-      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) phone.focus();
-      else win.focus();
-    }, 60);
-  }
-
-  function close(){
-    if (ov.hidden) return;
-    document.removeEventListener('keydown', onKey, true);
-    ov.classList.remove('on');
-    var finish = function(){
-      ov.hidden = true; unlock(); closeTimer = 0;
-      if (lastFocus && lastFocus.focus){ try { lastFocus.focus(); } catch(_){} }
-      lastFocus = null;
-    };
-    if (reduce) finish(); else closeTimer = setTimeout(finish, 320);
-  }
-
-  /* одна точка входа на всю страницу: кнопка с data-zs где угодно откроет окно */
-  document.addEventListener('click', function(e){
-    var t = e.target && e.target.closest ? e.target.closest('[data-zs]') : null;
-    if (!t) return;
-    e.preventDefault();
-    open(t);
-  });
-  document.getElementById('zsX').addEventListener('click', close);
-  document.getElementById('zsDone').addEventListener('click', close);
-  ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
 
   /* ---------- телефон ---------- */
   function digitsIn(s){ var m = String(s).match(/\d/g); return m ? m.length : 0; }
@@ -3200,47 +3105,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     if (d.length >= 10) out += '-' + d.slice(9, 11);
     return out;
   }
-  phone.addEventListener('input', function(e){
-    var raw = phone.value, pos = phone.selectionStart == null ? raw.length : phone.selectionStart;
-    var before = digitsIn(raw.slice(0, pos));
-    /* Backspace съел скобку или дефис — цифр не убавилось, и курсор отскочил бы
-       на тот же разделитель: поле «не стирается». Убираем цифру перед курсором сами. */
-    if (e.inputType === 'deleteContentBackward' && digitsIn(raw) === digitsIn(prev) && before > 0){
-      raw = dropDigit(raw, before); before--;
-    }
-    var out = mask(raw);
-    var d0 = raw.replace(/\D/g, '').charAt(0);
-    /* маска сама дописывает ведущую семёрку — значит цифр слева от курсора стало
-       на одну больше. Обрезанный хвост (номер уже полный) курсор не двигает */
-    var grew = (d0 && d0 !== '7' && d0 !== '8') ? 1 : 0;
-    var target = Math.min(before + grew, digitsIn(out));
-    phone.value = out;
-    prev = out;
-    var c = caretAfter(out, target);
-    try { phone.setSelectionRange(c, c); } catch(_){}
-    if (digitsIn(out) === 11){ errPh.hidden = true; phone.classList.remove('bad'); }
-  });
-  phone.addEventListener('focus', function(){
-    if (!phone.value){
-      phone.value = '+7 '; prev = phone.value;
-      try { phone.setSelectionRange(3, 3); } catch(_){}
-    }
-  });
-  phone.addEventListener('blur', function(){
-    if (digitsIn(phone.value) < 2){ phone.value = ''; prev = ''; }
-  });
 
-  /* ---------- выбор посещения ---------- */
-  seg.addEventListener('change', function(e){
-    if (!e.target || e.target.type !== 'radio') return;
-    var labs = seg.querySelectorAll('.zs-opt');
-    for (var i = 0; i < labs.length; i++){
-      labs[i].classList.toggle('on', labs[i].querySelector('input').checked);
-    }
-    seg.classList.remove('bad'); errKd.hidden = true;
-  });
-
-  /* ---------- отправка ---------- */
+  /* ---------- память браузера ---------- */
   function remember(lead){
     try {
       var all = JSON.parse(localStorage.getItem('zs_leads') || '[]');
@@ -3250,50 +3116,244 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     } catch(_){}    /* приватный режим — память недоступна, ронять форму из-за этого незачем */
   }
 
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    if (sending) return;                       // двойное нажатие не делает две заявки
+  /* ================= zsBind: общая логика любой формы заявки ================= */
+  function zsBind(form, opts){
+    opts = opts || {};
+    if (!form || form.__zsBound) return form && form.__zsApi;
 
-    var d = String(phone.value).replace(/\D/g, '');
-    var kind = form.querySelector('input[name="visit"]:checked');
-    var okPhone = d.length === 11, okKind = !!kind;
-    errPh.hidden = okPhone;  phone.classList.toggle('bad', !okPhone);
-    errKd.hidden = okKind;   seg.classList.toggle('bad', !okKind);
-    if (!okPhone){ phone.focus(); return; }
-    if (!okKind){ seg.querySelector('input').focus(); return; }
+    var phone = form.querySelector('input[name="phone"]');
+    var seg   = form.querySelector('.zs-seg');
+    var nameI = form.querySelector('input[name="name"]');
+    var send  = form.querySelector('[type="submit"]');
+    var sendT = send ? (send.querySelector('.zs-t') || send) : null;
+    var errPh = form.querySelector('.zs-err[data-for="phone"]');
+    var errKd = form.querySelector('.zs-err[data-for="visit"]');
+    var baseSend = sendT ? sendT.textContent : '';
+    var sending = false, prev = '';
 
-    sending = true;
-    send.disabled = true;
-    sendT.textContent = 'Отправляем…';
-
-    var lead = {
-      phone:  '+' + d,
-      visit:  kind.value,
-      source: source,                          // с какой кнопки пришла заявка
-      page:   location.href,
-      sentAt: new Date().toISOString()
-    };
-    window.__zsLead = lead;
-    remember(lead);
-
-    /* sending здесь НЕ снимаем: пока окно открыто, вторая заявка с того же
-       номера не нужна. Флаг обнуляется при следующем открытии окна */
-    function done(){
-      send.disabled = false;
-      sendT.textContent = baseSend;
-      step1.hidden = true; step2.hidden = false;
-      win.setAttribute('aria-labelledby', 'zsH2');
-      win.scrollTop = 0;
-      var b = document.getElementById('zsDone');
-      if (b) b.focus();
+    if (phone){
+      phone.addEventListener('input', function(e){
+        var raw = phone.value, pos = phone.selectionStart == null ? raw.length : phone.selectionStart;
+        var before = digitsIn(raw.slice(0, pos));
+        /* Backspace съел скобку или дефис — цифр не убавилось, и курсор отскочил бы
+           на тот же разделитель: поле «не стирается». Убираем цифру перед курсором сами. */
+        if (e.inputType === 'deleteContentBackward' && digitsIn(raw) === digitsIn(prev) && before > 0){
+          raw = dropDigit(raw, before); before--;
+        }
+        var out = mask(raw);
+        var d0 = raw.replace(/\D/g, '').charAt(0);
+        /* маска сама дописывает ведущую семёрку — значит цифр слева от курсора стало
+           на одну больше. Обрезанный хвост (номер уже полный) курсор не двигает */
+        var grew = (d0 && d0 !== '7' && d0 !== '8') ? 1 : 0;
+        var target = Math.min(before + grew, digitsIn(out));
+        phone.value = out;
+        prev = out;
+        var c = caretAfter(out, target);
+        try { phone.setSelectionRange(c, c); } catch(_){}
+        if (digitsIn(out) === 11){ if (errPh) errPh.hidden = true; phone.classList.remove('bad'); }
+      });
+      phone.addEventListener('focus', function(){
+        if (!phone.value){
+          phone.value = '+7 '; prev = phone.value;
+          try { phone.setSelectionRange(3, 3); } catch(_){}
+        }
+      });
+      phone.addEventListener('blur', function(){
+        if (digitsIn(phone.value) < 2){ phone.value = ''; prev = ''; }
+      });
     }
-    if (!ENDPOINT){ done(); return; }
-    fetch(ENDPOINT, {
-      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(lead)
-    }).then(done, done);       /* сеть отвалилась — заявку всё равно показываем принятой:
+
+    if (seg){
+      seg.addEventListener('change', function(e){
+        if (!e.target || e.target.type !== 'radio') return;
+        var labs = seg.querySelectorAll('.zs-opt');
+        for (var i = 0; i < labs.length; i++){
+          labs[i].classList.toggle('on', labs[i].querySelector('input').checked);
+        }
+        seg.classList.remove('bad');
+        if (errKd) errKd.hidden = true;
+      });
+    }
+
+    function reset(){
+      sending = false;
+      if (send) send.disabled = false;
+      if (sendT) sendT.textContent = baseSend;
+      if (errPh) errPh.hidden = true;
+      if (errKd) errKd.hidden = true;
+      if (phone) phone.classList.remove('bad');
+      if (seg) seg.classList.remove('bad');
+    }
+
+    form.addEventListener('submit', function(e){
+      e.preventDefault();
+      if (sending) return;                       // двойное нажатие не делает две заявки
+
+      var d = phone ? String(phone.value).replace(/\D/g, '') : '';
+      var kind = seg ? form.querySelector('input[name="visit"]:checked') : null;
+      var okPhone = !phone || d.length === 11;
+      var okKind  = !seg || !!kind;
+      if (errPh) errPh.hidden = okPhone;
+      if (phone) phone.classList.toggle('bad', !okPhone);
+      if (errKd) errKd.hidden = okKind;
+      if (seg) seg.classList.toggle('bad', !okKind);
+      if (!okPhone){ phone.focus(); return; }
+      if (!okKind){ seg.querySelector('input').focus(); return; }
+
+      sending = true;
+      if (send) send.disabled = true;
+      if (sendT) sendT.textContent = 'Отправляем…';
+
+      var src = typeof opts.source === 'function' ? opts.source() : (opts.source || '');
+      var lead = {
+        phone:  d ? '+' + d : '',
+        visit:  kind ? kind.value : '',
+        source: src,                             // с какой кнопки или формы пришла заявка
+        page:   location.href,
+        sentAt: new Date().toISOString()
+      };
+      if (nameI && nameI.value.trim()) lead.name = nameI.value.trim();
+      window.__zsLead = lead;
+      remember(lead);
+
+      /* sending здесь НЕ снимаем: пока форма на экране, вторая заявка с того же
+         номера не нужна. Флаг обнуляется вызовом reset() */
+      function done(){
+        if (send) send.disabled = false;
+        if (sendT) sendT.textContent = baseSend;
+        if (opts.onDone) opts.onDone(lead);
+      }
+      if (!ENDPOINT){ done(); return; }
+      fetch(ENDPOINT, {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(lead)
+      }).then(done, done);     /* сеть отвалилась — заявку всё равно показываем принятой:
                                   номер уже лежит в памяти браузера, а извиняться перед
                                   человеком за нашу сеть незачем */
-  });
+    });
+
+    form.__zsBound = true;
+    form.__zsApi = { reset: reset, setSource: function(v){ opts.source = v; } };
+    return form.__zsApi;
+  }
+  window.zsBind = zsBind;
+
+  /* ================= окно поверх страницы ================= */
+  (function(){
+    var ov = document.getElementById('zsOv');
+    if (!ov) return;
+    var win    = document.getElementById('zsWin');
+    var form   = document.getElementById('zsForm');
+    var phone  = document.getElementById('zsPhone');
+    var step1  = document.getElementById('zsStep1');
+    var step2  = document.getElementById('zsStep2');
+    var hTitle = document.getElementById('zsH');
+    var hSub   = document.getElementById('zsSub');
+
+    var baseTitle = hTitle.textContent;
+    var baseSub   = hSub.innerHTML;
+
+    var lastFocus = null, source = '', closeTimer = 0;
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    var api = zsBind(form, {
+      source: function(){ return source; },
+      onDone: function(){
+        step1.hidden = true; step2.hidden = false;
+        win.setAttribute('aria-labelledby', 'zsH2');
+        win.scrollTop = 0;
+        var b = document.getElementById('zsDone');
+        if (b) b.focus();
+      }
+    });
+
+    /* ---------- запирание прокрутки ---------- */
+    /* overflow:hidden на <html>, а не position:fixed на body: под окном лежит
+       липкая сцена первого экрана, и от position:fixed она бы дёрнулась.
+       Ширину исчезнувшей полосы прокрутки отдаём в CSS, чтобы страница и шапка
+       не прыгнули вправо. На маке и телефоне эта ширина ноль. */
+    function lock(){
+      var sbw = window.innerWidth - document.documentElement.clientWidth;
+      document.documentElement.style.setProperty('--zs-sbw', (sbw > 0 ? sbw : 0) + 'px');
+      document.documentElement.classList.add('zs-lock');
+    }
+    function unlock(){
+      document.documentElement.classList.remove('zs-lock');
+      document.documentElement.style.removeProperty('--zs-sbw');
+    }
+
+    /* ---------- фокус ---------- */
+    var SEL = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),' +
+              'textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+    function tabbables(){
+      /* offsetParent===null отсеивает скрытый шаг: иначе Tab уводил бы человека
+         в невидимые поля второго экрана */
+      return Array.prototype.filter.call(win.querySelectorAll(SEL), function(el){
+        return el.offsetParent !== null;
+      });
+    }
+    function onKey(e){
+      if (e.key === 'Escape' || e.key === 'Esc'){ e.preventDefault(); e.stopPropagation(); close(); return; }
+      if (e.key !== 'Tab') return;
+      var f = tabbables();
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1], a = document.activeElement;
+      if (e.shiftKey && (a === first || a === win || !win.contains(a))){ e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && a === last){ e.preventDefault(); first.focus(); }
+    }
+
+    function open(btn){
+      if (closeTimer){ clearTimeout(closeTimer); closeTimer = 0; }
+      lastFocus = btn || document.activeElement;
+      source = btn ? (btn.getAttribute('data-zs') || (btn.textContent || '').trim()) : '';
+
+      var t = btn && btn.getAttribute('data-zs-title');
+      var s = btn && btn.getAttribute('data-zs-sub');
+      hTitle.textContent = t || baseTitle;
+      if (s) hSub.textContent = s; else hSub.innerHTML = baseSub;
+
+      /* всегда открываем на шаге «форма», даже если в прошлый раз заявку уже
+         отправили: человек мог вернуться за второй датой */
+      step1.hidden = false; step2.hidden = true;
+      win.setAttribute('aria-labelledby', 'zsH');
+      if (api) api.reset();
+
+      lock();
+      ov.hidden = false;
+      win.scrollTop = 0;
+      requestAnimationFrame(function(){ ov.classList.add('on'); });
+      document.addEventListener('keydown', onKey, true);
+
+      /* на телефоне фокус в поле сразу выбрасывает клавиатуру и съедает пол-окна —
+         там фокус ставим на само окно, поле человек нажмёт сам */
+      setTimeout(function(){
+        if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) phone.focus();
+        else win.focus();
+      }, 60);
+    }
+
+    function close(){
+      if (ov.hidden) return;
+      document.removeEventListener('keydown', onKey, true);
+      ov.classList.remove('on');
+      var finish = function(){
+        ov.hidden = true; unlock(); closeTimer = 0;
+        if (lastFocus && lastFocus.focus){ try { lastFocus.focus(); } catch(_){} }
+        lastFocus = null;
+      };
+      if (reduce) finish(); else closeTimer = setTimeout(finish, 320);
+    }
+
+    /* одна точка входа на всю страницу: кнопка с data-zs где угодно откроет окно */
+    document.addEventListener('click', function(e){
+      var t = e.target && e.target.closest ? e.target.closest('[data-zs]') : null;
+      if (!t) return;
+      e.preventDefault();
+      open(t);
+    });
+    document.getElementById('zsX').addEventListener('click', close);
+    document.getElementById('zsDone').addEventListener('click', close);
+    ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
+  })();
 })();
 </script>
 
