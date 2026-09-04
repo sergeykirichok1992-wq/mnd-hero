@@ -935,6 +935,304 @@ body{
   .dk-girl,.dk::after{animation:none}
   .dk.dkrv .dk-list li{opacity:1; transform:none; transition:none}
 }
+
+/* ==================== ЕДИНАЯ КНОПКА И ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
+   Один блок на весь сайт: одна кнопка `.zs-btn` и одно окно `.zs-ov`.
+   Любая кнопка с атрибутом data-zs открывает это окно — где бы она ни стояла.
+
+   Пространство имён `zs-` (Звёздная смена) не пересекается ни с первым экраном,
+   ни с копией старого сайта (`.cr-*`), ни с четвёртым экраном (`.dk-*`).
+
+   Окно НЕ живёт в множителе --u: --u считается от контейнера 1100 px старого
+   сайта, а окно — оверлей во весь экран и к той сетке отношения не имеет.
+   Его размеры идут через clamp() от ширины окна браузера. */
+
+/* ---------- кнопка ---------- */
+/* Золотая пилюля: полностью круглые торцы, ровная плавная заливка без резких
+   переходов — золото должно светиться, а не делиться на светлую и тёмную
+   половины. Объём даёт не градиент, а тени: верхняя фаска, нижняя тень внутрь
+   и мягкое золотое свечение под кнопкой.
+   Кромка `inset 0 0 0 1px` обязательна: кнопка стоит и на тёмном четвёртом
+   экране, и на белых экранах 2-3, и без кромки на белом она растворяется. */
+.zs-btn{
+  position:relative; isolation:isolate; overflow:hidden;
+  display:inline-flex; align-items:center; justify-content:center; gap:.55em;
+  border:0; cursor:pointer; text-decoration:none; white-space:nowrap;
+  padding:clamp(15px,1.15vw,20px) clamp(30px,2.5vw,46px);
+  border-radius:999px;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(14px,1.05vw,19px); line-height:1.05; letter-spacing:.03em;
+  text-transform:uppercase; text-align:center; color:#2A1B03;
+  background:linear-gradient(180deg, #FBE7B4 0%, #F3D68F 36%, #E9C36C 68%, #DFB253 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9),           /* фаска сверху */
+    inset 0 -1px 0 rgba(255,255,255,.3),          /* отражённый свет снизу */
+    inset 0 0 0 1px rgba(160,116,32,.45),         /* кромка: держит форму на белом */
+    inset 0 -12px 18px -12px rgba(124,82,12,.35), /* объём: низ мягко уходит в тень */
+    0 2px 4px rgba(8,5,0,.26),
+    0 14px 26px -12px rgba(8,5,0,.55),
+    0 22px 48px -20px rgba(227,179,78,.7);        /* золото светит на подложку */
+  transition:transform .14s ease, box-shadow .25s ease, filter .25s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+/* глянец: мягкий свет сверху во всю ширину. Без вставной «капсулы» — у неё
+   был виден собственный край, и кнопка читалась как две склеенные половины */
+.zs-btn::before{
+  content:''; position:absolute; z-index:1; inset:0; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.14) 38%, rgba(255,255,255,0) 66%);
+}
+/* бегущий блик: раз в семь секунд по кнопке проходит полоса света.
+   Двигаем transform, а не background-position — иначе браузер перерисовывает
+   градиент каждый кадр и на телефоне это видно как подтормаживание */
+.zs-btn::after{
+  content:''; position:absolute; z-index:2; top:-60%; bottom:-60%; left:-45%;
+  width:34%; pointer-events:none;
+  background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.7) 45%,
+    rgba(255,255,255,.95) 50%, rgba(255,255,255,.7) 55%, rgba(255,255,255,0));
+  animation:zsSheen 7s ease-in-out infinite;
+}
+@keyframes zsSheen{
+  0%,58%  {transform:translate3d(-40%,0,0) rotate(18deg)}
+  86%,100%{transform:translate3d(430%,0,0) rotate(18deg)}
+}
+/* текст обязан лежать поверх глянца, поэтому он завёрнут в .zs-t */
+.zs-btn > .zs-t{position:relative; z-index:3}
+.zs-btn:hover{
+  transform:translateY(-1px); filter:brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.3),
+    inset 0 0 0 1px rgba(160,116,32,.45), inset 0 -12px 18px -12px rgba(124,82,12,.3),
+    0 3px 6px rgba(8,5,0,.26), 0 18px 32px -12px rgba(8,5,0,.55),
+    0 26px 60px -20px rgba(227,179,78,.9);
+}
+.zs-btn:active{
+  transform:translateY(1px); filter:brightness(.985);
+  box-shadow:
+    inset 0 2px 6px rgba(124,82,12,.4), inset 0 0 0 1px rgba(160,116,32,.55),
+    0 1px 2px rgba(8,5,0,.28), 0 8px 16px -10px rgba(8,5,0,.45);
+}
+.zs-btn:focus-visible{outline:3px solid rgba(255,238,190,.9); outline-offset:3px}
+.zs-btn[disabled]{cursor:default; filter:grayscale(.3) brightness(.94); opacity:.8; transform:none}
+.zs-btn[disabled]::after{animation:none; opacity:0}
+/* размеры: одна кнопка, три роста */
+.zs-btn--lg{padding:clamp(17px,1.4vw,24px) clamp(34px,3vw,58px); font-size:clamp(15px,1.2vw,22px)}
+.zs-btn--sm{padding:11px 22px; font-size:13px}
+.zs-btn--full{display:flex; width:100%}
+
+/* ---------- окно ---------- */
+/* Прокрутку страницы запирает overflow:hidden на <html>, а не position:fixed
+   на body: под окном лежит липкая сцена первого экрана, и от position:fixed
+   она бы дёрнулась. Полосу прокрутки, которая при этом исчезает, компенсируем
+   отступом — иначе страница и шапка прыгают вправо на её ширину. */
+html.zs-lock{overflow:hidden}
+html.zs-lock body{padding-right:var(--zs-sbw,0px)}
+html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
+
+.zs-ov{
+  position:fixed; inset:0; z-index:100;                 /* выше всего: шапка 30, логотип 40 */
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(12px,3vw,32px);
+  background:rgba(2,4,12,.76);
+  -webkit-backdrop-filter:blur(7px) saturate(.85); backdrop-filter:blur(7px) saturate(.85);
+  opacity:0; transition:opacity .3s ease;
+  touch-action:none; overscroll-behavior:contain;       /* палец по фону не листает страницу */
+}
+.zs-ov[hidden]{display:none}
+.zs-ov.on{opacity:1}
+
+.zs-win{
+  position:relative; isolation:isolate; overflow:hidden auto; overscroll-behavior:contain;
+  width:min(100%, 540px);
+  max-height:92vh; max-height:92dvh;                    /* dvh: адресная строка iOS не режет окно */
+  border-radius:clamp(20px,2.2vw,30px);
+  background:linear-gradient(180deg,#080F26 0%,#0A1234 40%,#0B1030 72%,#070C1C 100%);
+  color:#C9D6EE; text-align:center;
+  box-shadow:
+    inset 0 0 0 1px rgba(227,179,78,.3),                /* золотая кромка в толщину волоса */
+    inset 0 1px 0 rgba(255,238,190,.22),
+    0 40px 90px -30px rgba(0,0,0,.92),
+    0 0 130px -40px rgba(108,43,217,.55);               /* лиловый ореол вокруг окна */
+  opacity:0; transform:translateY(20px) scale(.96);
+  transition:opacity .3s ease, transform .42s cubic-bezier(.2,.7,.2,1);
+}
+.zs-ov.on .zs-win{opacity:1; transform:none}
+
+/* Ночное небо внутри окна — по рецепту квиза: размытые пятна синего, пурпурного
+   и лилового плюс тёплый золотой контрапункт. Они еле заметно дышат: движение
+   не должно ловиться боковым зрением, пока человек читает поля. */
+.zs-sky{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.zs-sky i{position:absolute; display:block; border-radius:50%; filter:blur(60px); will-change:transform,opacity}
+.zs-sky i:nth-child(1){left:-30%; top:-24%; width:88%; height:62%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.55), rgba(47,49,146,0) 70%);
+  animation:zsDrift1 34s ease-in-out infinite alternate}
+.zs-sky i:nth-child(2){right:-26%; top:18%; width:80%; height:58%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.42), rgba(108,43,217,0) 70%);
+  animation:zsDrift2 41s ease-in-out infinite alternate}
+.zs-sky i:nth-child(3){left:-18%; bottom:-26%; width:86%; height:60%;
+  background:radial-gradient(closest-side, rgba(176,106,224,.3), rgba(176,106,224,0) 70%);
+  animation:zsDrift3 29s ease-in-out infinite alternate}
+.zs-sky i:nth-child(4){right:-14%; bottom:-18%; width:52%; height:38%;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2), rgba(227,179,78,0) 70%);
+  animation:zsDrift2 37s ease-in-out infinite alternate-reverse}
+@keyframes zsDrift1{from{transform:translate3d(0,0,0) scale(1);   opacity:.9}
+                    to  {transform:translate3d(4%,3%,0) scale(1.1); opacity:1}}
+@keyframes zsDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
+                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.88}}
+@keyframes zsDrift3{from{transform:translate3d(0,0,0) scale(1);   opacity:.85}
+                    to  {transform:translate3d(5%,-4%,0) scale(1.12); opacity:1}}
+/* зерно: без него градиент полосит на больших тёмных плоскостях */
+.zs-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+.zs-body{position:relative; z-index:1;
+  padding:clamp(30px,3.4vw,46px) clamp(20px,2.8vw,42px) clamp(22px,2.6vw,34px)}
+
+/* крестик. 44x44 — минимальная цель для пальца, меньше делать нельзя */
+.zs-x{
+  position:absolute; z-index:3; top:clamp(10px,1vw,16px); right:clamp(10px,1vw,16px);
+  width:40px; height:40px; border-radius:50%; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(146,167,214,.22); background:rgba(255,255,255,.04); color:#9FB2D4;
+  transition:background .2s ease, color .2s ease, border-color .2s ease;
+}
+.zs-x:hover{background:rgba(255,255,255,.1); color:#fff; border-color:rgba(227,179,78,.5)}
+.zs-x:focus-visible{outline:2px solid rgba(227,179,78,.8); outline-offset:2px}
+.zs-x svg{width:17px; height:17px}
+
+/* звезда над заголовком — та же, что в иконке сайта. Она же становится печатью
+   на экране «спасибо»: один знак работает и как метка формы, и как штамп */
+.zs-mark{width:clamp(34px,3vw,44px); height:clamp(34px,3vw,44px); margin:0 auto clamp(14px,1.4vw,20px);
+  color:#E3B34E; filter:drop-shadow(0 0 14px rgba(227,179,78,.7))}
+.zs-mark svg{width:100%; height:100%; display:block}
+
+.zs-h{margin:0; font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,2.05vw,34px); line-height:1.12; letter-spacing:.01em;
+  text-transform:uppercase; color:#fff; text-wrap:balance}
+.zs-sub{margin:clamp(9px,.9vw,13px) auto 0; max-width:32ch;
+  font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(13.5px,1vw,16px); line-height:1.45; color:#93A6C8}
+.zs-sub b{color:#E3B34E; font-weight:600}
+
+.zs-step[hidden]{display:none}
+.zs-form{margin-top:clamp(20px,2.2vw,30px); text-align:left}
+.zs-f + .zs-f{margin-top:clamp(14px,1.5vw,20px)}
+.zs-lab{display:block; margin:0 0 8px 4px; font-family:"Golos Text",Arial,sans-serif;
+  font-size:11.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#7F91B4}
+
+/* Кегль поля не опускаем ниже 16px: на iOS поле с мелким шрифтом заставляет
+   Safari зумить всю страницу, как только в него ставят курсор */
+.zs-inp{
+  width:100%; padding:clamp(14px,1.2vw,18px) 20px; border-radius:999px;
+  border:1px solid rgba(146,167,214,.26); background:rgba(255,255,255,.05); color:#fff;
+  font-family:"Golos Text",Arial,sans-serif; font-weight:400;
+  font-size:max(16px, clamp(16px,1.15vw,19px)); line-height:1.2; letter-spacing:.02em;
+  transition:border-color .2s ease, background .2s ease, box-shadow .25s ease;
+}
+.zs-inp::placeholder{color:rgba(200,214,238,.35)}
+.zs-inp:focus{outline:0; border-color:rgba(227,179,78,.7); background:rgba(255,255,255,.08);
+  box-shadow:0 0 0 3px rgba(227,179,78,.16), 0 0 28px -6px rgba(227,179,78,.5)}
+.zs-inp.bad{border-color:rgba(255,120,120,.75); box-shadow:0 0 0 3px rgba(255,120,120,.14)}
+
+/* выбор посещения: две плитки вместо выпадающего списка. Выпадающий список
+   прячет второй вариант, а тут оба варианта видны сразу и подписаны —
+   родитель не должен догадываться, что такое «групповое» */
+.zs-seg{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.zs-opt{
+  position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; min-height:66px; padding:12px 10px; border-radius:16px; cursor:pointer;
+  border:1px solid rgba(146,167,214,.24); background:rgba(255,255,255,.04);
+  font-family:"Golos Text",Arial,sans-serif; font-size:15px; line-height:1.15;
+  color:#C9D6EE; text-align:center;
+  transition:border-color .2s ease, background .2s ease, color .2s ease, box-shadow .25s ease;
+}
+.zs-opt input{position:absolute; opacity:0; width:1px; height:1px; pointer-events:none}
+.zs-opt em{font-style:normal; font-size:11.5px; letter-spacing:.01em; color:#7F91B4; transition:color .2s ease}
+.zs-opt:hover{border-color:rgba(227,179,78,.4); background:rgba(255,255,255,.07)}
+.zs-opt.on{
+  border-color:rgba(227,179,78,.8); color:#fff;
+  background:linear-gradient(180deg, rgba(227,179,78,.24), rgba(227,179,78,.07));
+  box-shadow:inset 0 1px 0 rgba(255,238,190,.35), 0 12px 28px -16px rgba(227,179,78,.95);
+}
+.zs-opt.on em{color:#EBD3A0}
+.zs-opt:has(input:focus-visible){outline:2px solid rgba(227,179,78,.8); outline-offset:2px}
+.zs-seg.bad .zs-opt{border-color:rgba(255,120,120,.55)}
+
+.zs-err{margin:10px 4px 0; font-family:"Golos Text",Arial,sans-serif;
+  font-size:13px; line-height:1.35; color:#FF9C9C; text-align:left}
+.zs-err[hidden]{display:none}
+
+.zs-send{margin-top:clamp(18px,2vw,26px)}
+.zs-fine{margin:clamp(12px,1.2vw,16px) auto 0; max-width:44ch; text-align:center;
+  font-family:"Golos Text",Arial,sans-serif; font-size:11.5px; line-height:1.45; color:#66779A}
+.zs-fine a{color:#8FA3C8}
+
+/* ---------- экран «спасибо» ---------- */
+/* Звезда в круге — та же метка, что над формой, только крупная и загорается:
+   человек видит, что бланк проштампован, а не просто сменился текст */
+.zs-seal{
+  width:clamp(84px,7vw,110px); height:clamp(84px,7vw,110px);
+  margin:0 auto clamp(16px,1.7vw,24px); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; color:#E3B34E;
+  border:1px solid rgba(227,179,78,.5);
+  background:radial-gradient(closest-side, rgba(227,179,78,.22), rgba(227,179,78,0) 78%);
+  box-shadow:inset 0 0 24px rgba(227,179,78,.28), 0 0 44px -8px rgba(227,179,78,.7);
+}
+.zs-seal svg{width:52%; height:52%; display:block}
+.zs-step[data-step="2"]:not([hidden]) .zs-seal{animation:zsSeal .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes zsSeal{
+  0%  {transform:scale(.6) rotate(-24deg); opacity:0}
+  60% {transform:scale(1.06) rotate(4deg); opacity:1}
+  100%{transform:none; opacity:1}
+}
+/* «Закрыть» на экране «спасибо» намеренно тихая: главное действие там —
+   уйти в наши сообщества, а не закрыть окно */
+.zs-ghost{
+  margin-top:clamp(16px,1.8vw,24px); padding:12px 26px; border-radius:999px; cursor:pointer;
+  border:1px solid rgba(146,167,214,.26); background:transparent; color:#93A6C8;
+  font-family:"Golos Text",Arial,sans-serif; font-size:14px; font-weight:500;
+  transition:color .2s ease, border-color .2s ease, background .2s ease;
+}
+.zs-ghost:hover{color:#fff; border-color:rgba(227,179,78,.5); background:rgba(255,255,255,.05)}
+.zs-ghost:focus-visible{outline:2px solid rgba(227,179,78,.8); outline-offset:2px}
+
+.zs-socH{margin:clamp(20px,2.2vw,30px) 0 clamp(12px,1.2vw,16px);
+  font-family:"Golos Text",Arial,sans-serif; font-size:12px; font-weight:600;
+  letter-spacing:.18em; text-transform:uppercase; color:#7F91B4}
+.zs-soc{display:flex; justify-content:center; gap:clamp(12px,1.4vw,18px)}
+.zs-soc a{
+  width:clamp(56px,5vw,64px); height:clamp(56px,5vw,64px); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; text-decoration:none;
+  border:1px solid rgba(227,179,78,.3); background:rgba(255,255,255,.05); color:#E8D6A6;
+  transition:transform .2s ease, background .25s ease, color .2s ease,
+             border-color .2s ease, box-shadow .25s ease;
+}
+.zs-soc a:hover{
+  transform:translateY(-2px); color:#2A1B03; border-color:transparent;
+  background:linear-gradient(180deg,#FFF3CF,#E4BC63 55%,#C9922F);
+  box-shadow:0 14px 28px -14px rgba(227,179,78,.95);
+}
+.zs-soc a:focus-visible{outline:2px solid rgba(227,179,78,.85); outline-offset:3px}
+.zs-soc svg{width:46%; height:46%; display:block}
+
+/* ---------- узкие экраны ---------- */
+@media (max-width:420px){
+  .zs-seg{grid-template-columns:1fr}
+  .zs-opt{min-height:0; padding:12px 14px}
+  .zs-win{border-radius:20px}
+  .zs-body{padding:26px 18px 22px}
+}
+/* Окно ниже, чем экран телефона в альбомной ориентации: там 92dvh — это
+   ~330 px, и форма должна прокручиваться внутри себя, а не обрезаться */
+@media (max-height:520px){
+  .zs-mark{display:none}
+  .zs-body{padding-top:22px}
+}
+@media (prefers-reduced-motion:reduce){
+  .zs-btn,.zs-win,.zs-ov,.zs-opt,.zs-inp,.zs-soc a,.zs-x{transition:none}
+  .zs-btn::after{animation:none; opacity:0}
+  .zs-sky i{animation:none}
+  .zs-step[data-step="2"]:not([hidden]) .zs-seal{animation:none}
+}
 </style>
 </head>
 <body>
@@ -1141,11 +1439,119 @@ body{
       </ul>
     </div>
     <!-- кнопка стоит там, где в макете написано «тут кнопку сделай».
-         Куда она ведёт — Серёга скажет: на форму, в ВК или на телефон.
-         Пока это кнопка без действия, чтобы не уводить человека в никуда. -->
-    <div class="dk-cta"><button class="dk-btn" type="button">Оставить заявку</button></div>
+         Она общая для всего сайта (.zs-btn) и открывает общее окно заявки:
+         всё, что для этого нужно, — атрибут data-zs с меткой места. -->
+    <div class="dk-cta"><button class="zs-btn zs-btn--lg" type="button" data-zs="4-й экран"><span class="zs-t">Оставить заявку</span></button></div>
   </div>
 </section>
+
+<!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
+     Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
+
+       <button class="zs-btn" type="button" data-zs="4-й экран">
+         <span class="zs-t">Оставить заявку</span></button>
+
+     Значение data-zs — метка места, откуда пришла заявка (уедет менеджеру
+     вместе с телефоном). Необязательные атрибуты на кнопке:
+       data-zs-title — свой заголовок окна («Забронируйте дату»)
+       data-zs-sub   — свой подзаголовок
+
+     Разметка лежит в странице целиком: без JS человек и поисковик всё равно
+     видят текст формы, а не пустую коробку. -->
+<div class="zs-ov" id="zsOv" hidden>
+  <div class="zs-win" id="zsWin" role="dialog" aria-modal="true" aria-labelledby="zsH" tabindex="-1">
+    <div class="zs-sky" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="zs-grain" aria-hidden="true"></div>
+
+    <button class="zs-x" type="button" id="zsX" aria-label="Закрыть окно">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+
+    <div class="zs-body">
+
+      <!-- шаг 1: сама заявка -->
+      <div class="zs-step" data-step="1" id="zsStep1">
+        <div class="zs-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z" fill="currentColor"/></svg>
+        </div>
+        <h2 class="zs-h" id="zsH">Оставьте заявку</h2>
+        <p class="zs-sub" id="zsSub">Перезвоним в течение <b>30 минут</b>, подберём дату и время</p>
+
+        <form class="zs-form" id="zsForm" novalidate>
+          <div class="zs-f">
+            <label class="zs-lab" for="zsPhone">Ваш телефон</label>
+            <input class="zs-inp" id="zsPhone" name="phone" type="tel" inputmode="tel"
+                   autocomplete="tel" placeholder="+7 (___) ___-__-__"
+                   aria-describedby="zsErrPhone" required>
+            <p class="zs-err" id="zsErrPhone" hidden>Проверьте номер: нужно 11 цифр</p>
+          </div>
+
+          <div class="zs-f">
+            <span class="zs-lab" id="zsKindLab">Как планируете прийти</span>
+            <div class="zs-seg" id="zsSeg" role="radiogroup" aria-labelledby="zsKindLab">
+              <label class="zs-opt">
+                <input type="radio" name="visit" value="Индивидуальное">
+                Индивидуально<em>семьёй, с друзьями</em>
+              </label>
+              <label class="zs-opt">
+                <input type="radio" name="visit" value="Групповое">
+                Группой<em>класс, от 20 детей</em>
+              </label>
+            </div>
+            <p class="zs-err" id="zsErrKind" hidden>Выберите один из двух вариантов</p>
+          </div>
+
+          <div class="zs-send">
+            <button class="zs-btn zs-btn--lg zs-btn--full" type="submit" id="zsSend">
+              <span class="zs-t">Отправить заявку</span>
+            </button>
+          </div>
+          <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+            и на звонок от менеджера. Телефон нужен только для связи по заявке.</p>
+        </form>
+      </div>
+
+      <!-- шаг 2: заявка принята -->
+      <div class="zs-step" data-step="2" id="zsStep2" hidden>
+        <div class="zs-seal" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z" fill="currentColor"/></svg>
+        </div>
+        <h2 class="zs-h" id="zsH2">Спасибо за заявку!</h2>
+        <p class="zs-sub">Ожидайте звонка менеджера. А пока — загляните к нам:
+          там даты, кадры с прошлых сезонов и ответы на вопросы.</p>
+
+        <p class="zs-socH">Мы на связи здесь</p>
+        <!-- ССЫЛКИ НА СОЦСЕТИ.
+             Пока заглушки: вместо href="#" впиши адрес — больше ничего менять не надо.
+             На старом сайте Нижнего в подвале стоит группа https://vk.com/karamelka_nn —
+             если это она, её сюда и вписываем.
+             Знак МАКС нарисован от руки (официального глифа в открытом виде нет):
+             когда появится настоящий, меняется только <path> внутри его <svg>. -->
+        <div class="zs-soc">
+          <a href="#" target="_blank" rel="noopener" aria-label="Мы ВКонтакте">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.9 16.9c-5.2 0-8.4-3.6-8.5-9.6h2.6c.1 4.4 2.1 6.3 3.6 6.7V7.3h2.5v3.8c1.5-.2 3.1-1.9 3.6-3.8h2.5c-.4 2.4-2.1 4.1-3.3 4.8 1.2.6 3.2 2.1 3.9 4.8h-2.7c-.6-1.8-2-3.2-4-3.4v3.4h-.2z"/></svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" aria-label="Мы в мессенджере МАКС">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3.6 19V7.1c0-.8.98-1.16 1.48-.55L12 15l6.92-8.45c.5-.61 1.48-.25 1.48.55V19"/>
+            </svg>
+          </a>
+          <a href="#" target="_blank" rel="noopener" aria-label="Наш телеграм-канал">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.9 3.8 20.3 20.8c-.27 1.2-.99 1.5-2 .93l-5.5-4.06-2.65 2.56c-.3.3-.55.55-1.1.55l.39-5.6L19.6 6.05c.44-.4-.1-.6-.68-.22L6.3 13.7l-5.44-1.7c-1.18-.37-1.2-1.18.25-1.75L22.37 2.06c.98-.36 1.84.23 1.53 1.74z"/></svg>
+          </a>
+        </div>
+
+        <div class="zs-send">
+          <button class="zs-ghost" type="button" id="zsDone">Закрыть окно</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   var v=document.getElementById('v'), hero=document.getElementById('hero');
@@ -2621,6 +3027,264 @@ body{
   new IntersectionObserver(function(es){
     if (es[0].isIntersecting) start(); else stop();
   }, {rootMargin:'20% 0px'}).observe(sec);
+})();
+</script>
+
+
+<script>
+/* ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
+   Открывает окно любая кнопка с атрибутом data-zs — обработчик один на всю
+   страницу, поэтому новые кнопки достаточно просто поставить в разметку,
+   сюда лезть не надо.
+
+   Отправлять пока некуда: страница статическая, бэкенда нет. Заявка ложится
+   в window.__zsLead (видно в консоли) и в память браузера (localStorage,
+   ключ zs_leads, последние 20 штук), человек видит «спасибо».
+   Когда появится приёмник — вписать адрес в ENDPOINT, и та же заявка уедет
+   POST-запросом JSON-ом. Больше ничего править не нужно. */
+(function(){
+  'use strict';
+
+  var ENDPOINT = '';          // '' — не отправляем, только показываем «принято»
+
+  var ov = document.getElementById('zsOv');
+  if (!ov) return;
+  var win    = document.getElementById('zsWin');
+  var form   = document.getElementById('zsForm');
+  var phone  = document.getElementById('zsPhone');
+  var seg    = document.getElementById('zsSeg');
+  var send   = document.getElementById('zsSend');
+  var step1  = document.getElementById('zsStep1');
+  var step2  = document.getElementById('zsStep2');
+  var hTitle = document.getElementById('zsH');
+  var hSub   = document.getElementById('zsSub');
+  var errPh  = document.getElementById('zsErrPhone');
+  var errKd  = document.getElementById('zsErrKind');
+  var sendT  = send.querySelector('.zs-t');
+
+  var baseTitle = hTitle.textContent;
+  var baseSub   = hSub.innerHTML;
+  var baseSend  = sendT.textContent;
+
+  var lastFocus = null, source = '', sending = false, closeTimer = 0, prev = '';
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- запирание прокрутки ---------- */
+  /* overflow:hidden на <html>, а не position:fixed на body: под окном лежит
+     липкая сцена первого экрана, и от position:fixed она бы дёрнулась.
+     Ширину исчезнувшей полосы прокрутки отдаём в CSS, чтобы страница и шапка
+     не прыгнули вправо. На маке и телефоне эта ширина ноль. */
+  function lock(){
+    var sbw = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.setProperty('--zs-sbw', (sbw > 0 ? sbw : 0) + 'px');
+    document.documentElement.classList.add('zs-lock');
+  }
+  function unlock(){
+    document.documentElement.classList.remove('zs-lock');
+    document.documentElement.style.removeProperty('--zs-sbw');
+  }
+
+  /* ---------- фокус ---------- */
+  var SEL = 'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),' +
+            'textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  function tabbables(){
+    /* offsetParent===null отсеивает скрытый шаг: иначе Tab уводил бы человека
+       в невидимые поля второго экрана */
+    return Array.prototype.filter.call(win.querySelectorAll(SEL), function(el){
+      return el.offsetParent !== null;
+    });
+  }
+  function onKey(e){
+    if (e.key === 'Escape' || e.key === 'Esc'){ e.preventDefault(); e.stopPropagation(); close(); return; }
+    if (e.key !== 'Tab') return;
+    var f = tabbables();
+    if (!f.length) return;
+    var first = f[0], last = f[f.length - 1], a = document.activeElement;
+    if (e.shiftKey && (a === first || a === win || !win.contains(a))){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && a === last){ e.preventDefault(); first.focus(); }
+  }
+
+  /* ---------- открыть / закрыть ---------- */
+  function open(btn){
+    if (closeTimer){ clearTimeout(closeTimer); closeTimer = 0; }
+    lastFocus = btn || document.activeElement;
+    source = btn ? (btn.getAttribute('data-zs') || (btn.textContent || '').trim()) : '';
+
+    var t = btn && btn.getAttribute('data-zs-title');
+    var s = btn && btn.getAttribute('data-zs-sub');
+    hTitle.textContent = t || baseTitle;
+    if (s) hSub.textContent = s; else hSub.innerHTML = baseSub;
+
+    /* всегда открываем на шаге «форма», даже если в прошлый раз заявку уже
+       отправили: человек мог вернуться за второй датой */
+    step1.hidden = false; step2.hidden = true;
+    win.setAttribute('aria-labelledby', 'zsH');
+    sending = false; send.disabled = false; sendT.textContent = baseSend;
+    errPh.hidden = true; errKd.hidden = true;
+    phone.classList.remove('bad'); seg.classList.remove('bad');
+
+    lock();
+    ov.hidden = false;
+    win.scrollTop = 0;
+    requestAnimationFrame(function(){ ov.classList.add('on'); });
+    document.addEventListener('keydown', onKey, true);
+
+    /* на телефоне фокус в поле сразу выбрасывает клавиатуру и съедает пол-окна —
+       там фокус ставим на само окно, поле человек нажмёт сам */
+    setTimeout(function(){
+      if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) phone.focus();
+      else win.focus();
+    }, 60);
+  }
+
+  function close(){
+    if (ov.hidden) return;
+    document.removeEventListener('keydown', onKey, true);
+    ov.classList.remove('on');
+    var finish = function(){
+      ov.hidden = true; unlock(); closeTimer = 0;
+      if (lastFocus && lastFocus.focus){ try { lastFocus.focus(); } catch(_){} }
+      lastFocus = null;
+    };
+    if (reduce) finish(); else closeTimer = setTimeout(finish, 320);
+  }
+
+  /* одна точка входа на всю страницу: кнопка с data-zs где угодно откроет окно */
+  document.addEventListener('click', function(e){
+    var t = e.target && e.target.closest ? e.target.closest('[data-zs]') : null;
+    if (!t) return;
+    e.preventDefault();
+    open(t);
+  });
+  document.getElementById('zsX').addEventListener('click', close);
+  document.getElementById('zsDone').addEventListener('click', close);
+  ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
+
+  /* ---------- телефон ---------- */
+  function digitsIn(s){ var m = String(s).match(/\d/g); return m ? m.length : 0; }
+  function caretAfter(s, n){
+    if (n <= 0) return 0;
+    for (var i = 0, c = 0; i < s.length; i++){
+      var k = s.charCodeAt(i);
+      if (k >= 48 && k <= 57 && ++c === n) return i + 1;
+    }
+    return s.length;
+  }
+  function dropDigit(s, n){
+    for (var i = 0, c = 0; i < s.length; i++){
+      var k = s.charCodeAt(i);
+      if (k >= 48 && k <= 57 && ++c === n) return s.slice(0, i) + s.slice(i + 1);
+    }
+    return s;
+  }
+  /* в поле всегда российский формат, что бы человек ни вставил */
+  function mask(v){
+    var d = String(v).replace(/\D/g, '');
+    if (!d) return '';
+    if (d.charAt(0) === '8') d = '7' + d.slice(1);
+    else if (d.charAt(0) !== '7') d = '7' + d;
+    d = d.slice(0, 11);
+    var out = '+7';
+    if (d.length > 1) out += ' (' + d.slice(1, 4);
+    if (d.length >= 5) out += ') ' + d.slice(4, 7);
+    if (d.length >= 8) out += '-' + d.slice(7, 9);
+    if (d.length >= 10) out += '-' + d.slice(9, 11);
+    return out;
+  }
+  phone.addEventListener('input', function(e){
+    var raw = phone.value, pos = phone.selectionStart == null ? raw.length : phone.selectionStart;
+    var before = digitsIn(raw.slice(0, pos));
+    /* Backspace съел скобку или дефис — цифр не убавилось, и курсор отскочил бы
+       на тот же разделитель: поле «не стирается». Убираем цифру перед курсором сами. */
+    if (e.inputType === 'deleteContentBackward' && digitsIn(raw) === digitsIn(prev) && before > 0){
+      raw = dropDigit(raw, before); before--;
+    }
+    var out = mask(raw);
+    var d0 = raw.replace(/\D/g, '').charAt(0);
+    /* маска сама дописывает ведущую семёрку — значит цифр слева от курсора стало
+       на одну больше. Обрезанный хвост (номер уже полный) курсор не двигает */
+    var grew = (d0 && d0 !== '7' && d0 !== '8') ? 1 : 0;
+    var target = Math.min(before + grew, digitsIn(out));
+    phone.value = out;
+    prev = out;
+    var c = caretAfter(out, target);
+    try { phone.setSelectionRange(c, c); } catch(_){}
+    if (digitsIn(out) === 11){ errPh.hidden = true; phone.classList.remove('bad'); }
+  });
+  phone.addEventListener('focus', function(){
+    if (!phone.value){
+      phone.value = '+7 '; prev = phone.value;
+      try { phone.setSelectionRange(3, 3); } catch(_){}
+    }
+  });
+  phone.addEventListener('blur', function(){
+    if (digitsIn(phone.value) < 2){ phone.value = ''; prev = ''; }
+  });
+
+  /* ---------- выбор посещения ---------- */
+  seg.addEventListener('change', function(e){
+    if (!e.target || e.target.type !== 'radio') return;
+    var labs = seg.querySelectorAll('.zs-opt');
+    for (var i = 0; i < labs.length; i++){
+      labs[i].classList.toggle('on', labs[i].querySelector('input').checked);
+    }
+    seg.classList.remove('bad'); errKd.hidden = true;
+  });
+
+  /* ---------- отправка ---------- */
+  function remember(lead){
+    try {
+      var all = JSON.parse(localStorage.getItem('zs_leads') || '[]');
+      if (Object.prototype.toString.call(all) !== '[object Array]') all = [];
+      all.push(lead);
+      localStorage.setItem('zs_leads', JSON.stringify(all.slice(-20)));
+    } catch(_){}    /* приватный режим — память недоступна, ронять форму из-за этого незачем */
+  }
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if (sending) return;                       // двойное нажатие не делает две заявки
+
+    var d = String(phone.value).replace(/\D/g, '');
+    var kind = form.querySelector('input[name="visit"]:checked');
+    var okPhone = d.length === 11, okKind = !!kind;
+    errPh.hidden = okPhone;  phone.classList.toggle('bad', !okPhone);
+    errKd.hidden = okKind;   seg.classList.toggle('bad', !okKind);
+    if (!okPhone){ phone.focus(); return; }
+    if (!okKind){ seg.querySelector('input').focus(); return; }
+
+    sending = true;
+    send.disabled = true;
+    sendT.textContent = 'Отправляем…';
+
+    var lead = {
+      phone:  '+' + d,
+      visit:  kind.value,
+      source: source,                          // с какой кнопки пришла заявка
+      page:   location.href,
+      sentAt: new Date().toISOString()
+    };
+    window.__zsLead = lead;
+    remember(lead);
+
+    /* sending здесь НЕ снимаем: пока окно открыто, вторая заявка с того же
+       номера не нужна. Флаг обнуляется при следующем открытии окна */
+    function done(){
+      send.disabled = false;
+      sendT.textContent = baseSend;
+      step1.hidden = true; step2.hidden = false;
+      win.setAttribute('aria-labelledby', 'zsH2');
+      win.scrollTop = 0;
+      var b = document.getElementById('zsDone');
+      if (b) b.focus();
+    }
+    if (!ENDPOINT){ done(); return; }
+    fetch(ENDPOINT, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(lead)
+    }).then(done, done);       /* сеть отвалилась — заявку всё равно показываем принятой:
+                                  номер уже лежит в памяти браузера, а извиняться перед
+                                  человеком за нашу сеть незачем */
+  });
 })();
 </script>
 

@@ -1351,6 +1351,7 @@ body{
   /* сводка цен появляется ровно там, где карточки перестали стоять рядом */
   .pr-rail{display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
     gap:8px; margin:0 auto clamp(16px,4vw,24px); text-align:left}
+  /* сводка светится теми же цветами, что карточки под ней */
   .pr-rail div{display:flex; align-items:baseline; justify-content:space-between;
     gap:8px; padding:10px 14px; border-radius:12px;
     border:1px solid var(--r-neon,rgba(150,192,242,.42));
