@@ -1145,6 +1145,55 @@ body{
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:clamp(22px,2.4vw,42px); line-height:1.1; text-transform:uppercase; color:#fff; text-wrap:balance}
 
+/* ---------- Сатурн и комета ---------- */
+/* Два украшения в пустых полях по бокам окна: слева новогодний Сатурн,
+   справа комета. Обе картинки наполовину заходят на окно, поэтому лежат
+   НЕ внутри `.bk-card` (у него overflow:hidden — обрежет), а рядом, в общей
+   обойме `.bk-hold`. Обойма повторяет ширину окна, от неё и считаются проценты.
+
+   Только на большом экране: ниже 1440 px пустых полей сбоку не остаётся,
+   и картинки легли бы на текст. Разметки у них в HTML нет, обе создаёт
+   скрипт по факту ширины окна, чтобы телефон не качал 250 КБ ради спрятанного
+   (см. lessons/skryvat-lentu-display-none-chtoby-ne-kachalos.md).
+
+   Движение разложено на два слоя: внешний `span` двигает скрипт (параллакс от
+   прокрутки и курсора), внутренняя картинка сама качается ключевыми кадрами.
+   Один элемент не может делать и то и другое: transform у него один. */
+.bk-hold{position:relative; width:min(100%,1400px); margin:0 auto}
+.bk-deco{position:absolute; inset:0; z-index:3; pointer-events:none;
+  /* сколько пустого места осталось сбоку от окна на этом экране: на 2560 px
+     это 556 px, на 1600 — 76. Насколько картинка вылезает за край окна и
+     насколько она крупная — считается от этого числа, иначе на узком мониторе
+     её срежет краем экрана. Вычтенные 24 px — зазор до края, чтобы картинка
+     не липла к рамке браузера. */
+  --free:max(0px, (100vw - 100%) / 2 - 24px)}
+.bk-deco span{position:absolute; display:block; will-change:transform;
+  transform:translate3d(var(--dx,0px), var(--dy,0px), 0)}
+.bk-deco img{display:block; width:100%; height:auto}
+/* Сатурн: центр примерно на уровне заголовка, наполовину заходит на окно.
+   Размер тоже привязан к свободному месту: на 2560 px планета крупная, на
+   1600 — вдвое меньше, иначе она наползла бы на текст и её срезал бы край. */
+.bk-deco-l{left:calc(-1 * min(14%, var(--free))); top:20%;
+  width:clamp(190px, calc(150px + var(--free) * .5), 380px)}
+.bk-deco-l img{
+  filter:drop-shadow(0 30px 38px rgba(0,0,0,.62)) drop-shadow(0 0 70px rgba(255,190,90,.26));
+  animation:bkFloatA 17s ease-in-out infinite alternate}
+/* комета входит сверху справа, хвост уходит за край окна */
+.bk-deco-r{right:calc(-1 * min(16%, var(--free))); top:5%;
+  width:clamp(200px, calc(160px + var(--free) * .52), 410px)}
+.bk-deco-r img{
+  filter:drop-shadow(0 24px 34px rgba(0,0,0,.55)) drop-shadow(0 0 60px rgba(150,200,255,.28));
+  animation:bkFloatB 21s ease-in-out infinite alternate}
+@keyframes bkFloatA{from{transform:translate3d(0,0,0) rotate(-1.4deg)}
+                    to  {transform:translate3d(0,-16px,0) rotate(1.4deg)}}
+@keyframes bkFloatB{from{transform:translate3d(0,0,0) rotate(1.2deg)}
+                    to  {transform:translate3d(0,14px,0) rotate(-1.2deg)}}
+/* до 1440 px пустых полей сбоку нет вовсе: там картинки легли бы на текст */
+@media (max-width:1439px){ .bk-deco{display:none} }
+@media (prefers-reduced-motion:reduce){
+  .bk-deco img{animation:none}
+}
+
 /* появление: окно всплывает. Прятать умеет только класс .rv, его вешает
    скрипт — без скрипта всё видно сразу */
 .bk.rv .bk-card{opacity:0; transform:translateY(28px)}
@@ -1724,6 +1773,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="bk-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <div class="bk-grain" aria-hidden="true"></div>
   <div class="cr-cont">
+   <div class="bk-hold">
     <div class="bk-card">
       <div class="bk-card-sky" aria-hidden="true"><i></i><i></i><i></i></div>
       <p class="bk-eyebrow">Сезон 2026/27 · Нижний Новгород</p>
@@ -1790,6 +1840,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <p class="bk-lede">Мы перезвоним в течение <b>30&nbsp;минут</b>, предложим лучшие даты и цены и ответим на все вопросы.</p>
       </div>
     </div>
+
+    <!-- Сатурн и комета. Пусто намеренно: обе картинки создаёт скрипт экрана
+         и только на компьютере — телефону они не показываются и качать их
+         ему незачем. -->
+    <div class="bk-deco" id="bkDeco" aria-hidden="true"></div>
+   </div>
   </div>
 
 </section>
@@ -2867,6 +2923,73 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     clearTimeout(fitTimer);
     fitTimer = setTimeout(fitT, 150);
   }, {passive:true});
+
+  /* ---------- Сатурн и комета ----------
+     Создаём картинки только на компьютере (от 1201 px): на телефоне их не
+     видно, и качать их незачем. `loading` и `decoding` ставим ДО `src` —
+     после `src` загрузка уже началась и они опоздают
+     (см. lessons/loading-lazy-stavit-do-src.md).
+     Двигаются от прокрутки и от курсора: считаем один общий сдвиг и кладём
+     его в переменные --dx/--dy, всё остальное делает CSS. Пересчёт — в
+     requestAnimationFrame, слушатели пассивные, вне экрана не считаем. */
+  var deco = document.getElementById('bkDeco');
+  var wide = window.matchMedia('(min-width:1440px)');
+
+  function makeDeco(){
+    if (!deco || deco.firstChild || !wide.matches) return;
+    [['bk-deco-l','v2-saturn.webp','v2-saturn-380.webp 380w, v2-saturn.webp 760w',760,501],
+     ['bk-deco-r','v2-comet.webp','v2-comet-410.webp 410w, v2-comet.webp 820w',820,540]
+    ].forEach(function(d){
+      var sp = document.createElement('span');
+      sp.className = d[0];
+      var im = document.createElement('img');
+      im.loading = 'lazy'; im.decoding = 'async'; im.alt = '';
+      im.width = d[3]; im.height = d[4];
+      im.sizes = '30vw'; im.srcset = d[2];
+      im.src = d[1];
+      sp.appendChild(im);
+      deco.appendChild(sp);
+    });
+    parts = deco.children;
+  }
+  var parts = null, seen = false, mx = 0, my = 0, waiting = false;
+
+  function place(){
+    waiting = false;
+    if (!parts || !parts.length) return;
+    var r = s.getBoundingClientRect();
+    /* -1 — секция ниже экрана, +1 — выше: чистая доля, без пикселей */
+    var p = ((window.innerHeight / 2) - (r.top + r.height / 2)) / window.innerHeight;
+    if (p < -1) p = -1; else if (p > 1) p = 1;
+    var l = parts[0].style, c = parts[1].style;
+    l.setProperty('--dx', (mx *  16).toFixed(1) + 'px');
+    l.setProperty('--dy', (p  *  34 + my *  10).toFixed(1) + 'px');
+    c.setProperty('--dx', (mx * -13).toFixed(1) + 'px');
+    c.setProperty('--dy', (p  * -24 + my *  -8).toFixed(1) + 'px');
+  }
+  function ask(){ if (!waiting && seen){ waiting = true; requestAnimationFrame(place); } }
+
+  if (deco && !reduce){
+    makeDeco();
+    wide.addEventListener ? wide.addEventListener('change', makeDeco)
+                          : wide.addListener && wide.addListener(makeDeco);
+    if (window.IntersectionObserver){
+      new IntersectionObserver(function(es){ seen = es[0].isIntersecting; ask(); },
+        {rootMargin: '200px'}).observe(s);
+    } else { seen = true; }
+    window.addEventListener('scroll', ask, {passive:true});
+    window.addEventListener('resize', ask, {passive:true});
+    window.addEventListener('mousemove', function(e){
+      if (!seen) return;
+      var r = s.getBoundingClientRect();
+      mx = ((e.clientX - r.left) / r.width - 0.5) * 2;
+      my = ((e.clientY - r.top) / r.height - 0.5) * 2;
+      if (mx < -1) mx = -1; else if (mx > 1) mx = 1;
+      if (my < -1) my = -1; else if (my > 1) my = 1;
+      ask();
+    }, {passive:true});
+    ask();
+  }
 
   var form = document.getElementById('bkForm'), done = document.getElementById('bkDone');
   if (!form || !done) return;
