@@ -1099,19 +1099,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .zs-x:focus-visible{outline:2px solid rgba(227,179,78,.8); outline-offset:2px}
 .zs-x svg{width:17px; height:17px}
 
-/* звезда над заголовком — та же, что в иконке сайта. Она же становится печатью
-   на экране «спасибо»: один знак работает и как метка формы, и как штамп */
-.zs-mark{width:clamp(34px,3vw,44px); height:clamp(34px,3vw,44px); margin:0 auto clamp(14px,1.4vw,20px);
-  color:#E3B34E; filter:drop-shadow(0 0 14px rgba(227,179,78,.7))}
-.zs-mark svg{width:100%; height:100%; display:block}
-
 .zs-h{margin:0; font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:clamp(23px,2.05vw,34px); line-height:1.12; letter-spacing:.01em;
   text-transform:uppercase; color:#fff; text-wrap:balance}
-.zs-sub{margin:clamp(9px,.9vw,13px) auto 0; max-width:32ch;
+.zs-sub{margin:clamp(9px,.9vw,13px) auto 0; max-width:38ch;
   font-family:"Golos Text",Arial,sans-serif;
-  font-size:clamp(13.5px,1vw,16px); line-height:1.45; color:#93A6C8}
-.zs-sub b{color:#E3B34E; font-weight:600}
+  font-size:clamp(13.5px,1vw,16px); line-height:1.45; color:#93A6C8; text-wrap:pretty}
+/* «30 минут» — главное обещание строки, разрывать его переносом нельзя */
+.zs-sub b{color:#E3B34E; font-weight:600; white-space:nowrap}
 
 .zs-step[hidden]{display:none}
 .zs-form{margin-top:clamp(20px,2.2vw,30px); text-align:left}
@@ -1132,6 +1127,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .zs-inp:focus{outline:0; border-color:rgba(227,179,78,.7); background:rgba(255,255,255,.08);
   box-shadow:0 0 0 3px rgba(227,179,78,.16), 0 0 28px -6px rgba(227,179,78,.5)}
 .zs-inp.bad{border-color:rgba(255,120,120,.75); box-shadow:0 0 0 3px rgba(255,120,120,.14)}
+
+/* Выбор города — родной выпадающий список: на телефоне он открывается
+   системным барабаном, который человек и так умеет крутить. Стрелку рисуем
+   свою, потому что системная в тёмной теме почти не видна. Цвет строк списка
+   задаём явно: без этого на Windows он белый по белому. */
+.zs-sel{
+  padding-right:48px; cursor:pointer;
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none' stroke='%23A9BBDA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 20px center;
+}
+.zs-sel:invalid{color:rgba(200,214,238,.4)}          /* город ещё не выбран — как подсказка */
+.zs-sel option{background:#0A1234; color:#fff}
+.zs-sel option[value=""]{color:rgba(200,214,238,.55)}
 
 /* выбор посещения: две плитки вместо выпадающего списка. Выпадающий список
    прячет второй вариант, а тут оба варианта видны сразу и подписаны —
@@ -1198,21 +1207,29 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .zs-socH{margin:clamp(20px,2.2vw,30px) 0 clamp(12px,1.2vw,16px);
   font-family:"Golos Text",Arial,sans-serif; font-size:12px; font-weight:600;
   letter-spacing:.18em; text-transform:uppercase; color:#7F91B4}
-.zs-soc{display:flex; justify-content:center; gap:clamp(12px,1.4vw,18px)}
-.zs-soc a{
+/* Каждый мессенджер в своём фирменном цвете и с подписью: золотые кружки
+   без подписей человек читает как украшение, а не как «вот куда нажать».
+   Цвет узнаётся раньше, чем прочитано слово. */
+.zs-soc{display:flex; justify-content:center; gap:clamp(14px,1.8vw,28px);
+  margin:0; padding:0; list-style:none}
+.zs-soc a{display:flex; flex-direction:column; align-items:center; gap:9px;
+  text-decoration:none; color:#93A6C8;
+  font-family:"Golos Text",Arial,sans-serif; font-size:12.5px; font-weight:500;
+  transition:color .2s ease}
+.zs-soc i{
   width:clamp(56px,5vw,64px); height:clamp(56px,5vw,64px); border-radius:50%;
-  display:flex; align-items:center; justify-content:center; text-decoration:none;
-  border:1px solid rgba(227,179,78,.3); background:rgba(255,255,255,.05); color:#E8D6A6;
-  transition:transform .2s ease, background .25s ease, color .2s ease,
-             border-color .2s ease, box-shadow .25s ease;
+  display:flex; align-items:center; justify-content:center; color:#fff;
+  transition:transform .2s ease, box-shadow .25s ease, filter .2s ease;
 }
-.zs-soc a:hover{
-  transform:translateY(-2px); color:#2A1B03; border-color:transparent;
-  background:linear-gradient(180deg,#FFF3CF,#E4BC63 55%,#C9922F);
-  box-shadow:0 14px 28px -14px rgba(227,179,78,.95);
-}
-.zs-soc a:focus-visible{outline:2px solid rgba(227,179,78,.85); outline-offset:3px}
 .zs-soc svg{width:46%; height:46%; display:block}
+.zs-soc a:hover{color:#fff}
+.zs-soc a:hover i{transform:translateY(-3px); filter:brightness(1.08)}
+.zs-soc a:focus-visible{outline:0}
+.zs-soc a:focus-visible i{outline:2px solid rgba(227,179,78,.9); outline-offset:3px}
+.zs-vk  i{background:#0077FF;                                   box-shadow:0 14px 28px -14px rgba(0,119,255,.95)}
+.zs-max i{background:linear-gradient(135deg,#2C6BFF,#8B47E0);   box-shadow:0 14px 28px -14px rgba(120,71,224,.95)}
+.zs-tg  i{background:linear-gradient(180deg,#37AEE2,#1E96C8);   box-shadow:0 14px 28px -14px rgba(34,158,217,.95)}
+@media (max-width:340px){ .zs-soc{gap:12px} .zs-soc i{width:50px; height:50px} }
 
 /* ---------- узкие экраны ---------- */
 @media (max-width:420px){
@@ -1224,7 +1241,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* Окно ниже, чем экран телефона в альбомной ориентации: там 92dvh — это
    ~330 px, и форма должна прокручиваться внутри себя, а не обрезаться */
 @media (max-height:520px){
-  .zs-mark{display:none}
   .zs-body{padding-top:22px}
 }
 @media (prefers-reduced-motion:reduce){
@@ -1472,19 +1488,41 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
       <!-- шаг 1: сама заявка -->
       <div class="zs-step" data-step="1" id="zsStep1">
-        <div class="zs-mark" aria-hidden="true">
-          <svg viewBox="0 0 32 32"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z" fill="currentColor"/></svg>
-        </div>
         <h2 class="zs-h" id="zsH">Оставьте заявку</h2>
-        <p class="zs-sub" id="zsSub">Перезвоним в течение <b>30 минут</b>, подберём дату и время</p>
+        <p class="zs-sub" id="zsSub">Мы перезвоним Вам в течение <b>30 минут</b>, предложим лучшие даты,
+          цены и ответим на все вопросы</p>
 
         <form class="zs-form" id="zsForm" novalidate>
+          <div class="zs-f">
+            <label class="zs-lab" for="zsName">Ваше имя</label>
+            <input class="zs-inp" id="zsName" name="name" type="text"
+                   autocomplete="given-name" placeholder="Как к вам обращаться">
+          </div>
+
           <div class="zs-f">
             <label class="zs-lab" for="zsPhone">Ваш телефон</label>
             <input class="zs-inp" id="zsPhone" name="phone" type="tel" inputmode="tel"
                    autocomplete="tel" placeholder="+7 (___) ___-__-__"
                    aria-describedby="zsErrPhone" required>
             <p class="zs-err" id="zsErrPhone" data-for="phone" hidden>Проверьте номер: нужно 11 цифр</p>
+          </div>
+
+          <!-- От города зависит, в какую воронку CRM упадёт заявка, поэтому поле
+               обязательное: пустой город менеджеру пришлось бы уточнять звонком.
+               Нижний Новгород первым — это город самой страницы. Ярославля
+               и Екатеринбурга нет намеренно: это города партнёра по франшизе. -->
+          <div class="zs-f">
+            <label class="zs-lab" for="zsCity">Город</label>
+            <select class="zs-inp zs-sel" id="zsCity" name="city"
+                    aria-describedby="zsErrCity" required>
+              <option value="" disabled selected>Выберите город</option>
+              <option>Нижний Новгород</option>
+              <option>Казань</option>
+              <option>Крым</option>
+              <option>Ставрополь</option>
+              <option>Тюмень</option>
+            </select>
+            <p class="zs-err" id="zsErrCity" data-for="city" hidden>Выберите город</p>
           </div>
 
           <div class="zs-f">
@@ -1528,20 +1566,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
              если это она, её сюда и вписываем.
              Знак МАКС нарисован от руки (официального глифа в открытом виде нет):
              когда появится настоящий, меняется только <path> внутри его <svg>. -->
-        <div class="zs-soc">
-          <a href="#" target="_blank" rel="noopener" aria-label="Мы ВКонтакте">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.9 16.9c-5.2 0-8.4-3.6-8.5-9.6h2.6c.1 4.4 2.1 6.3 3.6 6.7V7.3h2.5v3.8c1.5-.2 3.1-1.9 3.6-3.8h2.5c-.4 2.4-2.1 4.1-3.3 4.8 1.2.6 3.2 2.1 3.9 4.8h-2.7c-.6-1.8-2-3.2-4-3.4v3.4h-.2z"/></svg>
-          </a>
-          <a href="#" target="_blank" rel="noopener" aria-label="Мы в мессенджере МАКС">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M3.6 19V7.1c0-.8.98-1.16 1.48-.55L12 15l6.92-8.45c.5-.61 1.48-.25 1.48.55V19"/>
-            </svg>
-          </a>
-          <a href="#" target="_blank" rel="noopener" aria-label="Наш телеграм-канал">
-            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.9 3.8 20.3 20.8c-.27 1.2-.99 1.5-2 .93l-5.5-4.06-2.65 2.56c-.3.3-.55.55-1.1.55l.39-5.6L19.6 6.05c.44-.4-.1-.6-.68-.22L6.3 13.7l-5.44-1.7c-1.18-.37-1.2-1.18.25-1.75L22.37 2.06c.98-.36 1.84.23 1.53 1.74z"/></svg>
-          </a>
-        </div>
+        <ul class="zs-soc">
+          <li><a class="zs-vk" href="#" target="_blank" rel="noopener">
+            <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.9 16.9c-5.2 0-8.4-3.6-8.5-9.6h2.6c.1 4.4 2.1 6.3 3.6 6.7V7.3h2.5v3.8c1.5-.2 3.1-1.9 3.6-3.8h2.5c-.4 2.4-2.1 4.1-3.3 4.8 1.2.6 3.2 2.1 3.9 4.8h-2.7c-.6-1.8-2-3.2-4-3.4v3.4h-.2z"/></svg></i>
+            <span>ВКонтакте</span></a></li>
+          <li><a class="zs-max" href="#" target="_blank" rel="noopener">
+            <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round"><path d="M3.6 19V7.1c0-.8.98-1.16 1.48-.55L12 15l6.92-8.45c.5-.61 1.48-.25 1.48.55V19"/></svg></i>
+            <span>МАКС</span></a></li>
+          <li><a class="zs-tg" href="#" target="_blank" rel="noopener">
+            <i aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.9 3.8 20.3 20.8c-.27 1.2-.99 1.5-2 .93l-5.5-4.06-2.65 2.56c-.3.3-.55.55-1.1.55l.39-5.6L19.6 6.05c.44-.4-.1-.6-.68-.22L6.3 13.7l-5.44-1.7c-1.18-.37-1.2-1.18.25-1.75L22.37 2.06c.98-.36 1.84.23 1.53 1.74z"/></svg></i>
+            <span>Телеграм</span></a></li>
+        </ul>
 
         <div class="zs-send">
           <button class="zs-ghost" type="button" id="zsDone">Закрыть окно</button>
@@ -3056,9 +3092,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         window.zsBind(form, {source:'5-й экран', onDone:function(lead){ ... }});
 
       Внутри формы ищутся по ИМЕНАМ, а не по id, поэтому таких форм может быть
-      сколько угодно: input[name=phone], радио input[name=visit] внутри .zs-seg,
-      необязательный input[name=name], кнопка [type=submit] со <span class="zs-t">,
-      сообщения об ошибке .zs-err[data-for=phone] и .zs-err[data-for=visit].
+      сколько угодно: input[name=phone], select[name=city], радио input[name=visit]
+      внутри .zs-seg, необязательный input[name=name], кнопка [type=submit]
+      со <span class="zs-t">, сообщения об ошибке .zs-err[data-for=phone],
+      .zs-err[data-for=city] и .zs-err[data-for=visit].
       Вернётся {reset, setSource}: reset приводит форму в исходное состояние.
 
    ВТОРУЮ КОПИЮ ЭТОГО СКРИПТА НЕ ЗАВОДИТЬ. Две разные проверки телефона и два
@@ -3122,11 +3159,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     if (!form || form.__zsBound) return form && form.__zsApi;
 
     var phone = form.querySelector('input[name="phone"]');
+    var city  = form.querySelector('[name="city"]');
     var seg   = form.querySelector('.zs-seg');
     var nameI = form.querySelector('input[name="name"]');
     var send  = form.querySelector('[type="submit"]');
     var sendT = send ? (send.querySelector('.zs-t') || send) : null;
     var errPh = form.querySelector('.zs-err[data-for="phone"]');
+    var errCt = form.querySelector('.zs-err[data-for="city"]');
     var errKd = form.querySelector('.zs-err[data-for="visit"]');
     var baseSend = sendT ? sendT.textContent : '';
     var sending = false, prev = '';
@@ -3163,6 +3202,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       });
     }
 
+    if (city){
+      city.addEventListener('change', function(){
+        if (city.value){ if (errCt) errCt.hidden = true; city.classList.remove('bad'); }
+      });
+    }
+
     if (seg){
       seg.addEventListener('change', function(e){
         if (!e.target || e.target.type !== 'radio') return;
@@ -3180,8 +3225,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       if (send) send.disabled = false;
       if (sendT) sendT.textContent = baseSend;
       if (errPh) errPh.hidden = true;
+      if (errCt) errCt.hidden = true;
       if (errKd) errKd.hidden = true;
       if (phone) phone.classList.remove('bad');
+      if (city) city.classList.remove('bad');
       if (seg) seg.classList.remove('bad');
     }
 
@@ -3192,12 +3239,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       var d = phone ? String(phone.value).replace(/\D/g, '') : '';
       var kind = seg ? form.querySelector('input[name="visit"]:checked') : null;
       var okPhone = !phone || d.length === 11;
+      var okCity  = !city || !!city.value;
       var okKind  = !seg || !!kind;
       if (errPh) errPh.hidden = okPhone;
       if (phone) phone.classList.toggle('bad', !okPhone);
+      if (errCt) errCt.hidden = okCity;
+      if (city) city.classList.toggle('bad', !okCity);
       if (errKd) errKd.hidden = okKind;
       if (seg) seg.classList.toggle('bad', !okKind);
       if (!okPhone){ phone.focus(); return; }
+      if (!okCity){ city.focus(); return; }
       if (!okKind){ seg.querySelector('input').focus(); return; }
 
       sending = true;
@@ -3207,6 +3258,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       var src = typeof opts.source === 'function' ? opts.source() : (opts.source || '');
       var lead = {
         phone:  d ? '+' + d : '',
+        city:   city ? city.value : '',          // от города зависит воронка в CRM
         visit:  kind ? kind.value : '',
         source: src,                             // с какой кнопки или формы пришла заявка
         page:   location.href,
