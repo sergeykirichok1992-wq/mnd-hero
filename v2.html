@@ -1312,7 +1312,7 @@ body{
 .sm{
   position:relative; z-index:1; isolation:isolate; overflow:hidden;
   color:#fff; text-align:center;
-  padding:clamp(24px,4.19vw,87px) 0 clamp(80px,9.6vw,200px);
+  padding:clamp(41px,7.12vw,148px) 0 clamp(80px,9.6vw,200px);
   /* подложка: почти чёрная вверху и еле синяя внизу — в макете низ экрана
      не угольный, а ночной, синева доходит до самых краёв кадра */
   background:linear-gradient(180deg,#000004 0%,#000005 34%,#00020C 64%,#000312 100%);
@@ -1362,7 +1362,7 @@ body{
 .sm-t{
   margin:clamp(6px,.9vw,20px) auto 0;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(20px,2.51vw,55px); line-height:1.05; letter-spacing:-.062em;
+  font-size:clamp(40px,5.02vw,110px); line-height:1.05; letter-spacing:-.062em;
   text-transform:uppercase; text-wrap:balance; color:#fff;
   text-shadow:0 2px 22px rgba(0,0,0,.5);
 }
@@ -1408,7 +1408,7 @@ body{
 .sm-lede{
   margin:clamp(24px,6vw,125px) auto 0; max-width:min(100%,30.5em);
   font-family:"CR Blogger","Golos Text",Arial,sans-serif; font-weight:400;
-  font-size:clamp(15px,1.13vw,24px); line-height:1.36; color:#EDF2FF;
+  font-size:clamp(24px,1.81vw,38px); line-height:1.36; color:#EDF2FF;
   text-shadow:0 2px 16px rgba(0,0,0,.55);
 }
 .sm-send{margin:clamp(28px,6.4vw,134px) 0 0}
@@ -1418,6 +1418,9 @@ body{
    Тени приходится перекрывать все три состояния (обычное, наведение, нажатие):
    у общей кнопки в них зашито золотое свечение, иначе оно вылезет под синей. */
 .zs-btn.sm-cta{
+  /* надпись обычными буквами и в 1,5 раза мельче общей (05.09.2026, Серёга):
+     кнопка на этом экране не должна кричать. Сама пилюля остаётся стандартной */
+  text-transform:none; letter-spacing:.02em; font-size:clamp(12px,.8vw,15px);
   color:#fff;
   background:linear-gradient(180deg,#6AA0FF 0%,#4C7DF2 38%,#3560DE 68%,#2547BE 100%);
   box-shadow:
