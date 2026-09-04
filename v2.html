@@ -793,11 +793,11 @@ body{
    Проверять замером overflow, а не глазами. */
 .dk-list{
   position:absolute; margin:0; padding:0; list-style:none;
-  left:510px; top:416px; width:824px;                   /* запас для браузера без cqw */
-  left:35.05cqw; top:28.62cqw; width:56.6cqw;
+  left:547px; top:416px; width:749px;                   /* запас для браузера без cqw */
+  left:37.62cqw; top:28.62cqw; width:51.47cqw;
   display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
   grid-template-rows:repeat(4,4.2cqw);
-  column-gap:.25cqw; row-gap:1.1cqw;
+  column-gap:.75cqw; row-gap:1.1cqw;                    /* зазор между колонками втрое больше */
 }
 /* Порядок в разметке смысловой: даты стоят рядом со временем. В письме
    Серёга разложил строчки по колонкам иначе — слева «кому, где, сколько,
@@ -810,6 +810,10 @@ body{
 .dk-list li:nth-child(3){grid-area:1/2}
 .dk-list li:nth-child(4){grid-area:2/2}
 .dk-list li:nth-child(6){grid-area:3/2}
+/* в правой колонке текст отставлен от значка вдвое дальше: было .2, стало .4 cqw */
+.dk-list li:nth-child(3),
+.dk-list li:nth-child(4),
+.dk-list li:nth-child(6){padding-left:2.9cqw}
 /* кремовая заливка и золотая рамка одним фоном: padding-box под заливку,
    border-box под рамку — так рамка получает градиент, а не плоский цвет */
 .dk-list li{
@@ -823,8 +827,8 @@ body{
   /* Blogger Sans обычного начертания — как просил Серёга 04.09.2026.
      Трекинг −.03em: без него самая длинная строка не помещается в колонку. */
   font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
-  font-size:25px;                                       /* запас для браузера без cqw */
-  font-size:1.70cqw; line-height:1.1; letter-spacing:-.04em; white-space:nowrap;
+  font-size:22px;                                       /* запас для браузера без cqw */
+  font-size:1.49cqw; line-height:1.1; letter-spacing:-.04em; white-space:nowrap;
   box-shadow:0 .16cqw .3cqw rgba(120,86,20,.25);
 }
 /* Значок стоит в своём квадрате и центрируется в нём по обеим осям: эмодзи
