@@ -1323,6 +1323,16 @@ body{
 .zs-btn[disabled]::after{animation:none; opacity:0}
 /* размеры: одна кнопка, три роста */
 .zs-btn--lg{padding:clamp(17px,1.4vw,24px) clamp(34px,3vw,58px); font-size:clamp(15px,1.2vw,22px)}
+/* На телефоне кнопки заявки выше: 70 px против прежних 50. Палец попадает
+   в них не целясь, и на маленьком экране кнопка читается как главное действие
+   экрана. Радиус 999px тут не меняется — он и так «до упора», но на высокой
+   кнопке торцы становятся заметно круглее сами.
+   Правило общее для всех кнопок заявки (.zs-btn): и в потоке страницы,
+   и в всплывающем окне. Кнопка города в шапке — не .zs-btn, её не задевает. */
+@media (max-width:640px){
+  .zs-btn{padding:24px 28px; font-size:16px}
+  .zs-btn--lg{padding:26px 32px; font-size:17px}
+}
 .zs-btn--sm{padding:11px 22px; font-size:13px}
 .zs-btn--full{display:flex; width:100%}
 
@@ -1785,9 +1795,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <div class="bk-card-sky" aria-hidden="true"><i></i><i></i><i></i></div>
       <p class="bk-eyebrow">Сезон 2026/27 · Нижний Новгород</p>
       <h2 class="bk-t" id="bkT">Забронируйте лучшие даты<br class="bk-br"> <b>по стартовым ценам</b></h2>
-      <p class="bk-lede">Каждого 1 числа цены растут на 100 ₽, а выходные декабря разбирают первыми.
-        Оставьте заявку&nbsp;- мы перезвоним в течение <b>30&nbsp;минут</b>, предложим лучшие даты
-        и цены и ответим на все вопросы.</p>
+      <p class="bk-lede">Оставьте заявку&nbsp;- мы перезвоним в течение <b>30&nbsp;минут</b>,
+        предложим лучшие даты и цены и ответим на все вопросы.</p>
 
       <form class="bk-form" id="bkForm" novalidate>
         <div class="bk-grid">
