@@ -1216,7 +1216,7 @@ body{
      за экран. */
   .bk-card{
     width:auto; margin:0 clamp(12px,4.2vw,22px);
-    padding:clamp(64px,19vw,96px) clamp(16px,4.4vw,30px);
+    padding:clamp(32px,9.5vw,48px) clamp(16px,4.4vw,30px);
     border-radius:22px;
   }
   /* Заголовок на телефоне крупный и в три строки: «Забронируйте / лучшие даты /
@@ -1228,7 +1228,12 @@ body{
   .bk-eyebrow{margin-bottom:clamp(20px,6.4vw,30px)}
   .bk-lede{margin-top:clamp(20px,7vw,34px); font-size:clamp(15px,4vw,18px)}
   /* воздух над полями — такой же, как от края окна до первой строки */
-  .bk-form{margin-top:clamp(64px,19vw,96px)}
+  .bk-form{margin-top:clamp(32px,9.5vw,48px)}
+  /* а вот перед вопросом о формате и перед кнопкой воздуха, наоборот, втрое
+     больше: это две отдельные ступени, и на телефоне они должны читаться
+     как отдельные, а не как продолжение списка полей */
+  .bk-f--kind{margin-top:clamp(28px,8vw,40px)}
+  .bk-send{margin-top:clamp(58px,17vw,80px)}
 }
 @media (prefers-reduced-motion:reduce){
   .bk-glow i{animation:none}
