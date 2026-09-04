@@ -2739,6 +2739,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     first: 3, gap: 14, gapSpread: 20
   });
 
+  /* пятый экран, дети и форма заявки (секция #book): затухание начинается
+     раньше и идёт круче, чем у письма — внизу золотой пол, туда звёздам
+     нельзя. Подключение молча выходит, если секции на странице ещё нет. */
+  add('book', 'bkSky', {
+    div: 6200, cap: 300, bias: 1.7, knotTop: 0.04, knotLen: 0.40,
+    fadeFrom: 0.45, fadeLen: 0.35, alpha: 0.9, shift: 46,
+    first: 9, gap: 15, gapSpread: 22
+  });
+
   if (!list.length) return;
 
   window.addEventListener('scroll', function(){
