@@ -943,10 +943,9 @@ body{
    Своей валидации и своего приёмника у экрана нет — намеренно.
 
    Что на экране: тёмное ночное небо (рецепт квиза — синяя ночь, размытые
-   пурпурные и лиловые пятна, зерно), поверх него большое «окно» заявки,
-   а под окном — фотография: Дед Мороз, помощники и дети с леденцами
-   (v2-kids.webp, вырезаны из клетки скриптом dechecker.py). Дети заходят
-   на нижнюю кромку окна так же, как персонажи заходят на письмо на экране 4.
+   пурпурные и лиловые пятна, зерно) и поверх него большое «окно» заявки.
+   Фотографии под окном нет — убрана 04.09.2026 по просьбе Серёги, окно
+   стоит на голом небе.
 
    Стык с экраном 4: его фон на широком экране кончается лиловым заревом по
    центру низа (189,195,255) на #002B78 — верх этого экрана начинается ровно
@@ -957,13 +956,13 @@ body{
    поэтому всё идёт через clamp() от ширины окна. */
 .bk{
   position:relative; isolation:isolate; overflow:hidden; color:#fff;
-  padding:clamp(72px,7.6vw,150px) 0 clamp(18px,2.4vw,44px);
+  padding:clamp(72px,7.6vw,150px) 0 clamp(64px,7vw,130px);
   background:
     radial-gradient(52vw 11vw at 50% 0%, rgba(189,195,255,.92), rgba(189,195,255,0) 100%),
     radial-gradient(70vw 20vw at 30% 0%, rgba(0,52,130,.9), rgba(0,52,130,0) 100%),
     linear-gradient(180deg,#002B78 0%,#0B1554 7%,#080F3E 18%,#060B2E 44%,#050922 76%,#04071A 100%);
 }
-/* отблески: синий, пурпурный, лиловый и один тёплый под детьми. Еле заметно
+/* отблески: синий, пурпурный, лиловый и один тёплый снизу. Еле заметно
    дышат — движение не должно ловиться боковым зрением, пока человек читает
    поля. Анимируются только transform и opacity. */
 .bk-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
@@ -999,8 +998,7 @@ body{
 .bk-card{
   position:relative; z-index:2; isolation:isolate; overflow:hidden;
   width:min(100%,1400px); margin:0 auto; text-align:center;
-  padding:clamp(34px,3.4vw,60px) clamp(18px,3.8vw,72px)
-          calc(clamp(22px,2.2vw,40px) + clamp(64px,8.6vw,166px));  /* низ: запас под детей */
+  padding:clamp(34px,3.4vw,60px) clamp(18px,3.8vw,72px) clamp(30px,3vw,54px);
   border-radius:clamp(22px,2.1vw,36px);
   background:linear-gradient(180deg, rgba(9,16,50,.88) 0%, rgba(7,11,36,.93) 100%);
   box-shadow:
@@ -1039,19 +1037,25 @@ body{
   .bk-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F1D695 38%,#E3B34E 62%,#C9922F 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
 }
-.bk-lede{margin:clamp(14px,1.6vw,24px) auto 0; max-width:60ch;
+.bk-lede{margin:clamp(14px,1.6vw,24px) auto 0; max-width:92ch; text-wrap:balance;
   font-family:"Golos Text",Arial,sans-serif;
   font-size:clamp(14.5px,1.12vw,19.5px); line-height:1.5; color:#B7C6E2}
 .bk-lede b{font-weight:600; color:#EBD3A0}
 
 /* ---------- поля ---------- */
-/* Четыре колонки: имя, телефон, город, как планируете прийти. Плитки выбора
-   шире полей — в них две строки текста. Ниже 1300 px сетка два на два
-   (плитки рядом с городом), ниже 640 всё в столбик. */
+/* Первый ряд — имя, телефон, город. Второй ряд — «как планируете прийти»:
+   вопрос стоит отдельной строкой во всю ширину, плитки выбора идут по центру
+   над кнопкой. Ниже 1300 px первый ряд ломается на два поля,
+   ниже 640 всё в столбик. */
 .bk-form{margin-top:clamp(24px,2.6vw,42px); text-align:left}
 .bk-form[hidden]{display:none}
-.bk-grid{display:grid; grid-template-columns:1fr 1fr 1fr 1.45fr; gap:clamp(14px,1.5vw,24px); align-items:start}
+.bk-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:clamp(14px,1.5vw,24px); align-items:start}
 .bk-f{min-width:0}
+/* вопрос о формате — отдельный ряд по центру: ширина как у пары полей,
+   чтобы плитки не растягивались на все 1400 px и перекликались с кнопкой */
+.bk-f--kind{grid-column:1 / -1; width:min(100%,720px); margin:clamp(2px,.4vw,8px) auto 0; text-align:center}
+.bk-f--kind .zs-lab{text-align:center}
+.bk-f--kind .zs-err{text-align:center}
 .bk-send{margin-top:clamp(22px,2.4vw,36px); display:flex; flex-direction:column; align-items:center}
 .bk-send .zs-btn{width:min(100%,480px)}
 .bk .zs-fine{max-width:72ch}
@@ -1085,36 +1089,14 @@ body{
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:clamp(22px,2.4vw,42px); line-height:1.1; text-transform:uppercase; color:#fff; text-wrap:balance}
 
-/* ---------- дети ---------- */
-/* Картинка заходит на нижнюю кромку окна: в полосу захода попадают только
-   поднятые леденцы и шапка Деда Мороза, текст окна они не закрывают —
-   низ окна на ту же величину пустой (см. padding-bottom у .bk-card).
-   z-index 8 — выше контейнера .cr-cont (у него 7): сцена и окно — соседи
-   внутри секции, и без этого дети оказались бы ПОД окном.
-   pointer-events:none — чтобы прозрачные поля картинки не перекрывали кнопку. */
-.bk-stage{
-  position:relative; z-index:8; pointer-events:none;
-  width:min(100%,1560px); margin:calc(-1 * clamp(64px,8.6vw,166px)) auto 0;
-}
-.bk-kids{display:block; position:relative; z-index:2; width:100%; height:auto}
-/* пол: тёплое пятно света под ногами и тень, чтобы дети стояли, а не висели */
-.bk-floor{position:absolute; z-index:1; left:-12%; right:-12%; bottom:-3%; height:42%; pointer-events:none;
-  background:radial-gradient(50% 58% at 50% 100%, rgba(255,214,150,.4), rgba(255,214,150,0) 72%)}
-.bk-stage::after{content:''; position:absolute; z-index:1; left:5%; right:5%; bottom:-2%; height:9%;
-  background:radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.62), rgba(0,0,0,0) 70%)}
-
-/* появление: окно всплывает, дети выходят чуть позже. Прятать умеет только
-   класс .rv, его вешает скрипт — без скрипта всё видно сразу */
+/* появление: окно всплывает. Прятать умеет только класс .rv, его вешает
+   скрипт — без скрипта всё видно сразу */
 .bk.rv .bk-card{opacity:0; transform:translateY(28px)}
-.bk.rv .bk-stage{opacity:0; transform:translateY(44px)}
 .bk.rv.on .bk-card{opacity:1; transform:none; transition:opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
-.bk.rv.on .bk-stage{opacity:1; transform:none; transition:opacity .8s ease .15s, transform .9s cubic-bezier(.2,.7,.2,1) .15s}
 
 /* ---------- планшет и телефон ---------- */
 /* Порог 1024, как у экрана 4: там с этой ширины начинается «холм», и верх
-   этого экрана должен быть того же цвета. Дети шире экрана: показываем
-   середину группы (Дед Мороз и дети вокруг него), края растворяются маской,
-   чтобы не резать человека пополам. */
+   этого экрана должен быть того же цвета. */
 @media (max-width:1023px){
   .bk{
     padding-top:clamp(44px,8vw,80px);
@@ -1122,26 +1104,13 @@ body{
       radial-gradient(70vw 22vw at 50% 0%, rgba(0,52,130,.6), rgba(0,52,130,0) 100%),
       linear-gradient(180deg,#000335 0%,#03073A 14%,#060B2E 40%,#050922 76%,#04071A 100%);
   }
-  .bk-card{padding:clamp(26px,5vw,40px) clamp(14px,3.6vw,28px) calc(clamp(18px,3vw,26px) + 52px); border-radius:22px}
+  .bk-card{padding:clamp(26px,5vw,40px) clamp(14px,3.6vw,28px) clamp(22px,4vw,32px); border-radius:22px}
   .bk-t{font-size:clamp(24px,5.6vw,44px)}
   .bk-lede{font-size:clamp(14px,2.4vw,17px)}
-  .bk-stage{margin-top:-52px; width:100%; overflow:hidden}
-  .bk-kids{
-    width:136%; max-width:none; left:50%; transform:translateX(-50%);
-    -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
-            mask-image:linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);
-  }
-  /* появление: у детей transform занят центровкой, поэтому на телефоне
-     они только проявляются, без сдвига */
-  .bk.rv .bk-stage{transform:none}
-}
-@media (max-width:600px){
-  .bk-kids{width:188%}
-  .bk-stage::after{left:0; right:0}
 }
 @media (prefers-reduced-motion:reduce){
   .bk-glow i{animation:none}
-  .bk.rv .bk-card,.bk.rv .bk-stage{opacity:1; transform:none; transition:none}
+  .bk.rv .bk-card{opacity:1; transform:none; transition:none}
   .bk-done:not([hidden]) .bk-seal{animation:none}
 }
 
@@ -1671,9 +1640,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </section>
 
 <!-- ==================== ЭКРАН 5: бронь по стартовым ценам ====================
-     Большое окно заявки поверх ночного неба, под ним — Дед Мороз, помощники
-     и дети с леденцами (v2-kids.webp). Поля и кнопка — из единого блока заявки
-     (.zs-*), логику отправки даёт window.zsBind — своей у экрана нет. -->
+     Большое окно заявки поверх ночного неба. Поля и кнопка — из единого блока
+     заявки (.zs-*), логику отправки даёт window.zsBind — своей у экрана нет. -->
 <section class="cr bk" id="book" aria-labelledby="bkT">
   <canvas class="bk-sky" id="bkSky" aria-hidden="true"></canvas>
   <div class="bk-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
@@ -1684,7 +1652,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <p class="bk-eyebrow">Сезон 2026/27 · Нижний Новгород</p>
       <h2 class="bk-t" id="bkT">Забронируйте лучшие даты<br class="bk-br"> <b>по стартовым ценам</b></h2>
       <p class="bk-lede">Каждого 1 числа цены растут на 100 ₽, а выходные декабря разбирают первыми.
-        Оставьте заявку - мы перезвоним в течение <b>30&nbsp;минут</b>, предложим лучшие даты
+        Оставьте заявку&nbsp;- мы перезвоним в течение <b>30&nbsp;минут</b>, предложим лучшие даты
         и цены и ответим на все вопросы.</p>
 
       <form class="bk-form" id="bkForm" novalidate>
@@ -1747,14 +1715,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
   </div>
 
-  <div class="bk-stage" aria-hidden="false">
-    <div class="bk-floor" aria-hidden="true"></div>
-    <img class="bk-kids" src="v2-kids.webp"
-         srcset="v2-kids-1000.webp 1000w, v2-kids.webp 1579w"
-         sizes="(max-width:600px) 188vw, (max-width:1023px) 136vw, min(94vw, 1560px)"
-         width="1579" height="1073" loading="lazy" decoding="async"
-         alt="Дед Мороз, помощники Министерства и дети с леденцами машут в камеру">
-  </div>
 </section>
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
@@ -3116,12 +3076,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     first: 3, gap: 14, gapSpread: 20
   });
 
-  /* пятый экран, дети и форма заявки (секция #book): затухание начинается
-     раньше и идёт круче, чем у письма — внизу золотой пол, туда звёздам
-     нельзя. Подключение молча выходит, если секции на странице ещё нет. */
+  /* пятый экран, форма заявки (секция #book): фотографии внизу больше нет,
+     поэтому звёзды идут почти до низа секции и гаснут только у самой кромки.
+     Подключение молча выходит, если секции на странице ещё нет. */
   add('book', 'bkSky', {
     div: 6200, cap: 300, bias: 1.7, knotTop: 0.04, knotLen: 0.40,
-    fadeFrom: 0.45, fadeLen: 0.35, alpha: 0.9, shift: 46,
+    fadeFrom: 0.74, fadeLen: 0.26, alpha: 0.9, shift: 46,
     first: 9, gap: 15, gapSpread: 22
   });
 
