@@ -1076,7 +1076,6 @@ body{
 }
 @media (max-width:640px){
   .bk-grid{grid-template-columns:1fr}
-  .bk-br{display:none}
 }
 
 /* ---------- «заявка принята» ---------- */
@@ -1116,9 +1115,26 @@ body{
       radial-gradient(70vw 22vw at 50% 0%, rgba(0,52,130,.6), rgba(0,52,130,0) 100%),
       linear-gradient(180deg,#000335 0%,#03073A 14%,#060B2E 40%,#050922 76%,#04071A 100%);
   }
-  .bk-card{padding:clamp(26px,5vw,40px) clamp(14px,3.6vw,28px) clamp(22px,4vw,32px); border-radius:22px}
-  .bk-t{font-size:clamp(24px,5.6vw,44px)}
-  .bk-lede{font-size:clamp(14px,2.4vw,17px)}
+  /* Окно не должно упираться в края экрана: до 1023 px контейнер `.cr-cont`
+     идёт без полей (так сделаны экраны-копии старого сайта), поэтому поля
+     задаёт себе само окно — width:auto плюс боковые margin. Без width:auto
+     окно осталось бы шириной в 100 % контейнера и margin вытолкнул бы его
+     за экран. */
+  .bk-card{
+    width:auto; margin:0 clamp(12px,4.2vw,22px);
+    padding:clamp(64px,19vw,96px) clamp(16px,4.4vw,30px);
+    border-radius:22px;
+  }
+  /* Заголовок на телефоне крупный и в три строки: «Забронируйте / лучшие даты /
+     по стартовым ценам». Принудительный перенос НЕ прячем (раньше ниже 640 px
+     он снимался) — он отделяет золотую часть, а белую `text-wrap:balance` сам
+     делит пополам. Две строки на телефоне держать нельзя: в ширину экрана они
+     влезают только кеглем 26 px, а крупнее просят глаза. */
+  .bk-t{font-size:clamp(28px,8.2vw,44px)}
+  .bk-eyebrow{margin-bottom:clamp(20px,6.4vw,30px)}
+  .bk-lede{margin-top:clamp(20px,7vw,34px); font-size:clamp(15px,4vw,18px)}
+  /* воздух над полями — такой же, как от края окна до первой строки */
+  .bk-form{margin-top:clamp(64px,19vw,96px)}
 }
 @media (prefers-reduced-motion:reduce){
   .bk-glow i{animation:none}
@@ -2777,9 +2793,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      Sans ещё не загрузился (телефон, медленная сеть), текст рисует запасной
      Golos — он шире на 21 %, «Забронируйте лучшие даты» перестаёт помещаться,
      и получаются три строки. Тогда уменьшаем кегль шагами по 6 %, пока строк
-     не станет две; после загрузки шрифта считаем заново — там кегль вернётся
-     к исходному. Меряем высоту блока, а не число переносов: у строк одна
-     и та же высота, делением получаем их количество. */
+     не станет столько, сколько задумано; после загрузки шрифта считаем заново —
+     там кегль вернётся к исходному. Меряем высоту блока, а не число переносов:
+     у строк одна и та же высота, делением получаем их количество.
+     На широком экране строк две, на телефоне (до 640 px) три: там заголовок
+     нарочно крупный и делится на «Забронируйте / лучшие даты / по стартовым
+     ценам». */
   var ttl = document.getElementById('bkT');
   function fitT(){
     if (!ttl) return;
@@ -2788,8 +2807,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var size = parseFloat(cs.fontSize);
     var mult = parseFloat(cs.lineHeight) / size;   /* межстрочный множитель */
     if (!size || !mult) return;
+    var max = window.innerWidth <= 640 ? 3 : 2;
     for (var i = 0; i < 12; i++){
-      if (Math.round(ttl.getBoundingClientRect().height / (size * mult)) <= 2) return;
+      if (Math.round(ttl.getBoundingClientRect().height / (size * mult)) <= max) return;
       size *= 0.94;
       ttl.style.fontSize = size + 'px';
     }
