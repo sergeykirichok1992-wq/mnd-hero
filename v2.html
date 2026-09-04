@@ -1264,7 +1264,7 @@ body{
      влезают только кеглем 26 px, а крупнее просят глаза. */
   .bk-t{font-size:clamp(28px,8.2vw,44px)}
   .bk-eyebrow{margin-bottom:clamp(20px,6.4vw,30px)}
-  .bk-lede{margin-top:clamp(20px,7vw,34px); font-size:clamp(15px,4vw,18px)}
+  .bk-lede{margin-top:clamp(20px,7vw,34px); font-size:clamp(16.5px,4.4vw,20px)}
   /* воздух над полями — такой же, как от края окна до первой строки */
   .bk-form{margin-top:clamp(32px,9.5vw,48px)}
   /* а вот перед вопросом о формате и перед кнопкой воздуха, наоборот, втрое
@@ -1533,8 +1533,8 @@ body{
    Правило общее для всех кнопок заявки (.zs-btn): и в потоке страницы,
    и в всплывающем окне. Кнопка города в шапке — не .zs-btn, её не задевает. */
 @media (max-width:640px){
-  .zs-btn{padding:24px 28px; font-size:16px}
-  .zs-btn--lg{padding:26px 32px; font-size:17px}
+  .zs-btn{padding:22px 26px; font-size:20px}
+  .zs-btn--lg{padding:23px 30px; font-size:23px}
 }
 .zs-btn--sm{padding:11px 22px; font-size:13px}
 .zs-btn--full{display:flex; width:100%}
@@ -1761,6 +1761,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .zs-win{border-radius:20px}
   .zs-body{padding:26px 18px 22px}
 }
+/* Телефон держат дальше от глаз, чем смотрят в монитор, и мелкий кегль там
+   читается вдвое хуже: на телефоне подписи, поля, плитки и мелкий текст
+   заметно крупнее. Блок стоит здесь, ниже всех базовых .zs-* правил, иначе
+   они его перебьют. */
+@media (max-width:640px){
+  .zs-lab{font-size:14px; letter-spacing:.11em; margin-bottom:10px}
+  .zs-inp{font-size:18px}
+  .zs-opt{font-size:17.5px}
+  .zs-opt em{font-size:13.5px}
+  .zs-err{font-size:14.5px}
+  .zs-fine{font-size:13.5px; max-width:54ch}
+  .zs-h{font-size:clamp(28px,7.8vw,36px)}
+  .zs-sub{font-size:17px}
+}
+
 /* Окно ниже, чем экран телефона в альбомной ориентации: там 92dvh — это
    ~330 px, и форма должна прокручиваться внутри себя, а не обрезаться */
 @media (max-height:520px){
