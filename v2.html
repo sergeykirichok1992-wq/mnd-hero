@@ -762,45 +762,54 @@ body{
    (полулидинг шрифта) вычли замером, поэтому число некруглое. */
 .dk-t{
   position:absolute; margin:0;
-  left:512px; top:317px; width:819px; font-size:48px;   /* запас для браузера без cqw */
-  left:35.2cqw; top:21.78cqw; width:56.3cqw; font-size:3.32cqw;
+  left:510px; top:333px; width:824px; font-size:48px;   /* запас для браузера без cqw */
+  left:35.05cqw; top:22.88cqw; width:56.6cqw; font-size:3.32cqw;
   font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
   line-height:1; letter-spacing:-.037em;
   color:#001B71; text-transform:uppercase; text-align:center; white-space:nowrap;
 }
 /* Строчки-плашки: две колонки, слева четыре, справа три.
 
-   ОДНА КОЛОНКА, СЕМЬ СТРОЧЕК. Так с 04.09.2026: Серёге нужен крупный текст,
-   а в двух колонках он упирался в ширину. Считается это просто. В двух
-   колонках на текст оставалось 24,5 cqw, и самая длинная строчка
-   («Значительные бонусы и спецусловия для групп», 19,1 em в Blogger Sans)
-   держала кегль на 1.26cqw. В одну колонку на текст есть 53 cqw — по ширине
-   влезло бы и 2.7cqw, поэтому теперь предел задаёт не ширина, а высота:
-   семь плашек с зазорами должны уместиться в кремовое поле письма
-   (31,5 cqw по высоте, минус заголовок).
+   ДВЕ КОЛОНКИ, ЧЕТЫРЕ СТРОЧКИ СЛЕВА И ТРИ СПРАВА — как на коллаже Серёги.
+   Плашки равные (`minmax(0,1fr)`), каждая растянута на всю колонку.
 
-   Отсюда числа: плашка 3.1cqw, зазор .45cqw, кегль 1.95cqw — это 28 px
-   на ширине окна 1600 против 18 px в двухколоночном варианте.
+   КЕГЛЬ ВЫЖАТ ДО ПРЕДЕЛА. Считается так: кремовое поле письма 56,6 cqw,
+   пополам минус зазор и место под значок — на текст остаётся 24,9 cqw.
+   Каждая строчка стоит в одну строку (`white-space:nowrap`), поэтому кегль
+   задаёт самая длинная — «Значительные бонусы и спецусловия для групп»,
+   в Blogger Sans с трекингом −.04em это 18,9 em. Отсюда потолок 1.37cqw;
+   стоит 1.33cqw, запас 3 % на разброс отрисовки шрифта.
 
-   Все плашки одной длины (растянуты на всю ширину поля), каждая строчка —
-   в одну строку. Поднимешь кегль ещё — текст упрётся в высоту плашки,
-   и плашки перестанут помещаться в письмо. Проверять замером, а не глазами. */
+   Всё, что можно было отдать тексту, уже отдано: значок ужат до 2.2 cqw,
+   поля плашки до .3/2.7 cqw, зазор колонок до .25 cqw, список расширен
+   на всё кремовое поле. Дальше крупнее — только сокращая сами фразы
+   или в одну колонку (там влезает 1.95cqw, но строчки идут столбиком).
+   Проверять замером overflow, а не глазами. */
 .dk-list{
   position:absolute; margin:0; padding:0; list-style:none;
-  left:512px; top:389px; width:819px;                   /* запас для браузера без cqw */
-  left:35.2cqw; top:26.72cqw; width:56.3cqw;
-  display:grid; grid-template-columns:minmax(0,1fr);
-  grid-template-rows:repeat(7,3.1cqw);
-  row-gap:.45cqw;
+  left:510px; top:416px; width:824px;                   /* запас для браузера без cqw */
+  left:35.05cqw; top:28.62cqw; width:56.6cqw;
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(4,4.2cqw);
+  column-gap:.25cqw; row-gap:1.1cqw;
 }
-/* Раскладка по колонкам больше не задаётся: строчки идут одной колонкой
-   в порядке разметки — тот же порядок, что и на телефоне. */
+/* Порядок в разметке смысловой: даты стоят рядом со временем. В письме
+   Серёга разложил строчки по колонкам иначе — слева «кому, где, сколько,
+   бонусы», справа «когда». Поэтому места заданы явно, а разметку не трогаем:
+   на телефоне строчки идут одной колонкой в прежнем порядке. */
+.dk-list li:nth-child(1){grid-area:1/1}
+.dk-list li:nth-child(2){grid-area:2/1}
+.dk-list li:nth-child(5){grid-area:3/1}
+.dk-list li:nth-child(7){grid-area:4/1}
+.dk-list li:nth-child(3){grid-area:1/2}
+.dk-list li:nth-child(4){grid-area:2/2}
+.dk-list li:nth-child(6){grid-area:3/2}
 /* кремовая заливка и золотая рамка одним фоном: padding-box под заливку,
    border-box под рамку — так рамка получает градиент, а не плоский цвет */
 .dk-list li{
   position:relative; display:flex; align-items:center;
-  padding:0 .5cqw 0 3cqw;
-  border:max(1px,.13cqw) solid transparent; border-radius:1cqw;
+  padding:0 .3cqw 0 2.7cqw;
+  border:max(1px,.15cqw) solid transparent; border-radius:1.35cqw;
   background:
     linear-gradient(168deg,#FDF7EA 0%,#F6E9D2 46%,#EEDBB9 100%) padding-box,
     linear-gradient(180deg,#FFF3C8 0%,#E9BB61 36%,#C58E27 70%,#8C5D11 100%) border-box;
@@ -808,8 +817,8 @@ body{
   /* Blogger Sans обычного начертания — как просил Серёга 04.09.2026.
      Трекинг −.03em: без него самая длинная строка не помещается в колонку. */
   font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
-  font-size:28px;                                       /* запас для браузера без cqw */
-  font-size:1.95cqw; line-height:1.1; letter-spacing:-.03em; white-space:nowrap;
+  font-size:19px;                                       /* запас для браузера без cqw */
+  font-size:1.33cqw; line-height:1.1; letter-spacing:-.04em; white-space:nowrap;
   box-shadow:0 .16cqw .3cqw rgba(120,86,20,.25);
 }
 /* Значок стоит в своём квадрате и центрируется в нём по обеим осям: эмодзи
@@ -818,7 +827,7 @@ body{
    а box-shadow обвёл бы пустой прямоугольник. */
 .dk-ico{
   position:absolute; top:50%; transform:translateY(-50%);
-  left:.4cqw; width:2.4cqw; height:2.4cqw; font-size:2.05cqw;
+  left:.3cqw; width:2.2cqw; height:2.2cqw; font-size:1.95cqw;
   display:flex; align-items:center; justify-content:center;
   line-height:1;
   filter:drop-shadow(0 .12cqw .18cqw rgba(90,60,10,.5));
