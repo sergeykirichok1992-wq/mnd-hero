@@ -348,6 +348,10 @@ body{
    курсив браузеру НЕ просить, иначе он наклонит второй раз сам. */
 @font-face{font-family:"Vasek"; font-style:normal; font-weight:400; font-display:swap;
   src:url(vasek.woff2) format("woff2"), url(vasek.woff) format("woff")}
+/* Blogger Sans Medium — им набран абзац шестого экрана. В семействе нет
+   начертания SemiBold, Medium — ближайшее к нему. Файл обрезан до кириллицы. */
+@font-face{font-family:"Blogger Sans Medium"; font-style:normal; font-weight:500; font-display:swap;
+  src:url(blogger-sans-medium.woff2) format("woff2"), url(blogger-sans-medium.woff) format("woff")}
 
 /* ---------- каркас, общий для обоих экранов ----------
    Вёрстка широкая, почти во весь экран: контейнер min(94vw,1720px) с полями
@@ -1293,14 +1297,13 @@ body{
    1400 px). Поэтому размеры идут через clamp() от ширины окна, а не через
    множитель --u старого сайта.
 
-   ФОН НА КОМПЬЮТЕРЕ — ОДНА КАРТИНКА `v2-sm-fon.webp` («фон общий»): в ней уже
-   и золотое боке вверху, и синий купол вокруг коллажа. Она кладётся во всю
-   ширину от верха секции, и раз коллаж тоже задан долей окна, купол всегда
-   встаёт вокруг него сам.
-   НА ТЕЛЕФОНЕ так нельзя: там секция намного выше своей ширины, и купол
-   этой картинки оказался бы под заголовком, а не вокруг коллажа. Поэтому
-   ниже 768 px фон собран как раньше — золото сверху отдельной картинкой,
-   купол отдельным слоем, привязанным к коллажу. */
+   ФОН РАЗРЕЗАН НАДВОЕ. Исходник Серёги «фон общий» — одна картинка, но одной
+   картинкой её класть нельзя: золото должно висеть на ВЕРХЕ СЕКЦИИ, а купол
+   обнимать КОЛЛАЖ, и стоит поменять размер коллажа, как купол от него
+   отвязывается. Поэтому картинка разрезана по строке 740 (там и золото,
+   и синева уже сошли в чёрный, шва не видно): верх — `v2-sm-gold.webp`,
+   низ — `v2-sm-dome.webp`. Золото лежит фоном секции, купол —
+   псевдоэлементом коллажа. Телефон устроен так же, только картинки другие. */
 
 /* Обёртка нужна только ради блика на стыке: сама секция обрезает всё лишнее,
    а блик обязан вылезти ВВЕРХ, на пятый экран, поэтому живёт снаружи неё.
@@ -1325,11 +1328,16 @@ body{
   aspect-ratio:2000/381; transform:translateY(-48.5%);
   background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
 }
-/* фон: во всю ширину от верха секции, высота своя. Растягивать по высоте
-   нельзя — купол станет овалом. Низ секции ниже картинки закрывает подложка. */
+/* Фон разрезан надвое, и это главное решение экрана. Золотое боке вверху
+   привязано к ВЕРХУ СЕКЦИИ, синий купол — к КОЛЛАЖУ. Одной картинкой их
+   держать нельзя: стоит поменять размер коллажа, и купол перестаёт его
+   обнимать. Обе половинки вырезаны из «фон общий» Серёги по строке 740,
+   где и золото, и синева уже сошли в чёрный, поэтому шва не видно.
+   Лежат с прозрачностью вместо чёрного фона — иначе верхняя закрасила бы
+   нижнюю и подложку. */
 .sm-bg{
   position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;
-  background:url(v2-sm-fon.webp) center top/100% auto no-repeat;
+  background:url(v2-sm-gold.webp) center top/100% auto no-repeat;
 }
 /* звёзды: слой над фоном и под текстом. Рисует общий движок «живого неба» */
 .sm-sky{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none}
@@ -1368,20 +1376,39 @@ body{
    родная ширина файла, выше растягивать нечего.
    Псевдоэлемент — тот же купол отдельной картинкой, он нужен ТОЛЬКО телефону
    (см. блок ниже); на компьютере купол уже нарисован в общем фоне. */
-/* Отрицательный верхний отступ — не опечатка: у файла коллажа сверху
-   ~5 % пустоты, и по макету заголовок стоит вплотную к арке. */
-.sm-art{position:relative; width:min(100%,66.7vw,1821px); margin:-2.74vw auto 0}
+/* Ширина коллажа — доля окна. По макету было 66,7 vw, 05.09.2026 Серёга
+   попросил на 20 % мельче — 53,36 vw.
+   Отрицательный верхний отступ — не опечатка: у файла коллажа сверху ~5 %
+   пустоты, и без него зазор до заголовка вышел бы вдвое больше нужного. */
+.sm-art{position:relative; width:min(100%,53.36vw,1821px); margin:-1.702vw auto 0}
+/* Синий купол. Размеры — доли ширины коллажа, посчитаны так, чтобы купол
+   встал ровно как в макете Серёги: там он приходился на 149,95 % ширины
+   коллажа, а его верх — на 22,6 % этой же ширины ниже верха коллажа
+   (в процентах от высоты блока это 27,4 %). Меняешь размер коллажа —
+   купол едет вместе с ним, ничего пересчитывать не надо. */
+.sm-art::before{
+  content:''; position:absolute; z-index:0; left:50%; top:27.44%; width:149.95%;
+  aspect-ratio:2747/1382; transform:translateX(-50%); pointer-events:none;
+  background:url(v2-sm-dome.webp) center/100% 100% no-repeat;
+}
+/* Прожекторы: те же лучи, что на первом экране, но заметно прозрачнее.
+   Холст шире и ниже коллажа, чтобы лучи выходили из-под острова и уходили
+   за его края. Слой лежит под картинкой коллажа (z-index у неё 1). */
+.sm-beams{
+  position:absolute; z-index:0; left:-14%; right:-14%; top:4%; bottom:-12%;
+  display:block; width:auto; height:auto; pointer-events:none;
+}
 .sm-art img{position:relative; z-index:1; display:block; width:100%; height:auto}
 
 /* ---------- текст и кнопка ---------- */
-/* Шрифт тот же, что у подзаголовка на экране с картой («Мы организовываем
-   свои мероприятия…») — CR Roboto Light.
+/* Шрифт — Blogger Sans Medium (05.09.2026, просьба Серёги «семи болд»:
+   начертания SemiBold в семействе нет, Medium — ближайшее).
    Ширина в `em`, а не в пикселях: она обязана ехать вместе с кеглем, иначе
    на узком окне в строку влезает лишнее слово и разбивка уходит от макета. */
 .sm-lede{
-  margin:max(10px,.96vw) auto 0; max-width:min(100%,34.5em);
-  font-family:"CR Roboto Light",Arial,sans-serif; font-weight:400;
-  font-size:clamp(17px,1.176vw,30px); line-height:1.55; color:#fff;
+  margin:max(10px,1.05vw) auto 0; max-width:min(100%,31.5em);
+  font-family:"Blogger Sans Medium","Blogger Sans",Arial,sans-serif; font-weight:500;
+  font-size:clamp(17px,1.294vw,33px); line-height:1.5; color:#fff;
   text-shadow:0 2px 16px rgba(0,0,0,.55);
 }
 .sm-send{margin:clamp(28px,6.4vw,134px) 0 0}
@@ -1431,10 +1458,10 @@ body{
      фона), купол — псевдоэлементом коллажа, поэтому он всегда вокруг него. */
   .sm{background:linear-gradient(180deg,#000004 0%,#000005 34%,#00020C 64%,#000312 100%)}
   .sm-bg{background-image:url(v2-sm-top-620.webp)}
+  .sm-beams{display:none}
   .sm-art::before{
-    content:''; position:absolute; z-index:0; left:50%; top:0; width:121%;
-    aspect-ratio:2500/3127; transform:translateX(-50%); pointer-events:none;
-    background:url(v2-sm-moon-480.webp) center/100% 100% no-repeat;
+    top:0; width:121%; aspect-ratio:2500/3127;
+    background-image:url(v2-sm-moon-480.webp);
     /* нижние 14 % гасим: у купола там своя «линия горизонта», и на коротком
        телефонном экране она попадает под кнопку светлой полосой */
     -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 86%,transparent 100%);
@@ -1444,7 +1471,7 @@ body{
      мешают. Отрицательные поля ровно те же, что боковые поля контейнера.
      100vw брать нельзя: на планшете с видимой полосой прокрутки это шире
      окна и даёт горизонтальный скролл. */
-  .sm-art{width:auto;
+  .sm-art{width:auto; margin-top:-2.74vw;   /* прежнее значение: телефон утверждён */
     margin-left:calc(-1 * clamp(16px,4.6vw,30px));
     margin-right:calc(-1 * clamp(16px,4.6vw,30px))}
   /* надзаголовок крупнее в 1,7 раза (04.09.2026, просьба Серёги): рукописная
@@ -2162,6 +2189,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <h2 class="sm-t" id="smT">Новая программа<br class="sm-br"> <b>2026-2027</b></h2>
 
         <div class="sm-art">
+          <canvas class="sm-beams" id="smBeams" aria-hidden="true"></canvas>
           <img src="v2-sm-logo2.webp"
                srcset="v2-sm-logo2-1100.webp 1100w, v2-sm-logo2.webp 1821w"
                sizes="(max-width:767px) 100vw, min(66.7vw, 1821px)"
@@ -2174,8 +2202,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           технологичным, красивым и необычайно интересным!</p>
 
         <p class="sm-send">
-          <button class="zs-btn zs-btn--lg sm-cta" type="button" data-zs="6-й экран, «Хочу в космос»">
-            <span class="zs-t">Хочу в космос!</span></button>
+          <button class="zs-btn sm-cta" type="button" data-zs="6-й экран, «Забронировать миссию»">
+            <span class="zs-t">Забронировать миссию!</span></button>
         </p>
       </div>
     </div>
@@ -3677,7 +3705,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   add('smena', 'smSky', {
     div: 5200, cap: 420, bias: 0.6, knotTop: 0.42, knotLen: 0.5,
     fadeFrom: 1.2, fadeLen: 1, fadeTop: 0.34, alpha: 1, shift: 52,
-    first: 7, gap: 13, gapSpread: 20
+    /* падающие звёзды тут чаще, чем на других экранах (05.09.2026, просьба
+       Серёги): первая на третьей секунде, дальше раз в 5-12 секунд */
+    first: 3, gap: 5, gapSpread: 7
   });
 
   if (!list.length) return;
