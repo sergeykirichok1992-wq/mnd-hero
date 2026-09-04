@@ -1266,7 +1266,9 @@ body{
   .bk-eyebrow{margin-bottom:clamp(20px,6.4vw,30px)}
   .bk-lede{margin-top:clamp(20px,7vw,34px); font-size:clamp(16.5px,4.4vw,20px)}
   /* воздух над полями — такой же, как от края окна до первой строки */
-  .bk-form{margin-top:clamp(32px,9.5vw,48px)}
+  /* плашки на 10 % уже: сужаем не каждую по отдельности, а всю форму —
+     поля, плитки и кнопка сядут по одной линии */
+  .bk-form{margin-top:clamp(32px,9.5vw,48px); width:90%; margin-left:auto; margin-right:auto}
   /* а вот перед вопросом о формате и перед кнопкой воздуха, наоборот, втрое
      больше: это две отдельные ступени, и на телефоне они должны читаться
      как отдельные, а не как продолжение списка полей */
@@ -1566,8 +1568,8 @@ body{
    Правило общее для всех кнопок заявки (.zs-btn): и в потоке страницы,
    и в всплывающем окне. Кнопка города в шапке — не .zs-btn, её не задевает. */
 @media (max-width:640px){
-  .zs-btn{padding:22px 26px; font-size:20px}
-  .zs-btn--lg{padding:23px 30px; font-size:23px}
+  .zs-btn{padding:25px 28px; font-size:23px}
+  .zs-btn--lg{padding:26.5px 32px; font-size:26.5px}
 }
 .zs-btn--sm{padding:11px 22px; font-size:13px}
 .zs-btn--full{display:flex; width:100%}
@@ -1799,14 +1801,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    заметно крупнее. Блок стоит здесь, ниже всех базовых .zs-* правил, иначе
    они его перебьют. */
 @media (max-width:640px){
-  .zs-lab{font-size:14px; letter-spacing:.11em; margin-bottom:10px}
-  .zs-inp{font-size:18px}
-  .zs-opt{font-size:17.5px}
-  .zs-opt em{font-size:13.5px}
-  .zs-err{font-size:14.5px}
-  .zs-fine{font-size:13.5px; max-width:54ch}
-  .zs-h{font-size:clamp(28px,7.8vw,36px)}
-  .zs-sub{font-size:17px}
+  .zs-lab{font-size:16px; letter-spacing:.11em; margin-bottom:11px}
+  .zs-inp{font-size:20.5px; padding:16.5px 22px}
+  .zs-opt{font-size:20px; padding:14px 12px; gap:3.5px}
+  .zs-opt em{font-size:15.5px}
+  .zs-err{font-size:16.5px}
+  .zs-fine{font-size:15.5px; max-width:54ch}
+  .zs-h{font-size:clamp(32px,9vw,41px)}
+  .zs-sub{font-size:19.5px}
 }
 
 /* Окно ниже, чем экран телефона в альбомной ориентации: там 92dvh — это
