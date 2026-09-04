@@ -762,28 +762,32 @@ body{
    (полулидинг шрифта) вычли замером, поэтому число некруглое. */
 .dk-t{
   position:absolute; margin:0;
-  left:516px; top:318px; width:811px; font-size:48px;   /* запас для браузера без cqw */
-  left:35.5cqw; top:21.88cqw; width:55.8cqw; font-size:3.32cqw;
+  left:512px; top:337px; width:819px; font-size:48px;   /* запас для браузера без cqw */
+  left:35.2cqw; top:23.18cqw; width:56.3cqw; font-size:3.32cqw;
   font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
   line-height:1; letter-spacing:-.037em;
   color:#001B71; text-transform:uppercase; text-align:center; white-space:nowrap;
 }
 /* Строчки-плашки: две колонки, слева четыре, справа три.
 
-   ПОЧЕМУ КЕГЛЬ ИМЕННО ТАКОЙ. Ширину колонки задаёт письмо: кремовое поле —
-   56,7 cqw, минус место под значок остаётся 23,5 cqw на текст. В одну строку
-   при таком кегле длинные строчки не помещаются, поэтому им разрешён перенос
-   (`white-space:normal`), а плашки высокие — в две строки текст стоит в них
-   свободно. Хочешь ещё крупнее — придётся сокращать сами строчки:
-   «Значительные бонусы и спецусловия для групп» в Blogger Sans занимает
-   19,1 em, и это потолок для двух колонок. */
+   ПОЧЕМУ КЕГЛЬ ИМЕННО ТАКОЙ. Каждая строчка обязана стоять в одну строку
+   (`white-space:nowrap`), поэтому кегль считается от самой длинной —
+   «Значительные бонусы и спецусловия для групп», в Blogger Sans с трекингом
+   −.03em это 19,1 em. Ширину колонки задаёт письмо: кремовое поле 56,7 cqw,
+   пополам минус место под значок — на текст остаётся 24,2 cqw. Отсюда
+   потолок 1.267cqw; стоит 1.23cqw, запас 3 % на разброс отрисовки шрифта.
+
+   Поднимешь кегль — самая длинная строка вылезет за плашку и ляжет поверх
+   рамки письма (minmax(0,1fr) не даёт колонкам разъехаться). Единственный
+   способ сделать текст крупнее и сохранить одну строку — сократить сами
+   фразы. Проверять замером overflow, а не глазами. */
 .dk-list{
   position:absolute; margin:0; padding:0; list-style:none;
-  left:516px; top:394px; width:811px;                   /* запас для браузера без cqw */
-  left:35.5cqw; top:27.12cqw; width:55.8cqw;
+  left:512px; top:420px; width:819px;                   /* запас для браузера без cqw */
+  left:35.2cqw; top:28.92cqw; width:56.3cqw;
   display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(4,5.3cqw);
-  column-gap:.5cqw; row-gap:.7cqw;
+  grid-template-rows:repeat(4,3.9cqw);
+  column-gap:.4cqw; row-gap:1.2cqw;
 }
 /* Порядок в разметке смысловой: даты стоят рядом со временем. В письме
    Серёга разложил строчки по колонкам иначе — слева «кому, где, сколько,
@@ -800,8 +804,8 @@ body{
    border-box под рамку — так рамка получает градиент, а не плоский цвет */
 .dk-list li{
   position:relative; display:flex; align-items:center;
-  padding:.25cqw .6cqw .25cqw 4.4cqw;
-  border:max(1px,.16cqw) solid transparent; border-radius:1.6cqw;
+  padding:0 .5cqw 0 3.25cqw;
+  border:max(1px,.15cqw) solid transparent; border-radius:1.25cqw;
   background:
     linear-gradient(168deg,#FDF7EA 0%,#F6E9D2 46%,#EEDBB9 100%) padding-box,
     linear-gradient(180deg,#FFF3C8 0%,#E9BB61 36%,#C58E27 70%,#8C5D11 100%) border-box;
@@ -809,11 +813,8 @@ body{
   /* Blogger Sans обычного начертания — как просил Серёга 04.09.2026.
      Трекинг −.03em: без него самая длинная строка не помещается в колонку. */
   font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
-  font-size:31px;                                       /* запас для браузера без cqw */
-  font-size:2.15cqw; line-height:1.1; letter-spacing:-.03em;
-  /* длинные строчки переносятся; balance делит их пополам, иначе на второй
-     строке остаётся одно слово-сирота */
-  text-wrap:balance;
+  font-size:18px;                                       /* запас для браузера без cqw */
+  font-size:1.23cqw; line-height:1.1; letter-spacing:-.03em; white-space:nowrap;
   box-shadow:0 .16cqw .3cqw rgba(120,86,20,.25);
 }
 /* Значок стоит в своём квадрате и центрируется в нём по обеим осям: эмодзи
@@ -822,7 +823,7 @@ body{
    а box-shadow обвёл бы пустой прямоугольник. */
 .dk-ico{
   position:absolute; top:50%; transform:translateY(-50%);
-  left:.6cqw; width:3.4cqw; height:3.4cqw; font-size:2.9cqw;
+  left:.4cqw; width:2.6cqw; height:2.6cqw; font-size:2.2cqw;
   display:flex; align-items:center; justify-content:center;
   line-height:1;
   filter:drop-shadow(0 .12cqw .18cqw rgba(90,60,10,.5));
