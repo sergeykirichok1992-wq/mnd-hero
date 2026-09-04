@@ -770,29 +770,30 @@ body{
 }
 /* Строчки-плашки: две колонки, слева четыре, справа три.
 
-   ПОЧЕМУ ОНИ УСТРОЕНЫ ИМЕННО ТАК. Каждая строчка обязана стоять в одну
-   строку (`white-space:nowrap`), значит кегль упирается в самую длинную.
-   Поэтому:
+   ВСЕ ПЛАШКИ ОДНОЙ ДЛИНЫ — так просил Серёга 04.09.2026. Значит колонки
+   равные (`minmax(0,1fr)`), плашка растянута на всю колонку, и строчка
+   «Значительные бонусы и спецусловия для групп» стоит там же, где на
+   коллаже: четвёртой в левой колонке.
 
-   1. Колонки и сами плашки — по ширине своего текста (`auto` и
-      `justify-self:start`), а не растянутые. Пустое место справа у коротких
-      строчек ничего не давало, а так оно уходит в кегль.
-   2. Самая длинная строчка — «Значительные бонусы и спецусловия для групп»
-      (19,1 em) — вынесена отдельной плашкой в нижний ряд на всю ширину.
-      Пока она стояла в колонке, она одна держала кегль всех семи.
+   ЧЕМ ЗА ЭТО ПЛАТИМ. Каждая строчка обязана стоять в одну строку
+   (`white-space:nowrap`), а ширину колонки задаёт письмо: кремовое поле
+   56,7 cqw, пополам минус место под значок — на текст остаётся 24,5 cqw.
+   Кегль считается от самой длинной строчки, а это те самые «Значительные
+   бонусы…» — 19,1 em в Blogger Sans с трекингом −.03em. Отсюда потолок
+   1.28cqw; стоит 1.26cqw, запас 3 % на разброс отрисовки шрифта.
 
-   После этого предел задаёт пара «Продолжительность…» (14 em) и
-   «С 27 ноября…» (17 em): вместе 31 em на 49 cqw свободной ширины, потолок
-   1.58cqw. Стоит 1.53cqw — запас 3 % на разброс отрисовки шрифта.
+   Пробовали иначе (и вернули по просьбе): плашки по ширине своего текста
+   плюс длинная строчка отдельным нижним рядом давали кегль 1.53cqw, но
+   плашки получались разной длины.
 
-   Поднимешь кегль ещё — строчка вылезет за плашку и ляжет поверх рамки
-   письма. Дальше крупнее можно только сокращая сами фразы.
+   Поднимешь кегль — строчка вылезет за плашку и ляжет поверх рамки письма.
+   Дальше крупнее можно только сокращая сами фразы.
    Проверять замером overflow, а не глазами. */
 .dk-list{
   position:absolute; margin:0; padding:0; list-style:none;
   left:512px; top:416px; width:819px;                   /* запас для браузера без cqw */
   left:35.2cqw; top:28.62cqw; width:56.3cqw;
-  display:grid; grid-template-columns:auto auto; justify-content:start;
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
   grid-template-rows:repeat(4,4.2cqw);
   column-gap:.4cqw; row-gap:1.1cqw;
 }
@@ -803,16 +804,15 @@ body{
 .dk-list li:nth-child(1){grid-area:1/1}
 .dk-list li:nth-child(2){grid-area:2/1}
 .dk-list li:nth-child(5){grid-area:3/1}
+.dk-list li:nth-child(7){grid-area:4/1}
 .dk-list li:nth-child(3){grid-area:1/2}
 .dk-list li:nth-child(4){grid-area:2/2}
 .dk-list li:nth-child(6){grid-area:3/2}
-.dk-list li:nth-child(7){grid-column:1 / -1; grid-row:4}
 /* кремовая заливка и золотая рамка одним фоном: padding-box под заливку,
    border-box под рамку — так рамка получает градиент, а не плоский цвет */
 .dk-list li{
   position:relative; display:flex; align-items:center;
-  justify-self:start;                                   /* плашка по ширине своего текста */
-  padding:0 .45cqw 0 2.95cqw;
+  padding:0 .45cqw 0 3.05cqw;
   border:max(1px,.15cqw) solid transparent; border-radius:1.35cqw;
   background:
     linear-gradient(168deg,#FDF7EA 0%,#F6E9D2 46%,#EEDBB9 100%) padding-box,
@@ -821,8 +821,8 @@ body{
   /* Blogger Sans обычного начертания — как просил Серёга 04.09.2026.
      Трекинг −.03em: без него самая длинная строка не помещается в колонку. */
   font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
-  font-size:22px;                                       /* запас для браузера без cqw */
-  font-size:1.53cqw; line-height:1.1; letter-spacing:-.03em; white-space:nowrap;
+  font-size:18px;                                       /* запас для браузера без cqw */
+  font-size:1.26cqw; line-height:1.1; letter-spacing:-.03em; white-space:nowrap;
   box-shadow:0 .16cqw .3cqw rgba(120,86,20,.25);
 }
 /* Значок стоит в своём квадрате и центрируется в нём по обеим осям: эмодзи
@@ -831,7 +831,7 @@ body{
    а box-shadow обвёл бы пустой прямоугольник. */
 .dk-ico{
   position:absolute; top:50%; transform:translateY(-50%);
-  left:.4cqw; width:2.4cqw; height:2.4cqw; font-size:2.05cqw;
+  left:.4cqw; width:2.5cqw; height:2.5cqw; font-size:2.15cqw;
   display:flex; align-items:center; justify-content:center;
   line-height:1;
   filter:drop-shadow(0 .12cqw .18cqw rgba(90,60,10,.5));
