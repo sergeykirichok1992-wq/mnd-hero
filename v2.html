@@ -710,82 +710,109 @@ body{
   .cr-city:hover,.cr-city.on{transform:translateY(-50%)}
 }
 
-/* ==================== ЭКРАН 4: «Для кого, где и когда» ====================
-   Письмо с персонажами. Картинка одна (v2-frame.webp), текст живёт разметкой
-   поверх неё: правится строкой, читается поиском, остаётся резким на любом экране.
-   Внутри кадра всё расставлено в cqw — долях ширины самой картинки, поэтому
-   композиция не разъезжается ни на какой ширине.
-   Числа сняты с макета «референс экрана.png» (холст 1920, кадр 1526x833),
-   в комментариях — пиксели макета.
+/* ==================== ЭКРАН 4: «Где, когда и для кого» ====================
+   Снежная поляна. Две картинки из папки «новый сайт/4 экран» и живой текст:
 
-   Персонажи и верх письма заходят на экран с картой — так в макете.
-   Кадр поднят отрицательным отступом на 131 px макета (8,585 % своей ширины).
-   Секция ничего не обрезает, а .cr даёт ей z-index 25, поэтому она рисуется
-   поверх карты. display:flow-root обязателен: без него отрицательный отступ
-   схлопнется с отступом секции и утянет вверх саму секцию вместе с фоном. */
+   • v2-snow.webp — поляна с золотыми дугами сверху и снизу. За дугами
+     картинка прозрачная: сверху сквозь неё виден экран с картой, снизу —
+     ночное небо пятого экрана. Поэтому у секции отрицательные поля с обеих
+     сторон, а z-index выше соседей.
+   • v2-ded.webp — Дед Мороз и письмо одной картинкой. Шапка выходит выше
+     верхней дуги, на экран с картой: так на макете Серёги.
+
+   Текст письма набран разметкой, а не нарисован: правится строкой, читается
+   поиском, остаётся резким на любом экране.
+
+   Масштаб всей сцены держит одна переменная --w: до 1720 px она равна ширине
+   окна, дальше расти перестаёт. На большом мониторе поляна не раздувается во
+   весь экран — фон просто тянется по горизонтали (снег мягкий, растяжки на
+   нём не видно, дуги остаются на своих местах), а Дед Мороз с письмом стоят
+   посередине в своём размере.
+
+   Числа внутри письма — доли ширины самой картинки (cqw), сняты с макета
+   «референс для 4 экрана» и с присланного скриншота-сборки. Поэтому
+   композиция не разъезжается ни на какой ширине. */
 .dk{
-  position:relative; display:flow-root; color:#fff;
-  padding-bottom:min(4.43vw, 90px);                    /* 85 px макета */
-  /* фон нарисован кодом, картинки нет: поле макета посчитано попиксельно,
-     под него подобраны четыре пятна света и ночная вертикаль.
-     Расхождение с макетом — 3,4 уровня из 255.
-     Правишь числа — сверяйся замером (instrumenty/bgcmp.py), а не на глаз. */
-  background:
-    radial-gradient(41.5% 62.7% at 58.3% 42.4%, rgba(0,42,101,1), rgba(0,42,101,0) 100%),
-    radial-gradient(45.9% 23.1% at 31.3% 104.5%, rgba(0,52,130,1), rgba(0,52,130,0) 100%),
-    radial-gradient(40.4% 57.7% at 44.4% 76.7%, rgba(122,77,220,1), rgba(122,77,220,0) 100%),
-    radial-gradient(41.1% 49.2% at 49.8% 94.4%, rgba(189,195,255,1), rgba(189,195,255,0) 100%),
-    linear-gradient(180deg,
-      #000524 0%, #000829 12.5%, #000B30 25%, #000F3A 37.5%, #00184D 50%,
-      #002565 62.5%, #002A71 75%, #00296F 87.5%, #002B78 100%);
+  --w: min(100vw, 1720px);
+  position:relative; display:flow-root; container-type:inline-size;
+  z-index:26;                             /* выше пятого экрана: нижняя дуга ложится на его небо */
+  margin-top:calc(var(--w) * -.066);      /* заходим на экран с картой */
+  margin-bottom:calc(var(--w) * -.036);   /* хвост нижней дуги — уже на ночном небе */
 }
-/* небо поверх нарисованного фона: только светлые точки, сам фон не трогаем.
-   z-index 1 — выше градиента секции и ниже .cr-cont (у него 7), поэтому
-   письмо, персонажи и кнопка всегда закрывают звёзды, а не наоборот. */
-.dk-sky{
-  position:absolute; inset:0; z-index:1; display:block;
-  width:100%; height:100%; pointer-events:none;
+/* поляна. Её высота задаёт высоту всей секции. object-fit:fill намеренно:
+   выше 1720 px картинка тянется по горизонтали, а не обрезается — иначе
+   золотые дуги уехали бы за края экрана. */
+.dk-bg{display:block; width:100%; height:calc(var(--w) * .5391); object-fit:fill}
+/* сцена: Дед Мороз с письмом. container-type — чтобы всё внутри считалось
+   в долях ширины картинки (cqw), а не окна */
+.dk-scene{
+  position:absolute; container-type:inline-size;
+  width:calc(var(--w) * .79);
+  left:50%; margin-left:calc(var(--w) * -.395);
+  top:calc(var(--w) * -.0103);            /* шапка выходит выше верхней дуги */
 }
-.dk-frame{position:relative; container-type:inline-size; margin-top:-8.585%}
 .dk-art{display:block; width:100%; height:auto}
-/* заголовок: верх заглавных в макете — 157 px от верха кадра, левый край 589 px.
-   top задан по верху строки, а не по верху букв: разницу (полулидинг плюс
-   выносной элемент шрифта) вычли замером, поэтому число некруглое. */
+/* заголовок. top задан по верху строки, а не по верху букв: разницу
+   (полулидинг шрифта) вычли замером, поэтому число некруглое. */
 .dk-t{
   position:absolute; margin:0;
-  left:620px; top:163px; font-size:48px;               /* запас для браузера без cqw */
-  left:38.52cqw; top:10.16cqw; font-size:3.02cqw;
+  left:488px; top:347px; width:744px; font-size:45px;   /* запас для браузера без cqw */
+  left:35.9cqw; top:25.03cqw; width:54.7cqw; font-size:3.32cqw;
   font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
   line-height:1; letter-spacing:-.037em;
-  color:#001B71; text-transform:uppercase; white-space:nowrap;
+  color:#001B71; text-transform:uppercase; text-align:center; white-space:nowrap;
 }
-/* строчки-плашки: 655x55,5 px в макете, шаг 66,8 px, левый край 585 px */
+/* Строчки-плашки: две колонки, слева четыре, справа три.
+   Кегль (1.13cqw) упирается в самую длинную строку — «Значительные бонусы
+   и спецусловия для групп». В Oswald она занимает 19,5 em, и в колонку
+   шириной 27 cqw вместе с местом под значок больше не влезает. Поднимешь
+   кегль — строка вылезет за плашку, и первым это заметит не браузер,
+   а глаз: minmax(0,1fr) не даёт колонкам разъехаться, поэтому текст
+   поедет поверх рамки письма. Проверять замером overflow (meas4.js). */
 .dk-list{
   position:absolute; margin:0; padding:0; list-style:none;
-  left:616px; top:256px; width:690px; gap:11px;        /* запас для браузера без cqw */
-  left:38.34cqw; top:15.92cqw; width:42.92cqw; gap:.74cqw;
-  display:flex; flex-direction:column;
+  left:488px; top:428px; width:744px;                   /* запас для браузера без cqw */
+  left:35.9cqw; top:31.0cqw; width:54.7cqw;
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(4,2.6cqw);
+  column-gap:.6cqw; row-gap:1.15cqw;
 }
+/* Порядок в разметке смысловой: даты стоят рядом со временем. В письме
+   Серёга разложил строчки по колонкам иначе — слева «кому, где, сколько,
+   бонусы», справа «когда». Поэтому места заданы явно, а разметку не трогаем:
+   на телефоне строчки идут одной колонкой в прежнем порядке. */
+.dk-list li:nth-child(1){grid-area:1/1}
+.dk-list li:nth-child(2){grid-area:2/1}
+.dk-list li:nth-child(5){grid-area:3/1}
+.dk-list li:nth-child(7){grid-area:4/1}
+.dk-list li:nth-child(3){grid-area:1/2}
+.dk-list li:nth-child(4){grid-area:2/2}
+.dk-list li:nth-child(6){grid-area:3/2}
+/* кремовая заливка и золотая рамка одним фоном: padding-box под заливку,
+   border-box под рамку — так рамка получает градиент, а не плоский цвет */
 .dk-list li{
   position:relative; display:flex; align-items:center;
-  height:58px; padding:7px 0 0 84px; font-size:29px;   /* запас для браузера без cqw */
-  height:3.64cqw; padding:.46cqw 0 0 5.24cqw;          /* текст — в 80 px от края плашки */
-  font-size:1.82cqw;
-  border-radius:999px; background:#fff; color:#000;
-  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
-  line-height:1; letter-spacing:-.043em; white-space:nowrap;
-  /* тень в макете лежит СВЕРХУ плашки, снизу её нет — так и оставлено */
-  box-shadow:0 -2px 4px rgba(0,0,0,.13);
-  box-shadow:0 -.13cqw .26cqw rgba(0,0,0,.13);
+  padding:0 .5cqw 0 3.3cqw;
+  border:max(1px,.12cqw) solid transparent; border-radius:.9cqw;
+  background:
+    linear-gradient(168deg,#FDF7EA 0%,#F6E9D2 46%,#EEDBB9 100%) padding-box,
+    linear-gradient(180deg,#FFF3C8 0%,#E9BB61 36%,#C58E27 70%,#8C5D11 100%) border-box;
+  color:#150E04;
+  font-family:"Oswald","Golos Text",Arial,sans-serif; font-weight:500;
+  font-size:15px;                                       /* запас для браузера без cqw */
+  font-size:1.13cqw; line-height:1.1; white-space:nowrap;
+  box-shadow:0 .14cqw .26cqw rgba(120,86,20,.25);
 }
 .dk-ico{
   position:absolute; top:50%; transform:translateY(-50%);
-  left:19px; width:39px; font-size:34px;               /* запас для браузера без cqw */
-  left:1.16cqw; width:2.4cqw; font-size:2.11cqw;
+  left:.4cqw; width:2.6cqw; font-size:2.1cqw;
   text-align:center; line-height:1;
 }
-.dk-cta{margin-top:2.88%; text-align:center}           /* 44 px под кадром */
-/* кнопка берёт готовый вид с сайта: золото, тёмно-коричневый текст, капитель */
+/* на широком экране кнопки в макете нет; выравнивание оставлено здесь —
+   на телефоне блок включают обратно, и кнопка должна стоять по центру */
+.dk-cta{display:none; text-align:center}
+/* кнопка берёт готовый вид с сайта: золото, тёмно-коричневый текст, капитель.
+   Видна только на телефоне, пока у него старая композиция. */
 .dk-btn{
   display:inline-block; padding:16px 34px; border:0; border-radius:3px; cursor:pointer;
   font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
@@ -797,7 +824,16 @@ body{
 }
 .dk-btn:hover{filter:brightness(1.06)}
 .dk-btn:active{transform:translateY(1px)}
-.dk-girl,.dk-t-mob{display:none}                       /* только для телефона */
+/* Небо со звёздами и девушка-часовщица — только для телефона.
+   Раскладку .dk-sky держим и здесь: на телефоне канве возвращают display,
+   и без absolute+inset она встаёт в поток своим пиксельным размером, а его
+   ставит скрипт по высоте секции — секция тянет канву, канва тянет секцию,
+   и экран уезжает на пятнадцать тысяч пикселей. */
+.dk-sky{
+  position:absolute; inset:0; z-index:1; display:none;
+  width:100%; height:100%; pointer-events:none;
+}
+.dk-girl{display:none}
 
 /* ==================== ЭКРАН 4 НА ТЕЛЕФОНЕ ====================
    Своя композиция, снятая с макета «4 экран/референс для 4 экрана.png»
@@ -808,10 +844,10 @@ body{
    макета в нашем масштабе. Выше 620 px композиция расти перестаёт, иначе
    на планшете девушка вырастает в великаншу, а строчки — в афишу.
 
-   Порог 1024, а не общие для сайта 768: письмо с персонажами (широкий
-   вариант) начинает разваливаться уже на 1000 px — кегль внутри него
-   считается от ширины картинки. */
-@media (max-width:1023px){
+   Порог 1280, а не общие для сайта 768: кегль в письме считается от ширины
+   картинки, и ниже 1280 px строчки падают до 11 px — там честнее телефонная
+   композиция. Было 1024, подняли 04.09.2026 вместе с новой поляной. */
+@media (max-width:1279px){
   /* Воздух под картой. Девушка выходит на экран с картой на 799 px макета,
      а у нас там ещё стоят подписи Ставрополя, Екатеринбурга и Тюмени —
      она бы их закрыла. Поэтому низу экрана с картой добавлен пустой запас
@@ -819,6 +855,7 @@ body{
   .cr-s3{padding-bottom:calc(60 * var(--u) + 512 * min(100vw, 620px) / 1080)}
   .dk{
     --m: min(100vw, 620px);
+    margin:0;                                          /* поляна с её вылетами — только на широком экране */
     background:none;                                   /* фон уезжает на «холм» */
     padding-bottom:calc(150 * var(--m) / 1080);
   }
@@ -840,7 +877,7 @@ body{
   /* звёзды соседней сессии поднимаем над холмом и обрезаем той же дугой,
      иначе на телефоне их не было бы видно вообще */
   .dk-sky{
-    z-index:3;
+    display:block; z-index:3;
     border-radius:50% 50% 0 0 /
       calc(128 * var(--m) / 1080) calc(128 * var(--m) / 1080) 0 0;
   }
@@ -876,11 +913,11 @@ body{
     0%,100%{transform:translateY(0)}
     50%    {transform:translateY(calc(-14 * var(--m) / 1080))}
   }
-  /* письма на телефоне нет — вместо него девушка */
-  .dk-art{display:none}
-  .dk-frame{margin-top:0; container-type:normal}
-  .dk-t-wide{display:none}
-  .dk-t-mob{display:inline}
+  /* письма и поляны на телефоне нет — вместо них девушка на «холме» */
+  .dk-art,.dk-bg{display:none}
+  /* z-index 7 — как у .cr-cont, в котором сцена лежала раньше: без него
+     заголовок и строчки уходят под «холм» (.dk::after, z-index 2) */
+  .dk-scene{position:relative; z-index:7; left:auto; top:auto; width:auto; margin:0; container-type:normal}
   .dk-t{
     position:static; left:auto; top:auto; width:auto;
     margin:calc(112 * var(--m) / 1080) auto 0; text-align:center;
@@ -893,6 +930,7 @@ body{
      Шрифт — Oswald, узкий: им строки помещаются в одну, как в макете. */
   .dk-list{
     position:static; left:auto; top:auto;
+    display:flex; flex-direction:column;               /* на широком экране это сетка в две колонки */
     width:calc(994 * var(--m) / 1080);
     margin:calc(48 * var(--m) / 1080) auto 0;
     gap:calc(13 * var(--m) / 1080);
@@ -919,7 +957,7 @@ body{
     left:calc(6 * var(--m) / 1080); width:calc(122 * var(--m) / 1080);
     font-size:max(22px, calc(74 * var(--m) / 1080));
   }
-  .dk-cta{margin-top:calc(70 * var(--m) / 1080)}
+  .dk-cta{display:block; margin-top:calc(70 * var(--m) / 1080)}
   .dk-btn{padding:calc(38 * var(--m) / 1080) calc(80 * var(--m) / 1080);
     font-size:calc(40 * var(--m) / 1080); border-radius:calc(10 * var(--m) / 1080)}
   /* появление плашек по очереди. Прятать их умеет только класс .dkrv, а его
@@ -1106,9 +1144,9 @@ body{
 .bk.rv.on .bk-card{opacity:1; transform:none; transition:opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
 
 /* ---------- планшет и телефон ---------- */
-/* Порог 1024, как у экрана 4: там с этой ширины начинается «холм», и верх
+/* Порог 1280, как у экрана 4: там с этой ширины начинается «холм», и верх
    этого экрана должен быть того же цвета. */
-@media (max-width:1023px){
+@media (max-width:1279px){
   .bk{
     padding-top:clamp(44px,8vw,80px);
     background:
@@ -1631,39 +1669,40 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </div>
 </section>
 
-<!-- ==================== ЭКРАН 4: «Для кого, где и когда» ====================
-     Письмо с персонажами. Картинка — одна: v2-frame.webp (рамка с персонажами
-     из папки «новый сайт»). Текст внутри письма — живая разметка, не картинка.
-     Персонажи и верх письма заходят на экран с картой: так в макете. -->
+<!-- ==================== ЭКРАН 4: «Где, когда и для кого» ====================
+     Снежная поляна: фон-поляна (v2-snow.webp) и Дед Мороз с письмом
+     (v2-ded.webp) — обе картинки из папки «новый сайт/4 экран».
+     Шапка Деда Мороза заходит на экран с картой, снизу секция кончается
+     золотой дугой уже на ночном небе пятого экрана.
+     Текст письма — живая разметка, не картинка. -->
 <section class="cr dk" id="forwhom" aria-labelledby="dkT">
   <canvas class="dk-sky" id="dkSky" aria-hidden="true"></canvas>
+  <img class="dk-bg" src="v2-snow.webp"
+       srcset="v2-snow-1400.webp 1400w, v2-snow.webp 2560w"
+       sizes="100vw" width="2560" height="1380" loading="lazy" decoding="async" alt="">
   <!-- телефон: девушка-часовщица выходит на экран с картой, «холм» (.dk::after)
        закрывает её низ. На широком экране этот слой скрыт. -->
   <div class="dk-girl" aria-hidden="true">
     <img src="v2-girl.webp" srcset="v2-girl-1000.webp 1000w, v2-girl.webp 1536w"
          sizes="128vw" width="1536" height="1024" alt="" loading="lazy" decoding="async">
   </div>
-  <div class="cr-cont">
-    <div class="dk-frame">
-      <img class="dk-art" src="v2-frame.webp"
-           srcset="v2-frame-1100.webp 1100w, v2-frame.webp 1526w"
-           sizes="(max-width:1023px) 100vw, 84vw"
-           width="1526" height="833" loading="lazy" decoding="async"
-           alt="Дед Мороз с посохом и мальчик на стремянке стоят у большого письма">
-      <!-- порядок слов в макете телефона другой, чем на широком экране,
-           поэтому два варианта: лишний скрыт через display:none и в чтении с экрана не участвует -->
-      <h2 class="dk-t" id="dkT"><span class="dk-t-wide">Для кого, где и когда:</span><span class="dk-t-mob">Где, когда и для кого:</span></h2>
-      <ul class="dk-list">
-        <li><span class="dk-ico" aria-hidden="true">🐣</span>Для детей от 4 до 11 лет</li>
-        <li><span class="dk-ico" aria-hidden="true">📍</span>Нижний Новгород, Ольгино 62</li>
-        <li><span class="dk-ico" aria-hidden="true">📅</span>С 27 ноября по 10 января (каждый день)</li>
-        <li><span class="dk-ico" aria-hidden="true">🕐</span>С 09:00 до 21:30</li>
-        <li><span class="dk-ico" aria-hidden="true">⏳</span>Продолжительность: 1 час 20 минут</li>
-        <li><span class="dk-ico" aria-hidden="true">🚌</span>Организованная группа - от 20 детей</li>
-        <li><span class="dk-ico" aria-hidden="true">🎁</span>Значительные бонусы и спецусловия для групп</li>
-      </ul>
-    </div>
-    <!-- кнопка стоит там, где в макете написано «тут кнопку сделай».
+  <div class="dk-scene">
+    <img class="dk-art" src="v2-ded.webp"
+         srcset="v2-ded-1200.webp 1200w, v2-ded.webp 2257w"
+         sizes="(max-width:1279px) 100vw, 79vw"
+         width="2257" height="1391" loading="lazy" decoding="async"
+         alt="Дед Мороз с посохом стоит рядом с большим письмом в новогодней рамке">
+    <h2 class="dk-t" id="dkT">Где, когда и для кого</h2>
+    <ul class="dk-list">
+      <li><span class="dk-ico" aria-hidden="true">🐣</span>Для детей от 4 до 11 лет</li>
+      <li><span class="dk-ico" aria-hidden="true">📍</span>Нижний Новгород, Ольгино 62</li>
+      <li><span class="dk-ico" aria-hidden="true">📅</span>С 27 ноября по 10 января (каждый день)</li>
+      <li><span class="dk-ico" aria-hidden="true">🕐</span>С 09:00 до 21:30</li>
+      <li><span class="dk-ico" aria-hidden="true">⏳</span>Продолжительность: 1 час 20 минут</li>
+      <li><span class="dk-ico" aria-hidden="true">🚌</span>Организованная группа - от 20 детей</li>
+      <li><span class="dk-ico" aria-hidden="true">🎁</span>Значительные бонусы и спецусловия для групп</li>
+    </ul>
+    <!-- кнопка осталась только для телефона: на широком экране её в макете нет.
          Она общая для всего сайта (.zs-btn) и открывает общее окно заявки:
          всё, что для этого нужно, — атрибут data-zs с меткой места. -->
     <div class="dk-cta"><button class="zs-btn zs-btn--lg" type="button" data-zs="4-й экран"><span class="zs-t">Оставить заявку</span></button></div>
@@ -3125,12 +3164,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* ---------- запуск ---------- */
   makeSprites();
 
-  /* письмо с персонажами: гуще вверху, к низу гаснет — там фон светлеет */
-  add('forwhom', 'dkSky', {
-    div: 6200, cap: 340, bias: 1.7, knotTop: 0.04, knotLen: 0.44,
-    fadeFrom: 0.54, fadeLen: 0.40, alpha: 1, shift: 46,
-    first: 6, gap: 15, gapSpread: 22
-  });
+  /* Четвёртый экран: звёзды нужны только телефону — там за строчками ночь.
+     На широком экране лежит белая снежная поляна, звёзд на ней не видно,
+     и рисовать их каждый кадр незачем. */
+  if (window.matchMedia('(max-width:1279px)').matches){
+    add('forwhom', 'dkSky', {
+      div: 6200, cap: 340, bias: 1.7, knotTop: 0.04, knotLen: 0.44,
+      fadeFrom: 0.54, fadeLen: 0.40, alpha: 1, shift: 46,
+      first: 6, gap: 15, gapSpread: 22
+    });
+  }
 
   /* карта городов: по всему полю, без затухания. Секция высокая,
      поэтому потолок числа звёзд выше, а сами они чуть скромнее по яркости —
