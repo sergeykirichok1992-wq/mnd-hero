@@ -769,8 +769,8 @@ body{
    (полулидинг шрифта) вычли замером, поэтому число некруглое. */
 .dk-t{
   position:absolute; margin:0;
-  left:510px; top:333px; width:824px; font-size:48px;   /* запас для браузера без cqw */
-  left:35.05cqw; top:22.88cqw; width:56.6cqw; font-size:3.32cqw;
+  left:510px; top:358px; width:824px; font-size:48px;   /* запас для браузера без cqw */
+  left:35.05cqw; top:24.63cqw; width:56.6cqw; font-size:3.32cqw;  /* 05.09.2026: опущен на 7 мм */
   font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
   line-height:1; letter-spacing:-.037em;
   color:#001B71; text-transform:uppercase; text-align:center; white-space:nowrap;
@@ -994,6 +994,9 @@ body{
     box-shadow:0 calc(6 * var(--m) / 1080) calc(14 * var(--m) / 1080) rgba(0,0,0,.38),
                0 0 calc(20 * var(--m) / 1080) rgba(255,214,140,.16);
   }
+  .dk-list li:nth-child(3),
+  .dk-list li:nth-child(4),
+  .dk-list li:nth-child(6){padding-left:calc(146 * var(--m) / 1080)}
   .dk-list li:nth-child(3),
   .dk-list li:nth-child(4),
   .dk-list li:nth-child(6){padding-left:calc(146 * var(--m) / 1080)}
