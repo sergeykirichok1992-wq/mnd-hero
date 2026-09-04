@@ -753,35 +753,35 @@ body{
    в долях ширины картинки (cqw), а не окна */
 .dk-scene{
   position:absolute; container-type:inline-size;
-  width:calc(var(--w) * .79);
-  left:50%; margin-left:calc(var(--w) * -.395);
-  top:calc(var(--w) * -.0103);            /* шапка выходит выше верхней дуги */
+  width:calc(var(--w) * .9085);           /* 04.09.2026: было .79, Серёга просил на 15 % крупнее */
+  left:50%; margin-left:calc(var(--w) * -.47);   /* сдвинута влево: слева 3 % поля, справа 6 % */
+  top:calc(var(--w) * -.070);             /* шапка заходит на экран с картой */
 }
 .dk-art{display:block; width:100%; height:auto; pointer-events:none}
 /* заголовок. top задан по верху строки, а не по верху букв: разницу
    (полулидинг шрифта) вычли замером, поэтому число некруглое. */
 .dk-t{
   position:absolute; margin:0;
-  left:488px; top:347px; width:744px; font-size:45px;   /* запас для браузера без cqw */
-  left:35.9cqw; top:25.03cqw; width:54.7cqw; font-size:3.32cqw;
+  left:516px; top:357px; width:811px; font-size:48px;   /* запас для браузера без cqw */
+  left:35.5cqw; top:24.58cqw; width:55.8cqw; font-size:3.32cqw;
   font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
   line-height:1; letter-spacing:-.037em;
   color:#001B71; text-transform:uppercase; text-align:center; white-space:nowrap;
 }
 /* Строчки-плашки: две колонки, слева четыре, справа три.
-   Кегль (1.13cqw) упирается в самую длинную строку — «Значительные бонусы
-   и спецусловия для групп». В Oswald она занимает 19,5 em, и в колонку
-   шириной 27 cqw вместе с местом под значок больше не влезает. Поднимешь
-   кегль — строка вылезет за плашку, и первым это заметит не браузер,
-   а глаз: minmax(0,1fr) не даёт колонкам разъехаться, поэтому текст
-   поедет поверх рамки письма. Проверять замером overflow (meas4.js). */
+   Кегль (1.22cqw) упирается в самую длинную строку — «Значительные бонусы
+   и спецусловия для групп». В Blogger Sans с трекингом −.03em она занимает
+   19,1 em, и в колонку шириной 27,6 cqw вместе с местом под значок больше
+   не влезает. Поднимешь кегль — строка вылезет за плашку, и первым это
+   заметит не браузер, а глаз: minmax(0,1fr) не даёт колонкам разъехаться,
+   поэтому текст поедет поверх рамки письма. Проверять замером overflow. */
 .dk-list{
   position:absolute; margin:0; padding:0; list-style:none;
-  left:488px; top:428px; width:744px;                   /* запас для браузера без cqw */
-  left:35.9cqw; top:31.0cqw; width:54.7cqw;
+  left:516px; top:445px; width:811px;                   /* запас для браузера без cqw */
+  left:35.5cqw; top:30.58cqw; width:55.8cqw;
   display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(4,2.6cqw);
-  column-gap:.6cqw; row-gap:1.15cqw;
+  grid-template-rows:repeat(4,3.05cqw);
+  column-gap:.5cqw; row-gap:1cqw;
 }
 /* Порядок в разметке смысловой: даты стоят рядом со временем. В письме
    Серёга разложил строчки по колонкам иначе — слева «кому, где, сколько,
@@ -798,20 +798,22 @@ body{
    border-box под рамку — так рамка получает градиент, а не плоский цвет */
 .dk-list li{
   position:relative; display:flex; align-items:center;
-  padding:0 .5cqw 0 3.3cqw;
-  border:max(1px,.12cqw) solid transparent; border-radius:.9cqw;
+  padding:0 .4cqw 0 3cqw;
+  border:max(1px,.14cqw) solid transparent; border-radius:1.05cqw;
   background:
     linear-gradient(168deg,#FDF7EA 0%,#F6E9D2 46%,#EEDBB9 100%) padding-box,
     linear-gradient(180deg,#FFF3C8 0%,#E9BB61 36%,#C58E27 70%,#8C5D11 100%) border-box;
   color:#150E04;
-  font-family:"Oswald","Golos Text",Arial,sans-serif; font-weight:500;
-  font-size:15px;                                       /* запас для браузера без cqw */
-  font-size:1.13cqw; line-height:1.1; white-space:nowrap;
-  box-shadow:0 .14cqw .26cqw rgba(120,86,20,.25);
+  /* Blogger Sans обычного начертания — как просил Серёга 04.09.2026.
+     Трекинг −.03em: без него самая длинная строка не помещается в колонку. */
+  font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
+  font-size:18px;                                       /* запас для браузера без cqw */
+  font-size:1.22cqw; line-height:1.1; letter-spacing:-.03em; white-space:nowrap;
+  box-shadow:0 .16cqw .3cqw rgba(120,86,20,.25);
 }
 .dk-ico{
   position:absolute; top:50%; transform:translateY(-50%);
-  left:.4cqw; width:2.6cqw; font-size:2.1cqw;
+  left:.3cqw; width:2.4cqw; font-size:2.3cqw;
   text-align:center; line-height:1;
 }
 /* на широком экране кнопки в макете нет; выравнивание оставлено здесь —
