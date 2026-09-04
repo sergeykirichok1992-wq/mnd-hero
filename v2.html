@@ -1053,10 +1053,15 @@ body{
 /* Первый ряд — имя, телефон, город. Второй ряд — «как планируете прийти»:
    вопрос стоит отдельной строкой во всю ширину, плитки выбора идут по центру
    над кнопкой. Ниже 1300 px первый ряд ломается на два поля,
-   ниже 640 всё в столбик. */
+   ниже 640 всё в столбик.
+
+   Сетка НЕ во всю ширину окна: 880 px против 1256 px внутреннего поля окна —
+   на треть уже. Три поля во всю ширину выглядели как забор, а так получается
+   лесенка от широкого к узкому: поля 880 → плитки выбора 720 → кнопка 480. */
 .bk-form{margin-top:clamp(24px,2.6vw,42px); text-align:left}
 .bk-form[hidden]{display:none}
-.bk-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:clamp(14px,1.5vw,24px); align-items:start}
+.bk-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:clamp(14px,1.5vw,24px);
+  align-items:start; width:min(100%,880px); margin:0 auto}
 .bk-f{min-width:0}
 /* вопрос о формате — отдельный ряд по центру: ширина как у пары полей,
    чтобы плитки не растягивались на все 1400 px и перекликались с кнопкой */
@@ -1298,6 +1303,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .zs-f + .zs-f{margin-top:clamp(14px,1.5vw,20px)}
 .zs-lab{display:block; margin:0 0 8px 4px; font-family:"Golos Text",Arial,sans-serif;
   font-size:11.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#7F91B4}
+/* звёздочка обязательного поля: золотом, чуть крупнее метки. В разметке идёт
+   с aria-hidden — для читалки обязательность уже сказана атрибутом required */
+.zs-req{color:#E3B34E; font-size:1.2em; line-height:0; vertical-align:-.05em}
 
 /* Кегль поля не опускаем ниже 16px: на iOS поле с мелким шрифтом заставляет
    Safari зумить всю страницу, как только в него ставят курсор */
@@ -1670,7 +1678,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                    placeholder="Имя" maxlength="60">
           </div>
           <div class="bk-f">
-            <label class="zs-lab" for="bkPhone">Ваш телефон</label>
+            <label class="zs-lab" for="bkPhone">Ваш телефон <span class="zs-req" aria-hidden="true">*</span></label>
             <input class="zs-inp" id="bkPhone" name="phone" type="tel" inputmode="tel"
                    autocomplete="tel" placeholder="+7 (___) ___-__-__"
                    aria-describedby="bkErrPhone" required>
@@ -1679,7 +1687,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <!-- город обязателен: от него зависит воронка в CRM. Ярославля и
                Екатеринбурга нет намеренно — они у партнёра по франшизе -->
           <div class="bk-f">
-            <label class="zs-lab" for="bkCity">Город</label>
+            <label class="zs-lab" for="bkCity">Город <span class="zs-req" aria-hidden="true">*</span></label>
             <select class="zs-inp zs-sel" id="bkCity" name="city" aria-describedby="bkErrCity" required>
               <option value="" disabled selected>Выберите город</option>
               <option>Нижний Новгород</option>
