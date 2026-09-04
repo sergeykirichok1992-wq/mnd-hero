@@ -1508,21 +1508,53 @@ body{
    сайта, а окно — оверлей во весь экран и к той сетке отношения не имеет.
    Его размеры идут через clamp() от ширины окна браузера. */
 
-/* ---------- кнопка ---------- */
-/* Золотая пилюля: полностью круглые торцы, ровная плавная заливка без резких
-   переходов — золото должно светиться, а не делиться на светлую и тёмную
-   половины. Объём даёт не градиент, а тени: верхняя фаска, нижняя тень внутрь
-   и мягкое золотое свечение под кнопкой.
+/* ---------- СТАНДАРТ КНОПОК «ЗВЁЗДНОЙ СМЕНЫ» ----------
+   Один размер и два вида на весь сайт. Третьего вида быть не должно:
+   если для нового места кажется, что нужна «ещё одна кнопка» — это
+   почти всегда значит, что нужен один из этих двух.
+
+     1. Обычная   <button class="zs-btn"><span class="zs-t">Текст</span></button>
+        золотая заливка, главное действие экрана.
+     2. Прозрачная <button class="zs-btn zs-btn--ghost"><span class="zs-t">Текст</span></button>
+        то же золото, но только обводкой — второстепенное действие рядом
+        с обычной или там, где золотая заливка перетянет внимание.
+
+   ШИРИНА ОДНА ДЛЯ ВСЕХ КНОПОК И НЕ ЗАВИСИТ ОТ ДЛИНЫ НАДПИСИ.
+   Её держит переменная --zs-btn-w. Кнопка «Оставить заявку» и кнопка
+   «Забронировать дату» обязаны быть одного размера: разнокалиберные пилюли
+   по странице читаются как разные элементы, а это одно и то же действие.
+   На экране уже кнопки, чем --zs-btn-w, кнопка сжимается до ширины места.
+
+   Текст обязан лежать в <span class="zs-t"> — поверх него рисуются глянец
+   и бегущий блик, без обёртки надпись окажется под ними.
+
+   Что менять, если размер не нравится: только три переменные ниже,
+   не отдельные кнопки. Правка размера в одном месте — весь сайт едет ровно.
+
    Кромка `inset 0 0 0 1px` обязательна: кнопка стоит и на тёмном четвёртом
-   экране, и на белых экранах 2-3, и без кромки на белом она растворяется. */
+   экране, и на белых экранах 2-3, и без кромки на белом она растворяется.
+   Заливка ровная и плавная, без резких переходов: объём даёт не градиент,
+   а тени — верхняя фаска, нижняя тень внутрь и золотое свечение снизу. */
+:root{
+  --zs-btn-w:480px;      /* ширина, одна на все кнопки сайта */
+  --zs-btn-h:64px;       /* высота */
+  --zs-btn-fs:17px;      /* кегль надписи */
+}
+@media (max-width:640px){
+  /* На телефоне кнопка выше: палец попадает в неё не целясь, и на маленьком
+     экране она читается как главное действие. */
+  :root{ --zs-btn-h:70px; --zs-btn-fs:16px }
+}
 .zs-btn{
   position:relative; isolation:isolate; overflow:hidden;
   display:inline-flex; align-items:center; justify-content:center; gap:.55em;
+  box-sizing:border-box;
+  width:min(100%, var(--zs-btn-w)); min-height:var(--zs-btn-h);
   border:0; cursor:pointer; text-decoration:none; white-space:nowrap;
-  padding:clamp(15px,1.15vw,20px) clamp(30px,2.5vw,46px);
+  padding:12px clamp(20px,2vw,34px);
   border-radius:999px;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(14px,1.05vw,19px); line-height:1.05; letter-spacing:.03em;
+  font-size:var(--zs-btn-fs); line-height:1.1; letter-spacing:.03em;
   text-transform:uppercase; text-align:center; color:#2A1B03;
   background:linear-gradient(180deg, #FBE7B4 0%, #F3D68F 36%, #E9C36C 68%, #DFB253 100%);
   box-shadow:
@@ -1575,20 +1607,52 @@ body{
 .zs-btn:focus-visible{outline:3px solid rgba(255,238,190,.9); outline-offset:3px}
 .zs-btn[disabled]{cursor:default; filter:grayscale(.3) brightness(.94); opacity:.8; transform:none}
 .zs-btn[disabled]::after{animation:none; opacity:0}
-/* размеры: одна кнопка, три роста */
-.zs-btn--lg{padding:clamp(17px,1.4vw,24px) clamp(34px,3vw,58px); font-size:clamp(15px,1.2vw,22px)}
-/* На телефоне кнопки заявки выше: 70 px против прежних 50. Палец попадает
-   в них не целясь, и на маленьком экране кнопка читается как главное действие
-   экрана. Радиус 999px тут не меняется — он и так «до упора», но на высокой
-   кнопке торцы становятся заметно круглее сами.
-   Правило общее для всех кнопок заявки (.zs-btn): и в потоке страницы,
-   и в всплывающем окне. Кнопка города в шапке — не .zs-btn, её не задевает. */
-@media (max-width:640px){
-  .zs-btn{padding:24px 28px; font-size:16px}
-  .zs-btn--lg{padding:26px 32px; font-size:17px}
+/* ---------- ВИД 2: прозрачная ----------
+   Та же пилюля того же размера, только без заливки: золото уходит в обводку
+   и в надпись. Обводку держит внутренняя тень, а не border, — иначе кнопка
+   стала бы на два пикселя шире соседней, и «одинаковая ширина» сломалась бы.
+   Глянец и бегущий блик выключены: блику не по чему бежать, а глянец на
+   прозрачном читается как грязное пятно. */
+.zs-btn--ghost{
+  color:#EBD3A0;
+  background:none;
+  box-shadow:
+    inset 0 0 0 2px rgba(227,179,78,.7),
+    0 10px 24px -18px rgba(227,179,78,.5);
 }
-.zs-btn--sm{padding:11px 22px; font-size:13px}
-.zs-btn--full{display:flex; width:100%}
+.zs-btn--ghost::before,.zs-btn--ghost::after{display:none}
+.zs-btn--ghost:hover{
+  color:#fff; transform:translateY(-1px); filter:none;
+  background:rgba(227,179,78,.1);
+  box-shadow:
+    inset 0 0 0 2px rgba(227,179,78,1),
+    0 16px 34px -18px rgba(227,179,78,.75);
+}
+.zs-btn--ghost:active{
+  transform:translateY(1px); background:rgba(227,179,78,.16);
+  box-shadow:inset 0 0 0 2px rgba(227,179,78,.9);
+}
+/* На белых экранах 2-3 прозрачная кнопка стоит на светлом: тонкое золото
+   на белом почти не видно, поэтому там обводка и надпись темнее. */
+.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost{
+  color:#8A6111; box-shadow:inset 0 0 0 2px rgba(160,116,32,.75);
+}
+.cr-s2 .zs-btn--ghost:hover,.cr-s3 .zs-btn--ghost:hover{
+  color:#3A2705; background:rgba(227,179,78,.16);
+  box-shadow:inset 0 0 0 2px rgba(160,116,32,1), 0 16px 34px -18px rgba(160,116,32,.5);
+}
+
+/* Псевдонимы старых модификаторов. Размер теперь один на все кнопки,
+   поэтому --lg, --sm и --full ничего не меняют. Оставлены, чтобы уже
+   расставленная по странице разметка (и работа соседних сессий) не сломалась;
+   в новых кнопках их писать не надо. */
+.zs-btn--lg,.zs-btn--sm,.zs-btn--full{}
+
+/* На узком экране надпись переносится, а не обрезается: ширина кнопки там
+   меньше --zs-btn-w, и длинный текст в одну строку не влезает */
+@media (max-width:640px){
+  .zs-btn{white-space:normal}
+}
 
 /* ---------- окно ---------- */
 /* Прокрутку страницы запирает overflow:hidden на <html>, а не position:fixed
@@ -1767,16 +1831,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   60% {transform:scale(1.06) rotate(4deg); opacity:1}
   100%{transform:none; opacity:1}
 }
-/* «Закрыть» на экране «спасибо» намеренно тихая: главное действие там —
-   уйти в наши сообщества, а не закрыть окно */
-.zs-ghost{
-  margin-top:clamp(16px,1.8vw,24px); padding:12px 26px; border-radius:999px; cursor:pointer;
-  border:1px solid rgba(146,167,214,.26); background:transparent; color:#93A6C8;
-  font-family:"Golos Text",Arial,sans-serif; font-size:14px; font-weight:500;
-  transition:color .2s ease, border-color .2s ease, background .2s ease;
-}
-.zs-ghost:hover{color:#fff; border-color:rgba(227,179,78,.5); background:rgba(255,255,255,.05)}
-.zs-ghost:focus-visible{outline:2px solid rgba(227,179,78,.8); outline-offset:2px}
+/* «Закрыть» на экране «спасибо» — прозрачный вид по стандарту: главное
+   действие там уйти в наши сообщества, а не закрыть окно */
+.zs-close{margin-top:clamp(16px,1.8vw,24px)}
 
 .zs-socH{margin:clamp(20px,2.2vw,30px) 0 clamp(12px,1.2vw,16px);
   font-family:"Golos Text",Arial,sans-serif; font-size:12px; font-weight:600;
@@ -2278,7 +2335,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </ul>
 
         <div class="zs-send">
-          <button class="zs-ghost" type="button" id="zsDone">Закрыть окно</button>
+          <button class="zs-btn zs-btn--ghost zs-close" type="button" id="zsDone">
+            <span class="zs-t">Закрыть окно</span></button>
         </div>
       </div>
 
