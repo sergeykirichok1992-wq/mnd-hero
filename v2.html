@@ -1410,18 +1410,37 @@ body{
   text-shadow:0 2px 16px rgba(0,0,0,.55);
 }
 .sm-send{margin:clamp(28px,6.4vw,134px) 0 0}
-/* Кнопка не капсом — так в макете. Заливка светлее общей: на чёрном небе
-   тёмное золото выглядело бы грязным пятном.
-   04.09.2026 кегль и поля уполовинены по просьбе Серёги: в макете кнопка была
-   вдвое крупнее. Нижние границы clamp() при этом не делили — 14 px и 16 px
-   полей на телефоне это и так минимум, ниже палец не попадает. */
+/* Кнопка обычная, как в форме заявки: размер и все повадки даёт `.zs-btn--lg`
+   в разметке, здесь меняется только цвет. Синяя вместо золотой — 04.09.2026
+   по просьбе Серёги: на этом экране золото уже занято заголовком и бликом.
+   Тени приходится перекрывать все три состояния (обычное, наведение, нажатие):
+   у общей кнопки в них зашито золотое свечение, иначе оно вылезет под синей. */
 .zs-btn.sm-cta{
-  padding:clamp(16px,1.17vw,25px) clamp(26px,4.69vw,98px);
-  font-family:"CR Blogger","Golos Text",Arial,sans-serif; font-weight:400;
-  font-size:clamp(14px,1.08vw,23px); letter-spacing:.01em; text-transform:none;
-  color:#1B1206;
-  background:linear-gradient(180deg,#FFEDAC 0%,#FDE39A 38%,#FBD584 68%,#F9CB72 100%);
+  color:#fff;
+  background:linear-gradient(180deg,#6AA0FF 0%,#4C7DF2 38%,#3560DE 68%,#2547BE 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),           /* фаска сверху */
+    inset 0 -1px 0 rgba(255,255,255,.18),
+    inset 0 0 0 1px rgba(24,48,132,.55),           /* кромка */
+    inset 0 -12px 18px -12px rgba(8,22,80,.45),    /* объём */
+    0 2px 4px rgba(2,6,24,.3),
+    0 14px 26px -12px rgba(2,6,24,.6),
+    0 22px 48px -20px rgba(74,124,246,.75);        /* синее светит на подложку */
 }
+.zs-btn.sm-cta:hover{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.18),
+    inset 0 0 0 1px rgba(24,48,132,.55), inset 0 -12px 18px -12px rgba(8,22,80,.4),
+    0 3px 6px rgba(2,6,24,.3), 0 18px 32px -12px rgba(2,6,24,.6),
+    0 26px 60px -20px rgba(90,140,255,.95);
+}
+.zs-btn.sm-cta:active{
+  box-shadow:
+    inset 0 2px 6px rgba(8,22,80,.5), inset 0 0 0 1px rgba(24,48,132,.65),
+    0 1px 2px rgba(2,6,24,.32), 0 8px 16px -10px rgba(2,6,24,.5);
+}
+/* «2026-2027» с новой строки — только на телефоне, см. телефонный блок ниже */
+.sm-br{display:none}
 
 @media (max-width:1023px){
   /* Поля по краям экрана. Ниже 768 px общий контейнер `.cr-cont` идёт без
@@ -1436,6 +1455,20 @@ body{
      картинки ни к чему */
   .sm-bg{background-image:url(v2-sm-top-620.webp)}
   .sm-art::before{background-image:url(v2-sm-moon-480.webp)}
+}
+@media (max-width:767px){
+  /* Коллаж во всю ширину экрана — на телефоне он главный, поля ему только
+     мешают. Отрицательные поля ровно те же, что боковые поля контейнера,
+     поэтому картинка выходит на края экрана. 100vw брать нельзя: на планшете
+     с видимой полосой прокрутки это шире окна и даёт горизонтальный скролл. */
+  .sm-art{width:auto;
+    margin-left:calc(-1 * clamp(16px,4.6vw,30px));
+    margin-right:calc(-1 * clamp(16px,4.6vw,30px))}
+  /* надзаголовок крупнее в 1,7 раза (04.09.2026, просьба Серёги): рукописная
+     строка на телефоне работает как картинка, мелкой её не видно */
+  .sm-eyebrow{font-size:clamp(30px,8.72vw,46px)}
+  /* заголовок в две строки: «НОВАЯ ПРОГРАММА» и год под ней */
+  .sm-br{display:inline}
 }
 
 /* появление: афиша всплывает снизу. Прячет только класс .rv, его вешает
@@ -2095,7 +2128,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <div class="cr-cont">
       <div class="sm-in">
         <p class="sm-eyebrow">АстроГномы зовут на миссию!</p>
-        <h2 class="sm-t" id="smT">Новая программа <b>2026-2027</b></h2>
+        <h2 class="sm-t" id="smT">Новая программа<br class="sm-br"> <b>2026-2027</b></h2>
 
         <div class="sm-art">
           <img src="v2-sm-logo.webp"
@@ -2110,7 +2143,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           технологичным, красивым и необычайно интересным!</p>
 
         <p class="sm-send">
-          <button class="zs-btn sm-cta" type="button" data-zs="6-й экран, «Хочу в космос»">
+          <button class="zs-btn zs-btn--lg sm-cta" type="button" data-zs="6-й экран, «Хочу в космос»">
             <span class="zs-t">Хочу в космос!</span></button>
         </p>
       </div>
