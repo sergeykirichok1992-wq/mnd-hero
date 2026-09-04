@@ -800,10 +800,10 @@ body{
    Проверять замером overflow, а не глазами. */
 .dk-list{
   position:absolute; margin:0; padding:0; list-style:none;
-  left:547px; top:416px; width:749px;                   /* запас для браузера без cqw */
-  left:37.62cqw; top:28.62cqw; width:51.47cqw;
+  left:547px; top:452px; width:749px;                   /* запас для браузера без cqw */
+  left:37.62cqw; top:31.1cqw; width:51.47cqw;
   display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(4,4.2cqw);
+  grid-template-rows:repeat(3,4.2cqw);
   column-gap:.75cqw; row-gap:1.1cqw;                    /* зазор между колонками втрое больше */
 }
 /* Порядок в разметке смысловой: даты стоят рядом со временем. В письме
@@ -813,7 +813,6 @@ body{
 .dk-list li:nth-child(1){grid-area:1/1}
 .dk-list li:nth-child(2){grid-area:2/1}
 .dk-list li:nth-child(5){grid-area:3/1}
-.dk-list li:nth-child(7){grid-area:4/1}
 .dk-list li:nth-child(3){grid-area:1/2}
 .dk-list li:nth-child(4){grid-area:2/2}
 .dk-list li:nth-child(6){grid-area:3/2}
@@ -835,7 +834,7 @@ body{
      Трекинг −.03em: без него самая длинная строка не помещается в колонку. */
   font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
   font-size:22px;                                       /* запас для браузера без cqw */
-  font-size:1.49cqw; line-height:1.1; letter-spacing:-.04em; white-space:nowrap;
+  font-size:1.53cqw; line-height:1.1; letter-spacing:-.04em; white-space:nowrap;
   box-shadow:0 .16cqw .3cqw rgba(120,86,20,.25);
 }
 /* Значок стоит в своём квадрате и центрируется в нём по обеим осям: эмодзи
@@ -995,6 +994,9 @@ body{
     box-shadow:0 calc(6 * var(--m) / 1080) calc(14 * var(--m) / 1080) rgba(0,0,0,.38),
                0 0 calc(20 * var(--m) / 1080) rgba(255,214,140,.16);
   }
+  .dk-list li:nth-child(3),
+  .dk-list li:nth-child(4),
+  .dk-list li:nth-child(6){padding-left:calc(146 * var(--m) / 1080)}
   .dk-ico{
     left:calc(6 * var(--m) / 1080); width:calc(122 * var(--m) / 1080);
     height:auto; font-size:max(22px, calc(74 * var(--m) / 1080));
@@ -1968,8 +1970,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <li><span class="dk-ico" aria-hidden="true">📅</span>Ежедневно с 27 ноября по 10 января</li>
       <li><span class="dk-ico" aria-hidden="true">🕐</span>С 09:00 до 21:30</li>
       <li><span class="dk-ico" aria-hidden="true">⏳</span>Продолжительность: 1 час 20 минут</li>
-      <li><span class="dk-ico" aria-hidden="true">🚌</span>Организованная группа - от 20 детей</li>
-      <li><span class="dk-ico" aria-hidden="true">🎁</span>Бонусы и спецусловия для групп</li>
+      <li><span class="dk-ico" aria-hidden="true">🎁</span>Спецусловия для групп от 20 детей</li>
     </ul>
     <!-- кнопка осталась только для телефона: на широком экране её в макете нет.
          Она общая для всего сайта (.zs-btn) и открывает общее окно заявки:
