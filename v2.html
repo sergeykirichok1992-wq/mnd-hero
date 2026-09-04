@@ -341,6 +341,13 @@ body{
    его использует первый экран. */
 @font-face{font-family:"CR Blogger Bold"; font-style:normal; font-weight:700; font-display:swap;
   src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff")}
+/* рукописный «Васёк» — им набран надзаголовок шестого экрана
+   («АстроГномы зовут на миссию!»). Шрифт бесплатен и для коммерции
+   (автор Designgsta), файл обрезан до кириллицы, латиницы и знаков
+   препинания: 24 КБ вместо 63. Начертание у него одно и оно уже наклонное —
+   курсив браузеру НЕ просить, иначе он наклонит второй раз сам. */
+@font-face{font-family:"Vasek"; font-style:normal; font-weight:400; font-display:swap;
+  src:url(vasek.woff2) format("woff2"), url(vasek.woff) format("woff")}
 
 /* ---------- каркас, общий для обоих экранов ----------
    Вёрстка широкая, почти во весь экран: контейнер min(94vw,1720px) с полями
@@ -1270,6 +1277,168 @@ body{
   .bk-done:not([hidden]) .bk-seal{animation:none}
 }
 
+/* ==================== ЭКРАН 6: «Звёздная смена» ====================
+   Афиша новой программы: рукописный надзаголовок, крупный заголовок,
+   коллаж с персонажами и кнопка. Пространство имён `sm-` (смена) — оно не
+   пересекается ни с первым экраном, ни с копиями старого сайта (`.cr-*`),
+   ни с четвёртым (`.dk-*`), ни с пятым (`.bk-*`), ни с формой (`.zs-*`).
+
+   Фон собран из двух картинок Серёги:
+     v2-sm-top.webp  — золотое боке, прижато к верху секции;
+     v2-sm-moon.webp — синий купол «луны», он обнимает коллаж.
+   В исходниках обе лежат ЧЁРНЫМ по краям, то есть непрозрачным прямоугольником.
+   Если положить их как есть, верхняя закрасит нижнюю и подложку. Поэтому обе
+   пересобраны с прозрачностью: чёрный переведён в альфу (скриптом, альфа =
+   самый яркий канал, цвет поделён на неё обратно). На чёрном фоне картинка
+   выглядит точно как исходник, а слои складываются светом сами, без режимов
+   смешивания — их в этом месте страницы применить нельзя, см. комментарий
+   к куполу ниже.
+
+   Размеры не в множителе --u: это не копия старого сайта, а свой экран,
+   поэтому всё идёт через clamp() от ширины окна. Опорная точка — макет
+   Серёги при окне 2085 px, от него и посчитаны vw. */
+
+/* Обёртка нужна только ради блика на стыке: сама секция обрезает всё лишнее
+   (`overflow:hidden` держит синий купол внутри), а блик обязан вылезти
+   ВВЕРХ, на пятый экран. Поэтому он живёт снаружи секции, в обёртке. */
+/* z-index:26 обязателен. Экраны-копии старого сайта (`.cr`) стоят на 25 —
+   без своего слоя блик уезжает ПОД пятый экран, и над швом от него не остаётся
+   ничего: видна только нижняя половина. Выше 26 брать нельзя, там шапка (30). */
+.sm-hold{position:relative; z-index:26}
+.sm{
+  position:relative; z-index:1; isolation:isolate; overflow:hidden;
+  color:#fff; text-align:center;
+  padding:clamp(36px,6.28vw,131px) 0 clamp(80px,9.6vw,200px);
+  /* подложка: почти чёрная вверху и еле синяя внизу — в макете низ экрана
+     не угольный, а ночной, синева доходит до самых краёв кадра */
+  background:linear-gradient(180deg,#000004 0%,#000005 34%,#00020C 64%,#000312 100%);
+}
+/* блик: тонкая горячая полоса ровно по шву двух экранов. У картинки
+   светящееся ядро стоит на 48,5 % высоты — на столько её и приподнимаем,
+   иначе полоса окажется ниже шва. z-index:3 — выше секции (1), чтобы низ
+   блика не закрасился её фоном. Ширина всегда во всё окно, как в макете. */
+.sm-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+/* Золотое боке вверху. Ширина 100 %, высота своя — картинка сама гаснет
+   в чёрное примерно к четверти своей высоты, растягивать её нельзя.
+   Как и купол, лежит с прозрачностью вместо чёрного фона: иначе её чёрный
+   низ закрасил бы синеву подложки на всю высоту секции.
+   Маска по горизонтали приглушает боке у самых краёв кадра — в макете углы
+   заметно темнее середины. */
+.sm-bg{
+  position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+  background:url(v2-sm-top.webp) center top/100% auto no-repeat;
+  -webkit-mask-image:linear-gradient(90deg,rgba(0,0,0,.55) 0%,#000 6%,#000 94%,rgba(0,0,0,.55) 100%);
+          mask-image:linear-gradient(90deg,rgba(0,0,0,.55) 0%,#000 6%,#000 94%,rgba(0,0,0,.55) 100%);
+}
+/* звёзды: слой над фоном и под текстом. Рисует общий движок «живого неба» */
+.sm-sky{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none}
+.sm-in{position:relative; z-index:2}
+
+/* ---------- надзаголовок «АстроГномы зовут на миссию!» ---------- */
+/* Рукописный «Васёк». Шрифт наклонный сам по себе, `font-style:italic`
+   не ставить. Тёплая тень под буквами — на золотом боке белое без неё
+   размывается и читается хуже. */
+.sm-eyebrow{
+  margin:0; font-family:"Vasek","Golos Text",Arial,sans-serif; font-weight:400;
+  font-size:clamp(33px,5.5vw,115px); line-height:1; letter-spacing:.01em;
+  color:#FFF7E6; text-shadow:0 2px 18px rgba(0,0,0,.55), 0 0 40px rgba(255,214,130,.35);
+}
+/* ---------- заголовок «НОВАЯ ПРОГРАММА 2026-2027» ---------- */
+/* Шрифт тот же Blogger Sans Bold, что и на пятом экране, но буквы стоят
+   заметно теснее: в макете строка на 8 % уже, чем тот же текст обычным
+   набором при той же высоте букв. Это и даёт отрицательный letter-spacing.
+   Ставить вместо этого мелкий кегль нельзя: высота букв в макете больше,
+   чем у заголовка пятого экрана, а не меньше. */
+.sm-t{
+  margin:clamp(6px,.9vw,20px) auto 0;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(32px,4.27vw,94px); line-height:1.05; letter-spacing:-.062em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+  text-shadow:0 2px 22px rgba(0,0,0,.5);
+}
+/* год золотом — той же заливкой, что «по стартовым ценам» на пятом экране */
+.sm-t b{font-weight:700; color:#E9C36C}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .sm-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
+
+/* ---------- коллаж ---------- */
+/* Синий купол — псевдоэлемент коллажа, а не фон секции: так он всегда стоит
+   вокруг персонажей, на любой ширине окна. Ширина 121 % от коллажа и верх
+   вровень с ним — числа сняты с макета.
+
+   Режим `mix-blend-mode:screen` тут НЕ работает: коллаж живёт внутри
+   `.cr-cont`, а у контейнера свой `z-index`, то есть свой слой; смешивать
+   купол с золотым боке под ним браузеру не с чем, и вместо свечения выходил
+   чёрный прямоугольник. Поэтому купол лежит с прозрачностью — смешивать
+   нечего, слои складываются сами.
+
+   Ширина коллажа — доля окна, а не «сколько влезет в контейнер»: в макете
+   он занимает 70 % ширины экрана, и на любой ширине должен занимать столько
+   же. Потолок 1600 px — родная ширина картинки, выше неё растягивать нечего.
+   На телефоне (ниже 900 px) 70 % мало, там коллаж идёт во всю ширину. */
+.sm-art{position:relative; width:min(100%,70vw,1600px); margin:clamp(26px,4.4vw,92px) auto 0}
+.sm-art::before{
+  content:''; position:absolute; z-index:0; left:50%; top:0; width:121%;
+  aspect-ratio:2500/3127; transform:translateX(-50%); pointer-events:none;
+  background:url(v2-sm-moon.webp) center/100% 100% no-repeat;
+  /* нижние 14 % картинки гасим: у купола там своя «линия горизонта», и на
+     телефоне, где секция короткая, она попадает под кнопку светлой полосой */
+  -webkit-mask-image:linear-gradient(180deg,#000 0%,#000 86%,transparent 100%);
+          mask-image:linear-gradient(180deg,#000 0%,#000 86%,transparent 100%);
+}
+.sm-art img{position:relative; z-index:1; display:block; width:100%; height:auto}
+
+/* ---------- текст и кнопка ---------- */
+/* Ширина в `em`, а не в пикселях: она обязана ехать вместе с кеглем, иначе
+   на узком окне в строку влезает лишнее слово и разбивка уходит от макета.
+   30,5 em — ровно между «строка помещается» (29,9) и «влезает следующее
+   слово» (31,2), поэтому текст всегда ложится тремя строками, как в макете. */
+.sm-lede{
+  margin:clamp(24px,6vw,125px) auto 0; max-width:min(100%,30.5em);
+  font-family:"CR Blogger","Golos Text",Arial,sans-serif; font-weight:400;
+  font-size:clamp(17px,2.25vw,47px); line-height:1.36; color:#EDF2FF;
+  text-shadow:0 2px 16px rgba(0,0,0,.55);
+}
+.sm-send{margin:clamp(28px,6.4vw,134px) 0 0}
+/* Кнопка крупная и не капсом — так в макете. Заливка светлее общей:
+   на чёрном небе тёмное золото выглядело бы грязным пятном. */
+.zs-btn.sm-cta{
+  padding:clamp(22px,2.33vw,49px) clamp(40px,9.38vw,196px);
+  font-family:"CR Blogger","Golos Text",Arial,sans-serif; font-weight:400;
+  font-size:clamp(16px,2.16vw,45px); letter-spacing:.01em; text-transform:none;
+  color:#1B1206;
+  background:linear-gradient(180deg,#FFEDAC 0%,#FDE39A 38%,#FBD584 68%,#F9CB72 100%);
+}
+
+@media (max-width:1023px){
+  /* Поля по краям экрана. Ниже 768 px общий контейнер `.cr-cont` идёт без
+     полей — так сделаны экраны-копии старого сайта, — поэтому поля этот
+     экран задаёт себе сам, иначе текст упрётся в края телефона. */
+  .sm .cr-cont{padding:0 clamp(16px,4.6vw,30px)}
+  /* коллаж во всю ширину: 70 % на телефоне — уже мелко */
+  .sm-art{width:100%}
+}
+@media (max-width:900px){
+  /* раскладка та же, меняются только файлы фона: узкому экрану тяжёлые
+     картинки ни к чему */
+  .sm-bg{background-image:url(v2-sm-top-620.webp)}
+  .sm-art::before{background-image:url(v2-sm-moon-480.webp)}
+}
+
+/* появление: афиша всплывает снизу. Прячет только класс .rv, его вешает
+   скрипт — без JS экран обязан быть виден */
+.sm.rv .sm-in{opacity:0; transform:translateY(30px)}
+.sm.rv.on .sm-in{opacity:1; transform:none; transition:opacity .8s ease, transform .9s cubic-bezier(.2,.7,.2,1)}
+@media (prefers-reduced-motion:reduce){
+  .sm.rv .sm-in{opacity:1; transform:none; transition:none}
+}
+
 /* ==================== ЕДИНАЯ КНОПКА И ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
    Один блок на весь сайт: одна кнопка `.zs-btn` и одно окно `.zs-ov`.
    Любая кнопка с атрибутом data-zs открывает это окно — где бы она ни стояла.
@@ -1892,6 +2061,41 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </div>
 
 </section>
+
+<!-- ==================== ЭКРАН 6: «Звёздная смена» ====================
+     Афиша новой программы. Ниже формы заявки — так в макете Серёги.
+     Блик на стыке лежит в обёртке, а не в секции: ему нужно вылезти вверх,
+     на пятый экран, а секция всё лишнее обрезает. -->
+<div class="sm-hold">
+  <div class="sm-blik" aria-hidden="true"></div>
+  <section class="sm" id="smena" aria-labelledby="smT">
+    <div class="sm-bg" aria-hidden="true"></div>
+    <canvas class="sm-sky" id="smSky" aria-hidden="true"></canvas>
+    <div class="cr-cont">
+      <div class="sm-in">
+        <p class="sm-eyebrow">АстроГномы зовут на миссию!</p>
+        <h2 class="sm-t" id="smT">Новая программа <b>2026-2027</b></h2>
+
+        <div class="sm-art">
+          <img src="v2-sm-logo.webp"
+               srcset="v2-sm-logo-1000.webp 1000w, v2-sm-logo.webp 1600w"
+               sizes="(max-width:1023px) 100vw, min(70vw, 1600px)"
+               width="1600" height="1392" loading="lazy" decoding="async"
+               alt="Звёздная смена: Дед Мороз, Снегурочка, Астроном и АстроГномы у обсерватории">
+        </div>
+
+        <p class="sm-lede">Мы сделали то, что давно хотели - объединили Новый Год
+          с тематикой космоса, ведь это дает возможность сделать мероприятие
+          технологичным, красивым и необычайно интересным!</p>
+
+        <p class="sm-send">
+          <button class="zs-btn sm-cta" type="button" data-zs="6-й экран, «Хочу в космос»">
+            <span class="zs-t">Хочу в космос!</span></button>
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
@@ -2933,6 +3137,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     io.observe(s);
   }
 
+  /* тем же способом всплывает афиша шестого экрана */
+  var sm = document.getElementById('smena');
+  if (sm && window.IntersectionObserver && !reduce){
+    sm.classList.add('rv');
+    var io2 = new IntersectionObserver(function(es){
+      if (es[0].isIntersecting){ sm.classList.add('on'); io2.disconnect(); }
+    }, {threshold:.08});
+    io2.observe(sm);
+  }
+
   /* Заголовок всегда в две строки. Разбивку задаёт <br class="bk-br">, но
      она держится, только пока строка помещается в ширину окна. Если Blogger
      Sans ещё не загрузился (телефон, медленная сеть), текст рисует запасной
@@ -3151,6 +3365,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       /* там, где фон светлеет, звёзды гасим: на светлом они читаются грязью */
       var v = y / H, fade = 1;
       if (v > o.fadeFrom) fade = Math.max(0, 1 - (v - o.fadeFrom) / o.fadeLen);
+      /* fadeTop — то же самое, но сверху. Нужен шестому экрану: там верх
+         занимает золотое боке, на светлом звёзды читаются грязью.
+         Настройка необязательная, у остальных небес её просто нет. */
+      if (o.fadeTop && v < o.fadeTop) fade *= v / o.fadeTop;
       fade = fade * fade;
       if (fade < 0.04) continue;
 
@@ -3364,6 +3582,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     div: 6200, cap: 300, bias: 1.7, knotTop: 0.04, knotLen: 0.40,
     fadeFrom: 0.74, fadeLen: 0.26, alpha: 0.9, shift: 46,
     first: 9, gap: 15, gapSpread: 22
+  });
+
+  /* шестой экран, афиша «Звёздной смены»: звёзды нужны на чёрном низе.
+     Сверху их гасит fadeTop — там золотое боке, снизу секция чёрная
+     до самого конца, поэтому нижнее затухание отодвинуто за край (1.2).
+     bias 0.6 сдвигает рассыпку вниз: pow(случайное, 0.6) тянется к единице. */
+  add('smena', 'smSky', {
+    div: 5200, cap: 420, bias: 0.6, knotTop: 0.42, knotLen: 0.5,
+    fadeFrom: 1.2, fadeLen: 1, fadeTop: 0.34, alpha: 1, shift: 52,
+    first: 7, gap: 13, gapSpread: 20
   });
 
   if (!list.length) return;
