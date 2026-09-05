@@ -878,7 +878,8 @@ body{
   position:absolute; inset:0; z-index:1; display:none;
   width:100%; height:100%; pointer-events:none;
 }
-.dk-girl{display:none}
+/* картинка экрана живёт только на телефоне: её стили — в медиа до 1279 px */
+.dkm{display:none}
 
 /* ==================== ЭКРАН 4 НА ТЕЛЕФОНЕ ====================
    Своя композиция, снятая с макета «4 экран/референс для 4 экрана.png»
@@ -897,7 +898,8 @@ body{
      а у нас там ещё стоят подписи Ставрополя, Екатеринбурга и Тюмени —
      она бы их закрыла. Поэтому низу экрана с картой добавлен пустой запас
      ровно на её рост. Сама карта, подписи и фон не тронуты: это только поле. */
-  .cr-s3{padding-bottom:calc(60 * var(--u) + 512 * min(100vw, 620px) / 1080)}
+  /* 05.09.2026: прежняя телефонная композиция (девушка-часовщица, живые
+     плашки) заменена одной картинкой — запас под девушку внизу карты убран. */
   .dk{
     --m: min(100vw, 620px);
     margin:0;                                          /* поляна с её вылетами — только на широком экране */
@@ -926,39 +928,7 @@ body{
     border-radius:50% 50% 0 0 /
       calc(128 * var(--m) / 1080) calc(128 * var(--m) / 1080) 0 0;
   }
-  /* девушка. z-index не ставим намеренно: элемент со своим слоем изолировал бы
-     наложение, и чёрный фон картинки перестал бы исчезать.
-     Фон самого блока — тёмная вуаль: картинка кладётся режимом screen, а он
-     складывает цвета с подложкой. Без вуали синий фон карты высветлил бы
-     плащ до сирени. Маска гасит края картинки там же, где кончается вуаль. */
-  .dk-girl{
-    display:block; position:absolute; left:0; right:0; pointer-events:none;
-    top:calc(-799 * var(--m) / 1080);
-    height:calc(920 * var(--m) / 1080);
-    /* окно шире экрана не бывает: картинка вылезает за края, и без обрезки
-       страница получала бы горизонтальную прокрутку. overflow тут не создаёт
-       свой слой — наложение screen продолжает считаться с фоном страницы */
-    overflow:hidden;
-    /* вуаль широкая и плотная: за девушкой стоит низ экрана с картой, а там
-       снег и ёлки. Без плотной вуали они лезут ей в лицо, в макете за ней чисто */
-    background:radial-gradient(37% 58% at 49% 53%,
-      rgba(0,3,26,.96) 42%, rgba(0,3,26,.72) 68%, rgba(0,3,26,.3) 84%, rgba(0,3,26,0) 100%);
-    animation:dkFloat 9s ease-in-out infinite;
-  }
-  .dk-girl img{
-    display:block; position:absolute; top:0; left:50%;
-    width:calc(1380 * var(--m) / 1080); height:auto;
-    margin-left:calc(-690 * var(--m) / 1080);
-    mix-blend-mode:screen;
-    filter:saturate(.9);
-    -webkit-mask-image:radial-gradient(62% 64% at 50% 48%, #000 62%, transparent 96%);
-            mask-image:radial-gradient(62% 64% at 50% 48%, #000 62%, transparent 96%);
-  }
-  @keyframes dkFloat{
-    0%,100%{transform:translateY(0)}
-    50%    {transform:translateY(calc(-14 * var(--m) / 1080))}
-  }
-  /* письма и поляны на телефоне нет — вместо них девушка на «холме» */
+  /* письма и поляны на телефоне нет — вместо них картинка .dkm на «холме» */
   .dk-art,.dk-bg{display:none}
   /* z-index 7 — как у .cr-cont, в котором сцена лежала раньше: без него
      заголовок и строчки уходят под «холм» (.dk::after, z-index 2) */
@@ -1012,7 +982,40 @@ body{
     height:auto; font-size:max(22px, calc(74 * var(--m) / 1080));
     filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));
   }
-  .dk-cta{display:block; margin-top:calc(34 * var(--m) / 1080)}   /* 05.09.2026: кнопка ближе к строчкам */
+  /* КАРТИНКА ЭКРАНА (05.09.2026). Весь экран на телефоне — один файл
+     v2-info.webp: рамка, заголовок и семь строчек нарисованы прямо в нём.
+     Внутри рамки у картинки ВЫРЕЗАНО ОКНО (альфа), и под окно подложены
+     кадры .dkm-win img — поэтому фотография в рамке живая, а рамка и плашка
+     с текстом остаются сверху и аккуратно режут её края.
+
+     Числа окна — доли от холста картинки 1024x1536 (левый край 122 px,
+     верх 99, ширина 782, высота 561). Меняешь картинку — пересчитай их,
+     иначе кадры вылезут из-под рамки. */
+  .dkm{display:block; position:relative; z-index:5;
+    width:var(--m); margin:calc(70 * var(--m) / 1080) auto 0}
+  .dkm-hold{position:relative; width:100%; aspect-ratio:1024/1536}
+  /* Края растворяем со всех четырёх сторон. Свой фон у картинки светлее
+     ночного неба секции, и без растушёвки видно прямоугольник — «наклеенный
+     лист»; особенно на планшете, где картинка уже экрана. Две маски
+     перемножаются (composite), крайние 4 % холста — чистый фон, рамка
+     начинается на 11,9 % по горизонтали и на 5,7 % сверху, маска её не задевает. */
+  .dkm-pic{position:absolute; inset:0; display:block; width:100%; height:100%;
+    -webkit-mask-image:linear-gradient(180deg, transparent 0, #000 4.2%, #000 93.5%, transparent 100%),
+                       linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+    -webkit-mask-composite:source-in;
+            mask-image:linear-gradient(180deg, transparent 0, #000 4.2%, #000 93.5%, transparent 100%),
+                       linear-gradient(90deg, transparent 0, #000 4%, #000 96%, transparent 100%);
+            mask-composite:intersect;}
+  .dkm-win{position:absolute; left:11.914%; top:6.445%;
+    width:76.367%; height:36.523%; overflow:hidden; background:#1B1008}
+  .dkm-win img{position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; opacity:0}                    /* смена кадров — резкая, без плавности */
+  .dkm-win img.on{opacity:1}
+  /* заголовок и строчки нарисованы на картинке, но из разметки не убраны:
+     они остаются для поиска и для тех, кто слушает страницу голосом */
+  .dk-t,.dk-list{position:absolute; width:1px; height:1px; margin:0; padding:0;
+    overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0}
+  .dk-cta{display:block; margin-top:calc(40 * var(--m) / 1080)}
   .dk-btn{padding:calc(38 * var(--m) / 1080) calc(80 * var(--m) / 1080);
     font-size:calc(40 * var(--m) / 1080); border-radius:calc(10 * var(--m) / 1080)}
   /* появление плашек по очереди. Прятать их умеет только класс .dkrv, а его
@@ -1025,7 +1028,7 @@ body{
 }
 @media (prefers-reduced-motion:reduce){
   .dk-btn{transition:none}
-  .dk-girl,.dk::after{animation:none}
+  .dk::after{animation:none}
   .dk.dkrv .dk-list li{opacity:1; transform:none; transition:none}
 }
 
@@ -2105,11 +2108,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <img class="dk-bg" src="v2-snow.webp"
        srcset="v2-snow-1400.webp 1400w, v2-snow.webp 2560w"
        sizes="100vw" width="2560" height="1380" loading="lazy" decoding="async" alt="">
-  <!-- телефон: девушка-часовщица выходит на экран с картой, «холм» (.dk::after)
-       закрывает её низ. На широком экране этот слой скрыт. -->
-  <div class="dk-girl" aria-hidden="true">
-    <img src="v2-girl.webp" srcset="v2-girl-1000.webp 1000w, v2-girl.webp 1536w"
-         sizes="128vw" width="1536" height="1024" alt="" loading="lazy" decoding="async">
+  <!-- ТЕЛЕФОН: весь экран одной картинкой. В окне рамки лежит кадр из макета,
+       остальные кадры доносит скрипт и щёлкает их, пока экран в поле зрения.
+       На широком экране блок скрыт (.dkm объявлен только в медиа до 1279 px). -->
+  <div class="dkm" aria-hidden="true">
+    <div class="dkm-hold">
+      <div class="dkm-win" id="dkmWin">
+        <img class="on" src="info/i1.webp" width="700" height="502" alt="" loading="lazy" decoding="async">
+      </div>
+      <img class="dkm-pic" src="v2-info.webp" width="1024" height="1536"
+           loading="lazy" decoding="async" alt="">
+    </div>
   </div>
   <div class="dk-scene">
     <img class="dk-art" src="v2-ded.webp"
@@ -4116,6 +4125,72 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     sec.classList.add('on');
   }, {rootMargin: '0px 0px -12% 0px'});
   io.observe(sec.querySelector('.dk-list') || sec);
+})();
+
+/* Четвёртый экран, телефон: кадры в окне картинки.
+   В рамке v2-info.webp вырезано окно, под ним лежат фотографии — этот скрипт
+   их перещёлкивает, пока экран виден. Смена резкая, по STEP миллисекунд:
+   так и просили — «мелькание», а не слайд-шоу.
+
+   ЧЕТЫРЕ ВЕЩИ, БЕЗ КОТОРЫХ ЭТО ВРЕДНО:
+   1. Кадры (около 350 КБ) грузятся, только когда экран подъезжает к окну,
+      и только на телефонной раскладке. На компьютере блока нет вовсе.
+   2. Пока экран не в кадре или вкладка спрятана — таймер стоит.
+   3. Если в системе включено «меньше движения», мелькания нет: остаётся
+      тот кадр, что нарисован в макете.
+   4. Первый кадр — вырезанное из макета фото, поэтому до загрузки остальных
+      экран выглядит ровно так, как его нарисовали. */
+(function(){
+  var win = document.getElementById('dkmWin');
+  if (!win) return;
+  var STEP = 300;                                        /* сколько держится кадр, мс */
+  var SRC  = ['info/i2.webp','info/i3.webp','info/i4.webp','info/i5.webp','info/i6.webp'];
+  var phone = window.matchMedia('(max-width:1279px)');
+  var calm  = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var shots = [win.firstElementChild], cur = 0, timer = null;
+  var seen = false, loaded = false, ready = false;
+
+  /* Мелькать начинаем только когда ВСЕ кадры уже в памяти браузера. Иначе на
+     медленном интернете первые круги идут по недокачанным картинкам, и в окне
+     вместо фотографии вспыхивает пустая заливка. */
+  function load(){
+    if (loaded) return; loaded = true;
+    var wait = [];
+    for (var i = 0; i < SRC.length; i++){
+      var im = document.createElement('img');
+      im.src = SRC[i]; im.alt = ''; im.width = 700; im.height = 502; im.decoding = 'async';
+      win.appendChild(im); shots.push(im);
+      wait.push(im.decode ? im.decode().catch(function(){}) 
+                          : new Promise(function(r){ im.onload = im.onerror = r; }));
+    }
+    Promise.all(wait).then(function(){ ready = true; start(); });
+  }
+  function show(i){
+    shots[cur].classList.remove('on');
+    cur = i % shots.length;
+    shots[cur].classList.add('on');
+  }
+  function start(){
+    if (timer || !seen || document.hidden || calm.matches || !phone.matches) return;
+    load();
+    if (!ready) return;                                  /* кадры ещё качаются — ждём */
+    timer = setInterval(function(){ show(cur + 1); }, STEP);
+  }
+  function stop(){
+    if (!timer) return;
+    clearInterval(timer); timer = null;
+    show(0);                                             /* вернулись — снова кадр из макета */
+  }
+  if ('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){
+      seen = es[0].isIntersecting;
+      seen ? start() : stop();
+    }, {threshold: .25}).observe(win);
+  }
+  document.addEventListener('visibilitychange', function(){ document.hidden ? stop() : start(); });
+  function onWidth(){ phone.matches ? start() : stop(); }
+  if (phone.addEventListener) phone.addEventListener('change', onWidth);
+  else if (phone.addListener) phone.addListener(onWidth);      /* Safari до 14 */
 })();
 
 /* ==================== ГОДА НА ФОНЕ ВТОРОГО ЭКРАНА ====================
