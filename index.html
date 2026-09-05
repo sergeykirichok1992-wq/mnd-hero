@@ -103,6 +103,20 @@ body{
 .stage > *{position:absolute; inset:0}
 #v{width:100%; height:100%; object-fit:cover; display:block; z-index:1;
    filter:saturate(1.14) contrast(1.07) brightness(1.04)}
+/* Ролик — часть декорации, а не плеер. Браузер по своей воле включает над ним
+   родную панель: на телефоне — когда автозапуск не прошёл, на любом экране —
+   от нажатия по кадру. Панель кладёт поверх видео тёмную подложку и полосу
+   перемотки, и первый экран темнеет. Гасим панель во всех её видах и снимаем
+   с видео нажатия — оно ничем не управляется, кроме прокрутки. */
+#v{pointer-events:none}
+#v::-webkit-media-controls,
+#v::-webkit-media-controls-enclosure,
+#v::-webkit-media-controls-panel,
+#v::-webkit-media-controls-panel-container,
+#v::-webkit-media-controls-overlay-play-button,
+#v::-webkit-media-controls-start-playback-button{
+  display:none !important; opacity:0 !important; -webkit-appearance:none;
+}
 #poster{width:100%; height:100%; object-fit:cover; display:block; z-index:2; pointer-events:none;
   filter:saturate(1.14) contrast(1.07) brightness(1.04); transition:opacity .32s ease}
 .vig{
@@ -2809,6 +2823,18 @@ body{
     }
   }
   ensureSize();
+
+  // Панель плеера гасится стилями, но браузер может ещё и включить сам атрибут
+  // controls (Safari делает это, когда считает ролик «настоящим видео»), а на
+  // айфоне — увести кадр в свой полноэкранный плеер. Держим оборону и здесь.
+  function noControls(){ if(v.controls){ v.controls=false; } v.removeAttribute('controls'); }
+  noControls();
+  ['loadedmetadata','loadeddata','canplay','playing','pause','seeked'].forEach(function(e){
+    v.addEventListener(e, noControls);
+  });
+  v.addEventListener('webkitbeginfullscreen', function(){
+    try{ if(v.webkitExitFullscreen) v.webkitExitFullscreen(); }catch(e){}
+  });
 
   v.addEventListener('loadedmetadata', function(){
     if(v.duration && isFinite(v.duration)) dur=v.duration; ready=true;
