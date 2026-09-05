@@ -1391,14 +1391,17 @@ body{
 /* Прожекторы: те же лучи, что на первом экране, но заметно прозрачнее.
    Холст шире и ниже коллажа, чтобы лучи выходили из-под острова и уходили
    за его края. Слой лежит под картинкой коллажа (z-index у неё 1). */
-/* Размеры ОБЯЗАТЕЛЬНО задавать шириной и высотой, а не четырьмя краями.
-   `<canvas>` — заменяемый элемент: при `width:auto` он берёт собственный
-   размер 300x150, а `right`/`bottom` просто отбрасываются. Из-за этого лучи
-   полдня рисовались в маленькой коробочке в левом верхнем углу коллажа.
-   128 % ширины = по 14 % вылета в каждую сторону, 108 % высоты = 4 % сверху
-   и 12 % снизу, чтобы фонари стояли под островом. */
+/* Прожекторы лежат на ВСЮ СЕКЦИЮ, а не внутри коллажа: светят они из-под
+   нижней кромки экрана вверх на логотип, поэтому холст обязан доставать
+   до низа. Слой между фоном (0) и звёздами (1), то есть заведомо позади
+   картинки коллажа и текста — они живут в `.cr-cont` с большим z-index.
+
+   Размеры ОБЯЗАТЕЛЬНО задавать шириной и высотой, а не четырьмя краями:
+   `<canvas>` — заменяемый элемент, при `width:auto` он берёт собственный
+   размер 300x150, а `right`/`bottom` браузер отбрасывает. На этом уже
+   обожглись — лучи рисовались в коробочке 300x150 в углу коллажа. */
 .sm-beams{
-  position:absolute; z-index:0; left:-14%; top:4%; width:128%; height:108%;
+  position:absolute; z-index:1; left:0; top:0; width:100%; height:100%;
   display:block; pointer-events:none;
 }
 .sm-art img{position:relative; z-index:1; display:block; width:100%; height:auto}
@@ -2188,6 +2191,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="sm-blik" aria-hidden="true"></div>
   <section class="sm" id="smena" aria-labelledby="smT">
     <div class="sm-bg" aria-hidden="true"></div>
+    <canvas class="sm-beams" id="smBeams" aria-hidden="true"></canvas>
     <canvas class="sm-sky" id="smSky" aria-hidden="true"></canvas>
     <div class="cr-cont">
       <div class="sm-in">
@@ -2195,7 +2199,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <h2 class="sm-t" id="smT">Новая программа<br class="sm-br"> <b>2026-2027</b></h2>
 
         <div class="sm-art">
-          <canvas class="sm-beams" id="smBeams" aria-hidden="true"></canvas>
           <img src="v2-sm-logo2.webp"
                srcset="v2-sm-logo2-1100.webp 1100w, v2-sm-logo2.webp 1821w"
                sizes="(max-width:767px) 100vw, min(66.7vw, 1821px)"
@@ -3233,6 +3236,149 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.addEventListener('orientationchange', function(){
     clearTimeout(tmr); tmr = setTimeout(ready, 300);
   });
+})();
+</script>
+
+<script>
+/* ==================== ПРОЖЕКТОРЫ ШЕСТОГО ЭКРАНА ====================
+   Четыре луча бьют ИЗ-ПОД НИЖНЕЙ КРОМКИ ЭКРАНА вверх и сходятся на логотипе.
+   Идея та же, что на первом экране: фонари внизу, лучи качаются маятником
+   со слегка разными скоростями, поэтому рисунок никогда не повторяется.
+   Отличий два: они заметно прозрачнее (там лучи — главный герой, тут только
+   подсветка) и целятся не в середину кадра, а в реальную коробку коллажа —
+   её положение скрипт замеряет сам, поэтому лучи остаются на логотипе
+   при любой ширине окна и любом его размере.
+
+   Холст лежит на всю секцию слоем между фоном и звёздами, то есть заведомо
+   ПОЗАДИ картинки коллажа: сам логотип лучи не засвечивают, они видны
+   только вокруг него и снизу.
+
+   Размытия (`filter:blur`) намеренно нет: мягкость даёт градиент самого луча,
+   а размытие холста в миллион пикселей роняет частоту кадров — на пятом
+   экране на этом уже обожглись.
+
+   Телефону лучи не рисуются: холст спрятан `display:none`, скрипт выходит
+   на первой же проверке размера. */
+(function(){
+  var cv = document.getElementById('smBeams');
+  if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  if (!ctx) return;
+  var sec = document.getElementById('smena');
+  var art = sec && sec.querySelector('.sm-art');
+  if (!sec || !art) return;
+
+  var slow = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var W = 0, H = 0, raf = 0, t0 = 0, seen = true;
+  var DPR = Math.min(2, window.devicePixelRatio || 1);
+  /* коробка коллажа в долях холста — пересчитывается при каждом замере */
+  var aL = 0.25, aR = 0.75, aT = 0.2;
+
+  /* x0 — где стоит фонарь по низу кадра (доля ширины);
+     u  — куда целится по ширине КОЛЛАЖА (0 — левый край, 1 — правый);
+     w  — ширина луча у вершины; sp/sw/ph — маятник; a — яркость. */
+  var BEAMS = [
+    {x0:0.17, u:0.24, w:0.085, sp:1.500, sw:0.055, ph:0.00, a:0.22},
+    {x0:0.37, u:0.42, w:0.062, sp:2.050, sw:0.042, ph:1.57, a:0.17},
+    {x0:0.63, u:0.58, w:0.062, sp:1.980, sw:0.042, ph:4.71, a:0.17},
+    {x0:0.83, u:0.76, w:0.085, sp:1.580, sw:0.055, ph:3.14, a:0.22}
+  ];
+
+  function measure(){
+    var r = cv.getBoundingClientRect();
+    var w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+    var ar = art.getBoundingClientRect();
+    /* доли считаем от холста: он ровно по секции */
+    if (h > 4){
+      aL = (ar.left - r.left) / w;
+      aR = (ar.right - r.left) / w;
+      aT = (ar.top - r.top) / h;
+    }
+    if (w === W && h === H) return false;
+    W = w; H = h;
+    cv.width  = Math.round(w * DPR);
+    cv.height = Math.round(h * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    return true;
+  }
+
+  function draw(t){
+    if (W < 4 || H < 4) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    var aw = Math.max(0.05, aR - aL);
+    for (var i = 0; i < BEAMS.length; i++){
+      var b = BEAMS[i];
+      /* основание — чуть ниже кромки экрана, чтобы самого фонаря не было видно */
+      var x0 = b.x0 * W, y0 = H * 1.03;
+      /* вершина — верх коллажа, по ширине целимся в его же коробку */
+      var x1 = (aL + (b.u + Math.sin(t * b.sp + b.ph) * b.sw) * aw) * W;
+      var y1 = aT * H;
+      var a  = b.a * (0.80 + 0.20 * Math.sin(t * (0.6 + i * 0.21) + b.ph * 2));
+      var dx = x1 - x0, dy = y1 - y0, L = Math.sqrt(dx*dx + dy*dy) || 1;
+      var nx = -dy / L, ny = dx / L, wb = b.w * W * 0.16, wt = b.w * W;
+      var g = ctx.createLinearGradient(x0, y0, x1, y1);
+      g.addColorStop(0,    'rgba(178,212,255,' + a + ')');
+      g.addColorStop(0.42, 'rgba(152,194,255,' + (a * 0.46) + ')');
+      g.addColorStop(1,    'rgba(140,186,255,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(x0 + nx*wb, y0 + ny*wb);
+      ctx.lineTo(x1 + nx*wt, y1 + ny*wt);
+      ctx.lineTo(x1 - nx*wt, y1 - ny*wt);
+      ctx.lineTo(x0 - nx*wb, y0 - ny*wb);
+      ctx.closePath(); ctx.fill();
+      /* зарево у самой кромки, там где стоит фонарь */
+      var rg = ctx.createRadialGradient(x0, y0, 0, x0, y0, W * 0.055);
+      rg.addColorStop(0, 'rgba(200,225,255,' + (a * 1.15) + ')');
+      rg.addColorStop(1, 'rgba(200,225,255,0)');
+      ctx.fillStyle = rg;
+      ctx.beginPath(); ctx.arc(x0, y0, W * 0.055, 0, 6.2832); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function frame(now){
+    raf = 0;
+    if (!t0) t0 = now;
+    draw((now - t0) / 1000);
+    kick();
+  }
+  function kick(){
+    if (raf || !seen || slow.matches || document.hidden) return;
+    raf = requestAnimationFrame(frame);
+  }
+  function halt(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+
+  measure(); draw(0);
+
+  if (window.IntersectionObserver){
+    new IntersectionObserver(function(es){
+      seen = es[0].isIntersecting;
+      if (seen){ measure(); kick(); } else halt();
+    }, {rootMargin:'220px 0px'}).observe(sec);
+  }
+  if (window.ResizeObserver){
+    var tmr = 0;
+    new ResizeObserver(function(){
+      clearTimeout(tmr);
+      tmr = setTimeout(function(){ measure(); if (!raf) draw(0); }, 140);
+    }).observe(sec);
+  } else {
+    window.addEventListener('resize', function(){ measure(); if (!raf) draw(0); });
+  }
+  /* Замер повторяем на каждом удобном случае, а не только при загрузке.
+     Коллаж грузится лениво: пока картинки нет, коробка ниже и уже, и лучи
+     целятся не туда. А если скрипт почему-то отработал до раскладки, холст
+     так и остался бы своим собственным размером 300x150 — тогда лучей
+     не видно вовсе. Замер дешёвый, страховка того стоит. */
+  var im = art.querySelector('img');
+  if (im && !im.complete) im.addEventListener('load', function(){ measure(); if (!raf) draw(0); });
+  window.addEventListener('load', function(){ measure(); if (!raf) draw(0); });
+
+  document.addEventListener('visibilitychange', function(){ document.hidden ? halt() : kick(); });
+  if (slow.addEventListener) slow.addEventListener('change', function(){ slow.matches ? halt() : kick(); });
+  kick();
 })();
 </script>
 
