@@ -4163,7 +4163,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       wait.push(im.decode ? im.decode().catch(function(){}) 
                           : new Promise(function(r){ im.onload = im.onerror = r; }));
     }
-    Promise.all(wait).then(function(){ ready = true; start(); });
+    Promise.all(wait).then(function(){
+      /* кадр, который не доехал (404, оборванная сеть), из круга выкидываем:
+         иначе на его такте окно вспыхивает пустой заливкой */
+      shots = shots.filter(function(im){ return im.naturalWidth > 0; });
+      if (shots.length < 2) return;                      /* мелькать нечем — оставляем как есть */
+      cur = 0; shots[0].classList.add('on');
+      ready = true; start();
+    });
   }
   function show(i){
     shots[cur].classList.remove('on');
