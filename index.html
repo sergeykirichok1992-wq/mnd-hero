@@ -109,6 +109,16 @@ body{
    перемотки, и первый экран темнеет. Гасим панель во всех её видах и снимаем
    с видео нажатия — оно ничем не управляется, кроме прокрутки. */
 #v{pointer-events:none}
+/* Этого мало для Safari на компьютере: он подставляет к большому <video> свою
+   панель с полосой перемотки и притемняет кадр, и она нарисована браузером, а
+   не страницей — CSS до неё не достаёт. Поэтому на компьютере сам ролик уводим
+   с глаз (1x1, прозрачный), а кадр рисуем сами на канве-двойнике: для браузера
+   «большого видео» на странице больше нет, показывать панель не над чем.
+   На телефоне ролик остаётся как был — там панели нет, а лишняя перерисовка
+   каждого кадра стоила бы заряда. */
+#vpaint{width:100%; height:100%; display:block; z-index:1; pointer-events:none;
+  filter:saturate(1.14) contrast(1.07) brightness(1.04)}
+body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 #v::-webkit-media-controls,
 #v::-webkit-media-controls-enclosure,
 #v::-webkit-media-controls-panel,
@@ -1505,6 +1515,7 @@ body{
 <section id="hero">
   <div class="stage">
     <video id="v" playsinline webkit-playsinline muted autoplay preload="auto" disablepictureinpicture></video>
+    <canvas id="vpaint"></canvas>
     <img id="poster" alt="">
     <div class="vig" style="z-index:3"></div>
     <canvas id="snowBack" style="z-index:4"></canvas>
@@ -2519,6 +2530,11 @@ body{
   // до того, как у видео появится источник, так что ничего само не поедет.
   if(!TOUCH){ v.autoplay = false; v.removeAttribute('autoplay'); }
   poster.src = TOUCH ? 'poster-mob.webp' : 'poster.webp';
+
+  // канва-двойник ролика: только на компьютере, см. комментарий к #vpaint
+  var cvV=document.getElementById('vpaint'), ctxV=cvV.getContext('2d');
+  var VCANVAS = !TOUCH;
+  if(VCANVAS) document.body.classList.add('vcanvas'); else cvV.style.display='none';
   if(!BAKED) logo.src = 'logo.webp';   // на телефоне логотип уже в ролике — файл не качаем
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
   var DPR=Math.min(2, window.devicePixelRatio||1);
@@ -2820,6 +2836,7 @@ body{
       cvLL.width=LW; cvLL.height=LH;
       cvFX.width=LW; cvFX.height=LH;
       cvSB.width=LW; cvSB.height=LH; cvSF.width=LW; cvSF.height=LH;
+      cvV.width=Math.round(W*DPR); cvV.height=Math.round(Hh*DPR);
     }
   }
   ensureSize();
@@ -3000,6 +3017,13 @@ body{
       var target=cl(p/VIDEO_END)*dur;
       cur = reduce ? target : cur+(target-cur)*0.17;
       if(ready && !seekBusy && Math.abs(v.currentTime-cur)>0.012){ try{ v.currentTime=cur; }catch(e){} }
+    }
+
+    // кадр ролика на канву — «cover», как делал object-fit у самого видео
+    if(VCANVAS && v.videoWidth){
+      var vk=Math.max(cvV.width/v.videoWidth, cvV.height/v.videoHeight),
+          vdw=v.videoWidth*vk, vdh=v.videoHeight*vk;
+      try{ ctxV.drawImage(v,(cvV.width-vdw)/2,(cvV.height-vdh)/2,vdw,vdh); }catch(e){}
     }
 
     // ---- логотип выезжает сверху навстречу восходящей луне ----
