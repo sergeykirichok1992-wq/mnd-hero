@@ -706,14 +706,18 @@ body{
     right:calc(100% - 6.55cqw); width:16cqw; height:12cqw; margin-top:-6cqw;
     background:radial-gradient(closest-side, rgba(255,178,92,.34), rgba(255,178,92,0) 100%);
   }
-  /* главный офис: багровый отсвет вместо тёплого. Пунктирная рамка тут была,
-     Серёга попросил убрать — осталась только её коробка, она задаёт отсвету
-     размер и место */
+  /* главный офис: багровый отсвет вместо тёплого, крупнее и мягче — размер,
+     цвет и спад сняты с макета «моб карта.psd» (пик альфы .28, полное затухание
+     примерно в 110 px макета = 11cqw). Коробка ровно та же, что у тёплого
+     отсвета: центр совпадает с огоньком, эллипс closest-side гаснет на всех
+     четырёх сторонах. Раньше тут стояла коробка от пунктирной рамки со сдвинутым
+     влево центром градиента — левая половина пятна не помещалась и обрезалась
+     прямоугольником, это было видно на телефоне */
   .cr-city[data-city="nizhny"]::after{
-    right:auto; margin-top:0; width:auto; height:auto;
-    left:-18px; right:-11px; top:-33px; bottom:-26px;
-    left:-4.7cqw; right:-2.8cqw; top:-8.6cqw; bottom:-6.9cqw;
-    background:radial-gradient(42% 50% at 13% 52%, rgba(226,66,74,.5), rgba(226,66,74,0) 74%);
+    right:calc(100% - 36px); width:82px; height:82px; margin-top:-41px;
+    right:calc(100% - 9.5cqw); width:22cqw; height:22cqw; margin-top:-11cqw;
+    background:radial-gradient(closest-side,
+      rgba(219,40,72,.30), rgba(219,40,72,.15) 50%, rgba(219,40,72,.05) 80%, rgba(219,40,72,0) 100%);
   }
 }
 @media (prefers-reduced-motion:reduce){
