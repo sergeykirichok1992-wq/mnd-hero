@@ -1147,7 +1147,11 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .bk-card{
   position:relative; z-index:2; isolation:isolate; overflow:hidden;
   width:min(100%,1400px); margin:0 auto; text-align:center;
-  padding:clamp(34px,3.4vw,44.88px) clamp(18px,3.8vw,53.86px) clamp(30px,3vw,40.39px);
+  /* 05.09.2026: воздух внутри окна в полтора раза больше — по просьбе Серёги.
+     Тем же заходом раздвинуты заголовок↔подзаголовок (.bk-lede), подзаголовок↔поля
+     (.bk-form) и плитки↔кнопка (.bk-send). Только на большом экране: ниже 1280 px
+     свои отступы, они уже настроены. */
+  padding:clamp(51px,5.1vw,67.32px) clamp(18px,3.8vw,53.86px) clamp(45px,4.6vw,60.59px);
   border-radius:clamp(22px,2.1vw,26.93px);
   background:linear-gradient(180deg, rgba(9,16,50,.9) 0%, rgba(7,11,36,.95) 100%);
   box-shadow:
@@ -1194,7 +1198,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   .bk-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F1D695 38%,#E3B34E 62%,#C9922F 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
 }
-.bk-lede{margin:clamp(14px,1.6vw,17.95px) auto 0; max-width:92ch; text-wrap:balance;
+.bk-lede{margin:clamp(23px,2.6vw,29.17px) auto 0; max-width:92ch; text-wrap:balance;
   font-family:"Golos Text",Arial,sans-serif;
   font-size:clamp(14.5px,1.12vw,14.58px); line-height:1.5; color:#B7C6E2}
 .bk-lede b{font-weight:600; color:#EBD3A0}
@@ -1208,7 +1212,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    Сетка НЕ во всю ширину окна: 880 px против 1256 px внутреннего поля окна —
    на треть уже. Три поля во всю ширину выглядели как забор, а так получается
    лесенка от широкого к узкому: поля 880 → плитки выбора 720 → кнопка 480. */
-.bk-form{margin-top:clamp(24px,2.6vw,31.42px); text-align:left}
+.bk-form{margin-top:clamp(38px,4vw,49.37px); text-align:left}
 .bk-form[hidden]{display:none}
 .bk-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:clamp(14px,1.5vw,17.95px);
   align-items:start; width:min(100%,880px); margin:0 auto}
@@ -1218,7 +1222,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .bk-f--kind{grid-column:1 / -1; width:min(100%,720px); margin:clamp(2px,.4vw,5.98px) auto 0; text-align:center}
 .bk-f--kind .zs-lab{text-align:center}
 .bk-f--kind .zs-err{text-align:center}
-.bk-send{margin-top:clamp(22px,2.4vw,26.93px); display:flex; flex-direction:column; align-items:center}
+.bk-send{margin-top:clamp(36px,3.9vw,47.12px); display:flex; flex-direction:column; align-items:center}
 .bk-send .zs-btn{width:min(100%,480px)}
 .bk .zs-fine{max-width:72ch}
 @media (max-width:1300px){
