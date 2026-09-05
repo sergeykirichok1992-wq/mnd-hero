@@ -1510,27 +1510,28 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    у общей кнопки в них зашито золотое свечение, иначе оно вылезет под синей. */
 .zs-btn.sm-cta{
   color:#fff;
-  background:linear-gradient(180deg,#5A8FF0 0%,#3F6CDE 38%,#2A50C6 68%,#1B39A4 100%);
+  background:linear-gradient(180deg,#6FA0FF 0%,#3F6CDE 52%,#1B39A4 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.55),           /* фаска сверху */
-    inset 0 -1px 0 rgba(255,255,255,.18),
-    inset 0 0 0 1px rgba(24,48,132,.55),           /* кромка */
-    inset 0 -12px 18px -12px rgba(8,22,80,.45),    /* объём */
-    0 2px 4px rgba(2,6,24,.3),
-    0 14px 26px -12px rgba(2,6,24,.6),
-    0 22px 48px -20px rgba(74,124,246,.75);        /* синее светит на подложку */
+    inset 0 1px 0 rgba(255,255,255,.45),           /* фаска сверху */
+    inset 0 0 0 1px rgba(24,48,132,.5),            /* кромка */
+    0 0 0 1px rgba(120,165,255,.5),                /* светлое кольцо по краю */
+    0 4px 0 #16307F,                               /* бортик, синий вместо золотого */
+    0 10px 15px -3px rgba(0,0,0,.5),
+    0 0 30px 4px rgba(74,124,246,.42);             /* синее светит вокруг */
 }
 .zs-btn.sm-cta:hover{
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.55), inset 0 -1px 0 rgba(255,255,255,.18),
-    inset 0 0 0 1px rgba(24,48,132,.55), inset 0 -12px 18px -12px rgba(8,22,80,.4),
-    0 3px 6px rgba(2,6,24,.3), 0 18px 32px -12px rgba(2,6,24,.6),
-    0 26px 60px -20px rgba(90,140,255,.95);
+    inset 0 1px 0 rgba(255,255,255,.45), inset 0 0 0 1px rgba(24,48,132,.5),
+    0 0 0 1px rgba(120,165,255,.5), 0 4px 0 #16307F,
+    0 12px 18px -3px rgba(0,0,0,.5),
+    0 0 44px 8px rgba(74,124,246,.7);
 }
 .zs-btn.sm-cta:active{
   box-shadow:
-    inset 0 2px 6px rgba(8,22,80,.5), inset 0 0 0 1px rgba(24,48,132,.65),
-    0 1px 2px rgba(2,6,24,.32), 0 8px 16px -10px rgba(2,6,24,.5);
+    inset 0 1px 0 rgba(255,255,255,.3), inset 0 0 0 1px rgba(24,48,132,.5),
+    0 0 0 1px rgba(120,165,255,.5), 0 2px 0 #16307F,
+    0 6px 10px -3px rgba(0,0,0,.45),
+    0 0 26px 4px rgba(74,124,246,.45);
 }
 /* «2026-2027» с новой строки — только на телефоне, см. телефонный блок ниже */
 .sm-br{display:none}
@@ -1629,8 +1630,13 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 
    Кромка `inset 0 0 0 1px` обязательна: кнопка стоит и на тёмном четвёртом
    экране, и на белых экранах 2-3, и без кромки на белом она растворяется.
-   Заливка ровная и плавная, без резких переходов: объём даёт не градиент,
-   а тени — верхняя фаска, нижняя тень внутрь и золотое свечение снизу. */
+
+   Вид заливки (05.09.2026, образец Серёги): кнопка не лежит на странице,
+   а СТОИТ на собственной толщине. Толщину рисует тень `0 4px 0` тёмным
+   золотом — это бортик под кнопкой. При нажатии кнопка съезжает на 2 px
+   вниз, а бортик становится вдвое ниже: палец её вдавил. Заливка — ровный
+   градиент от светлого золота вверху к насыщенному внизу, вокруг мягкое
+   золотое свечение, оно ярче под курсором. */
 :root{
   --zs-btn-h:64px;       /* высота, одна на все кнопки сайта */
   --zs-btn-fs:17px;      /* кегль надписи */
@@ -1650,24 +1656,23 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   border-radius:999px;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:var(--zs-btn-fs); line-height:1.1; letter-spacing:.03em;
-  text-transform:uppercase; text-align:center; color:#2A1B03;
-  background:linear-gradient(180deg, #FBE7B4 0%, #F3D68F 36%, #E9C36C 68%, #DFB253 100%);
+  text-transform:uppercase; text-align:center; color:#451A03;
+  background:linear-gradient(180deg, #FDE68A 0%, #FCD34D 52%, #F59E0B 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.9),           /* фаска сверху */
-    inset 0 -1px 0 rgba(255,255,255,.3),          /* отражённый свет снизу */
-    inset 0 0 0 1px rgba(160,116,32,.45),         /* кромка: держит форму на белом */
-    inset 0 -12px 18px -12px rgba(124,82,12,.35), /* объём: низ мягко уходит в тень */
-    0 2px 4px rgba(8,5,0,.26),
-    0 14px 26px -12px rgba(8,5,0,.55),
-    0 22px 48px -20px rgba(227,179,78,.7);        /* золото светит на подложку */
-  transition:transform .14s ease, box-shadow .25s ease, filter .25s ease;
+    inset 0 1px 0 rgba(255,255,255,.55),          /* фаска сверху */
+    inset 0 0 0 1px rgba(180,83,9,.32),           /* кромка: держит форму на белом */
+    0 0 0 1px rgba(251,191,36,.5),                /* светлое кольцо по краю */
+    0 4px 0 #B45309,                              /* бортик: кнопка стоит на толщине */
+    0 10px 15px -3px rgba(0,0,0,.5),              /* тень на подложку */
+    0 0 30px 4px rgba(245,158,11,.34);            /* золото светит вокруг */
+  transition:transform .15s ease, box-shadow .3s ease, filter .3s ease;
   -webkit-tap-highlight-color:transparent;
 }
 /* глянец: мягкий свет сверху во всю ширину. Без вставной «капсулы» — у неё
    был виден собственный край, и кнопка читалась как две склеенные половины */
 .zs-btn::before{
   content:''; position:absolute; z-index:1; inset:0; border-radius:inherit; pointer-events:none;
-  background:linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.14) 38%, rgba(255,255,255,0) 66%);
+  background:linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,.08) 38%, rgba(255,255,255,0) 62%);
 }
 /* бегущий блик: раз в семь секунд по кнопке проходит полоса света.
    Двигаем transform, а не background-position — иначе браузер перерисовывает
@@ -1686,18 +1691,21 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 /* текст обязан лежать поверх глянца, поэтому он завёрнут в .zs-t */
 .zs-btn > .zs-t{position:relative; z-index:3}
 .zs-btn:hover{
-  transform:translateY(-1px); filter:brightness(1.04);
+  filter:brightness(1.03);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(255,255,255,.3),
-    inset 0 0 0 1px rgba(160,116,32,.45), inset 0 -12px 18px -12px rgba(124,82,12,.3),
-    0 3px 6px rgba(8,5,0,.26), 0 18px 32px -12px rgba(8,5,0,.55),
-    0 26px 60px -20px rgba(227,179,78,.9);
+    inset 0 1px 0 rgba(255,255,255,.55), inset 0 0 0 1px rgba(180,83,9,.32),
+    0 0 0 1px rgba(251,191,36,.5), 0 4px 0 #B45309,
+    0 12px 18px -3px rgba(0,0,0,.5),
+    0 0 44px 8px rgba(245,158,11,.6);
 }
+/* нажатие: кнопка съезжает на толщину бортика, бортик становится вдвое ниже */
 .zs-btn:active{
-  transform:translateY(1px); filter:brightness(.985);
+  transform:translateY(2px); filter:brightness(.99);
   box-shadow:
-    inset 0 2px 6px rgba(124,82,12,.4), inset 0 0 0 1px rgba(160,116,32,.55),
-    0 1px 2px rgba(8,5,0,.28), 0 8px 16px -10px rgba(8,5,0,.45);
+    inset 0 1px 0 rgba(255,255,255,.4), inset 0 0 0 1px rgba(180,83,9,.32),
+    0 0 0 1px rgba(251,191,36,.5), 0 2px 0 #B45309,
+    0 6px 10px -3px rgba(0,0,0,.45),
+    0 0 26px 4px rgba(245,158,11,.4);
 }
 .zs-btn:focus-visible{outline:3px solid rgba(255,238,190,.9); outline-offset:3px}
 .zs-btn[disabled]{cursor:default; filter:grayscale(.3) brightness(.94); opacity:.8; transform:none}
