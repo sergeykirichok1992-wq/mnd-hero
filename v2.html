@@ -610,6 +610,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    — тот же, которым набраны подписи под цифрами сезона (.cr-cap), и тем же кеглем
    20*--u: Серёга попросил свести их к одному виду. Сознательное отличие от копии. */
 .cr-p20{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(20 * var(--u)); line-height:1.4; color:#fff}
+.cr-sub-m{display:none}
 /* воздух над заголовком экрана карты: на телефоне на 15 % меньше (131 -> 111 px) */
 .cr-gaptop{height:calc(66 * var(--u))}
 /* Телефон. Кегль заголовка — эталонные 13 px старого сайта: пробовали 11,6 px,
@@ -625,6 +626,11 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   .cr-h2b{font-size:13px}
   .cr-gaptop{height:calc(46 * var(--u))}
   .cr-sub + .cr-sub{padding-top:0; margin-top:calc(-5 * var(--u))}
+  /* «не привлекая» переезжает в конец первой части, чтобы на телефоне это слово
+     стояло во второй строке: «…мероприятия в / нескольких городах, не привлекая /
+     партнеров по франшизе». Слово написано в разметке дважды, лишнее спрятано. */
+  .cr-sub-m{display:inline}
+  .cr-sub-w{display:none}
 }
 .cr-nimg{padding:calc(10 * var(--u)) calc(5 * var(--u))}
 
@@ -2098,8 +2104,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     <div style="height:calc(28 * var(--u))"></div>
 
-    <div class="cr-n cr-sub"><p class="cr-t cr-p20">Мы организовываем свои мероприятия в нескольких городах, </p></div>
-    <div class="cr-n cr-sub"><p class="cr-t cr-p20">не привлекая партнеров по франшизе</p></div>
+    <div class="cr-n cr-sub"><p class="cr-t cr-p20">Мы организовываем свои мероприятия в нескольких городах, <span class="cr-sub-m">не привлекая</span></p></div>
+    <div class="cr-n cr-sub"><p class="cr-t cr-p20"><span class="cr-sub-w">не привлекая </span>партнеров по франшизе</p></div>
 
     <div style="height:calc(33 * var(--u))"></div>
 
