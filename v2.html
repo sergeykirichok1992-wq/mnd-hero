@@ -38,7 +38,7 @@
   /* Набор заголовков секций. Один на все экраны: эталон снят с квиза,
      менять размер/цвет заголовков — только здесь, а не в каждой секции */
   --h2-family:"Blogger Sans","Golos Text",Arial,sans-serif;
-  --h2-weight:700; --h2-size:clamp(22.4px,3.52vw,62.4px);   /* на 20% меньше исходного 28/4.4/78 */
+  --h2-weight:700; --h2-size:clamp(22.4px,3.52vw,53.04px);   /* на 20% меньше исходного 28/4.4/78 */
   --h2-lh:1.1; --h2-ls:.005em; --h2-color:#fff;
   /* размеры логотипа, пересчитанные из кадра 1920x1080 при object-fit:cover */
   --logo-w: max(52.2vw, 92.8vh);
@@ -211,13 +211,13 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 
 .kicker{
   font-family:"Golos Text",Arial,sans-serif; font-weight:500;
-  font-size:clamp(10px,.82vw,13px); letter-spacing:.34em; text-transform:uppercase;
-  color:rgba(205,220,245,.66); margin-top:clamp(12px,1.2vw,20px);
+  font-size:clamp(10px,.82vw,11.05px); letter-spacing:.34em; text-transform:uppercase;
+  color:rgba(205,220,245,.66); margin-top:clamp(12px,1.2vw,17px);
 }
 .season{
   font-family:"Oswald",Arial,sans-serif; font-weight:500;
-  font-size:clamp(16px,1.62vw,27px); letter-spacing:.34em; text-transform:uppercase;
-  margin-bottom:clamp(8px,.9vw,15px);
+  font-size:clamp(16px,1.62vw,22.95px); letter-spacing:.34em; text-transform:uppercase;
+  margin-bottom:clamp(8px,.9vw,12.75px);
   background:
     linear-gradient(102deg, rgba(255,255,255,0) 38%, rgba(255,255,255,.9) 50%, rgba(255,255,255,0) 62%),
     linear-gradient(180deg,#FFFFFF 0%,#EAF1FC 46%,#BCCBE2 100%);
@@ -227,7 +227,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 }
 .years{
   font-family:"Oswald",Arial,sans-serif; font-weight:700; line-height:.84;
-  font-size:clamp(46px,7.4vw,116px); letter-spacing:-.005em;
+  font-size:clamp(46px,7.4vw,98.6px); letter-spacing:-.005em;
 }
 .years .fill{
   display:block;
@@ -261,7 +261,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 
 .city{
   font-family:"Prata",Georgia,serif; line-height:1.14;
-  font-size:clamp(19px,2.15vw,38px);
+  font-size:clamp(19px,2.15vw,32.3px);
   text-transform:uppercase; letter-spacing:.045em;
   background:
     linear-gradient(102deg, rgba(255,255,255,0) 36%, rgba(255,255,255,.95) 49%, rgba(255,255,255,0) 62%),
@@ -274,14 +274,14 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 }
 .season{ animation:sheenSilver 13s linear 5s infinite; background-size:250% 100%, 100% 100%; background-repeat:no-repeat }
 .rule{
-  height:1px; margin:clamp(12px,1.3vw,22px) 0 clamp(12px,1.2vw,20px);
-  margin-left:auto; width:clamp(70px,7vw,120px);
+  height:1px; margin:clamp(12px,1.3vw,18.7px) 0 clamp(12px,1.2vw,17px);
+  margin-left:auto; width:clamp(70px,7vw,102px);
   background:linear-gradient(90deg,rgba(227,179,78,0),rgba(227,179,78,.85));
 }
 .facts{list-style:none; margin:0; padding:0}
 .facts li{
   font-family:"Golos Text",Arial,sans-serif;
-  font-size:clamp(12px,1.04vw,17px); letter-spacing:.055em;
+  font-size:clamp(12px,1.04vw,14.45px); letter-spacing:.055em;
   color:rgba(214,226,245,.9); line-height:1.65;
 }
 .facts li + li{color:rgba(196,210,234,.72)}
@@ -378,8 +378,8 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   src:url(blogger-sans-medium.woff2) format("woff2"), url(blogger-sans-medium.woff) format("woff")}
 
 /* ---------- каркас, общий для обоих экранов ----------
-   Вёрстка широкая, почти во весь экран: контейнер min(94vw,1720px) с полями
-   clamp(16px,3vw,56px) — общее правило сайта, см. ai-clone/feedback.
+   Вёрстка широкая, почти во весь экран: контейнер min(94vw,1462px) с полями
+   clamp(16px,3vw,47.6px) — общее правило сайта, см. ai-clone/feedback.
    Старый сайт был узкий: там контейнер стоял ступенями 1100/940/720.
    ГЛАВНОЕ: --u — это «один пиксель старого сайта» в новом масштабе.
    Все размеры, снятые с оригинала, записаны через него: calc(48 * var(--u)).
@@ -388,14 +388,14 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    Ниже 1100 множитель упирается в 1px: мельче оригинала быть не должно. */
 .cr{
   position:relative; z-index:25;                 /* выше липкой сцены первого экрана */
-  --u: max(1px, (min(94vw, 1720px) - 2*clamp(16px, 3vw, 56px)) / 1100);
+  --u: max(1px, (min(94vw,1462px) - 2*clamp(16px,3vw,47.6px)) / 1100);
   font-family:"CR Roboto Light",Arial,sans-serif;
   font-size:calc(16 * var(--u)); line-height:1.4285714285714286;
   text-align:left;
 }
 .cr *,.cr *::before,.cr *::after{box-sizing:border-box}
 .cr-cont{
-  width:min(94vw, 1720px); margin:0 auto; padding:0 clamp(16px, 3vw, 56px);
+  width:min(94vw,1462px); margin:0 auto; padding:0 clamp(16px,3vw,47.6px);
   position:relative; z-index:7;
 }
 /* на телефоне поля отдаём тексту: там кадр и так узкий */
@@ -514,7 +514,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    растут вместе со всей страницей, как и остальные размеры на этих экранах. */
 .cr-lenta{
   display:block; overflow:hidden;
-  --lh:min(52vw, 240px);
+  --lh:min(52vw,204px);
   --fr:calc(var(--lh) * .035);               /* рамка полароида - те же 3,5 %, что в коллаже */
   padding:calc(var(--lh) * .08) 0;           /* запас, чтобы наклонённые углы не срезались */
   touch-action:pan-y;                        /* вертикальную прокрутку отдаём странице */
@@ -533,12 +533,12 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-card img{display:block; height:100%; width:auto; max-width:none; -webkit-user-drag:none}
 /* Компьютер и планшет: лента обрывается не по краю монитора, а примерно в пяти
    сантиметрах от него. Около четырёх даёт сам контейнер (.cr-cont ужат до
-   min(94vw,1720px) со своими полями), эти поля добирают остальное. На планшете
+   min(94vw,1462px) со своими полями), эти поля добирают остальное. На планшете
    они сжимаются: там пять сантиметров с двух сторон съели бы пол-ленты. */
 @media (min-width:768px){
   .cr-lenta{
     --lh:calc(240 * var(--u));
-    margin-inline:clamp(0px, 2.6vw, 52px);
+    margin-inline:clamp(0px,2.6vw,44.2px);
     cursor:grab;
   }
   .cr-lenta.drag, .cr-lenta.drag *{cursor:grabbing}
@@ -790,7 +790,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    «референс для 4 экрана» и с присланного скриншота-сборки. Поэтому
    композиция не разъезжается ни на какой ширине. */
 .dk{
-  --w: min(100vw, 1720px);
+  --w: min(100vw,1462px);
   position:relative; display:flow-root; container-type:inline-size;
   z-index:26;                             /* выше пятого экрана: нижняя дуга ложится на его небо */
   /* Секция лежит поверх низа карты, и обе картинки — с прозрачными краями.
@@ -907,7 +907,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .dk-btn{
   display:inline-block; padding:16px 34px; border:0; border-radius:3px; cursor:pointer;
   font-family:"CR Blogger Bold","Blogger Sans",Arial,sans-serif; font-weight:700;
-  font-size:clamp(15px,1.15vw,21px); letter-spacing:.02em; text-transform:uppercase;
+  font-size:clamp(15px,1.15vw,17.85px); letter-spacing:.02em; text-transform:uppercase;
   color:#231705; text-decoration:none; text-align:center;
   background:linear-gradient(166deg,#FFF3CF 0%,#F3D68C 26%,#D3A244 62%,#EBCE86 100%);
   box-shadow:inset 0 0 0 1px rgba(120,86,20,.35), 0 16px 32px -14px rgba(211,162,68,.9);
@@ -947,7 +947,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   /* 05.09.2026: прежняя телефонная композиция (девушка-часовщица, живые
      плашки) заменена одной картинкой — запас под девушку внизу карты убран. */
   .dk{
-    --m: min(100vw, 620px);
+    --m: min(100vw,527px);
     /* 05.09.2026: экран стал белым полем. Верхней дугой заходим на экран
        с картой — так же, как на широком экране это делает шапка Деда Мороза. */
     margin:calc(-96 * var(--m) / 1080) 0 0;
@@ -1095,7 +1095,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    поэтому всё идёт через clamp() от ширины окна. */
 .bk{
   position:relative; isolation:isolate; overflow:hidden; color:#fff;
-  padding:clamp(72px,7.6vw,150px) 0 clamp(64px,7vw,130px);
+  padding:clamp(72px,7.6vw,127.5px) 0 clamp(64px,7vw,110.5px);
   background:
     radial-gradient(52vw 11vw at 50% 0%, rgba(189,195,255,.92), rgba(189,195,255,0) 100%),
     radial-gradient(70vw 20vw at 30% 0%, rgba(0,52,130,.9), rgba(0,52,130,0) 100%),
@@ -1141,8 +1141,8 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .bk-card{
   position:relative; z-index:2; isolation:isolate; overflow:hidden;
   width:min(100%,1400px); margin:0 auto; text-align:center;
-  padding:clamp(34px,3.4vw,60px) clamp(18px,3.8vw,72px) clamp(30px,3vw,54px);
-  border-radius:clamp(22px,2.1vw,36px);
+  padding:clamp(34px,3.4vw,51px) clamp(18px,3.8vw,61.2px) clamp(30px,3vw,45.9px);
+  border-radius:clamp(22px,2.1vw,30.6px);
   background:linear-gradient(180deg, rgba(9,16,50,.9) 0%, rgba(7,11,36,.95) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(227,179,78,.34),
@@ -1165,8 +1165,8 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   background:radial-gradient(closest-side, rgba(227,179,78,.13) 0%, rgba(227,179,78,.08) 36%, rgba(227,179,78,.02) 70%, rgba(227,179,78,0) 100%)}
 .bk-card > *:not(.bk-card-sky){position:relative; z-index:1}
 
-.bk-eyebrow{margin:0 0 clamp(12px,1.3vw,18px); font-family:"Golos Text",Arial,sans-serif;
-  font-size:clamp(11px,.86vw,13px); font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8FA3C8}
+.bk-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(11px,.86vw,11.05px); font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#8FA3C8}
 /* две строки: «Забронируйте лучшие даты / по стартовым ценам». Перенос
    принудительный (<br class="bk-br">), чтобы золотая часть не рвалась;
    на телефоне перенос убран и строки раскладывает text-wrap:balance.
@@ -1179,7 +1179,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    экрана (fitT): если строк всё-таки три, он уменьшает кегль. */
 .bk-t{margin:0 auto;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(26px,3.7vw,68px); line-height:1.06; letter-spacing:.005em;
+  font-size:clamp(26px,3.7vw,57.8px); line-height:1.06; letter-spacing:.005em;
   text-transform:uppercase; text-wrap:balance; color:#fff}
 /* «по стартовым ценам» — золотом: сначала плоский цвет как запас, потом
    градиент по буквам там, где браузер умеет резать фон по тексту */
@@ -1188,9 +1188,9 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   .bk-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F1D695 38%,#E3B34E 62%,#C9922F 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
 }
-.bk-lede{margin:clamp(14px,1.6vw,24px) auto 0; max-width:92ch; text-wrap:balance;
+.bk-lede{margin:clamp(14px,1.6vw,20.4px) auto 0; max-width:92ch; text-wrap:balance;
   font-family:"Golos Text",Arial,sans-serif;
-  font-size:clamp(14.5px,1.12vw,19.5px); line-height:1.5; color:#B7C6E2}
+  font-size:clamp(14.5px,1.12vw,16.57px); line-height:1.5; color:#B7C6E2}
 .bk-lede b{font-weight:600; color:#EBD3A0}
 
 /* ---------- поля ---------- */
@@ -1202,17 +1202,17 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    Сетка НЕ во всю ширину окна: 880 px против 1256 px внутреннего поля окна —
    на треть уже. Три поля во всю ширину выглядели как забор, а так получается
    лесенка от широкого к узкому: поля 880 → плитки выбора 720 → кнопка 480. */
-.bk-form{margin-top:clamp(24px,2.6vw,42px); text-align:left}
+.bk-form{margin-top:clamp(24px,2.6vw,35.7px); text-align:left}
 .bk-form[hidden]{display:none}
-.bk-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:clamp(14px,1.5vw,24px);
+.bk-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:clamp(14px,1.5vw,20.4px);
   align-items:start; width:min(100%,880px); margin:0 auto}
 .bk-f{min-width:0}
 /* вопрос о формате — отдельный ряд по центру: ширина как у пары полей,
    чтобы плитки не растягивались на все 1400 px и перекликались с кнопкой */
-.bk-f--kind{grid-column:1 / -1; width:min(100%,720px); margin:clamp(2px,.4vw,8px) auto 0; text-align:center}
+.bk-f--kind{grid-column:1 / -1; width:min(100%,720px); margin:clamp(2px,.4vw,6.8px) auto 0; text-align:center}
 .bk-f--kind .zs-lab{text-align:center}
 .bk-f--kind .zs-err{text-align:center}
-.bk-send{margin-top:clamp(22px,2.4vw,36px); display:flex; flex-direction:column; align-items:center}
+.bk-send{margin-top:clamp(22px,2.4vw,30.6px); display:flex; flex-direction:column; align-items:center}
 .bk-send .zs-btn{width:min(100%,480px)}
 .bk .zs-fine{max-width:72ch}
 @media (max-width:1300px){
@@ -1224,10 +1224,10 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 
 /* ---------- «заявка принята» ---------- */
 .bk-done[hidden]{display:none}
-.bk-done{padding-top:clamp(6px,.8vw,12px)}
+.bk-done{padding-top:clamp(6px,.8vw,10.2px)}
 .bk-seal{
-  width:clamp(84px,7vw,112px); height:clamp(84px,7vw,112px);
-  margin:0 auto clamp(16px,1.7vw,24px); border-radius:50%;
+  width:clamp(84px,7vw,95.2px); height:clamp(84px,7vw,95.2px);
+  margin:0 auto clamp(16px,1.7vw,20.4px); border-radius:50%;
   display:flex; align-items:center; justify-content:center; color:#E3B34E;
   border:1px solid rgba(227,179,78,.5);
   background:radial-gradient(closest-side, rgba(227,179,78,.22), rgba(227,179,78,0) 78%);
@@ -1242,7 +1242,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 }
 .bk-done-h{margin:0 auto; max-width:24ch;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(22px,2.4vw,42px); line-height:1.1; text-transform:uppercase; color:#fff; text-wrap:balance}
+  font-size:clamp(22px,2.4vw,35.7px); line-height:1.1; text-transform:uppercase; color:#fff; text-wrap:balance}
 
 /* ---------- Сатурн и комета ---------- */
 /* Два украшения в пустых полях по бокам окна: слева новогодний Сатурн,
@@ -1303,7 +1303,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    этого экрана должен быть того же цвета. */
 @media (max-width:1279px){
   .bk{
-    padding-top:clamp(70px,12.8vw,128px);   /* 05.09.2026: воздух над окном в 1,6 раза больше */
+    padding-top:clamp(70px,12.8vw,108.8px);   /* 05.09.2026: воздух над окном в 1,6 раза больше */
     background:
       radial-gradient(70vw 22vw at 50% 0%, rgba(0,52,130,.6), rgba(0,52,130,0) 100%),
       linear-gradient(180deg,#000335 0%,#03073A 14%,#060B2E 40%,#050922 76%,#04071A 100%);
@@ -1314,8 +1314,8 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
      окно осталось бы шириной в 100 % контейнера и margin вытолкнул бы его
      за экран. */
   .bk-card{
-    width:auto; margin:0 clamp(12px,4.2vw,22px);
-    padding:clamp(32px,9.5vw,48px) clamp(16px,4.4vw,30px);
+    width:auto; margin:0 clamp(12px,4.2vw,18.7px);
+    padding:clamp(32px,9.5vw,40.8px) clamp(16px,4.4vw,25.5px);
     border-radius:22px;
   }
   /* Заголовок на телефоне крупный и в три строки: «Забронируйте / лучшие даты /
@@ -1323,16 +1323,16 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
      он снимался) — он отделяет золотую часть, а белую `text-wrap:balance` сам
      делит пополам. Две строки на телефоне держать нельзя: в ширину экрана они
      влезают только кеглем 26 px, а крупнее просят глаза. */
-  .bk-t{font-size:clamp(28px,8.2vw,44px)}
-  .bk-eyebrow{margin-bottom:clamp(20px,6.4vw,30px)}
-  .bk-lede{margin-top:clamp(20px,7vw,34px); font-size:clamp(15px,4vw,18px)}
+  .bk-t{font-size:clamp(28px,8.2vw,37.4px)}
+  .bk-eyebrow{margin-bottom:clamp(20px,6.4vw,25.5px)}
+  .bk-lede{margin-top:clamp(20px,7vw,28.9px); font-size:clamp(15px,4vw,15.3px)}
   /* воздух над полями — такой же, как от края окна до первой строки */
-  .bk-form{margin-top:clamp(32px,9.5vw,48px)}
+  .bk-form{margin-top:clamp(32px,9.5vw,40.8px)}
   /* а вот перед вопросом о формате и перед кнопкой воздуха, наоборот, втрое
      больше: это две отдельные ступени, и на телефоне они должны читаться
      как отдельные, а не как продолжение списка полей */
-  .bk-f--kind{margin-top:clamp(28px,8vw,40px)}
-  .bk-send{margin-top:clamp(58px,17vw,80px)}
+  .bk-f--kind{margin-top:clamp(28px,8vw,34px)}
+  .bk-send{margin-top:clamp(58px,17vw,68px)}
 }
 @media (prefers-reduced-motion:reduce){
   .bk-glow i{animation:none}
@@ -1533,7 +1533,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   /* Поля по краям экрана. Ниже 768 px общий контейнер `.cr-cont` идёт без
      полей — так сделаны экраны-копии старого сайта, — поэтому поля этот
      экран задаёт себе сам, иначе текст упрётся в края телефона. */
-  .sm .cr-cont{padding:0 clamp(16px,4.6vw,30px)}
+  .sm .cr-cont{padding:0 clamp(16px,4.6vw,25.5px)}
 }
 @media (max-width:767px){
   /* ФОН ТЕЛЕФОНА собран из двух слоёв, а не из общей картинки: секция тут
@@ -1563,11 +1563,11 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
      100vw брать нельзя: на планшете с видимой полосой прокрутки это шире
      окна и даёт горизонтальный скролл. */
   .sm-art{width:auto; margin-top:-2.74vw;   /* прежнее значение: телефон утверждён */
-    margin-left:calc(-1 * clamp(16px,4.6vw,30px));
-    margin-right:calc(-1 * clamp(16px,4.6vw,30px))}
+    margin-left:calc(-1 * clamp(16px,4.6vw,25.5px));
+    margin-right:calc(-1 * clamp(16px,4.6vw,25.5px))}
   /* надзаголовок крупнее в 1,7 раза (04.09.2026, просьба Серёги): рукописная
      строка на телефоне работает как картинка, мелкой её не видно */
-  .sm-eyebrow{font-size:clamp(30px,8.72vw,46px)}
+  .sm-eyebrow{font-size:clamp(30px,8.72vw,39.1px)}
   /* заголовок в две строки: «НОВАЯ ПРОГРАММА» и год под ней */
   .sm-br{display:inline}
   /* кегль и отступ абзаца на телефоне свои: доля окна тут дала бы мелкоту */
@@ -1640,7 +1640,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   box-sizing:border-box;
   max-width:100%; min-height:var(--zs-btn-h);
   border:0; cursor:pointer; text-decoration:none; white-space:nowrap;
-  padding:12px clamp(20px,2vw,34px);
+  padding:12px clamp(20px,2vw,28.9px);
   border-radius:999px;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:var(--zs-btn-fs); line-height:1.1; letter-spacing:.03em;
@@ -1759,7 +1759,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .zs-ov{
   position:fixed; inset:0; z-index:100;                 /* выше всего: шапка 30, логотип 40 */
   display:flex; align-items:center; justify-content:center;
-  padding:clamp(12px,3vw,32px);
+  padding:clamp(12px,3vw,27.2px);
   background:rgba(2,4,12,.76);
   -webkit-backdrop-filter:blur(7px) saturate(.85); backdrop-filter:blur(7px) saturate(.85);
   opacity:0; transition:opacity .3s ease;
@@ -1772,7 +1772,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   position:relative; isolation:isolate; overflow:hidden auto; overscroll-behavior:contain;
   width:min(100%, 540px);
   max-height:92vh; max-height:92dvh;                    /* dvh: адресная строка iOS не режет окно */
-  border-radius:clamp(20px,2.2vw,30px);
+  border-radius:clamp(20px,2.2vw,25.5px);
   background:linear-gradient(180deg,#080F26 0%,#0A1234 40%,#0B1030 72%,#070C1C 100%);
   color:#C9D6EE; text-align:center;
   box-shadow:
@@ -1813,11 +1813,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
 
 .zs-body{position:relative; z-index:1;
-  padding:clamp(30px,3.4vw,46px) clamp(20px,2.8vw,42px) clamp(22px,2.6vw,34px)}
+  padding:clamp(30px,3.4vw,39.1px) clamp(20px,2.8vw,35.7px) clamp(22px,2.6vw,28.9px)}
 
 /* крестик. 44x44 — минимальная цель для пальца, меньше делать нельзя */
 .zs-x{
-  position:absolute; z-index:3; top:clamp(10px,1vw,16px); right:clamp(10px,1vw,16px);
+  position:absolute; z-index:3; top:clamp(10px,1vw,13.6px); right:clamp(10px,1vw,13.6px);
   width:40px; height:40px; border-radius:50%; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
   border:1px solid rgba(146,167,214,.22); background:rgba(255,255,255,.04); color:#9FB2D4;
@@ -1828,17 +1828,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .zs-x svg{width:17px; height:17px}
 
 .zs-h{margin:0; font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(23px,2.05vw,34px); line-height:1.12; letter-spacing:.01em;
+  font-size:clamp(23px,2.05vw,28.9px); line-height:1.12; letter-spacing:.01em;
   text-transform:uppercase; color:#fff; text-wrap:balance}
-.zs-sub{margin:clamp(9px,.9vw,13px) auto 0; max-width:38ch;
+.zs-sub{margin:clamp(9px,.9vw,11.05px) auto 0; max-width:38ch;
   font-family:"Golos Text",Arial,sans-serif;
-  font-size:clamp(13.5px,1vw,16px); line-height:1.45; color:#93A6C8; text-wrap:pretty}
+  font-size:clamp(13.5px,1vw,13.6px); line-height:1.45; color:#93A6C8; text-wrap:pretty}
 /* «30 минут» — главное обещание строки, разрывать его переносом нельзя */
 .zs-sub b{color:#E3B34E; font-weight:600; white-space:nowrap}
 
 .zs-step[hidden]{display:none}
-.zs-form{margin-top:clamp(20px,2.2vw,30px); text-align:left}
-.zs-f + .zs-f{margin-top:clamp(14px,1.5vw,20px)}
+.zs-form{margin-top:clamp(20px,2.2vw,25.5px); text-align:left}
+.zs-f + .zs-f{margin-top:clamp(14px,1.5vw,17px)}
 .zs-lab{display:block; margin:0 0 8px 4px; font-family:"Golos Text",Arial,sans-serif;
   font-size:11.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#7F91B4}
 /* звёздочка обязательного поля: золотом, чуть крупнее метки. В разметке идёт
@@ -1848,10 +1848,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* Кегль поля не опускаем ниже 16px: на iOS поле с мелким шрифтом заставляет
    Safari зумить всю страницу, как только в него ставят курсор */
 .zs-inp{
-  width:100%; padding:clamp(14px,1.2vw,18px) 20px; border-radius:999px;
+  width:100%; padding:clamp(14px,1.2vw,15.3px) 20px; border-radius:999px;
   border:1px solid rgba(146,167,214,.26); background:rgba(255,255,255,.05); color:#fff;
   font-family:"Golos Text",Arial,sans-serif; font-weight:400;
-  font-size:max(16px, clamp(16px,1.15vw,19px)); line-height:1.2; letter-spacing:.02em;
+  font-size:max(16px, clamp(16px,1.15vw,16.15px)); line-height:1.2; letter-spacing:.02em;
   transition:border-color .2s ease, background .2s ease, box-shadow .25s ease;
 }
 .zs-inp::placeholder{color:rgba(200,214,238,.35)}
@@ -1901,8 +1901,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-size:13px; line-height:1.35; color:#FF9C9C; text-align:left}
 .zs-err[hidden]{display:none}
 
-.zs-send{margin-top:clamp(18px,2vw,26px)}
-.zs-fine{margin:clamp(12px,1.2vw,16px) auto 0; max-width:44ch; text-align:center;
+.zs-send{margin-top:clamp(18px,2vw,22.1px)}
+.zs-fine{margin:clamp(12px,1.2vw,13.6px) auto 0; max-width:44ch; text-align:center;
   font-family:"Golos Text",Arial,sans-serif; font-size:11.5px; line-height:1.45; color:#66779A}
 .zs-fine a{color:#8FA3C8}
 
@@ -1910,8 +1910,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* Звезда в круге — та же метка, что над формой, только крупная и загорается:
    человек видит, что бланк проштампован, а не просто сменился текст */
 .zs-seal{
-  width:clamp(84px,7vw,110px); height:clamp(84px,7vw,110px);
-  margin:0 auto clamp(16px,1.7vw,24px); border-radius:50%;
+  width:clamp(84px,7vw,93.5px); height:clamp(84px,7vw,93.5px);
+  margin:0 auto clamp(16px,1.7vw,20.4px); border-radius:50%;
   display:flex; align-items:center; justify-content:center; color:#E3B34E;
   border:1px solid rgba(227,179,78,.5);
   background:radial-gradient(closest-side, rgba(227,179,78,.22), rgba(227,179,78,0) 78%);
@@ -1926,22 +1926,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 /* «Закрыть» на экране «спасибо» — прозрачный вид по стандарту: главное
    действие там уйти в наши сообщества, а не закрыть окно */
-.zs-close{margin-top:clamp(16px,1.8vw,24px)}
+.zs-close{margin-top:clamp(16px,1.8vw,20.4px)}
 
-.zs-socH{margin:clamp(20px,2.2vw,30px) 0 clamp(12px,1.2vw,16px);
+.zs-socH{margin:clamp(20px,2.2vw,25.5px) 0 clamp(12px,1.2vw,13.6px);
   font-family:"Golos Text",Arial,sans-serif; font-size:12px; font-weight:600;
   letter-spacing:.18em; text-transform:uppercase; color:#7F91B4}
 /* Каждый мессенджер в своём фирменном цвете и с подписью: золотые кружки
    без подписей человек читает как украшение, а не как «вот куда нажать».
    Цвет узнаётся раньше, чем прочитано слово. */
-.zs-soc{display:flex; justify-content:center; gap:clamp(14px,1.8vw,28px);
+.zs-soc{display:flex; justify-content:center; gap:clamp(14px,1.8vw,23.8px);
   margin:0; padding:0; list-style:none}
 .zs-soc a{display:flex; flex-direction:column; align-items:center; gap:9px;
   text-decoration:none; color:#93A6C8;
   font-family:"Golos Text",Arial,sans-serif; font-size:12.5px; font-weight:500;
   transition:color .2s ease}
 .zs-soc i{
-  width:clamp(56px,5vw,64px); height:clamp(56px,5vw,64px); border-radius:50%;
+  width:clamp(47.6px,5vw,54.4px); height:clamp(47.6px,5vw,54.4px); border-radius:50%;
   display:flex; align-items:center; justify-content:center; color:#fff;
   transition:transform .2s ease, box-shadow .25s ease, filter .2s ease;
 }
