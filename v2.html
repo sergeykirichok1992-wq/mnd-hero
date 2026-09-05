@@ -1345,9 +1345,21 @@ body{
    где и золото, и синева уже сошли в чёрный, поэтому шва не видно.
    Лежат с прозрачностью вместо чёрного фона — иначе верхняя закрасила бы
    нижнюю и подложку. */
+/* Картинка живёт в псевдоэлементе, а не в самом слое: слой обрезает
+   (`overflow:hidden`), а картинка внутри него на 8,4 % выше секции и ездит
+   вверх-вниз — это и есть параллакс. Запас по 4,2 % сверху и снизу ровно
+   равен размаху хода, поэтому в крайних положениях щели не открывается.
+   Сдвиг ставит скрипт в переменную `--sm-par`: напрямую до псевдоэлемента
+   из JS не дотянуться. Двигаем `transform`, а не `top` — только он
+   не заставляет браузер пересчитывать раскладку каждый кадр. */
 .sm-bg{
   position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;
+}
+.sm-bg::before{
+  content:''; position:absolute; left:0; right:0; top:-4.2%; height:108.4%;
   background:url(v2-sm-fon2.webp) center top/cover no-repeat;
+  transform:translate3d(0, var(--sm-par, 0px), 0);
+  will-change:transform;
 }
 /* звёзды: слой над фоном и под текстом. Рисует общий движок «живого неба» */
 .sm-sky{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none}
@@ -1478,7 +1490,11 @@ body{
   .sm{background:linear-gradient(180deg,#000004 0%,#000005 34%,#00020C 64%,#000312 100%)}
   /* размер задаём целиком, не только картинку: у компьютера фон лежит `cover`,
      и на телефоне он растянул бы золото по высоте секции */
-  .sm-bg{background:url(v2-sm-top-620.webp) center top/100% auto no-repeat}
+  .sm-bg::before{
+    top:0; height:100%;
+    background:url(v2-sm-top-620.webp) center top/100% auto no-repeat;
+    transform:none; will-change:auto;   /* параллакса на телефоне нет */
+  }
   .sm-beams{display:none}
   .sm-art::before{
     content:''; position:absolute; z-index:0; left:50%; top:0; width:121%;
@@ -3402,6 +3418,71 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   document.addEventListener('visibilitychange', function(){ document.hidden ? halt() : kick(); });
   if (slow.addEventListener) slow.addEventListener('change', function(){ slow.matches ? halt() : kick(); });
   kick();
+})();
+</script>
+
+<script>
+/* ==================== ПАРАЛЛАКС ФОНА ШЕСТОГО ЭКРАНА ====================
+   Фон едет чуть медленнее страницы — от этого экран читается глубоким.
+   Считаем не «сколько прокрутили», а где центр секции относительно центра
+   окна: пока секция входит снизу — картинка чуть приподнята, пока уходит
+   вверх — чуть опущена. Ход маленький: 4 % высоты секции, но не больше 70 px.
+
+   Сдвиг кладём в переменную `--sm-par`, её читает `transform` у картинки фона.
+   Двигаем только `transform`: `top` или `background-position` заставили бы
+   браузер пересчитывать раскладку каждый кадр.
+
+   На телефоне параллакса нет намеренно: там фон другой и короткий, а лишняя
+   работа на прокрутке в телефоне заметнее всего. Системную настройку
+   «уменьшить движение» тоже уважаем. */
+(function(){
+  var sec = document.getElementById('smena');
+  var bg  = sec && sec.querySelector('.sm-bg');
+  if (!sec || !bg) return;
+
+  var slow   = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var narrow = window.matchMedia('(max-width:767px)');
+  var raf = 0, seen = true, last = null;
+
+  function apply(){
+    raf = 0;
+    if (narrow.matches || slow.matches){
+      if (last !== 0){ bg.style.setProperty('--sm-par', '0px'); last = 0; }
+      return;
+    }
+    var r  = sec.getBoundingClientRect();
+    var de = document.documentElement;
+    var vh = window.innerHeight || de.clientHeight || 1;
+    var sy = window.pageYOffset || de.scrollTop || 0;
+    var secTop = r.top + sy;
+
+    /* Ход считаем не «где центр секции», а по реально доступной прокрутке.
+       Шестой экран последний на странице: увести его выше середины окна
+       нельзя, и обычная формула отработала бы четвертью размаха.
+       Поэтому границы обрезаем по тому, докуда страница вообще прокручивается. */
+    var maxScroll = Math.max(0, de.scrollHeight - vh);
+    var start = Math.max(0, secTop - vh);
+    var end   = Math.min(maxScroll, secTop + r.height - vh);
+    var p = end > start ? (sy - start) / (end - start) : 0.5;
+    p = p < 0 ? 0 : (p > 1 ? 1 : p);
+
+    var amp = Math.min(70, r.height * 0.04);      /* запас коробки 4,2 % — больше не берём */
+    var y = Math.round((p - 0.5) * 2 * amp * 10) / 10;
+    if (y !== last){ bg.style.setProperty('--sm-par', y + 'px'); last = y; }
+  }
+  function kick(){ if (!raf && seen) raf = requestAnimationFrame(apply); }
+
+  apply();
+  window.addEventListener('scroll', kick, {passive:true});
+  window.addEventListener('resize', kick);
+  if (window.IntersectionObserver){
+    new IntersectionObserver(function(es){
+      seen = es[0].isIntersecting;
+      if (seen) kick();
+    }, {rootMargin:'200px 0px'}).observe(sec);
+  }
+  if (slow.addEventListener) slow.addEventListener('change', kick);
+  if (narrow.addEventListener) narrow.addEventListener('change', kick);
 })();
 </script>
 
