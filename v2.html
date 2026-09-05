@@ -1346,9 +1346,10 @@ body{
    Лежат с прозрачностью вместо чёрного фона — иначе верхняя закрасила бы
    нижнюю и подложку. */
 /* Картинка живёт в псевдоэлементе, а не в самом слое: слой обрезает
-   (`overflow:hidden`), а картинка внутри него на 8,4 % выше секции и ездит
-   вверх-вниз — это и есть параллакс. Запас по 4,2 % сверху и снизу ровно
+   (`overflow:hidden`), а картинка внутри него на 23 % выше секции и ездит
+   вверх-вниз — это и есть параллакс. Запас по 11,5 % сверху и снизу ровно
    равен размаху хода, поэтому в крайних положениях щели не открывается.
+   05.09.2026 запас увеличен втрое: прежний ход в 4 % Серёга почти не видел.
    Сдвиг ставит скрипт в переменную `--sm-par`: напрямую до псевдоэлемента
    из JS не дотянуться. Двигаем `transform`, а не `top` — только он
    не заставляет браузер пересчитывать раскладку каждый кадр. */
@@ -1356,7 +1357,7 @@ body{
   position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none;
 }
 .sm-bg::before{
-  content:''; position:absolute; left:0; right:0; top:-4.2%; height:108.4%;
+  content:''; position:absolute; left:0; right:0; top:-11.5%; height:123%;
   background:url(v2-sm-fon2.webp) center top/cover no-repeat;
   transform:translate3d(0, var(--sm-par, 0px), 0);
   will-change:transform;
@@ -3466,7 +3467,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var p = end > start ? (sy - start) / (end - start) : 0.5;
     p = p < 0 ? 0 : (p > 1 ? 1 : p);
 
-    var amp = Math.min(70, r.height * 0.04);      /* запас коробки 4,2 % — больше не берём */
+    /* Размах хода. Больше запаса коробки (11,5 % высоты) брать нельзя —
+       вылезет щель. 160 px — потолок для очень высоких экранов. */
+    var amp = Math.min(160, r.height * 0.11);
     var y = Math.round((p - 0.5) * 2 * amp * 10) / 10;
     if (y !== last){ bg.style.setProperty('--sm-par', y + 'px'); last = y; }
   }
