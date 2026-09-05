@@ -606,9 +606,15 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-h2b span{font-family:"CR Blogger",Arial,sans-serif; font-size:300%}
 .cr-h2b strong{font-weight:700}
 .cr-amber{color:rgb(253,198,140)}
-.cr-p20{text-align:center; font-family:"CR Roboto Light",Arial,sans-serif; font-size:calc(20 * var(--u)); line-height:1.4; color:#fff}
-/* Телефон. Заголовок на 11 % мельче эталонных 13 px: на узком экране он
-   разъезжался на шесть строк и забирал пол-экрана (просьба Серёги 05.09.2026).
+/* Подзаголовок карты. Шрифт с 05.09.2026 не Roboto Light оригинала, а Blogger Sans
+   — тот же, которым набраны подписи под цифрами сезона (.cr-cap), и тем же кеглем
+   20*--u: Серёга попросил свести их к одному виду. Сознательное отличие от копии. */
+.cr-p20{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(20 * var(--u)); line-height:1.4; color:#fff}
+/* воздух над заголовком экрана карты: на телефоне на 15 % меньше (131 -> 111 px) */
+.cr-gaptop{height:calc(66 * var(--u))}
+/* Телефон. Кегль заголовка — эталонные 13 px старого сайта: пробовали 11,6 px,
+   Серёга вернул обратно, а место на экране выиграли отступом сверху (46*--u
+   вместо 66*--u, весь воздух над заголовком стал на 15 % меньше).
    Подзаголовок — две части одной фразы, они живут в двух блоках `.cr-n`
    (так на старом сайте: там каждая часть умещалась в свою строку). На телефоне
    первая часть переносится, и padding блоков подкладывал между её последней
@@ -616,7 +622,8 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    разными. Схлопываем зазор только здесь: на широком экране копия остаётся
    слово в слово и пиксель в пиксель. */
 @media (max-width:767px){
-  .cr-h2b{font-size:11.6px}
+  .cr-h2b{font-size:13px}
+  .cr-gaptop{height:calc(46 * var(--u))}
   .cr-sub + .cr-sub{padding-top:0; margin-top:calc(-5 * var(--u))}
 }
 .cr-nimg{padding:calc(10 * var(--u)) calc(5 * var(--u))}
@@ -2081,7 +2088,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="cr-shadowtop" aria-hidden="true"></div>
   <div class="cr-cont">
 
-    <div style="height:calc(66 * var(--u))"></div>
+    <div class="cr-gaptop"></div>
 
     <div class="cr-n">
       <h2 class="cr-t cr-h2b" id="crT3"><span><strong>МЫ СОЗДАЕМ САМЫЕ МАСШТАБНЫЕ НОВОГОДНИЕ МЕРОПРИЯТИЯ&nbsp;</strong></span><span><strong>В 7 ГОРОДАХ РОССИИ&nbsp;</strong></span><br><span class="cr-amber"><strong>И МЫ НЕ ФРАНШИЗА!</strong></span><span><strong>&nbsp;</strong></span></h2>
