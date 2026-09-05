@@ -1406,6 +1406,15 @@ body{
 .sm-beams{
   position:absolute; z-index:1; left:0; top:0; width:100%; height:100%;
   display:block; pointer-events:none;
+  /* Мягкость краёв даёт размытие холста, как на первом экране (там
+     `#beams{filter:blur(13px)}`). Рисовать мягкий край самими трапециями
+     нельзя: слои видно ступеньками. Размытие тут по доле окна, чтобы луч
+     размывался одинаково на любом экране.
+     `screen` — тоже как на первом экране: свет только прибавляется,
+     тёмных мест от холста не появляется. Смешивать есть с чем: холст лежит
+     прямо в секции, а не внутри контейнера со своим слоем. */
+  mix-blend-mode:screen;
+  filter:blur(clamp(9px,1.15vw,28px));
 }
 .sm-art img{position:relative; z-index:1; display:block; width:100%; height:auto}
 
@@ -3288,10 +3297,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      v — куда достаёт по высоте кадра;
      w — ширина луча у дальнего конца; sp/sw/ph — маятник; a — яркость. */
   var BEAMS = [
-    {x0:0.015, y0:-0.02, u:0.34, v:1.02, w:0.115, sp:1.500, sw:0.060, ph:0.00, a:0.26},
-    {x0:0.105, y0:-0.02, u:0.48, v:0.88, w:0.085, sp:2.050, sw:0.045, ph:1.57, a:0.20},
-    {x0:0.895, y0:-0.02, u:0.52, v:0.88, w:0.085, sp:1.980, sw:0.045, ph:4.71, a:0.20},
-    {x0:0.985, y0:-0.02, u:0.66, v:1.02, w:0.115, sp:1.580, sw:0.060, ph:3.14, a:0.26}
+    {x0:0.015, y0:-0.02, u:0.34, v:1.02, w:0.100, sp:1.500, sw:0.060, ph:0.00, a:0.28},
+    {x0:0.105, y0:-0.02, u:0.48, v:0.88, w:0.072, sp:2.050, sw:0.045, ph:1.57, a:0.21},
+    {x0:0.895, y0:-0.02, u:0.52, v:0.88, w:0.072, sp:1.980, sw:0.045, ph:4.71, a:0.21},
+    {x0:0.985, y0:-0.02, u:0.66, v:1.02, w:0.100, sp:1.580, sw:0.060, ph:3.14, a:0.28}
   ];
 
   function measure(){
@@ -3327,29 +3336,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       var a  = b.a * (0.80 + 0.20 * Math.sin(t * (0.6 + i * 0.21) + b.ph * 2));
       var dx = x1 - x0, dy = y1 - y0, L = Math.sqrt(dx*dx + dy*dy) || 1;
       var nx = -dy / L, ny = dx / L, wb = b.w * W * 0.16, wt = b.w * W;
-      /* Луч рисуется не одной трапецией, а стопкой вложенных: самая широкая
-         и самая бледная снизу, дальше уже и ярче. В режиме `lighter` они
-         складываются, и поперёк луча получается мягкий колокол вместо ровной
-         заливки с резаным краем. Семь слоёв — предел, за которым разницы
-         уже не видно; яркость каждого a/7, чтобы в середине вышло ровно `a`.
-         Так дешевле, чем `filter:blur` на холст в миллион пикселей. */
-      var K = 7;
-      for (var k = 0; k < K; k++){
-        var f  = Math.pow(1 - k / K, 0.62);          /* ширина слоя, 1 → 0 */
-        var wtk = wt * f, wbk = wb * f;
-        var ak = a / K;
-        var g = ctx.createLinearGradient(x0, y0, x1, y1);
-        g.addColorStop(0,    'rgba(178,212,255,' + ak + ')');
-        g.addColorStop(0.42, 'rgba(152,194,255,' + (ak * 0.46) + ')');
-        g.addColorStop(1,    'rgba(140,186,255,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.moveTo(x0 + nx*wbk, y0 + ny*wbk);
-        ctx.lineTo(x1 + nx*wtk, y1 + ny*wtk);
-        ctx.lineTo(x1 - nx*wtk, y1 - ny*wtk);
-        ctx.lineTo(x0 - nx*wbk, y0 - ny*wbk);
-        ctx.closePath(); ctx.fill();
-      }
+      /* Одна трапеция на луч — ровно как на первом экране. Мягкость краёв
+         даёт не рисование, а размытие всего холста в CSS (`filter:blur`).
+         Складывать луч из нескольких трапеций пробовали 05.09.2026: слои
+         видно ступеньками, Серёга назвал это «квадратиками». */
+      var g = ctx.createLinearGradient(x0, y0, x1, y1);
+      g.addColorStop(0,    'rgba(178,212,255,' + a + ')');
+      g.addColorStop(0.42, 'rgba(152,194,255,' + (a * 0.46) + ')');
+      g.addColorStop(1,    'rgba(140,186,255,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(x0 + nx*wb, y0 + ny*wb);
+      ctx.lineTo(x1 + nx*wt, y1 + ny*wt);
+      ctx.lineTo(x1 - nx*wt, y1 - ny*wt);
+      ctx.lineTo(x0 - nx*wb, y0 - ny*wb);
+      ctx.closePath(); ctx.fill();
       /* зарево в углу, там где висит фонарь */
       var rg = ctx.createRadialGradient(x0, y0, 0, x0, y0, W * 0.05);
       rg.addColorStop(0, 'rgba(200,225,255,' + (a * 0.9) + ')');
