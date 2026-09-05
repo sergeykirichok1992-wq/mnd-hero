@@ -1037,18 +1037,20 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
      кадры .dkm-win img — поэтому фотография в рамке живая, а рамка и плашка
      с текстом остаются сверху и аккуратно режут её края.
 
-     Числа окна — доли от холста картинки 1024x1536 (левый край 122 px,
-     верх 99, ширина 782, высота 561). Меняешь картинку — пересчитай их,
-     иначе кадры вылезут из-под рамки. */
+     Числа окна — доли от холста картинки 904x1492 (левый край 60 px,
+     верх 55, ширина 782, высота 561). Меняешь картинку — пересчитай их,
+     иначе кадры вылезут из-под рамки. Холст обрезан по краям карточки:
+     поля 46 px по бокам и 40 сверху — ровно столько, сколько нужно тени
+     и снегу, поэтому на телефоне карточка идёт почти во всю ширину. */
   .dkm{display:block; position:relative; z-index:5;
     width:var(--m); margin:calc(70 * var(--m) / 1080) auto 0}
-  .dkm-hold{position:relative; width:100%; aspect-ratio:1024/1536}
+  .dkm-hold{position:relative; width:100%; aspect-ratio:904/1492}
   /* Фон вокруг карточки вырезан в самой картинке: карточка со своим снегом
      лежит на белом поле секции. Тень тоже нарисована в файле — CSS-фильтр
      здесь не годится, он размывал бы и полупрозрачный снег. */
   .dkm-pic{position:absolute; inset:0; display:block; width:100%; height:100%}
-  .dkm-win{position:absolute; left:11.914%; top:6.445%;
-    width:76.367%; height:36.523%; overflow:hidden; background:#EDE3D0}
+  .dkm-win{position:absolute; left:6.637%; top:3.686%;
+    width:86.504%; height:37.601%; overflow:hidden; background:#EDE3D0}
   .dkm-win img{position:absolute; inset:0; width:100%; height:100%;
     object-fit:cover; opacity:0}                    /* смена кадров — резкая, без плавности */
   .dkm-win img.on{opacity:1}
@@ -2162,9 +2164,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="dkm" aria-hidden="true">
     <div class="dkm-hold">
       <div class="dkm-win" id="dkmWin">
-        <img class="on" src="info/i1.webp" width="700" height="502" alt="" loading="lazy" decoding="async">
+        <img class="on" src="info/i1.webp" width="800" height="574" alt="" loading="lazy" decoding="async">
       </div>
-      <img class="dkm-pic" src="v2-info.webp" width="1024" height="1536"
+      <img class="dkm-pic" src="v2-info.webp" width="904" height="1492"
            loading="lazy" decoding="async" alt="">
     </div>
   </div>
@@ -4232,7 +4234,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var wait = [];
     for (var i = 0; i < SRC.length; i++){
       var im = document.createElement('img');
-      im.src = SRC[i]; im.alt = ''; im.width = 700; im.height = 502; im.decoding = 'async';
+      im.src = SRC[i]; im.alt = ''; im.width = 800; im.height = 574; im.decoding = 'async';
       win.appendChild(im); shots.push(im);
       wait.push(im.decode ? im.decode().catch(function(){}) 
                           : new Promise(function(r){ im.onload = im.onerror = r; }));
