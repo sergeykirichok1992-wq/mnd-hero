@@ -1993,35 +1993,44 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 
 /* ==================== ЭКРАН 7: «В какую красоту попадут дети» ====================
-   Бесконечная лента квадратных снимков площадки на белом поле. Пространство
-   имён `pl-` (площадки) — не пересекается ни с `.cr-*`, ни с `.dk-*`,
-   ни с `.bk-*`, ни с `.sm-*`, ни с формой `.zs-*`.
+   Две бесконечные ленты квадратных снимков площадки на белом поле.
+   Пространство имён `pl-` (площадки) — не пересекается ни с `.cr-*`,
+   ни с `.dk-*`, ни с `.bk-*`, ни с `.sm-*`, ни с формой `.zs-*`.
 
    Заголовок и подпись взяты у второго экрана (`.cr-h2`, `.cr-lead`) — тот же
-   шрифт, те же два цвета, тот же множитель `--u`. Сама лента к сетке старого
-   сайта отношения не имеет: она во всю ширину окна, размеры через clamp().
+   шрифт, те же два цвета, тот же множитель `--u`.
 
-   ЧЕМ ЭТА ЛЕНТА ОТЛИЧАЕТСЯ ОТ ЛЕНТЫ ВТОРОГО ЭКРАНА. Та собирается скриптом,
+   ПОЛЯ ПО КРАЯМ — ТЕ ЖЕ, ЧТО У ЛЕНТЫ ВТОРОГО ЭКРАНА (просьба Серёги 05.09.2026):
+   дорожка лежит в общем контейнере `.cr-cont` и добавляет к нему
+   `margin-inline: clamp(0px,2.6vw,44.2px)` — то же правило, что у `.cr-lenta`.
+   Ниже 768 px полей нет, и это тоже как на втором экране: на узком экране
+   пять сантиметров съели бы пол-ленты.
+
+   ЧЕМ ЭТИ ЛЕНТЫ ОТЛИЧАЮТСЯ ОТ ЛЕНТЫ ВТОРОГО ЭКРАНА. Та собирается скриптом,
    едет от таймера и разгоняется пальцем. Здесь всё проще: карточки лежат
    в разметке, движение делает одна CSS-анимация. Пальцем не разгоняется —
    и не надо: это витрина, а не игрушка. */
 .pl{background:#fff; color:#333; padding:calc(60 * var(--u)) 0 calc(70 * var(--u))}
 
-/* Дорожка во всю ширину окна. Края растворяются маской — снимки уходят
-   в белое поле, а не обрываются об кромку экрана. Проценты маски одинаковые
-   с обеих сторон, иначе лента визуально «съезжает» в одну сторону. */
+/* Дорожка. Поля по бокам — от контейнера, поля сверху и снизу нужны теням
+   карточек: `overflow:hidden` держит ленту внутри и без запаса срезал бы тень
+   ровной линией. Края растворяются маской — снимки уезжают в белое поле,
+   а не обрываются об кромку дорожки. Проценты маски одинаковые с обеих
+   сторон, иначе лента визуально «съезжает» в одну сторону. */
 .pl-track{
-  position:relative; width:100%; overflow:hidden;
-  -webkit-mask:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%);
-          mask:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%);
+  position:relative; overflow:hidden;
+  padding:clamp(8px,1.1vw,20px) 0;
+  -webkit-mask:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
+          mask:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent 100%);
 }
+@media (min-width:768px){ .pl-track{margin-inline:clamp(0px,2.6vw,44.2px)} }
 
 /* ПЕТЛЯ БЕЗ ШВА ДЕРЖИТСЯ НА ДВУХ ВЕЩАХ:
-   1) в дорожке лежат ДВА одинаковых комплекта карточек;
+   1) в каждом ряду лежат ДВА одинаковых комплекта карточек;
    2) зазор между карточками задан `margin-right`, а НЕ `gap`.
-   С `gap` ширина дорожки равна 2N карточек плюс 2N-1 зазор, её половина
+   С `gap` ширина ряда равна 2N карточек плюс 2N-1 зазор, её половина
    на ползазора короче комплекта — и на каждом круге лента дёргается.
-   С `margin-right` половина дорожки это ровно один комплект.
+   С `margin-right` половина ряда это ровно один комплект.
    Точное расстояние всё равно меряет скрипт и кладёт в `--pl-w`; проценты
    тут — запасной вариант на случай, если скрипт не отработал. */
 .pl-row{
@@ -2030,31 +2039,33 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   animation-play-state:paused;          /* пускает скрипт, когда лента в кадре */
   will-change:transform;
 }
+.pl-row + .pl-row{margin-top:clamp(10px,1.1vw,20px)}
 .pl-row.is-run{animation-play-state:running}
 @keyframes plRun{
   from{transform:translate3d(0,0,0)}
   to  {transform:translate3d(calc(var(--pl-w) * -1),0,0)}
 }
-/* Пока лента едет, на неё можно навести и рассмотреть кадр: движение
-   останавливается, карточка чуть подрастает. На тач-экранах hover нет —
-   поэтому правило в @media (hover:hover), иначе телефон «залипал» бы
-   на первом касании. */
+/* Пока лента едет, на неё можно навести и рассмотреть кадр: оба ряда встают,
+   карточка чуть подрастает. На тач-экранах hover нет — поэтому правило
+   в @media (hover:hover), иначе телефон «залипал» бы на первом касании. */
 @media (hover:hover){
   .pl-track:hover .pl-row.is-run{animation-play-state:paused}
   .pl-card:hover{transform:scale(1.05); filter:brightness(1.06)}
 }
+/* Карточка меньше, чем была в один ряд: два ряда квадратов по 320 px заняли бы
+   пол-экрана в высоту. */
 .pl-card{
   flex:0 0 auto; margin:0 clamp(10px,1.1vw,20px) 0 0;
-  width:clamp(168px,19.5vw,320px); aspect-ratio:1;
-  border-radius:clamp(12px,1.2vw,22px); overflow:hidden;
+  width:clamp(140px,15.2vw,242px); aspect-ratio:1;
+  border-radius:clamp(12px,1.1vw,20px); overflow:hidden;
   background:var(--c,#3b2b22);          /* средний цвет кадра: пока грузится, не белая дырка */
-  box-shadow:0 clamp(8px,1vw,18px) clamp(18px,2.2vw,40px) rgba(20,16,40,.16),
+  box-shadow:0 clamp(6px,.8vw,14px) clamp(14px,1.8vw,30px) rgba(20,16,40,.16),
              0 2px 6px rgba(20,16,40,.08);
   transition:transform .3s ease, filter .3s ease;
 }
 .pl-card img{display:block; width:100%; height:100%; object-fit:cover}
 
-/* «Меньше движения»: лента стоит, но её можно листать пальцем или колесом. */
+/* «Меньше движения»: ленты стоят, но их можно листать пальцем или колесом. */
 @media (prefers-reduced-motion:reduce){
   .pl-row{animation:none}
   .pl-track{overflow-x:auto; -webkit-overflow-scrolling:touch}
@@ -2400,10 +2411,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </div>
 
 <!-- ==================== ЭКРАН 7: «В какую красоту попадут дети» ====================
-     Бесконечная лента квадратных снимков площадки на белом поле.
-     Заголовок и подпись — в стиле второго экрана (те же классы .cr-h2/.cr-lead).
-     Второй комплект карточек — копия первого, он нужен только для петли,
-     поэтому спрятан от читалок aria-hidden. -->
+     Две бесконечные ленты квадратных снимков площадки на белом поле.
+     Заголовок и подпись — в стиле второго экрана (те же классы .cr-h2/.cr-lead),
+     поля по краям — те же, что у ленты второго экрана.
+     Второй комплект карточек в каждом ряду — копия первого, он нужен только
+     для петли, поэтому спрятан от читалок aria-hidden. -->
 <section class="cr pl" id="places" aria-labelledby="plT">
   <div class="cr-cont">
     <div class="cr-n">
@@ -2413,45 +2425,48 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <div style="height:calc(26 * var(--u))"></div>
 
     <div class="cr-n"><p class="cr-t cr-lead">Так мы оформляем наши площадки</p></div>
-  </div>
 
-  <div style="height:calc(34 * var(--u))"></div>
+    <div style="height:calc(30 * var(--u))"></div>
 
-  <div class="pl-track">
-    <div class="pl-row" id="plRow">
-      <figure class="pl-card" style="--c:#241a25"><img src="plosh/pl01.webp" width="700" height="700" alt="Изба в новогодней подсветке" loading="eager" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#30291e"><img src="plosh/pl02.webp" width="700" height="700" alt="Ёлка в бревенчатом зале" loading="eager" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#493c2e"><img src="plosh/pl03.webp" width="700" height="700" alt="Кабинет Деда Мороза" loading="eager" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#382241"><img src="plosh/pl04.webp" width="700" height="700" alt="Фонари на деревьях у площадки" loading="eager" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#9a5d3b"><img src="plosh/pl05.webp" width="700" height="700" alt="Вывеска Министерства новогодних дел" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#60423e"><img src="plosh/pl06.webp" width="700" height="700" alt="Стол с ёлочкой и какао" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#3c3031"><img src="plosh/pl07.webp" width="700" height="700" alt="Заснеженный двор со снеговиком" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#231a16"><img src="plosh/pl08.webp" width="700" height="700" alt="Полки с реквизитом" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#673418"><img src="plosh/pl09.webp" width="700" height="700" alt="Большая ёлка с подарками" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#4d3e2d"><img src="plosh/pl10.webp" width="700" height="700" alt="Фирменный шар в гирляндах" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#2e1d17"><img src="plosh/pl11.webp" width="700" height="700" alt="Пульт Министерства" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#5d3d30"><img src="plosh/pl12.webp" width="700" height="700" alt="Полка с игрушками и глобусами" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#54372c"><img src="plosh/pl13.webp" width="700" height="700" alt="Ёлка у окна мансарды" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#291a0e"><img src="plosh/pl14.webp" width="700" height="700" alt="Светящаяся надпись «Дед Мороз»" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#503a31"><img src="plosh/pl15.webp" width="700" height="700" alt="Зал с люстрой и ёлкой" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" style="--c:#332218"><img src="plosh/pl16.webp" width="700" height="700" alt="Часы и печатная машинка" loading="lazy" decoding="async"></figure>
-      <!-- второй комплект: тот же порядок, нужен только чтобы петля сомкнулась -->
-      <figure class="pl-card" aria-hidden="true" style="--c:#241a25"><img src="plosh/pl01.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#30291e"><img src="plosh/pl02.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#493c2e"><img src="plosh/pl03.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#382241"><img src="plosh/pl04.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#9a5d3b"><img src="plosh/pl05.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#60423e"><img src="plosh/pl06.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#3c3031"><img src="plosh/pl07.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#231a16"><img src="plosh/pl08.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#673418"><img src="plosh/pl09.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#4d3e2d"><img src="plosh/pl10.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#2e1d17"><img src="plosh/pl11.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#5d3d30"><img src="plosh/pl12.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#54372c"><img src="plosh/pl13.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#291a0e"><img src="plosh/pl14.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#503a31"><img src="plosh/pl15.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
-      <figure class="pl-card" aria-hidden="true" style="--c:#332218"><img src="plosh/pl16.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+    <div class="pl-track" id="plTrack">
+      <div class="pl-row" data-row="1">
+        <figure class="pl-card" style="--c:#241a25"><img src="plosh/pl01.webp" width="700" height="700" alt="Изба в новогодней подсветке" loading="eager" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#493c2e"><img src="plosh/pl03.webp" width="700" height="700" alt="Кабинет Деда Мороза" loading="eager" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#9a5d3b"><img src="plosh/pl05.webp" width="700" height="700" alt="Вывеска Министерства новогодних дел" loading="eager" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#3c3031"><img src="plosh/pl07.webp" width="700" height="700" alt="Заснеженный двор со снеговиком" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#673418"><img src="plosh/pl09.webp" width="700" height="700" alt="Большая ёлка с подарками" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#2e1d17"><img src="plosh/pl11.webp" width="700" height="700" alt="Пульт Министерства" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#54372c"><img src="plosh/pl13.webp" width="700" height="700" alt="Ёлка у окна мансарды" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#503a31"><img src="plosh/pl15.webp" width="700" height="700" alt="Зал с люстрой и ёлкой" loading="lazy" decoding="async"></figure>
+        <!-- второй комплект: копия первого, нужен только чтобы петля сомкнулась -->
+        <figure class="pl-card" aria-hidden="true" style="--c:#241a25"><img src="plosh/pl01.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#493c2e"><img src="plosh/pl03.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#9a5d3b"><img src="plosh/pl05.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#3c3031"><img src="plosh/pl07.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#673418"><img src="plosh/pl09.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#2e1d17"><img src="plosh/pl11.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#54372c"><img src="plosh/pl13.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#503a31"><img src="plosh/pl15.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+      </div>
+      <div class="pl-row" data-row="2">
+        <figure class="pl-card" style="--c:#30291e"><img src="plosh/pl02.webp" width="700" height="700" alt="Ёлка в бревенчатом зале" loading="eager" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#382241"><img src="plosh/pl04.webp" width="700" height="700" alt="Фонари на деревьях у площадки" loading="eager" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#60423e"><img src="plosh/pl06.webp" width="700" height="700" alt="Стол с ёлочкой и какао" loading="eager" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#231a16"><img src="plosh/pl08.webp" width="700" height="700" alt="Полки с реквизитом" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#4d3e2d"><img src="plosh/pl10.webp" width="700" height="700" alt="Фирменный шар в гирляндах" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#5d3d30"><img src="plosh/pl12.webp" width="700" height="700" alt="Полка с игрушками и глобусами" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#291a0e"><img src="plosh/pl14.webp" width="700" height="700" alt="Светящаяся надпись «Дед Мороз»" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" style="--c:#332218"><img src="plosh/pl16.webp" width="700" height="700" alt="Часы и печатная машинка" loading="lazy" decoding="async"></figure>
+        <!-- второй комплект: копия первого, нужен только чтобы петля сомкнулась -->
+        <figure class="pl-card" aria-hidden="true" style="--c:#30291e"><img src="plosh/pl02.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#382241"><img src="plosh/pl04.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#60423e"><img src="plosh/pl06.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#231a16"><img src="plosh/pl08.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#4d3e2d"><img src="plosh/pl10.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#5d3d30"><img src="plosh/pl12.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#291a0e"><img src="plosh/pl14.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+        <figure class="pl-card" aria-hidden="true" style="--c:#332218"><img src="plosh/pl16.webp" width="700" height="700" alt="" loading="lazy" decoding="async"></figure>
+      </div>
     </div>
   </div>
 </section>
@@ -4946,32 +4961,46 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </script>
 
 <script>
-/* ==================== ЭКРАН 7: ЛЕНТА ПЛОЩАДОК ====================
+/* ==================== ЭКРАН 7: ДВЕ ЛЕНТЫ ПЛОЩАДОК ====================
    Скрипт делает две вещи и обе мелкие:
-   1) меряет ширину ОДНОГО комплекта карточек и ставит её в --pl-w, а длительность
-      круга считает от неё — тогда лента едет с постоянной скоростью на любой
-      ширине окна (иначе на мониторе она бы «летела», а на телефоне ползла);
-   2) пускает анимацию, только пока лента в кадре и вкладка открыта.
+   1) меряет ширину ОДНОГО комплекта карточек в каждом ряду и ставит её
+      в --pl-w, а длительность круга считает от неё — тогда ленты едут
+      с постоянной скоростью на любой ширине окна (иначе на мониторе они бы
+      «летели», а на телефоне ползли);
+   2) пускает анимацию, только пока ленты в кадре и вкладка открыта.
+
    Скорость привязана к ширине карточки, а не задана в пикселях: глаз меряет
-   движение долями кадра — тот же расчёт, что у ленты второго экрана. */
+   движение долями кадра — тот же расчёт, что у ленты второго экрана.
+
+   ПОЧЕМУ У НИЖНЕГО РЯДА СВОЯ СКОРОСТЬ. Карточки везде одной ширины, и если
+   ряды поедут одинаково, их стыки встанут ровными столбиками — сетка вместо
+   ленты. Нижний ряд идёт на 12 % медленнее и стартует со сдвигом, поэтому
+   столбики не собираются никогда. Направление у обоих одно. */
 (function(){
-  var row = document.getElementById('plRow');
-  if (!row) return;
-  var track = row.parentNode;
-  var cards = row.children;
-  var half  = cards.length / 2;               /* комплектов ровно два */
-  var SPEED = 0.13;                           /* ширин карточки в секунду */
+  var track = document.getElementById('plTrack');
+  if (!track) return;
+  var rows = track.querySelectorAll('.pl-row');
+  if (!rows.length) return;
+  var SPEED = 0.115;                          /* ширин карточки в секунду */
+  var SLOW  = 0.88;                           /* во столько раз медленнее нижний ряд */
+  var PHASE = 0.31;                           /* стартовый сдвиг нижнего ряда, долей круга */
 
   function measure(){
-    if (!cards.length || !row.offsetParent) return;
-    /* расстояние от первой карточки до её копии = ширина комплекта.
-       Меряем offsetLeft, а не getBoundingClientRect: лента в этот момент
-       уже сдвинута анимацией, и прямоугольник вернул бы съехавшие числа. */
-    var w = cards[half].offsetLeft - cards[0].offsetLeft;
-    if (!w) return;
-    var cw = cards[0].offsetWidth || 1;
-    row.style.setProperty('--pl-w', w + 'px');
-    row.style.setProperty('--pl-dur', (w / (cw * SPEED)).toFixed(2) + 's');
+    if (!track.offsetParent) return;
+    for (var i = 0; i < rows.length; i++){
+      var row = rows[i], cards = row.children, half = cards.length / 2;
+      if (!cards.length) continue;
+      /* расстояние от первой карточки до её копии = ширина комплекта.
+         Меряем offsetLeft, а не getBoundingClientRect: ряд в этот момент
+         уже сдвинут анимацией, и прямоугольник вернул бы съехавшие числа. */
+      var w = cards[half].offsetLeft - cards[0].offsetLeft;
+      var cw = cards[0].offsetWidth;
+      if (!w || !cw) continue;
+      var dur = w / (cw * SPEED * (i ? SLOW : 1));
+      row.style.setProperty('--pl-w', w + 'px');
+      row.style.setProperty('--pl-dur', dur.toFixed(2) + 's');
+      row.style.animationDelay = i ? (-dur * PHASE).toFixed(2) + 's' : '0s';
+    }
   }
 
   measure();
@@ -4980,7 +5009,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
 
   var seen = false;
-  function apply(){ row.classList.toggle('is-run', seen && !document.hidden); }
+  function apply(){
+    var on = seen && !document.hidden;
+    for (var i = 0; i < rows.length; i++) rows[i].classList.toggle('is-run', on);
+  }
   if ('IntersectionObserver' in window){
     new IntersectionObserver(function(es){
       seen = es[0].isIntersecting; apply();
