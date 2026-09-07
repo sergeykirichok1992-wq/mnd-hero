@@ -2018,8 +2018,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   --kr-ball-sw:25vh;                      /* размах: столько вверх и вниз,
                                              то есть полный ход — половина
                                              высоты экрана (07.09.2026) */
-  --kr-ball-dur-1:16s;                    /* скорость красного */
-  --kr-ball-dur-2:20s;                    /* скорость золотого */
+  --kr-ball-dur:16s;                      /* СКОРОСТЬ обоих. Срок один на двоих
+                                             намеренно: шары ходят навстречу
+                                             друг другу, а при разных сроках
+                                             встречное движение расползлось бы
+                                             за пару минут (07.09.2026) */
+  --kr-ball-pull:46px;                    /* насколько шар тянется за курсором */
 
   position:relative; overflow:hidden;     /* краями экрана шары и обрезает */
   color:#333; padding:calc(60 * var(--u)) 0 calc(70 * var(--u));
@@ -2046,35 +2050,46 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 
 /* ЁЛОЧНЫЕ ШАРЫ — снимки, которые прислал Серёга (`shar-red.webp`,
-   `shar-gold.webp`). Тень под шаром вшита в сам файл, отдельной тени
-   в стилях нет. Слой лежит под содержимым, поэтому шары выглядывают
+   `shar-gold.webp`). Слой лежит под содержимым, поэтому шары выглядывают
    из-за кромки и не спорят с кадрами карусели.
+
+   ДВА ДВИЖЕНИЯ НА ОДИН ШАР, и поэтому две вложенные коробки: обёртка
+   `.kr-ball` съезжает за курсором, картинка внутри качается вверх-вниз.
+   В один `transform` их не сложить — анимация переписывала бы сдвиг мыши
+   каждый кадр.
+
+   НАВСТРЕЧУ ДРУГ ДРУГУ: у золотого `alternate-reverse` — он начинает ход
+   с той стороны, где красный заканчивает. Срок у обоих один (`--kr-ball-dur`),
+   иначе встречное движение со временем разъедется.
+
    Локальная `--d` — ширина кадра со снимком: у золотого она своя,
    и сдвиг за кромку пересчитывается от неё сам. */
 .kr-balls{position:absolute; inset:0; z-index:1; pointer-events:none}
 .kr-ball{
   --d:var(--kr-ball-d);
-  position:absolute; display:block;
-  width:var(--d); height:auto;
+  position:absolute; display:block; width:var(--d);
+  transform:translate3d(var(--px,0px), var(--py,0px), 0);
+  transition:transform .55s cubic-bezier(.22,.61,.36,1);
+  will-change:transform;
+}
+.kr-ball img{
+  display:block; width:100%; height:auto;
   filter:drop-shadow(calc(var(--d) * .035) calc(var(--d) * .05) calc(var(--d) * .05) rgba(24,44,74,.28));
-  animation:kr-float var(--dur) ease-in-out infinite alternate;
+  animation:kr-float var(--kr-ball-dur) ease-in-out infinite alternate;
   will-change:transform;
 }
 /* Красный слева: центр за кромкой, в кадр входит чуть больше половины —
    как на образце. */
 .kr-ball--red{
-  --dur:var(--kr-ball-dur-1);
   left:calc(var(--d) * -.44); top:24%;
 }
-/* Золотой справа и ниже, чуть крупнее. Отрицательная задержка сразу сдвигает
-   его по фазе: иначе на глазах у зрителя оба шара стартовали бы из одной точки.
-   Сдвиг вправо меньше — в файле со снимком справа лежит вшитая тень. */
+/* Золотой справа и ниже, чуть крупнее. Сдвиг вправо меньше — в снимке
+   справа больше пустого поля. */
 .kr-ball--gold{
   --d:calc(var(--kr-ball-d) * 1.06);
-  --dur:var(--kr-ball-dur-2);
   right:calc(var(--d) * -.34); top:52%;
-  animation-delay:-2.4s;
 }
+.kr-ball--gold img{animation-direction:alternate-reverse}
 @keyframes kr-float{
   from{transform:translateY(calc(var(--kr-ball-sw) * -1))}
   to{transform:translateY(var(--kr-ball-sw))}
@@ -2295,7 +2310,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .kr-strip{transition:none}
   .kr-th{transition:none}
   .kr-thumbs{scroll-behavior:auto}
-  .kr-ball{animation:none}
+  .kr-ball{transition:none}
+  .kr-ball img{animation:none}
 }
 </style>
 </head>
@@ -2648,8 +2664,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <section class="cr kr" id="places" aria-labelledby="krT">
   <!-- Украшение, а не содержание: `aria-hidden` убирает шары из читалки. -->
   <div class="kr-balls" aria-hidden="true">
-    <img class="kr-ball kr-ball--red" src="shar-red.webp" width="520" height="678" alt="" loading="lazy" decoding="async" draggable="false">
-    <img class="kr-ball kr-ball--gold" src="shar-gold.webp" width="520" height="621" alt="" loading="lazy" decoding="async" draggable="false">
+    <span class="kr-ball kr-ball--red"><img src="shar-red.webp" width="520" height="703" alt="" loading="lazy" decoding="async" draggable="false"></span>
+    <span class="kr-ball kr-ball--gold"><img src="shar-gold.webp" width="520" height="701" alt="" loading="lazy" decoding="async" draggable="false"></span>
   </div>
   <div class="cr-cont">
     <div class="cr-n">
@@ -5450,6 +5466,56 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.addEventListener('load', function(){ show(i); });
 
   fit();
+})();
+</script>
+
+<script>
+/* ШАРЫ СЛЕДЯТ ЗА КУРСОРОМ (просьба Серёги 07.09.2026). Считаем, куда мышь
+   ушла от середины экрана, и сдвигаем шары: красный — за курсором, золотой —
+   в противоположную сторону, тем же жестом, что они и качаются.
+   Сдвиг пишем в переменные `--px/--py` обёртки, плавность даёт CSS-переход,
+   поэтому скрипту не нужен свой цикл анимации — только один кадр на событие.
+   Ставим слушателя на окно, а не на секцию: слой с шарами `pointer-events:none`,
+   да и курсор чаще ходит по карусели, чем по полям. Пересчёт прячем в
+   `requestAnimationFrame`: мышь шлёт события чаще, чем экран успевает рисовать.
+   На тач-экранах и при «меньше движения» скрипт не заводится вовсе. */
+(function(){
+  var sec = document.getElementById('places');
+  if (!sec || !window.matchMedia) return;
+  if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+
+  var balls = sec.querySelectorAll('.kr-ball');
+  if (!balls.length) return;
+
+  var px = 0, py = 0, waiting = false;
+
+  function paint(){
+    waiting = false;
+    for (var n = 0; n < balls.length; n++){
+      var k = balls[n].classList.contains('kr-ball--gold') ? -1 : 1;
+      balls[n].style.setProperty('--px', (px * k).toFixed(1) + 'px');
+      balls[n].style.setProperty('--py', (py * k).toFixed(1) + 'px');
+    }
+  }
+  function ask(){ if (!waiting){ waiting = true; requestAnimationFrame(paint); } }
+
+  function move(e){
+    var r = sec.getBoundingClientRect();
+    /* шары реагируют, только пока экран на виду: иначе они уезжают в крайнее
+       положение от движения мыши где-то на другом конце страницы */
+    if (r.bottom < 0 || r.top > innerHeight){ px = py = 0; ask(); return; }
+    var pull = parseFloat(getComputedStyle(sec).getPropertyValue('--kr-ball-pull')) || 46;
+    var nx = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+    var ny = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+    px = Math.max(-1, Math.min(1, nx)) * pull;
+    py = Math.max(-1, Math.min(1, ny)) * pull * .6;
+    ask();
+  }
+
+  window.addEventListener('pointermove', move, {passive:true});
+  /* курсор ушёл из окна — шары возвращаются на место */
+  document.addEventListener('pointerleave', function(){ px = py = 0; ask(); });
 })();
 </script>
 
