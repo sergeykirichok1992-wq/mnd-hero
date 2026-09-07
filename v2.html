@@ -2065,14 +2065,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 /* СЕТКА ПО ВЕРСИЯМ (Серёга 07.09.2026):
      компьютер — три вертикальных в ряд, два горизонтальных рядом;
-     телефон   — два вертикальных в ряд, два горизонтальных столбиком.
+     телефон   — четыре вертикальных сеткой 2x2, два горизонтальных столбиком.
    Порядок двух мобильных правил важен: `.kr-slide` идёт ПЕРВЫМ, иначе оно
    перебило бы колонку у горизонтального слайда (у того оба класса,
    а специфичность одинаковая). Состав слайдов на версиях разный, поэтому
    сетки мало — ленту пересобирает скрипт, см. блок «ЭКРАН 7» перед </body>. */
 .kr-slide--hor{grid-template-columns:1fr 1fr}
 @media (max-width:767px){
-  .kr-slide{grid-template-columns:1fr 1fr}
+  /* Вертикальные идут по четыре: две сверху, две снизу. Ширина колонки —
+     44,44 % ширины карусели, и это не на глаз. Высота слайда из двух
+     горизонтальных равна 2*(W/1,5) + зазор = 1,333W + зазор. У сетки 2x2
+     высота равна 2*(1,5c) + зазор, где c — ширина колонки; приравняли одно
+     к другому и получили c = 0,4444W. Поэтому оба вида слайда на телефоне
+     одной высоты, как и просил Серёга, а по бокам остаётся немного воздуха —
+     сетка стоит по центру. */
+  .kr-slide{grid-template-columns:repeat(2, 44.44%); justify-content:center}
   .kr-slide--hor{grid-template-columns:1fr}
 }
 .kr-shot{
@@ -2545,58 +2552,68 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <div class="kr-view" id="krView" role="group" aria-roledescription="карусель" aria-label="Фотографии площадки">
       <div class="kr-strip" id="krStrip">
         <div class="kr-slide">
-          <figure class="kr-shot" data-th="karus_v/m01.webp"><img src="karus_v/v01.webp" width="820" height="1230" alt="Ёлка и Дед Мороз в бревенчатом зале" loading="eager" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m02.webp"><img src="karus_v/v02.webp" width="820" height="1230" alt="Фонари на деревьях над площадкой" loading="eager" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m03.webp"><img src="karus_v/v03.webp" width="820" height="1230" alt="Заснеженная ёлка у крыльца избы" loading="eager" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m01.webp"><img src="karus_v/v01.webp" width="820" height="1230" alt="Ёлка и Дед Мороз в бревенчатом зале" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m02.webp"><img src="karus_v/v02.webp" width="820" height="1230" alt="Фонари на деревьях над площадкой" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m03.webp"><img src="karus_v/v03.webp" width="820" height="1230" alt="Заснеженная ёлка у крыльца избы" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
         <div class="kr-slide kr-slide--hor">
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm01.webp"><img src="karus_v/h01.webp" width="1400" height="933" alt="Изба Министерства в новогодней подсветке" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm02.webp"><img src="karus_v/h02.webp" width="1400" height="933" alt="Гости у крыльца избы вечером" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
-          <figure class="kr-shot" data-th="karus_v/m04.webp"><img src="karus_v/v04.webp" width="820" height="1230" alt="Фасад избы с ёлками и снеговиком" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m05.webp"><img src="karus_v/v05.webp" width="820" height="1230" alt="Светящийся домик в неоне" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m06.webp"><img src="karus_v/v06.webp" width="820" height="1230" alt="Гости у избы зимним вечером" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m04.webp"><img src="karus_v/v04.webp" width="820" height="1230" alt="Фасад избы с ёлками и снеговиком" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m05.webp"><img src="karus_v/v05.webp" width="820" height="1230" alt="Светящийся домик в неоне" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m06.webp"><img src="karus_v/v06.webp" width="820" height="1230" alt="Гости у избы зимним вечером" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
         <div class="kr-slide kr-slide--hor">
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm03.webp"><img src="karus_v/h03.webp" width="1400" height="933" alt="Праздничный стол под гирляндами" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm04.webp"><img src="karus_v/h04.webp" width="1400" height="933" alt="Стена писем Деду Морозу при свечах" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
-          <figure class="kr-shot" data-th="karus_v/m07.webp"><img src="karus_v/v07.webp" width="820" height="1230" alt="Стена писем и старых газет" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m08.webp"><img src="karus_v/v08.webp" width="820" height="1230" alt="Двор в огнях и снеговик" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m09.webp"><img src="karus_v/v09.webp" width="820" height="1230" alt="Пряничные ёлочки на мастер-классе" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m07.webp"><img src="karus_v/v07.webp" width="820" height="1230" alt="Стена писем и старых газет" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m08.webp"><img src="karus_v/v08.webp" width="820" height="1230" alt="Двор в огнях и снеговик" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m09.webp"><img src="karus_v/v09.webp" width="820" height="1230" alt="Пряничные ёлочки на мастер-классе" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
         <div class="kr-slide kr-slide--hor">
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm05.webp"><img src="karus_v/h05.webp" width="1400" height="933" alt="Волшебники встречают гостей на крыльце" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm06.webp"><img src="karus_v/h06.webp" width="1400" height="933" alt="Представление в бревенчатом зале" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
-          <figure class="kr-shot" data-th="karus_v/m10.webp"><img src="karus_v/v10.webp" width="820" height="1230" alt="Дед Мороз у пульта Министерства" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m11.webp"><img src="karus_v/v11.webp" width="820" height="1230" alt="Неоновый олень на тёмной стене" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m12.webp"><img src="karus_v/v12.webp" width="820" height="1230" alt="Печатная машинка и часы в кабинете" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m10.webp"><img src="karus_v/v10.webp" width="820" height="1230" alt="Дед Мороз у пульта Министерства" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m11.webp"><img src="karus_v/v11.webp" width="820" height="1230" alt="Неоновый олень на тёмной стене" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m12.webp"><img src="karus_v/v12.webp" width="820" height="1230" alt="Печатная машинка и часы в кабинете" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
         <div class="kr-slide kr-slide--hor">
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm07.webp"><img src="karus_v/h07.webp" width="1400" height="933" alt="Витрина со старыми газетами" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm08.webp"><img src="karus_v/h08.webp" width="1400" height="933" alt="Мастерская: инструменты на стене" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
-          <figure class="kr-shot" data-th="karus_v/m13.webp"><img src="karus_v/v13.webp" width="820" height="1230" alt="Стена с инструментами в мастерской" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m14.webp"><img src="karus_v/v14.webp" width="820" height="1230" alt="Светящийся цилиндр в зелёном неоне" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m15.webp"><img src="karus_v/v15.webp" width="820" height="1230" alt="Зал при свечах во время программы" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m13.webp"><img src="karus_v/v13.webp" width="820" height="1230" alt="Стена с инструментами в мастерской" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m14.webp"><img src="karus_v/v14.webp" width="820" height="1230" alt="Светящийся цилиндр в зелёном неоне" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m15.webp"><img src="karus_v/v15.webp" width="820" height="1230" alt="Зал при свечах во время программы" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
         <div class="kr-slide kr-slide--hor">
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm09.webp"><img src="karus_v/h09.webp" width="1400" height="933" alt="Светящийся стол в зелёном неоне" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm10.webp"><img src="karus_v/h10.webp" width="1400" height="933" alt="Зал при свечах в лиловом свете" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
-          <figure class="kr-shot" data-th="karus_v/m16.webp"><img src="karus_v/v16.webp" width="820" height="1230" alt="Портреты в галерее Министерства" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m17.webp"><img src="karus_v/v17.webp" width="820" height="1230" alt="Пульт Министерства новогодних дел" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m18.webp"><img src="karus_v/v18.webp" width="820" height="1230" alt="Дед Мороз читает письмо ребёнку" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m16.webp"><img src="karus_v/v16.webp" width="820" height="1230" alt="Портреты в галерее Министерства" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m17.webp"><img src="karus_v/v17.webp" width="820" height="1230" alt="Пульт Министерства новогодних дел" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m18.webp"><img src="karus_v/v18.webp" width="820" height="1230" alt="Дед Мороз читает письмо ребёнку" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
         <div class="kr-slide kr-slide--hor">
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm11.webp"><img src="karus_v/h11.webp" width="1400" height="933" alt="Светящаяся стена под ультрафиолетом" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm12.webp"><img src="karus_v/h12.webp" width="1400" height="933" alt="Общий кадр с Дедом Морозом у ёлки" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
+        </div>
+        <div class="kr-slide">
+          <figure class="kr-shot" data-th="karus_v/m19.webp"><img src="karus_v/v19.webp" width="820" height="1230" alt="Светящаяся вывеска «Дед Мороз»" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m20.webp"><img src="karus_v/v20.webp" width="820" height="1230" alt="Часовщица встречает гостей" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m21.webp"><img src="karus_v/v21.webp" width="820" height="1230" alt="Письмо Деду Морозу и книги" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+        </div>
+        <div class="kr-slide">
+          <figure class="kr-shot" data-th="karus_v/m22.webp"><img src="karus_v/v22.webp" width="820" height="1230" alt="Зал управления Министерства" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m23.webp"><img src="karus_v/v23.webp" width="820" height="1230" alt="Карамельный мастер-класс" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m24.webp"><img src="karus_v/v24.webp" width="820" height="1230" alt="Пульт и ёлка в бревенчатом зале" loading="lazy" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
       </div>
 
@@ -2641,6 +2658,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <button class="kr-th" type="button" data-i="10" aria-label="Слайд 11: Дед Мороз читает письмо ребёнку"><img src="karus_v/m18.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th kr-th--hor" type="button" data-i="11" aria-label="Слайд 12: Светящаяся стена под ультрафиолетом"><img src="karus_v/hm11.webp" width="300" height="200" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th kr-th--hor" type="button" data-i="11" aria-label="Слайд 12: Общий кадр с Дедом Морозом у ёлки"><img src="karus_v/hm12.webp" width="300" height="200" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th" type="button" data-i="12" aria-label="Слайд 13: Светящаяся вывеска «Дед Мороз»"><img src="karus_v/m19.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th" type="button" data-i="12" aria-label="Слайд 13: Часовщица встречает гостей"><img src="karus_v/m20.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th" type="button" data-i="12" aria-label="Слайд 13: Письмо Деду Морозу и книги"><img src="karus_v/m21.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th" type="button" data-i="13" aria-label="Слайд 14: Зал управления Министерства"><img src="karus_v/m22.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th" type="button" data-i="13" aria-label="Слайд 14: Карамельный мастер-класс"><img src="karus_v/m23.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th" type="button" data-i="13" aria-label="Слайд 14: Пульт и ёлка в бревенчатом зале"><img src="karus_v/m24.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
     </div>
   </div>
 </section>
@@ -5146,9 +5169,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Листается стрелками, клавишами, щелчком по миниатюре и пальцем.
 
    ДВЕ РАСКЛАДКИ. На компьютере в слайде три вертикальных снимка или два
-   горизонтальных рядом; на телефоне — два вертикальных или два горизонтальных
-   столбиком. Состав слайда разный, а значит и слайдов выходит разное
-   количество: двенадцать на компьютере, пятнадцать на телефоне. Поэтому одной
+   горизонтальных рядом; на телефоне — четыре вертикальных сеткой 2x2 или два
+   горизонтальных столбиком. Состав слайда разный, а значит и слайдов выходит
+   разное количество: четырнадцать на компьютере, двенадцать на телефоне. Поэтому одной
    сетки мало — лента и полоса миниатюр собираются заново при каждом переходе
    через 768 px.
 
@@ -5306,7 +5329,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      движении рамки окна нельзя. На обычный resize достаточно пересчитать
      высоту показом того же слайда. */
   var mq = window.matchMedia('(max-width:767px)');
-  function fit(){ build(mq.matches ? 2 : 3, 2); show(0); }
+  function fit(){ build(mq.matches ? 4 : 3, 2); show(0); }
   if (mq.addEventListener) mq.addEventListener('change', fit);
   else if (mq.addListener) mq.addListener(fit);
 
