@@ -2043,59 +2043,34 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     inset calc(-1 * clamp(8px,1.1vw,16px)) 0 clamp(20px,2.6vw,34px) calc(-1 * clamp(8px,1.1vw,16px)) rgba(26,45,74,.2);
 }
 
-/* ЁЛОЧНЫЕ ШАРЫ. Нарисованы кодом, картинок нет: сфера — стопка радиальных
-   градиентов (блик, отсвет снизу, само тело), колпачок и петелька —
-   псевдоэлементы. Слой лежит под содержимым, поэтому шары видны в полях
-   по краям и не спорят с кадрами.
-   Локальная `--d` нужна, чтобы у золотого можно было поменять один размер,
-   а колпачок с петелькой пересчитались сами. */
+/* ЁЛОЧНЫЕ ШАРЫ — снимки, которые прислал Серёга (`shar-red.webp`,
+   `shar-gold.webp`). Тень под шаром вшита в сам файл, отдельной тени
+   в стилях нет. Слой лежит под содержимым, поэтому шары выглядывают
+   из-за кромки и не спорят с кадрами карусели.
+   Локальная `--d` — ширина кадра со снимком: у золотого она своя,
+   и сдвиг за кромку пересчитывается от неё сам. */
 .kr-balls{position:absolute; inset:0; z-index:1; pointer-events:none}
 .kr-ball{
   --d:var(--kr-ball-d);
   position:absolute; display:block;
-  width:var(--d); height:var(--d); border-radius:50%;
-  box-shadow:calc(var(--d) * .05) calc(var(--d) * .07) calc(var(--d) * .12) rgba(24,44,74,.26);
+  width:var(--d); height:auto;
   animation:kr-float var(--dur) ease-in-out infinite alternate;
   will-change:transform;
 }
-/* колпачок (латунная шапочка) */
-.kr-ball::before{
-  content:''; position:absolute; left:50%; top:calc(var(--d) * -.085);
-  width:calc(var(--d) * .2); height:calc(var(--d) * .155);
-  transform:translateX(-50%);
-  border-radius:calc(var(--d) * .022);
-  background:linear-gradient(90deg,#7E6A34 0%,#D8BE75 28%,#F1E2AE 46%,#C9AC5E 68%,#6F5C2C 100%);
-}
-/* петелька над колпачком */
-.kr-ball::after{
-  content:''; position:absolute; left:50%; top:calc(var(--d) * -.205);
-  width:calc(var(--d) * .125); height:calc(var(--d) * .125);
-  transform:translateX(-50%);
-  border-radius:50%;
-  border:calc(var(--d) * .022) solid rgba(255,255,255,.7);
-}
 /* Красный слева: центр за кромкой, в кадр входит чуть больше половины —
-   так же, как на образце, который прислал Серёга. */
+   как на образце. */
 .kr-ball--red{
   --dur:var(--kr-ball-dur-1);
-  left:calc(var(--d) * -.42); top:24%;
-  background:
-    radial-gradient(circle at 34% 26%, rgba(255,255,255,.7) 0 3%, rgba(255,255,255,0) 26%),
-    linear-gradient(180deg, rgba(255,255,255,0) 40%, rgba(0,0,0,.055) 49%, rgba(255,255,255,.03) 56%, rgba(255,255,255,0) 68%),
-    radial-gradient(circle at 32% 28%, #E4776E 0%, #D0453B 24%, #B12A22 52%, #7A130F 86%, #9C201A 100%);
+  left:calc(var(--d) * -.44); top:24%;
 }
-/* Золотой справа и ниже, чуть крупнее. Отрицательная задержка сдвигает его
-   по фазе сразу, без «первого прохода» — иначе на глазах у зрителя оба шара
-   стартовали бы из одной точки. */
+/* Золотой справа и ниже, чуть крупнее. Отрицательная задержка сразу сдвигает
+   его по фазе: иначе на глазах у зрителя оба шара стартовали бы из одной точки.
+   Сдвиг вправо меньше — в файле со снимком справа лежит вшитая тень. */
 .kr-ball--gold{
   --d:calc(var(--kr-ball-d) * 1.06);
   --dur:var(--kr-ball-dur-2);
-  right:calc(var(--d) * -.4); top:52%;
+  right:calc(var(--d) * -.34); top:52%;
   animation-delay:-2.4s;
-  background:
-    radial-gradient(circle at 38% 28%, rgba(255,255,255,.8) 0 4%, rgba(255,255,255,0) 30%),
-    radial-gradient(circle at 62% 86%, rgba(255,236,186,.45), rgba(255,236,186,0) 34%),
-    radial-gradient(circle at 34% 30%, #F7E9B8 0%, #EBD087 24%, #D6AC52 52%, #A87B2B 86%, #C6963C 100%);
 }
 @keyframes kr-float{
   from{transform:translateY(calc(var(--kr-ball-sw) * -1))}
@@ -2670,8 +2645,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <section class="cr kr" id="places" aria-labelledby="krT">
   <!-- Украшение, а не содержание: `aria-hidden` убирает шары из читалки. -->
   <div class="kr-balls" aria-hidden="true">
-    <i class="kr-ball kr-ball--red"></i>
-    <i class="kr-ball kr-ball--gold"></i>
+    <img class="kr-ball kr-ball--red" src="shar-red.webp" width="560" height="650" alt="" loading="lazy" decoding="async" draggable="false">
+    <img class="kr-ball kr-ball--gold" src="shar-gold.webp" width="560" height="638" alt="" loading="lazy" decoding="async" draggable="false">
   </div>
   <div class="cr-cont">
     <div class="cr-n">
@@ -2687,9 +2662,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <div class="kr-view" id="krView" role="group" aria-roledescription="карусель" aria-label="Фотографии площадки">
       <div class="kr-strip" id="krStrip">
         <div class="kr-slide">
-          <figure class="kr-shot" data-th="karus_v/m01.webp"><img src="karus_v/v01.webp" width="820" height="1230" alt="Ёлка и Дед Мороз в бревенчатом зале" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m02.webp"><img src="karus_v/v02.webp" width="820" height="1230" alt="Фонари на деревьях над площадкой" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
-          <figure class="kr-shot" data-th="karus_v/m03.webp"><img src="karus_v/v03.webp" width="820" height="1230" alt="Заснеженная ёлка у крыльца избы" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m01.webp"><img src="karus_v/v01.webp" width="820" height="1230" alt="Изба в гирляндах и снеговик у скамейки" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m02.webp"><img src="karus_v/v02.webp" width="820" height="1230" alt="Вывеска Министерства новогодних дел под гирляндами" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
+          <figure class="kr-shot" data-th="karus_v/m03.webp"><img src="karus_v/v03.webp" width="820" height="1230" alt="Заснеженный двор с ёлками и снеговиком" loading="eager" decoding="async" sizes="(max-width:767px) 45vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
         <div class="kr-slide kr-slide--hor">
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm01.webp"><img src="karus_v/h01.webp" width="1400" height="933" alt="Изба Министерства в новогодней подсветке" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
@@ -2763,9 +2738,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
 
     <div class="kr-thumbs" id="krThumbs" aria-label="Кадры площадки">
-      <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1: Ёлка и Дед Мороз в бревенчатом зале"><img src="karus_v/m01.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
-      <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1: Фонари на деревьях над площадкой"><img src="karus_v/m02.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
-      <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1: Заснеженная ёлка у крыльца избы"><img src="karus_v/m03.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
+      <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1: Изба в гирляндах и снеговик у скамейки"><img src="karus_v/m01.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
+      <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1: Вывеска Министерства новогодних дел под гирляндами"><img src="karus_v/m02.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
+      <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1: Заснеженный двор с ёлками и снеговиком"><img src="karus_v/m03.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
       <button class="kr-th kr-th--hor" type="button" data-i="1" aria-label="Слайд 2: Изба Министерства в новогодней подсветке"><img src="karus_v/hm01.webp" width="300" height="200" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th kr-th--hor" type="button" data-i="1" aria-label="Слайд 2: Гости у крыльца избы вечером"><img src="karus_v/hm02.webp" width="300" height="200" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="2" aria-label="Слайд 3: Фасад избы с ёлками и снеговиком"><img src="karus_v/m04.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
