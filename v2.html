@@ -2097,6 +2097,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   to{transform:translateY(var(--kr-ball-sw))}
 }
 
+/* Строчка под слайдером. Ширина ограничена 46 знаками в строке: это абзац,
+   а не заголовок, и во всю ширину карусели он читался бы полосой текста.
+   Кегль между подписью экрана и обычным текстом. */
+.kr-note{
+  margin:1.2cm auto 0; max-width:46ch; text-align:center;
+  font-family:"CR Blogger",Arial,sans-serif;
+  font-size:calc(22 * var(--u)); line-height:1.45; color:#3a3a46;
+}
+@media (max-width:767px){ .kr-note{font-size:16px; margin-top:1cm} }
+
 /* Кнопка под слайдером: 2,5 см воздуха от полосы миниатюр (просьба Серёги
    07.09.2026). Вид обычный, золотой — по стандарту кнопок сайта.
    ШИРИНА. На телефоне — во всю ширину блока, как у кнопки в форме пятого
@@ -2883,6 +2893,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <button class="kr-th" type="button" data-i="16" aria-label="Слайд 17: Стол с письмами, часами и фонарём"><img src="karus_v/m42.webp?v=17" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th kr-th--4th" type="button" data-i="16" aria-label="Слайд 17: Ещё кадр площадки"><img src="karus_v/m56.webp?v=17" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
     </div>
+
+    <p class="kr-note">Настоящая большая изба Деда Мороза - то редкое место,
+      где дети хотя бы допускают мысль «А вдруг здесь всё по-настоящему?»</p>
 
     <p class="kr-send">
       <button class="zs-btn" type="button" data-zs="7-й экран, «Забронировать дату»">
