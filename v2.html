@@ -2052,10 +2052,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   flex:0 0 100%; display:grid; grid-template-columns:repeat(3,1fr);
   gap:var(--kr-gap); margin:0;
 }
-/* СЛАЙД С ГОРИЗОНТАЛЬНЫМИ. На компьютере это ДВА снимка в ряд, на телефоне —
-   ТРИ столбиком (Серёга 07.09.2026). Состав слайда при этом разный, поэтому
-   раскладку меняет не только сетка: карусель пересобирается скриптом,
-   см. блок «ЭКРАН 7: КАРУСЕЛЬ ПЛОЩАДКИ» перед </body>. */
+/* СЛАЙД С ГОРИЗОНТАЛЬНЫМИ — два снимка: на компьютере рядом, на телефоне
+   друг под другом (Серёга 07.09.2026). Снимков в слайде поровну, поэтому
+   раскладку меняет одна строка сетки, а не пересборка карусели. */
 .kr-slide--hor{grid-template-columns:1fr 1fr}
 @media (max-width:767px){ .kr-slide--hor{grid-template-columns:1fr} }
 .kr-shot{
@@ -2074,16 +2073,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    `width:100%` тоже обязателен: без него фигура с заданным aspect-ratio
    не тянется по колонке грида, и браузер считает ширину из высоты.
 
-   ПОТОЛОК ВЫСОТЫ НУЖЕН ТОЛЬКО НА ТЕЛЕФОНЕ. Там снимки идут столбиком, и три
-   горизонтали 3:2 во всю ширину заняли бы вдвое больше ширины экрана.
-   Каждому кадру отведена треть от 76 % высоты окна минус зазоры; упёршись
-   в потолок, кадр становится панорамнее — лишнее срезает `object-fit:cover`.
-   На компьютере снимки идут парой в ряд, каждый вполовину ширины, и высота
-   выходит втрое меньше — потолок там не нужен. */
+   ПОТОЛКА ВЫСОТЫ У КАДРА НЕТ. Он был, пока на телефоне стояло три снимка
+   столбиком: три горизонтали 3:2 во всю ширину занимают вдвое больше ширины
+   экрана, и кадры приходилось срезать до панорам. Снимков стало два, пара
+   столбиком занимает около двух третей экрана — потолок больше не нужен,
+   и кадры показываются целиком, как просил Серёга. */
 .kr-shot--hor{width:100%; aspect-ratio:3/2}
-@media (max-width:767px){
-  .kr-shot--hor{max-height:calc((76vh - 2 * var(--kr-gap)) / 3)}
-}
 .kr-shot img{display:block; width:100%; height:100%; object-fit:cover; user-select:none; -webkit-user-select:none}
 
 /* Стрелки. Это не кнопки действия по стандарту сайта (`.zs-btn`), а органы
@@ -2510,11 +2505,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </div>
 
 <!-- ==================== ЭКРАН 7: «В какую красоту попадут дети» ====================
-     Карусель: слайды через один — три вертикальных снимка в ряд или
-     горизонтальные (две в ряд на компьютере, три столбиком на телефоне).
-     В разметке лежит компьютерная раскладка; на телефоне скрипт пересобирает
-     горизонтальные слайды по три. Поэтому у каждого снимка есть data-th —
-     адрес его миниатюры: полосу миниатюр скрипт строит заново вместе с лентой. Высота у видов разная, окно
+     Карусель: слайды через один — три вертикальных снимка в ряд или два
+     горизонтальных (рядом на компьютере, столбиком на телефоне). Снимков
+     в слайде поровну на обеих версиях, поэтому раскладку меняет одна строка
+     сетки, а карусель ничего не пересобирает. Высота у видов разная, окно
      подстраивается под открытый слайд (скрипт ставит --kr-h).
      Код прислал Серёга (React + Framer Motion), здесь то же поведение
      на голом CSS и скрипте. Кадры — karus_v/v01…v18 и h01…h12. -->
@@ -5133,17 +5127,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      - стрелка гаснет там, где дальше слайдов нет.
    Листается стрелками, клавишами, щелчком по миниатюре и пальцем.
 
-   ДВЕ РАСКЛАДКИ. Вертикальные снимки всегда идут по три в ряд, а горизонтальные
-   на компьютере стоят по два в ряд, на телефоне — по три столбиком (просьба
-   Серёги 07.09.2026). Это не только другая сетка: в слайде оказывается разное
-   число снимков, а значит и слайдов получается разное количество — двенадцать
-   на компьютере, десять на телефоне. Поэтому лента и полоса миниатюр
-   собираются скриптом заново при каждом переходе через 768 px.
-
-   В разметке лежит компьютерная раскладка — без скрипта экран показывает её,
-   а не пустое место. Сами карточки при пересборке ПЕРЕНОСЯТСЯ, а не создаются
-   заново: уже загруженные снимки не качаются повторно. Миниатюры строятся
-   из атрибута data-th у карточки. */
+   РАСКЛАДКИ И ПОЧЕМУ ЗДЕСЬ НЕТ ПЕРЕСБОРКИ. Вертикальные снимки идут по три
+   в ряд, горизонтальные — по два: на компьютере рядом, на телефоне столбиком.
+   Снимков в слайде поровну на обеих версиях, поэтому раскладку меняет одна
+   строка сетки в стилях, а лента и полоса миниатюр остаются теми же.
+   Короткое время (07.09.2026) на телефоне стояло три горизонтальных снимка
+   в слайде — тогда состав слайдов был разный, и скрипт пересобирал ленту
+   по matchMedia. Если такое вернётся, без пересборки снова не обойтись. */
 (function(){
   var view = document.getElementById('krView');
   if (!view) return;
@@ -5153,54 +5143,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       next   = document.getElementById('krNext'),
       num    = document.getElementById('krNum'),
       all    = document.getElementById('krAll'),
-      ths    = null, last = 0, i = 0;
-
-  /* исходный состав: группы вертикальных (по три) и плоский список горизонтальных */
-  var VERT = [], HOR = [];
-  [].forEach.call(strip.children, function(sl){
-    var frames = [].slice.call(sl.children);
-    if (sl.className.indexOf('kr-slide--hor') > -1) HOR = HOR.concat(frames);
-    else VERT.push(frames);
-  });
-
-  function build(perHor){
-    var packs = [], k;
-    for (k = 0; k < HOR.length; k += perHor) packs.push(HOR.slice(k, k + perHor));
-
-    /* чередуем: тройка вертикальных, группа горизонтальных, снова тройка.
-       Если один список кончился раньше, остаток просто дописывается. */
-    var groups = [], v = 0, h = 0;
-    while (v < VERT.length || h < packs.length){
-      if (v < VERT.length) groups.push({hor:false, f:VERT[v++]});
-      if (h < packs.length) groups.push({hor:true,  f:packs[h++]});
-    }
-
-    strip.innerHTML = '';
-    thumbs.innerHTML = '';
-    groups.forEach(function(g, n){
-      var sl = document.createElement('div');
-      sl.className = 'kr-slide' + (g.hor ? ' kr-slide--hor' : '');
-      g.f.forEach(function(fr){
-        sl.appendChild(fr);                       /* переносим, не пересоздаём */
-        var b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'kr-th' + (g.hor ? ' kr-th--hor' : '');
-        b.setAttribute('data-i', n);
-        var img = fr.querySelector('img');
-        b.setAttribute('aria-label', 'Слайд ' + (n + 1) + ': ' + (img ? img.alt : ''));
-        var t = document.createElement('img');
-        t.src = fr.getAttribute('data-th');
-        t.alt = ''; t.loading = 'lazy'; t.decoding = 'async'; t.draggable = false;
-        b.appendChild(t);
-        thumbs.appendChild(b);
-      });
-      strip.appendChild(sl);
-    });
-
-    ths = thumbs.querySelectorAll('.kr-th');
-    last = strip.children.length - 1;
-    if (all) all.textContent = last + 1;
-  }
+      ths    = thumbs.querySelectorAll('.kr-th'),
+      last   = strip.children.length - 1,
+      i      = 0;
+  if (all) all.textContent = last + 1;
 
   function show(n){
     n = Math.max(0, Math.min(last, n));
@@ -5284,18 +5230,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   view.addEventListener('pointerleave', end);
   view.addEventListener('dragstart', function(e){ e.preventDefault(); });
 
-  /* Пересобираем ленту только при переходе через 768 px, а не на каждый resize:
-     пересборка сбрасывает показ на первый слайд, и делать это при каждом
-     движении рамки окна нельзя. */
-  var mq = window.matchMedia('(max-width:767px)');
-  function relayout(){ build(mq.matches ? 3 : 2); show(0); }
-  if (mq.addEventListener) mq.addEventListener('change', relayout);
-  else if (mq.addListener) mq.addListener(relayout);
-
+  /* Высота слайда зависит от ширины окна — у горизонтальных на телефоне кадры
+     встают столбиком, — поэтому на resize пересчитываем её показом того же
+     слайда. */
   window.addEventListener('resize', function(){ show(i); });
   window.addEventListener('load', function(){ show(i); });
 
-  build(mq.matches ? 3 : 2);
   show(0);
 })();
 </script>
