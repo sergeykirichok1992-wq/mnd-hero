@@ -2082,14 +2082,23 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .kr-slide{grid-template-columns:repeat(2, 44.44%); justify-content:center}
   .kr-slide--hor{grid-template-columns:1fr}
 }
+/* ПОЧЕМУ РАДИУС ЗАДАН И КАРТИНКЕ ТОЖЕ (`border-radius:inherit` ниже), А ПОДЛОЖКИ
+   ПОД НЕЙ НЕТ. Скруглять углы одним `overflow:hidden` у рамки ненадёжно: лента
+   едет в своём слое (`will-change:transform`), и браузер обрезает содержимое
+   слоя без сглаживания — по углам остаются прямоугольные хвосты картинки.
+   Полупрозрачная белая подложка добавляла к ним серую кромку: на пастельном
+   фоне она читалась как грязь. Серёга это увидел 07.09.2026. Теперь скругление
+   рисует сама картинка, а подложки нет вовсе — пока кадр грузится, сквозь него
+   виден фон экрана. */
 .kr-shot{
   margin:0; aspect-ratio:2/3; overflow:hidden;
-  border-radius:clamp(10px,1.1vw,20px); background:rgba(255,255,255,.55);
+  border-radius:clamp(10px,1.1vw,20px);
   /* Тень одинаковая на всех ширинах (просьба Серёги 07.09.2026): раньше
      размытие росло вместе с окном через clamp, и на мониторе снимки висели
      над фоном заметно выше, чем на телефоне. Сначала было 9 px, в тот же
      вечер увеличено вдвое — 0 6px 18px. */
-  box-shadow:0 6px 18px rgba(20,16,40,.20);
+  /* тень уведена в синеву фона: нейтрально-серая на пастели читалась пятном */
+  box-shadow:0 6px 18px rgba(64,54,120,.20);
 }
 /* ГОРИЗОНТАЛЬНЫЙ КАДР — горизонталь 3:2 во всю ширину, три штуки в колонку.
    Правило стоит ПОСЛЕ базового `.kr-shot` намеренно: специфичность у них
@@ -2104,7 +2113,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    столбиком занимает около двух третей экрана — потолок больше не нужен,
    и кадры показываются целиком, как просил Серёга. */
 .kr-shot--hor{width:100%; aspect-ratio:3/2}
-.kr-shot img{display:block; width:100%; height:100%; object-fit:cover; user-select:none; -webkit-user-select:none}
+.kr-shot img{
+  display:block; width:100%; height:100%; object-fit:cover;
+  border-radius:inherit;                       /* углы режет сама картинка, а не слой */
+  user-select:none; -webkit-user-select:none;
+}
 
 /* Стрелки. Это не кнопки действия по стандарту сайта (`.zs-btn`), а органы
    управления самой каруселью — как `.navbtn` в шапке. Белый кружок с тенью,
@@ -2146,9 +2159,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   display:flex; gap:3px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
   scroll-behavior:smooth; padding-bottom:2px;
   /* Края полосы растворяются — по обрезанной миниатюре у кромки видно,
-     что лента продолжается и её можно листать. */
-  -webkit-mask:linear-gradient(90deg,transparent 0,#000 3.5%,#000 96.5%,transparent 100%);
-          mask:linear-gradient(90deg,transparent 0,#000 3.5%,#000 96.5%,transparent 100%);
+     что лента продолжается и её можно листать. Полоса растворения короткая
+     (2 %): на длинной у кромки повисали еле видимые полупрозрачные кадры
+     и читались как грязь. */
+  -webkit-mask:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);
+          mask:linear-gradient(90deg,transparent 0,#000 2%,#000 98%,transparent 100%);
 }
 .kr-thumbs::-webkit-scrollbar{display:none}
 /* Свёрнутая миниатюра — не полоска в пару пикселей, а узнаваемый кусок кадра
@@ -2159,11 +2174,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .kr-th{
   flex:0 0 auto; height:var(--th-h); width:calc(var(--th-h) * .44);
   padding:0; border:0; border-radius:7px; overflow:hidden; cursor:pointer;
-  background:rgba(255,255,255,.55); opacity:.72;
+  opacity:.85;                                 /* было .72 — свёрнутые казались выцветшими */
   transition:width .3s ease-out, margin .3s ease-out, opacity .3s ease-out;
 }
 .kr-th--hor{width:calc(var(--th-h) * .62)}
-.kr-th img{display:block; width:100%; height:100%; object-fit:cover}
+.kr-th img{display:block; width:100%; height:100%; object-fit:cover; border-radius:inherit}
 /* Открытый слайд показан кадрами целиком. ОДНОЙ ШИРИНЫ ДЛЯ ЭТОГО МАЛО:
    горизонтальная миниатюра шире вертикальной по своей пропорции, и свёрнутая
    горизонтальная оказывалась шире раскрытой вертикальной — «где я» переставало
