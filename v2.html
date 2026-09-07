@@ -2097,36 +2097,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   to{transform:translateY(var(--kr-ball-sw))}
 }
 
-/* Обёртка окна карусели: она нужна только слою шаров на телефоне — тот
-   привязывается к кромкам слайдера, а не к секции. */
-.kr-stage{position:relative}
-
-/* ШАРЫ НА ТЕЛЕФОНЕ (просьба Серёги 07.09.2026): летают у верхней и нижней
-   кромки слайдера, заходят на него не больше чем на сантиметр и рисуются
-   ПОВЕРХ кадров.
-
-   Как считается заход. Высота снимка с шаром — примерно 1,35 его ширины
-   (520x703). Ставим шар так, чтобы в среднем положении он заходил на полсантиметра,
-   и качается он на ±полсантиметра (`--kr-ball-sw`) — значит в крайней точке
-   заход ровно сантиметр, а в другой крайней шар только касается кромки.
-
-   Слой лежит ПОСЛЕ окна карусели и с бо́льшим z-index, поэтому шары идут
-   поверх кадров; клики они не перехватывают (`pointer-events:none`). */
-.kr-balls--mob{display:none}
-@media (max-width:767px){
-  .kr-balls{display:none}                     /* общий слой секции на телефоне не нужен */
-  .kr-balls--mob{
-    display:block; position:absolute; inset:0; z-index:5;
-    pointer-events:none; --kr-ball-sw:.5cm;
-  }
-  .kr-balls--mob .kr-ball--red{
-    left:4%; right:auto; top:calc(.5cm - var(--d) * 1.35);
-  }
-  .kr-balls--mob .kr-ball--gold{
-    right:4%; left:auto; top:auto; bottom:calc(.5cm - var(--d) * 1.35);
-  }
-}
-
 /* Кнопка под слайдером: 2,5 см воздуха от полосы миниатюр (просьба Серёги
    07.09.2026). Вид обычный, золотой — по стандарту кнопок сайта. */
 .kr-send{margin:2.5cm 0 0; text-align:center}
@@ -2286,9 +2256,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Ширины считаются от высоты полосы: вертикальная развёрнутая — снимок 2:3,
    горизонтальная — 1,5 высоты (тот же кадр 3:2), свёрнутые — 26 % высоты. */
 .kr-thumbs{
-  /* своя ступень слоя: шар, вылетающий из-под нижней кромки слайдера,
-     проходит ПОД полосой миниатюр, а не поверх неё */
-  position:relative; z-index:6;
   --th-h:clamp(56px,5.2vw,92px);
   width:min(100%, 124vh, 1240px); margin:clamp(10px,1vw,16px) auto 0;
   display:flex; gap:3px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
@@ -2351,16 +2318,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      нового заголовка, и подпись начинала спорить с ним за главное место.
      Держим то же отношение, что на втором экране (заголовок / подпись = 1,4). */
   .kr .cr-lead{font-size:18px}
-  /* Шары: 12,5vw на телефоне дали бы 49 px — точка, а не шар. Считаем от
-     ширины экрана крупнее. Размер подобран под зазор над слайдером: шар
-     вылезает вверх на свою высоту минус полсантиметра захода, и весь этот
-     хвост должен уместиться между подписью и кромкой кадров — иначе шар
-     наезжает на строчку «Так мы оформляем наши площадки». */
-  .kr{--kr-ball-d:clamp(64px,18vw,96px)}
-  .kr-ball--red{top:30%}
-  .kr-ball--gold{top:66%}
-  /* воздух над слайдером — место, в котором висит верхний шар */
-  .kr-stage{margin-top:1.5cm}
+  /* ШАРОВ НА ТЕЛЕФОНЕ НЕТ (решение Серёги 07.09.2026). Пробовали и общий
+     слой секции, и отдельный у кромок слайдера — на узком экране шар либо
+     наезжает на подпись, либо закрывает кадры. Оставили только на компьютере. */
+  .kr-balls{display:none}
 }
 
 /* «Меньше движения»: слайды, высота и миниатюры меняются мгновенно. */
@@ -2742,7 +2703,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     <div style="height:calc(30 * var(--u))"></div>
 
-    <div class="kr-stage">
     <div class="kr-view" id="krView" role="group" aria-roledescription="карусель" aria-label="Фотографии площадки">
       <div class="kr-strip" id="krStrip">
         <div class="kr-slide kr-slide--hor">
@@ -2851,15 +2811,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       </button>
 
       <p class="kr-count" aria-hidden="true"><span id="krNum">1</span> / <span id="krAll">12</span></p>
-    </div>
-
-      <!-- ШАРЫ НА ТЕЛЕФОНЕ. Слой лежит в обёртке карусели, а не в секции:
-           так «сверху» и «снизу» отсчитываются от самого слайдера, а не от
-           экрана, и заход внутрь получается ровно тот, что просил Серёга. -->
-      <div class="kr-balls kr-balls--mob" aria-hidden="true">
-        <span class="kr-ball kr-ball--red"><img src="shar-red.webp" width="520" height="703" alt="" loading="lazy" decoding="async" draggable="false"></span>
-        <span class="kr-ball kr-ball--gold"><img src="shar-gold.webp" width="520" height="701" alt="" loading="lazy" decoding="async" draggable="false"></span>
-      </div>
     </div>
 
     <div class="kr-thumbs" id="krThumbs" aria-label="Кадры площадки">
