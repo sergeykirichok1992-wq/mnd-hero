@@ -2002,16 +2002,104 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    теперь задумано: окно карусели подстраивается под открытый слайд
    и переезжает плавно (просьба Серёги 07.09.2026, до этого высота была общая).
 
-   ФОН — пастельная растяжка «Dreamy Pastel Wash» (150°, четыре цвета) плюс
-   плёнка зерна поверх. Зерно — SVG-шум прямо в стиле, отдельного файла нет. */
+   ФОН нарисован кодом: светлый голубой градиент плюс плёнка зерна поверх
+   (просьба Серёги 07.09.2026, до этого была пастельная растяжка в четыре
+   цвета). Зерно — SVG-шум прямо в стиле, отдельного файла нет; убирать его
+   нельзя: на широких экранах плавный градиент без него идёт полосами.
+   По верхней и нижней кромке лежит тень — экран выглядит утопленным
+   между соседними, см. `.kr::after`. */
 .kr{
   --kr-gap:clamp(8px,1.1vw,20px);
+
+  /* ШАРЫ. Всё, что у них регулируется, объявлено здесь — размер, размах
+     качания и СКОРОСТЬ. Больше секунд = плывёт медленнее. Два разных срока
+     нужны, чтобы шары не качались строем: глаз сразу замечает синхрон. */
+  --kr-ball-d:clamp(96px,12.5vw,196px);   /* диаметр красного */
+  --kr-ball-sw:clamp(9px,1.5vw,22px);     /* размах: столько вверх и вниз */
+  --kr-ball-dur-1:7s;                     /* скорость красного */
+  --kr-ball-dur-2:9.5s;                   /* скорость золотого */
+
+  position:relative; overflow:hidden;     /* краями экрана шары и обрезает */
   color:#333; padding:calc(60 * var(--u)) 0 calc(70 * var(--u));
-  background-color:#DCEBF7;
+  background-color:#E4EFF9;
   background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.100'/></svg>"),
-    linear-gradient(150deg,#DCEBF7 0%,#B9D4EC 33%,#F3D9E4 67%,#F7EFE3 100%);
+    radial-gradient(125% 95% at 50% 40%,#F3F8FD 0%,#E3EFF9 46%,#CDE1F1 100%);
   background-size:120px 120px, auto;
   background-blend-mode:overlay, normal;
+}
+
+/* ТЕНЬ ОТ КРОМОК ЭКРАНА. Не отдельная картинка, а внутренняя тень на всю
+   секцию: сверху и снизу сильная, по бокам едва заметная. Лежит НАД фоном
+   и НАД шарами, но ПОД содержимым (`z-index:6` против `z-index:7`
+   у `.cr-cont`) — иначе притемняла бы заголовок и кадры карусели.
+   `pointer-events:none` обязателен: слой накрывает всю секцию, и без него
+   карусель перестала бы ловить мышь и палец. */
+.kr::after{
+  content:''; position:absolute; inset:0; z-index:6; pointer-events:none;
+  box-shadow:
+    inset 0 clamp(12px,1.7vw,24px) clamp(26px,3.6vw,48px) calc(-1 * clamp(8px,1.2vw,16px)) rgba(26,45,74,.46),
+    inset 0 calc(-1 * clamp(12px,1.7vw,24px)) clamp(26px,3.6vw,48px) calc(-1 * clamp(8px,1.2vw,16px)) rgba(26,45,74,.46),
+    inset clamp(8px,1.1vw,16px) 0 clamp(20px,2.6vw,34px) calc(-1 * clamp(8px,1.1vw,16px)) rgba(26,45,74,.2),
+    inset calc(-1 * clamp(8px,1.1vw,16px)) 0 clamp(20px,2.6vw,34px) calc(-1 * clamp(8px,1.1vw,16px)) rgba(26,45,74,.2);
+}
+
+/* ЁЛОЧНЫЕ ШАРЫ. Нарисованы кодом, картинок нет: сфера — стопка радиальных
+   градиентов (блик, отсвет снизу, само тело), колпачок и петелька —
+   псевдоэлементы. Слой лежит под содержимым, поэтому шары видны в полях
+   по краям и не спорят с кадрами.
+   Локальная `--d` нужна, чтобы у золотого можно было поменять один размер,
+   а колпачок с петелькой пересчитались сами. */
+.kr-balls{position:absolute; inset:0; z-index:1; pointer-events:none}
+.kr-ball{
+  --d:var(--kr-ball-d);
+  position:absolute; display:block;
+  width:var(--d); height:var(--d); border-radius:50%;
+  box-shadow:calc(var(--d) * .05) calc(var(--d) * .07) calc(var(--d) * .12) rgba(24,44,74,.26);
+  animation:kr-float var(--dur) ease-in-out infinite alternate;
+  will-change:transform;
+}
+/* колпачок (латунная шапочка) */
+.kr-ball::before{
+  content:''; position:absolute; left:50%; top:calc(var(--d) * -.085);
+  width:calc(var(--d) * .2); height:calc(var(--d) * .155);
+  transform:translateX(-50%);
+  border-radius:calc(var(--d) * .022);
+  background:linear-gradient(90deg,#7E6A34 0%,#D8BE75 28%,#F1E2AE 46%,#C9AC5E 68%,#6F5C2C 100%);
+}
+/* петелька над колпачком */
+.kr-ball::after{
+  content:''; position:absolute; left:50%; top:calc(var(--d) * -.205);
+  width:calc(var(--d) * .125); height:calc(var(--d) * .125);
+  transform:translateX(-50%);
+  border-radius:50%;
+  border:calc(var(--d) * .022) solid rgba(255,255,255,.7);
+}
+/* Красный слева: центр за кромкой, в кадр входит чуть больше половины —
+   так же, как на образце, который прислал Серёга. */
+.kr-ball--red{
+  --dur:var(--kr-ball-dur-1);
+  left:calc(var(--d) * -.42); top:24%;
+  background:
+    radial-gradient(circle at 34% 26%, rgba(255,255,255,.7) 0 3%, rgba(255,255,255,0) 26%),
+    linear-gradient(180deg, rgba(255,255,255,0) 40%, rgba(0,0,0,.055) 49%, rgba(255,255,255,.03) 56%, rgba(255,255,255,0) 68%),
+    radial-gradient(circle at 32% 28%, #E4776E 0%, #D0453B 24%, #B12A22 52%, #7A130F 86%, #9C201A 100%);
+}
+/* Золотой справа и ниже, чуть крупнее. Отрицательная задержка сдвигает его
+   по фазе сразу, без «первого прохода» — иначе на глазах у зрителя оба шара
+   стартовали бы из одной точки. */
+.kr-ball--gold{
+  --d:calc(var(--kr-ball-d) * 1.06);
+  --dur:var(--kr-ball-dur-2);
+  right:calc(var(--d) * -.4); top:52%;
+  animation-delay:-2.4s;
+  background:
+    radial-gradient(circle at 38% 28%, rgba(255,255,255,.8) 0 4%, rgba(255,255,255,0) 30%),
+    radial-gradient(circle at 62% 86%, rgba(255,236,186,.45), rgba(255,236,186,0) 34%),
+    radial-gradient(circle at 34% 30%, #F7E9B8 0%, #EBD087 24%, #D6AC52 52%, #A87B2B 86%, #C6963C 100%);
+}
+@keyframes kr-float{
+  from{transform:translateY(calc(var(--kr-ball-sw) * -1))}
+  to{transform:translateY(var(--kr-ball-sw))}
 }
 
 /* ОКНО КАРУСЕЛИ. Ширину ограничивают три вещи, и меньшая побеждает: ширина
@@ -2215,6 +2303,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      нового заголовка, и подпись начинала спорить с ним за главное место.
      Держим то же отношение, что на втором экране (заголовок / подпись = 1,4). */
   .kr .cr-lead{font-size:18px}
+  /* Шары: 12,5vw на телефоне дали бы 49 px — точка, а не шар. Считаем от
+     ширины экрана крупнее и разводим по высоте, чтобы оба попадали в поля
+     рядом с каруселью, а не прятались под ней. */
+  .kr{--kr-ball-d:clamp(78px,25vw,124px)}
+  .kr-ball--red{top:30%}
+  .kr-ball--gold{top:66%}
 }
 
 /* «Меньше движения»: слайды, высота и миниатюры меняются мгновенно. */
@@ -2223,6 +2317,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .kr-strip{transition:none}
   .kr-th{transition:none}
   .kr-thumbs{scroll-behavior:auto}
+  .kr-ball{animation:none}
 }
 </style>
 </head>
@@ -2573,6 +2668,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      Код прислал Серёга (React + Framer Motion), здесь то же поведение
      на голом CSS и скрипте. Кадры — karus_v/v01…v18 и h01…h12. -->
 <section class="cr kr" id="places" aria-labelledby="krT">
+  <!-- Украшение, а не содержание: `aria-hidden` убирает шары из читалки. -->
+  <div class="kr-balls" aria-hidden="true">
+    <i class="kr-ball kr-ball--red"></i>
+    <i class="kr-ball kr-ball--gold"></i>
+  </div>
   <div class="cr-cont">
     <div class="cr-n">
       <h2 class="cr-t cr-h2" id="krT"><span class="cr-red"><strong>ПОСМОТРИТЕ В КАКУЮ КРАСОТУ&nbsp;</strong></span><span class="cr-blue"><strong>ПОПАДУТ ДЕТИ!</strong></span></h2>
