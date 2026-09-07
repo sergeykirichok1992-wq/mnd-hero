@@ -2052,11 +2052,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   flex:0 0 100%; display:grid; grid-template-columns:repeat(3,1fr);
   gap:var(--kr-gap); margin:0;
 }
-/* СЛАЙД С ГОРИЗОНТАЛЬНЫМИ — два снимка: на компьютере рядом, на телефоне
-   друг под другом (Серёга 07.09.2026). Снимков в слайде поровну, поэтому
-   раскладку меняет одна строка сетки, а не пересборка карусели. */
+/* СЕТКА ПО ВЕРСИЯМ (Серёга 07.09.2026):
+     компьютер — три вертикальных в ряд, два горизонтальных рядом;
+     телефон   — два вертикальных в ряд, два горизонтальных столбиком.
+   Порядок двух мобильных правил важен: `.kr-slide` идёт ПЕРВЫМ, иначе оно
+   перебило бы колонку у горизонтального слайда (у того оба класса,
+   а специфичность одинаковая). Состав слайдов на версиях разный, поэтому
+   сетки мало — ленту пересобирает скрипт, см. блок «ЭКРАН 7» перед </body>. */
 .kr-slide--hor{grid-template-columns:1fr 1fr}
-@media (max-width:767px){ .kr-slide--hor{grid-template-columns:1fr} }
+@media (max-width:767px){
+  .kr-slide{grid-template-columns:1fr 1fr}
+  .kr-slide--hor{grid-template-columns:1fr}
+}
 .kr-shot{
   margin:0; aspect-ratio:2/3; overflow:hidden;
   border-radius:clamp(10px,1.1vw,20px); background:rgba(255,255,255,.55);
@@ -5127,13 +5134,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      - стрелка гаснет там, где дальше слайдов нет.
    Листается стрелками, клавишами, щелчком по миниатюре и пальцем.
 
-   РАСКЛАДКИ И ПОЧЕМУ ЗДЕСЬ НЕТ ПЕРЕСБОРКИ. Вертикальные снимки идут по три
-   в ряд, горизонтальные — по два: на компьютере рядом, на телефоне столбиком.
-   Снимков в слайде поровну на обеих версиях, поэтому раскладку меняет одна
-   строка сетки в стилях, а лента и полоса миниатюр остаются теми же.
-   Короткое время (07.09.2026) на телефоне стояло три горизонтальных снимка
-   в слайде — тогда состав слайдов был разный, и скрипт пересобирал ленту
-   по matchMedia. Если такое вернётся, без пересборки снова не обойтись. */
+   ДВЕ РАСКЛАДКИ. На компьютере в слайде три вертикальных снимка или два
+   горизонтальных рядом; на телефоне — два вертикальных или два горизонтальных
+   столбиком. Состав слайда разный, а значит и слайдов выходит разное
+   количество: двенадцать на компьютере, пятнадцать на телефоне. Поэтому одной
+   сетки мало — лента и полоса миниатюр собираются заново при каждом переходе
+   через 768 px.
+
+   В разметке лежит компьютерная раскладка: без скрипта экран показывает её,
+   а не пустое место. Карточки при пересборке ПЕРЕНОСЯТСЯ, а не создаются
+   заново — уже загруженные снимки не качаются повторно. Миниатюры строятся
+   из атрибута data-th у карточки. */
 (function(){
   var view = document.getElementById('krView');
   if (!view) return;
@@ -5143,10 +5154,59 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       next   = document.getElementById('krNext'),
       num    = document.getElementById('krNum'),
       all    = document.getElementById('krAll'),
-      ths    = thumbs.querySelectorAll('.kr-th'),
-      last   = strip.children.length - 1,
-      i      = 0;
-  if (all) all.textContent = last + 1;
+      ths    = null, last = 0, i = 0;
+
+  /* исходный состав: плоские списки карточек по видам */
+  var VERT = [], HOR = [];
+  [].forEach.call(strip.children, function(sl){
+    var frames = [].slice.call(sl.children);
+    if (sl.className.indexOf('kr-slide--hor') > -1) HOR = HOR.concat(frames);
+    else VERT = VERT.concat(frames);
+  });
+
+  function chunk(list, per){
+    var out = [];
+    for (var k = 0; k < list.length; k += per) out.push(list.slice(k, k + per));
+    return out;
+  }
+
+  function build(perV, perH){
+    var vs = chunk(VERT, perV), hs = chunk(HOR, perH);
+
+    /* чередуем: группа вертикальных, группа горизонтальных, снова вертикальных.
+       Если один список кончился раньше, остаток просто дописывается. */
+    var groups = [], v = 0, h = 0;
+    while (v < vs.length || h < hs.length){
+      if (v < vs.length) groups.push({hor:false, f:vs[v++]});
+      if (h < hs.length) groups.push({hor:true,  f:hs[h++]});
+    }
+
+    strip.innerHTML = '';
+    thumbs.innerHTML = '';
+    groups.forEach(function(g, n){
+      var sl = document.createElement('div');
+      sl.className = 'kr-slide' + (g.hor ? ' kr-slide--hor' : '');
+      g.f.forEach(function(fr){
+        sl.appendChild(fr);                       /* переносим, не пересоздаём */
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'kr-th' + (g.hor ? ' kr-th--hor' : '');
+        b.setAttribute('data-i', n);
+        var img = fr.querySelector('img');
+        b.setAttribute('aria-label', 'Слайд ' + (n + 1) + ': ' + (img ? img.alt : ''));
+        var t = document.createElement('img');
+        t.src = fr.getAttribute('data-th');
+        t.alt = ''; t.loading = 'lazy'; t.decoding = 'async'; t.draggable = false;
+        b.appendChild(t);
+        thumbs.appendChild(b);
+      });
+      strip.appendChild(sl);
+    });
+
+    ths = thumbs.querySelectorAll('.kr-th');
+    last = strip.children.length - 1;
+    if (all) all.textContent = last + 1;
+  }
 
   function show(n){
     n = Math.max(0, Math.min(last, n));
@@ -5230,13 +5290,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   view.addEventListener('pointerleave', end);
   view.addEventListener('dragstart', function(e){ e.preventDefault(); });
 
-  /* Высота слайда зависит от ширины окна — у горизонтальных на телефоне кадры
-     встают столбиком, — поэтому на resize пересчитываем её показом того же
-     слайда. */
+  /* Пересобираем ленту только при переходе через 768 px, а не на каждый resize:
+     пересборка сбрасывает показ на первый слайд, и делать это при каждом
+     движении рамки окна нельзя. На обычный resize достаточно пересчитать
+     высоту показом того же слайда. */
+  var mq = window.matchMedia('(max-width:767px)');
+  function fit(){ build(mq.matches ? 2 : 3, 2); show(0); }
+  if (mq.addEventListener) mq.addEventListener('change', fit);
+  else if (mq.addListener) mq.addListener(fit);
+
   window.addEventListener('resize', function(){ show(i); });
   window.addEventListener('load', function(){ show(i); });
 
-  show(0);
+  fit();
 })();
 </script>
 
