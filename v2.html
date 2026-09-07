@@ -1997,33 +1997,41 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Оригинал был на React и Framer Motion — здесь то же поведение на голом CSS
    и полусотне строк скрипта.
 
-   СЛАЙДЫ ДВУХ ВИДОВ (просьба Серёги 07.09.2026): либо три вертикальных снимка
-   в ряд, либо один горизонтальный во всю ширину. Идут через один.
+   СЛАЙДЫ ДВУХ ВИДОВ, идут через один: три вертикальных снимка в ряд или
+   две горизонтальные панорамы одна под другой. Высота у них разная — и это
+   теперь задумано: окно карусели подстраивается под открытый слайд
+   и переезжает плавно (просьба Серёги 07.09.2026, до этого высота была общая).
 
-   ВЫСОТА У ОБОИХ ВИДОВ ОДНА, и это главное в конструкции: если бы слайды были
-   разной высоты, окно прыгало бы при каждом листании. Высота тройки — это
-   `(ширина - 2 зазора) / 3 * 1,5` (снимок 2:3), то есть `50cqw - зазор`,
-   и ровно столько же назначено горизонтальному кадру. `cqw` — доля ширины
-   самой карусели (`container-type:inline-size` у `.kr-view`); перед ним стоит
-   запасное `aspect-ratio` на случай браузера без единиц контейнера.
-
-   Пространство имён `kr-` (карусель) — не пересекается ни с `.cr-*`,
-   ни с `.dk-*`, ни с `.bk-*`, ни с `.sm-*`, ни с формой `.zs-*`.
-   Заголовок и подпись — классами второго экрана (`.cr-h2`, `.cr-lead`). */
-.kr{--kr-gap:clamp(8px,1.1vw,20px); background:#fff; color:#333;
-    padding:calc(60 * var(--u)) 0 calc(70 * var(--u))}
+   ФОН — пастельная растяжка «Dreamy Pastel Wash» (150°, четыре цвета) плюс
+   плёнка зерна поверх. Зерно — SVG-шум прямо в стиле, отдельного файла нет. */
+.kr{
+  --kr-gap:clamp(8px,1.1vw,20px);
+  color:#333; padding:calc(60 * var(--u)) 0 calc(70 * var(--u));
+  background-color:#DCEBF7;
+  background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.100'/></svg>"),
+    linear-gradient(150deg,#DCEBF7 0%,#B9D4EC 33%,#F3D9E4 67%,#F7EFE3 100%);
+  background-size:120px 120px, auto;
+  background-blend-mode:overlay, normal;
+}
 
 /* ОКНО КАРУСЕЛИ. Ширину ограничивают три вещи, и меньшая побеждает: ширина
-   контейнера, высота окна браузера и потолок 1240 px. Высота слайда — около
-   половины ширины, отсюда пересчёт `124vh`: слайд занимает примерно 60 %
-   высоты экрана и помещается целиком.
-   Своей рамки и фона у окна нет — они у самих снимков. Снизу оставлен
-   `padding`: `overflow:hidden` срезал бы их тени ровной линией. */
+   контейнера, высота окна браузера и потолок 1240 px.
+
+   ВЫСОТУ СТАВИТ СКРИПТ в `--kr-h` — по фактической высоте открытого слайда,
+   и она переезжает тем же движением, что и сама лента. Поэтому у ленты
+   `align-items:flex-start`: без него флексбокс растянул бы каждый слайд
+   по самому высокому, и мерить было бы нечего. `box-sizing:content-box`
+   тут обязателен — иначе нижний отступ под тени съедал бы кусок кадра.
+   Если скрипт не отработал, `height:auto` даёт высоту по самому высокому
+   слайду: не идеально, но ничего не рушится. */
 .kr-view{
   position:relative; isolation:isolate; overflow:hidden;
-  container-type:inline-size;                  /* даёт cqw для высоты широкого кадра */
+  container-type:inline-size;                  /* даёт cqw для расчётов внутри */
+  box-sizing:content-box;
   width:min(100%, 124vh, 1240px); margin-inline:auto;
+  height:var(--kr-h, auto);
   padding-bottom:clamp(6px,.9vw,14px);
+  transition:height .45s cubic-bezier(.22,.61,.36,1);
   touch-action:pan-y;                          /* вертикальную прокрутку отдаём странице */
 }
 /* Лента слайдов. Двигаем `transform`, а не `left`: только он не заставляет
@@ -2031,7 +2039,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    `is-drag` снимает плавность — иначе слайд тянулся бы за пальцем с задержкой
    в полсекунды. */
 .kr-strip{
-  display:flex; will-change:transform;
+  display:flex; align-items:flex-start; will-change:transform;
   transform:translate3d(calc(var(--i,0) * -100%),0,0);
   transition:transform .45s cubic-bezier(.22,.61,.36,1);
 }
@@ -2044,19 +2052,23 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   flex:0 0 100%; display:grid; grid-template-columns:repeat(3,1fr);
   gap:var(--kr-gap); margin:0;
 }
-.kr-slide--wide{grid-template-columns:1fr}
+.kr-slide--duo{grid-template-columns:1fr}
 .kr-shot{
   margin:0; aspect-ratio:2/3; overflow:hidden;
-  border-radius:clamp(10px,1.1vw,20px); background:#efeef2;
+  border-radius:clamp(10px,1.1vw,20px); background:rgba(255,255,255,.55);
   box-shadow:0 clamp(5px,.7vw,12px) clamp(14px,1.6vw,28px) rgba(20,16,40,.16),
              0 1px 4px rgba(20,16,40,.08);
 }
-/* Горизонтальный кадр: ширина вся, высота — ровно как у тройки рядом. */
-.kr-shot--wide{
-  aspect-ratio:2.083/1;                        /* запасное значение */
-  height:calc(50cqw - var(--kr-gap));
-  width:100%;
-}
+/* СЛАЙД ИЗ ДВУХ ПАНОРАМ. Правило стоит ПОСЛЕ базового `.kr-shot` намеренно:
+   специфичность у них одинаковая (один класс против одного), и в обратном
+   порядке базовое `aspect-ratio:2/3` перебивало панорамное — кадры выходили
+   почти квадратными, а пара занимала пол-экрана в высоту.
+   `width:100%` тоже обязателен: без него фигура с заданным aspect-ratio
+   не тянется по колонке грида, и браузер считает ширину из высоты.
+   `max-height` держит пару в пределах экрана: две панорамы 2,5:1 во всю
+   ширину дали бы высоту почти в ширину окна. Упёршись в потолок, кадр
+   становится ещё панорамнее — лишнее срезает `object-fit:cover`. */
+.kr-shot--duo{width:100%; aspect-ratio:2.5/1; max-height:34vh}
 .kr-shot img{display:block; width:100%; height:100%; object-fit:cover; user-select:none; -webkit-user-select:none}
 
 /* Стрелки. Это не кнопки действия по стандарту сайта (`.zs-btn`), а органы
@@ -2087,11 +2099,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"CR Blogger",Arial,sans-serif; font-size:clamp(12px,1.05vw,15px); line-height:1.5;
 }
 
-/* ПОЛОСА МИНИАТЮР. У слайда с тройкой три миниатюры, у горизонтального — одна
-   широкая. Разворачиваются те, что стоят в открытом слайде, поэтому по полосе
-   видно, где ты находишься; щелчок по любой ведёт на её слайд.
-   Ширины считаются от высоты полосы: развёрнутый вертикальный — снимок 2:3,
-   развёрнутый горизонтальный — тот же кадр 2,08:1, свёрнутые — 26 % высоты. */
+/* ПОЛОСА МИНИАТЮР. Одна миниатюра — один снимок, а не слайд: сжатая до
+   полоски тройка превратилась бы в кашу. Разворачиваются те, что стоят
+   в открытом слайде (три у вертикального, две у панорамного), поэтому
+   по полосе видно, где ты находишься; щелчок по любой ведёт на её слайд.
+   Ширины считаются от высоты полосы: вертикальная развёрнутая — снимок 2:3,
+   панорамная — 1,9 высоты (полный кадр 2,5:1 занял бы пол-полосы),
+   свёрнутые — 26 % высоты. */
 .kr-thumbs{
   --th-h:clamp(48px,4.6vw,78px);
   width:min(100%, 124vh, 1240px); margin:clamp(10px,1vw,16px) auto 0;
@@ -2102,14 +2116,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .kr-th{
   flex:0 0 auto; height:var(--th-h); width:calc(var(--th-h) * .26);
   padding:0; border:0; border-radius:5px; overflow:hidden; cursor:pointer;
-  background:#efeef2; opacity:.55;
+  background:rgba(255,255,255,.55); opacity:.55;
   transition:width .3s ease-out, margin .3s ease-out, opacity .3s ease-out;
 }
 .kr-th img{display:block; width:100%; height:100%; object-fit:cover}
 .kr-th.is-on{width:calc(var(--th-h) * .667); opacity:1}
-.kr-th--wide.is-on{width:calc(var(--th-h) * 2.083)}
-/* воздух ставим только вокруг тройки, внутри неё снимки идут вплотную —
-   так видно, что это одна группа, а не три случайные миниатюры */
+.kr-th--wide.is-on{width:calc(var(--th-h) * 1.9)}
+/* воздух ставим только вокруг открытой группы, внутри неё снимки идут
+   вплотную — так видно, что это один слайд, а не случайные соседи */
 .kr-th.is-on.is-first{margin-left:6px}
 .kr-th.is-on.is-last{margin-right:6px}
 @media (hover:hover){ .kr-th:hover{opacity:1} }
@@ -2120,7 +2134,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    карусели и полосе миниатюр (просьба Серёги 07.09.2026).
    Там же заголовок уменьшен в полтора раза: 13 px базового кегля (эталон
    старого сайта, span 300 % от него = 39 px) — это на весь экран, а тут
-   над ним ещё и подпись. Правило живёт только внутри `.kr`: у второго
+   над ним ещё и подпись. Правила живут только внутри `.kr`: у второго
    и третьего экранов кегль остаётся эталонным. */
 @media (max-width:767px){
   .kr .cr-cont{padding-inline:14px}
@@ -2131,8 +2145,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .kr .cr-lead{font-size:18px}
 }
 
-/* «Меньше движения»: слайды и миниатюры меняются мгновенно, без разъезда. */
+/* «Меньше движения»: слайды, высота и миниатюры меняются мгновенно. */
 @media (prefers-reduced-motion:reduce){
+  .kr-view{transition:none}
   .kr-strip{transition:none}
   .kr-th{transition:none}
   .kr-thumbs{scroll-behavior:auto}
@@ -2478,11 +2493,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </div>
 
 <!-- ==================== ЭКРАН 7: «В какую красоту попадут дети» ====================
-     Карусель: слайды через один — три вертикальных снимка с воздухом между
-     ними и один горизонтальный во всю ширину. Высота у обоих видов одна,
-     иначе окно прыгало бы при листании. Код прислал Серёга (React + Framer
-     Motion), здесь то же поведение на голом CSS и скрипте.
-     Кадры — karus_v/v01…v18.webp и h01…h06.webp, миниатюры m01…m18, hm01…hm06. -->
+     Карусель: слайды через один — три вертикальных снимка в ряд или две
+     горизонтальные панорамы одна под другой. Высота у видов разная, окно
+     подстраивается под открытый слайд (скрипт ставит --kr-h).
+     Код прислал Серёга (React + Framer Motion), здесь то же поведение
+     на голом CSS и скрипте. Кадры — karus_v/v01…v18 и h01…h12. -->
 <section class="cr kr" id="places" aria-labelledby="krT">
   <div class="cr-cont">
     <div class="cr-n">
@@ -2502,48 +2517,54 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <figure class="kr-shot"><img src="karus_v/v02.webp" width="820" height="1230" alt="Фонари на деревьях над площадкой" loading="eager" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v03.webp" width="820" height="1230" alt="Заснеженная ёлка у крыльца избы" loading="eager" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
-        <div class="kr-slide kr-slide--wide">
-          <figure class="kr-shot kr-shot--wide"><img src="karus_v/h01.webp" width="2000" height="960" alt="Изба Министерства в новогодней подсветке" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+        <div class="kr-slide kr-slide--duo">
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h01.webp" width="2000" height="800" alt="Изба Министерства в новогодней подсветке" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h02.webp" width="2000" height="800" alt="Гости у крыльца избы вечером" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
           <figure class="kr-shot"><img src="karus_v/v04.webp" width="820" height="1230" alt="Фасад избы с ёлками и снеговиком" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v05.webp" width="820" height="1230" alt="Светящийся домик в неоне" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v06.webp" width="820" height="1230" alt="Гости у избы зимним вечером" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
-        <div class="kr-slide kr-slide--wide">
-          <figure class="kr-shot kr-shot--wide"><img src="karus_v/h02.webp" width="2000" height="960" alt="Гости у крыльца избы зимним вечером" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+        <div class="kr-slide kr-slide--duo">
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h03.webp" width="2000" height="800" alt="Праздничный стол под гирляндами" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h04.webp" width="2000" height="800" alt="Стена писем Деду Морозу при свечах" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
           <figure class="kr-shot"><img src="karus_v/v07.webp" width="820" height="1230" alt="Стена писем и старых газет" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v08.webp" width="820" height="1230" alt="Двор в огнях и снеговик" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v09.webp" width="820" height="1230" alt="Пряничные ёлочки на мастер-классе" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
-        <div class="kr-slide kr-slide--wide">
-          <figure class="kr-shot kr-shot--wide"><img src="karus_v/h03.webp" width="2000" height="960" alt="Праздничный стол под гирляндами" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+        <div class="kr-slide kr-slide--duo">
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h05.webp" width="2000" height="800" alt="Волшебники встречают гостей на крыльце" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h06.webp" width="2000" height="800" alt="Представление в бревенчатом зале" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
           <figure class="kr-shot"><img src="karus_v/v10.webp" width="820" height="1230" alt="Дед Мороз у пульта Министерства" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v11.webp" width="820" height="1230" alt="Неоновый олень на тёмной стене" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v12.webp" width="820" height="1230" alt="Печатная машинка и часы в кабинете" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
-        <div class="kr-slide kr-slide--wide">
-          <figure class="kr-shot kr-shot--wide"><img src="karus_v/h04.webp" width="2000" height="960" alt="Стена писем Деду Морозу при свечах" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+        <div class="kr-slide kr-slide--duo">
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h07.webp" width="2000" height="800" alt="Витрина со старыми газетами" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h08.webp" width="2000" height="800" alt="Мастерская: инструменты на бревенчатой стене" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
           <figure class="kr-shot"><img src="karus_v/v13.webp" width="820" height="1230" alt="Стена с инструментами в мастерской" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v14.webp" width="820" height="1230" alt="Светящийся цилиндр в зелёном неоне" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v15.webp" width="820" height="1230" alt="Зал при свечах во время программы" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
-        <div class="kr-slide kr-slide--wide">
-          <figure class="kr-shot kr-shot--wide"><img src="karus_v/h05.webp" width="2000" height="960" alt="Волшебники встречают гостей на крыльце" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+        <div class="kr-slide kr-slide--duo">
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h09.webp" width="2000" height="800" alt="Светящийся стол в зелёном неоне" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h10.webp" width="2000" height="800" alt="Зал при свечах в лиловом свете" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
         </div>
         <div class="kr-slide">
           <figure class="kr-shot"><img src="karus_v/v16.webp" width="820" height="1230" alt="Портреты в галерее Министерства" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v17.webp" width="820" height="1230" alt="Пульт Министерства новогодних дел" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
           <figure class="kr-shot"><img src="karus_v/v18.webp" width="820" height="1230" alt="Дед Мороз читает письмо ребёнку" loading="lazy" decoding="async" sizes="(max-width:767px) 32vw, min(32vw, 400px)" draggable="false"></figure>
         </div>
-        <div class="kr-slide kr-slide--wide">
-          <figure class="kr-shot kr-shot--wide"><img src="karus_v/h06.webp" width="2000" height="960" alt="Представление в бревенчатом зале" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+        <div class="kr-slide kr-slide--duo">
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h11.webp" width="2000" height="800" alt="Светящаяся стена под ультрафиолетом" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
+          <figure class="kr-shot kr-shot--duo"><img src="karus_v/h12.webp" width="2000" height="800" alt="Общий кадр с Дедом Морозом у ёлки" loading="lazy" decoding="async" sizes="(max-width:767px) 100vw, min(100vw, 1240px)" draggable="false"></figure>
         </div>
       </div>
 
@@ -2561,27 +2582,33 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1, кадр 1: Ёлка и Дед Мороз в бревенчатом зале"><img src="karus_v/m01.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
       <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1, кадр 2: Фонари на деревьях над площадкой"><img src="karus_v/m02.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
       <button class="kr-th is-on" type="button" data-i="0" aria-label="Слайд 1, кадр 3: Заснеженная ёлка у крыльца избы"><img src="karus_v/m03.webp" width="220" height="330" alt="" loading="eager" decoding="async" draggable="false"></button>
-      <button class="kr-th kr-th--wide" type="button" data-i="1" aria-label="Слайд 2: Изба Министерства в новогодней подсветке"><img src="karus_v/hm01.webp" width="300" height="144" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="1" aria-label="Слайд 2, кадр 1: Изба Министерства в новогодней подсветке"><img src="karus_v/hm01.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="1" aria-label="Слайд 2, кадр 2: Гости у крыльца избы вечером"><img src="karus_v/hm02.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="2" aria-label="Слайд 3, кадр 1: Фасад избы с ёлками и снеговиком"><img src="karus_v/m04.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="2" aria-label="Слайд 3, кадр 2: Светящийся домик в неоне"><img src="karus_v/m05.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="2" aria-label="Слайд 3, кадр 3: Гости у избы зимним вечером"><img src="karus_v/m06.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
-      <button class="kr-th kr-th--wide" type="button" data-i="3" aria-label="Слайд 4: Гости у крыльца избы зимним вечером"><img src="karus_v/hm02.webp" width="300" height="144" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="3" aria-label="Слайд 4, кадр 1: Праздничный стол под гирляндами"><img src="karus_v/hm03.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="3" aria-label="Слайд 4, кадр 2: Стена писем Деду Морозу при свечах"><img src="karus_v/hm04.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="4" aria-label="Слайд 5, кадр 1: Стена писем и старых газет"><img src="karus_v/m07.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="4" aria-label="Слайд 5, кадр 2: Двор в огнях и снеговик"><img src="karus_v/m08.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="4" aria-label="Слайд 5, кадр 3: Пряничные ёлочки на мастер-классе"><img src="karus_v/m09.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
-      <button class="kr-th kr-th--wide" type="button" data-i="5" aria-label="Слайд 6: Праздничный стол под гирляндами"><img src="karus_v/hm03.webp" width="300" height="144" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="5" aria-label="Слайд 6, кадр 1: Волшебники встречают гостей на крыльце"><img src="karus_v/hm05.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="5" aria-label="Слайд 6, кадр 2: Представление в бревенчатом зале"><img src="karus_v/hm06.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="6" aria-label="Слайд 7, кадр 1: Дед Мороз у пульта Министерства"><img src="karus_v/m10.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="6" aria-label="Слайд 7, кадр 2: Неоновый олень на тёмной стене"><img src="karus_v/m11.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="6" aria-label="Слайд 7, кадр 3: Печатная машинка и часы в кабинете"><img src="karus_v/m12.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
-      <button class="kr-th kr-th--wide" type="button" data-i="7" aria-label="Слайд 8: Стена писем Деду Морозу при свечах"><img src="karus_v/hm04.webp" width="300" height="144" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="7" aria-label="Слайд 8, кадр 1: Витрина со старыми газетами"><img src="karus_v/hm07.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="7" aria-label="Слайд 8, кадр 2: Мастерская: инструменты на бревенчатой стене"><img src="karus_v/hm08.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="8" aria-label="Слайд 9, кадр 1: Стена с инструментами в мастерской"><img src="karus_v/m13.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="8" aria-label="Слайд 9, кадр 2: Светящийся цилиндр в зелёном неоне"><img src="karus_v/m14.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="8" aria-label="Слайд 9, кадр 3: Зал при свечах во время программы"><img src="karus_v/m15.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
-      <button class="kr-th kr-th--wide" type="button" data-i="9" aria-label="Слайд 10: Волшебники встречают гостей на крыльце"><img src="karus_v/hm05.webp" width="300" height="144" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="9" aria-label="Слайд 10, кадр 1: Светящийся стол в зелёном неоне"><img src="karus_v/hm09.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="9" aria-label="Слайд 10, кадр 2: Зал при свечах в лиловом свете"><img src="karus_v/hm10.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="10" aria-label="Слайд 11, кадр 1: Портреты в галерее Министерства"><img src="karus_v/m16.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="10" aria-label="Слайд 11, кадр 2: Пульт Министерства новогодних дел"><img src="karus_v/m17.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th" type="button" data-i="10" aria-label="Слайд 11, кадр 3: Дед Мороз читает письмо ребёнку"><img src="karus_v/m18.webp" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
-      <button class="kr-th kr-th--wide" type="button" data-i="11" aria-label="Слайд 12: Представление в бревенчатом зале"><img src="karus_v/hm06.webp" width="300" height="144" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="11" aria-label="Слайд 12, кадр 1: Светящаяся стена под ультрафиолетом"><img src="karus_v/hm11.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
+      <button class="kr-th kr-th--wide" type="button" data-i="11" aria-label="Слайд 12, кадр 2: Общий кадр с Дедом Морозом у ёлки"><img src="karus_v/hm12.webp" width="300" height="120" alt="" loading="lazy" decoding="async" draggable="false"></button>
     </div>
   </div>
 </section>
@@ -5105,6 +5132,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     num.textContent = n + 1;
     prev.disabled = (n === 0);
     next.disabled = (n === last);
+    /* высота окна = высота открытого слайда: у тройки вертикальных и у пары
+       панорам она разная, и окно переезжает между ними плавно */
+    var sl = strip.children[n];
+    if (sl) view.style.setProperty('--kr-h', sl.offsetHeight + 'px');
     var first = null, lastOn = null;
     for (var k = 0; k < ths.length; k++){
       var on = (+ths[k].getAttribute('data-i') === n);
