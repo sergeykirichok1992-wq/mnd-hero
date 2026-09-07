@@ -2141,20 +2141,37 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Ширины считаются от высоты полосы: вертикальная развёрнутая — снимок 2:3,
    горизонтальная — 1,5 высоты (тот же кадр 3:2), свёрнутые — 26 % высоты. */
 .kr-thumbs{
-  --th-h:clamp(48px,4.6vw,78px);
+  --th-h:clamp(56px,5.2vw,92px);
   width:min(100%, 124vh, 1240px); margin:clamp(10px,1vw,16px) auto 0;
-  display:flex; gap:2px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
+  display:flex; gap:3px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
   scroll-behavior:smooth; padding-bottom:2px;
+  /* Края полосы растворяются — по обрезанной миниатюре у кромки видно,
+     что лента продолжается и её можно листать. */
+  -webkit-mask:linear-gradient(90deg,transparent 0,#000 3.5%,#000 96.5%,transparent 100%);
+          mask:linear-gradient(90deg,transparent 0,#000 3.5%,#000 96.5%,transparent 100%);
 }
 .kr-thumbs::-webkit-scrollbar{display:none}
+/* Свёрнутая миниатюра — не полоска в пару пикселей, а узнаваемый кусок кадра
+   (просьба Серёги 07.09.2026: «пусть будут более раскрытыми»). Держим две
+   ширины: вертикальный кадр 2:3 показывается на две трети, горизонтальный 3:2 —
+   примерно наполовину. Полностью раскрывается только выбранный слайд, иначе
+   разницы между «где я» и «что дальше» не видно. */
 .kr-th{
-  flex:0 0 auto; height:var(--th-h); width:calc(var(--th-h) * .26);
-  padding:0; border:0; border-radius:5px; overflow:hidden; cursor:pointer;
-  background:rgba(255,255,255,.55); opacity:.55;
+  flex:0 0 auto; height:var(--th-h); width:calc(var(--th-h) * .44);
+  padding:0; border:0; border-radius:7px; overflow:hidden; cursor:pointer;
+  background:rgba(255,255,255,.55); opacity:.72;
   transition:width .3s ease-out, margin .3s ease-out, opacity .3s ease-out;
 }
+.kr-th--hor{width:calc(var(--th-h) * .62)}
 .kr-th img{display:block; width:100%; height:100%; object-fit:cover}
-.kr-th.is-on{width:calc(var(--th-h) * .667); opacity:1}
+/* Открытый слайд показан кадрами целиком. ОДНОЙ ШИРИНЫ ДЛЯ ЭТОГО МАЛО:
+   горизонтальная миниатюра шире вертикальной по своей пропорции, и свёрнутая
+   горизонтальная оказывалась шире раскрытой вертикальной — «где я» переставало
+   читаться. Поэтому у открытых ещё и белая кромка с тенью. */
+.kr-th.is-on{
+  width:calc(var(--th-h) * .667); opacity:1;
+  box-shadow:inset 0 0 0 2px rgba(255,255,255,.92), 0 3px 10px rgba(20,16,40,.28);
+}
 .kr-th--hor.is-on{width:calc(var(--th-h) * 1.5)}
 /* воздух ставим только вокруг открытой группы, внутри неё снимки идут
    вплотную — так видно, что это один слайд, а не случайные соседи */
@@ -2171,6 +2188,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    над ним ещё и подпись. Правила живут только внутри `.kr`: у второго
    и третьего экранов кегль остаётся эталонным. */
 @media (max-width:767px){
+  /* Полоса миниатюр на телефоне выше, чем дала бы общая формула (там vw мал,
+     и кадры выходили по 25 px — в них ничего не разобрать). */
+  .kr-thumbs{--th-h:clamp(60px,17vw,84px)}
   .kr .cr-cont{padding-inline:14px}
   /* 07.09.2026: сначала уменьшили в полтора раза, потом Серёга попросил
      вернуть половину обратно — 8,7 px + 50 %. Это ровно эталонные 13 px
