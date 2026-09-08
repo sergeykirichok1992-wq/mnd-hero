@@ -608,9 +608,8 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-amber{color:rgb(253,198,140)}
 /* Подзаголовок карты. Шрифт с 05.09.2026 не Roboto Light оригинала, а Blogger Sans
    — тот же, которым набраны подписи под цифрами сезона (.cr-cap), и тем же кеглем
-   20*--u: Серёга попросил свести их к одному виду. Сознательное отличие от копии.
-   Межстрочный на компьютере 1,26 вместо 1,4 — ещё на 10 % плотнее, 08.09.2026. */
-.cr-p20{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(20 * var(--u)); line-height:1.26; color:#fff}
+   20*--u: Серёга попросил свести их к одному виду. Сознательное отличие от копии. */
+.cr-p20{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(20 * var(--u)); line-height:1.4; color:#fff}
 .cr-sub-m{display:none}
 /* Подзаголовок — две части одной фразы в двух блоках `.cr-n` (так на старом
    сайте, где каждая часть умещалась в свою строку). Поля блоков подкладывают
@@ -627,7 +626,6 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 @media (max-width:767px){
   .cr-h2b{font-size:13px}
   .cr-gaptop{height:calc(46 * var(--u))}
-  .cr-p20{line-height:1.4}          /* на телефоне интервал прежний: строк три, плотнее не надо */
   /* «не привлекая» переезжает в конец первой части, чтобы на телефоне это слово
      стояло во второй строке: «…мероприятия в / нескольких городах, не привлекая /
      партнеров по франшизе». Слово написано в разметке дважды, лишнее спрятано. */
