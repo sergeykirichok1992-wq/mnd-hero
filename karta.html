@@ -50,10 +50,17 @@
   background:linear-gradient(180deg,
     hsl(var(--tint) 100% 99%) 0%, hsl(var(--tint) 100% 94.7%) 100%);
   /* мягкая кромка по периметру (в макете — Bevel & Emboss) плюс тень под карточкой */
+  /* Снизу вверх: мягкая кромка по периметру и тень под карточкой (из макета),
+     а дальше два слоя рассеянного свечения в тон самой карточки — ближнее
+     поплотнее, дальнее пошире. Свечение сделано тенью, а не размытием
+     (filter:blur): размытие считает видеокарта каждый кадр, а тень рисуется
+     один раз → schedule-app/lessons/cdp-disable-gpu-vret-pro-fps.md */
   box-shadow:
     inset 0 0 calc(18 * var(--u)) rgba(0,0,0,.10),
     inset 0 calc(-2 * var(--u)) calc(10 * var(--u)) rgba(0,0,0,.07),
-    calc(2 * var(--u)) calc(2 * var(--u)) calc(9 * var(--u)) rgba(0,0,0,.5);
+    calc(2 * var(--u)) calc(2 * var(--u)) calc(9 * var(--u)) rgba(0,0,0,.5),
+    0 0 calc(62 * var(--u))  hsl(var(--tint) 100% 80% / .34),
+    0 0 calc(175 * var(--u)) hsl(var(--tint) 92% 70% / .24);
 }
 .pg:nth-child(even){--tilt:2.83deg}
 
@@ -136,12 +143,12 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
 <div class="demo">
 <h1>Карточка программы — шаблон</h1>
 <p class="note">Высота карточки зависит только от длины текста. Окно с фотографией, рамка, поля и скругления у всех одинаковые.<br>
-Наклон рамки через одну зеркалится, тон карточки у каждой свой — насыщенность и светлота общие.</p>
+Наклон рамки через одну зеркалится, тон карточки у каждой свой — насыщенность и светлота общие. Кадры в окне меняются каждые 0,4 секунды.</p>
 
 <div class="row row--one">
-  <article class="pg" data-shots="karta/1.webp">
+  <article class="pg" data-shots="karta/k1/01.webp,karta/k1/02.webp,karta/k1/03.webp,karta/k1/04.webp,karta/k1/05.webp,karta/k1/06.webp,karta/k1/07.webp,karta/k1/08.webp,karta/k1/09.webp,karta/k1/10.webp,karta/k1/11.webp,karta/k1/12.webp,karta/k1/13.webp,karta/k1/14.webp,karta/k1/15.webp,karta/k1/16.webp,karta/k1/17.webp">
     <div class="pg-shot">
-      <div class="pg-win"><img class="on" src="karta/1.webp" width="903" height="904" alt=""></div>
+      <div class="pg-win"><img class="on" src="karta/k1/01.webp" width="760" height="760" alt=""></div>
       <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
         <defs>
           <!-- полоски леденца: узор идёт поверх всей рамки, наклон снят с макета -->
@@ -152,8 +159,8 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
           </pattern>
           <g id="pgRing1"><rect x="0" y="0" width="899" height="899" rx="46" ry="46"
              fill="none" stroke="#fff" stroke-width="15"/></g>
-          <!-- блик: кольцо минус то же кольцо, сдвинутое вниз. Остаётся полоска
-               по верхней стороне каждой грани — так и работает фаска в макете -->
+          <!-- фаска: кольцо минус то же кольцо, сдвинутое вниз, — остаётся полоска
+               по верхней стороне каждой грани, ровно как свет сверху в макете -->
           <mask id="pgHi1"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
             <use href="#pgRing1"/><g transform="translate(0,3)"><rect x="0" y="0" width="899" height="899"
             rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
@@ -167,13 +174,11 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
             <use href="#pgRing1"/><g transform="translate(0,-7)"><rect x="0" y="0" width="899" height="899"
             rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
         </defs>
-        <!-- тень: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
+        <!-- тень от рамки: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
         <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
           <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
                 fill="none" stroke="url(#pgCandy1)" stroke-width="15"/>
         </g>
-        <!-- фаска: свет сверху, два слоя на сторону — переход мягче, и рамка
-             читается круглой палочкой, а не плоской лентой -->
         <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo21)" opacity=".18"/>
         <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo1)"  opacity=".26"/>
         <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi21)" opacity=".40"/>
@@ -186,14 +191,9 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
     </div>
   </article>
 
-</div>
-
-<h2>Как высота едет за текстом</h2>
-<p class="note">Тексты тут взяты разной длины нарочно, чтобы было видно поведение.</p>
-<div class="row row--three">
-  <article class="pg" data-shots="karta/1.webp">
+  <article class="pg" data-shots="karta/k2/01.webp,karta/k2/02.webp,karta/k2/03.webp,karta/k2/04.webp,karta/k2/05.webp,karta/k2/06.webp,karta/k2/07.webp">
     <div class="pg-shot">
-      <div class="pg-win"><img class="on" src="karta/1.webp" width="903" height="904" alt=""></div>
+      <div class="pg-win"><img class="on" src="karta/k2/01.webp" width="760" height="760" alt=""></div>
       <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
         <defs>
           <!-- полоски леденца: узор идёт поверх всей рамки, наклон снят с макета -->
@@ -204,8 +204,8 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
           </pattern>
           <g id="pgRing2"><rect x="0" y="0" width="899" height="899" rx="46" ry="46"
              fill="none" stroke="#fff" stroke-width="15"/></g>
-          <!-- блик: кольцо минус то же кольцо, сдвинутое вниз. Остаётся полоска
-               по верхней стороне каждой грани — так и работает фаска в макете -->
+          <!-- фаска: кольцо минус то же кольцо, сдвинутое вниз, — остаётся полоска
+               по верхней стороне каждой грани, ровно как свет сверху в макете -->
           <mask id="pgHi2"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
             <use href="#pgRing2"/><g transform="translate(0,3)"><rect x="0" y="0" width="899" height="899"
             rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
@@ -219,13 +219,11 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
             <use href="#pgRing2"/><g transform="translate(0,-7)"><rect x="0" y="0" width="899" height="899"
             rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
         </defs>
-        <!-- тень: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
+        <!-- тень от рамки: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
         <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
           <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
                 fill="none" stroke="url(#pgCandy2)" stroke-width="15"/>
         </g>
-        <!-- фаска: свет сверху, два слоя на сторону — переход мягче, и рамка
-             читается круглой палочкой, а не плоской лентой -->
         <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo22)" opacity=".18"/>
         <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)"  opacity=".26"/>
         <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi22)" opacity=".40"/>
@@ -233,14 +231,19 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
       </svg>
     </div>
     <div class="pg-panel">
-      <h3 class="pg-t">Карамельный мастер-класс</h3>
-      <p class="pg-p">Каждый ребенок варит свой леденец на палочке и забирает его с собой</p>
+      <h3 class="pg-t">Шествие с фонариками</h3>
+      <p class="pg-p">ТЕКСТ ДЛЯ ПРИМЕРА — пришли настоящий. Пока стоит заглушка нужной длины, чтобы было видно, как ведёт себя карточка</p>
     </div>
   </article>
 
-  <article class="pg" data-shots="karta/1.webp">
+</div>
+
+<h2>Как высота едет за текстом</h2>
+<p class="note">Тексты тут взяты разной длины нарочно. Фотографии не меняются — чтобы страница не тянула лишнее.</p>
+<div class="row row--three">
+  <article class="pg" data-shots="">
     <div class="pg-shot">
-      <div class="pg-win"><img class="on" src="karta/1.webp" width="903" height="904" alt=""></div>
+      <div class="pg-win"><img class="on" src="karta/k1/03.webp" width="760" height="760" alt=""></div>
       <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
         <defs>
           <!-- полоски леденца: узор идёт поверх всей рамки, наклон снят с макета -->
@@ -251,8 +254,8 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
           </pattern>
           <g id="pgRing3"><rect x="0" y="0" width="899" height="899" rx="46" ry="46"
              fill="none" stroke="#fff" stroke-width="15"/></g>
-          <!-- блик: кольцо минус то же кольцо, сдвинутое вниз. Остаётся полоска
-               по верхней стороне каждой грани — так и работает фаска в макете -->
+          <!-- фаска: кольцо минус то же кольцо, сдвинутое вниз, — остаётся полоска
+               по верхней стороне каждой грани, ровно как свет сверху в макете -->
           <mask id="pgHi3"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
             <use href="#pgRing3"/><g transform="translate(0,3)"><rect x="0" y="0" width="899" height="899"
             rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
@@ -266,13 +269,11 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
             <use href="#pgRing3"/><g transform="translate(0,-7)"><rect x="0" y="0" width="899" height="899"
             rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
         </defs>
-        <!-- тень: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
+        <!-- тень от рамки: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
         <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
           <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
                 fill="none" stroke="url(#pgCandy3)" stroke-width="15"/>
         </g>
-        <!-- фаска: свет сверху, два слоя на сторону — переход мягче, и рамка
-             читается круглой палочкой, а не плоской лентой -->
         <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo23)" opacity=".18"/>
         <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo3)"  opacity=".26"/>
         <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi23)" opacity=".40"/>
@@ -280,14 +281,14 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
       </svg>
     </div>
     <div class="pg-panel">
-      <h3 class="pg-t">Космическое шоу</h3>
-      <p class="pg-p">Большое представление с проекциями во всю стену, живыми актерами, спецэффектами и снегом в зале. Дети попадают внутрь истории и помогают героям спасти Новый год (40 минут)</p>
+      <h3 class="pg-t">Совсем коротко</h3>
+      <p class="pg-p">Одна строка</p>
     </div>
   </article>
 
-  <article class="pg" data-shots="karta/1.webp">
+  <article class="pg" data-shots="">
     <div class="pg-shot">
-      <div class="pg-win"><img class="on" src="karta/1.webp" width="903" height="904" alt=""></div>
+      <div class="pg-win"><img class="on" src="karta/k1/09.webp" width="760" height="760" alt=""></div>
       <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
         <defs>
           <!-- полоски леденца: узор идёт поверх всей рамки, наклон снят с макета -->
@@ -298,8 +299,8 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
           </pattern>
           <g id="pgRing4"><rect x="0" y="0" width="899" height="899" rx="46" ry="46"
              fill="none" stroke="#fff" stroke-width="15"/></g>
-          <!-- блик: кольцо минус то же кольцо, сдвинутое вниз. Остаётся полоска
-               по верхней стороне каждой грани — так и работает фаска в макете -->
+          <!-- фаска: кольцо минус то же кольцо, сдвинутое вниз, — остаётся полоска
+               по верхней стороне каждой грани, ровно как свет сверху в макете -->
           <mask id="pgHi4"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
             <use href="#pgRing4"/><g transform="translate(0,3)"><rect x="0" y="0" width="899" height="899"
             rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
@@ -313,13 +314,11 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
             <use href="#pgRing4"/><g transform="translate(0,-7)"><rect x="0" y="0" width="899" height="899"
             rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
         </defs>
-        <!-- тень: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
+        <!-- тень от рамки: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
         <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
           <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
                 fill="none" stroke="url(#pgCandy4)" stroke-width="15"/>
         </g>
-        <!-- фаска: свет сверху, два слоя на сторону — переход мягче, и рамка
-             читается круглой палочкой, а не плоской лентой -->
         <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo24)" opacity=".18"/>
         <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo4)"  opacity=".26"/>
         <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi24)" opacity=".40"/>
@@ -327,8 +326,53 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
       </svg>
     </div>
     <div class="pg-panel">
-      <h3 class="pg-t">Встреча с Дедом Морозом</h3>
-      <p class="pg-p">Фотография и подарок каждому</p>
+      <h3 class="pg-t">Средний текст</h3>
+      <p class="pg-p">Каждый ребенок варит свой леденец на палочке и забирает его с собой</p>
+    </div>
+  </article>
+
+  <article class="pg" data-shots="">
+    <div class="pg-shot">
+      <div class="pg-win"><img class="on" src="karta/k1/13.webp" width="760" height="760" alt=""></div>
+      <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+        <defs>
+          <!-- полоски леденца: узор идёт поверх всей рамки, наклон снят с макета -->
+          <pattern id="pgCandy5" width="77.6" height="77.6" patternUnits="userSpaceOnUse"
+                   patternTransform="rotate(28.8)">
+            <rect width="77.6" height="77.6" fill="#FFFFFF"/>
+            <rect width="41.5" height="77.6" fill="#F4372B"/>
+          </pattern>
+          <g id="pgRing5"><rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+             fill="none" stroke="#fff" stroke-width="15"/></g>
+          <!-- фаска: кольцо минус то же кольцо, сдвинутое вниз, — остаётся полоска
+               по верхней стороне каждой грани, ровно как свет сверху в макете -->
+          <mask id="pgHi5"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
+            <use href="#pgRing5"/><g transform="translate(0,3)"><rect x="0" y="0" width="899" height="899"
+            rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
+          <mask id="pgHi25"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
+            <use href="#pgRing5"/><g transform="translate(0,7)"><rect x="0" y="0" width="899" height="899"
+            rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
+          <mask id="pgLo5"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
+            <use href="#pgRing5"/><g transform="translate(0,-3)"><rect x="0" y="0" width="899" height="899"
+            rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
+          <mask id="pgLo25"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
+            <use href="#pgRing5"/><g transform="translate(0,-7)"><rect x="0" y="0" width="899" height="899"
+            rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
+        </defs>
+        <!-- тень от рамки: тёплая, уходит вправо, плюс лёгкая вокруг — как в макете -->
+        <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+          <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                fill="none" stroke="url(#pgCandy5)" stroke-width="15"/>
+        </g>
+        <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo25)" opacity=".18"/>
+        <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo5)"  opacity=".26"/>
+        <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi25)" opacity=".40"/>
+        <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi5)"  opacity=".75"/>
+      </svg>
+    </div>
+    <div class="pg-panel">
+      <h3 class="pg-t">Длинный текст с переносом заголовка</h3>
+      <p class="pg-p">Большое представление с проекциями во всю стену, живыми актерами, спецэффектами и снегом в зале. Дети попадают внутрь истории и помогают героям спасти Новый год (40 минут)</p>
     </div>
   </article>
 
@@ -360,7 +404,7 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
    4. Мелькать начинаем, когда ВСЕ кадры уже в памяти: иначе на медленном
       интернете в окне вместо фотографии вспыхивает пустая заливка. */
 (function(){
-  var STEP = 300;
+  var STEP = 400;                                  /* сколько держится кадр, мс */
   var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
 
   document.querySelectorAll('.pg').forEach(function(card){
