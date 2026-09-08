@@ -1056,7 +1056,10 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
     /* воздух между дугой и карточкой. 07.09.2026: было 70, Серёга попросил
        вдвое больше — видимый зазор считается вместе с прозрачным полем
        самой картинки (40 px её холста), поэтому число не 140, а 180. */
-    width:var(--m); margin:calc(180 * var(--m) / 1080) auto 0}
+    /* не просто var(--m): 100vw внутри неё считает ширину ВМЕСТЕ с полосой
+       прокрутки, и в узком окне компьютера (390-527 px) вся страница ехала
+       вбок на 15 px. Тот же приём стоит у .km-in восьмого экрана. */
+    width:min(var(--m), 100%); margin:calc(180 * var(--m) / 1080) auto 0}
   .dkm-hold{position:relative; width:100%; aspect-ratio:904/1492}
   /* Фон вокруг карточки вырезан в самой картинке: карточка со своим снегом
      лежит на белом поле секции. Тень тоже нарисована в файле — CSS-фильтр
@@ -2523,7 +2526,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      Выше 1000 — гирлянда с шарами, ниже 1300 — фонарь и микроскоп. */
   .km-cta{
     z-index:1; position:relative; padding:0;
-    margin:calc(var(--kw) * 0.394737) 0 0;   /* 1080 px холста 2736 */
+    margin:calc(var(--kw) * 0.431287) 0 0;   /* 1180 px холста 2736 */
   }
 }
 /* Градиент заголовка на компьютере круче телефонного: на макете верхняя
@@ -5836,7 +5839,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* Экономия трафика и медленная сеть. Признак есть только в Chrome
      и Edge; остальных прикрывает то, что на телефоне ролика и так нет. */
   var skupo = net.saveData === true || /(^|-)(slow-)?2g$|^3g$/.test(net.effectiveType || '');
-  var started = false, shown = false, tries = 0;
+  var started = false, shown = false, tries = 0, hochu = false;
 
   function mozhno(){ return comp.matches && !calm.matches && !skupo }
 
@@ -5850,16 +5853,23 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }
 
   function play(){
+    hochu = true;
     var p = v.play();
     if(p && p.catch) p.catch(function(){
       /* Safari в режиме энергосбережения запрещает автозапуск даже
          беззвучного видео, и распознать этот режим нельзя. Пробуем
          несколько раз, потом ждём любого жеста человека — жест снимает
-         запрет. Не вышло и так — молча остаёмся с постером. */
-      if(++tries < 4) setTimeout(play, 320);
-      else document.addEventListener('pointerdown', play, {once:true});
+         запрет. Не вышло и так — молча остаёмся с постером.
+
+         Флаг `hochu` обязателен: без него отказ от НАШЕЙ же паузы
+         (браузер отвечает отказом на play(), прерванный pause()) через
+         320 мс запускал ролик обратно, и он крутился за кадром. */
+      if(!hochu) return;
+      if(++tries < 4) setTimeout(function(){ if(hochu) play() }, 320);
+      else document.addEventListener('pointerdown', function(){ if(hochu) play() }, {once:true});
     });
   }
+  function stop(){ hochu = false; v.pause() }
 
   function start(){
     if(started || !mozhno()) return;
@@ -5886,14 +5896,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     if(!started) return;
     /* Невидимый ролик обязательно на паузу: декодер греет ноутбук,
        а на этой странице он уже второй — первый экран крутит свой. */
-    if(mozhno() && vidno() && !document.hidden) play(); else v.pause();
+    if(mozhno() && vidno() && !document.hidden) play(); else stop();
   }
 
   if('IntersectionObserver' in window){
     new IntersectionObserver(function(es){
       for(var i = 0; i < es.length; i++){
         if(es[i].isIntersecting){ start(); play() }
-        else if(started) v.pause();
+        else if(started) stop();
       }
     }, {rootMargin:'300px'}).observe(wrap);
   } else {
@@ -5907,10 +5917,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      «меньше движения» или растянуть окно с телефонного до компьютерного. */
   function slushat(mq, fn){ if(mq.addEventListener) mq.addEventListener('change', fn);
     else if(mq.addListener) mq.addListener(fn) }
-  slushat(comp, function(){ if(mozhno()){ start(); tick() } else v.pause() });
+  /* `vidno()` тут обязателен: без него достаточно было растянуть окно
+     на самом верху страницы — и ролик качался целиком, хотя до экрана
+     ещё десяток прокруток. Наблюдатель включит его сам, когда доедем. */
+  slushat(comp, function(){ if(mozhno()){ if(vidno()) start(); tick() } else stop() });
   slushat(calm, function(){
-    if(calm.matches){ v.pause(); shown = false; v.className = 'km-video' }
-    else if(vidno()){ start(); play() }
+    if(calm.matches){ stop(); shown = false; v.className = 'km-video' }
+    /* Движение вернули: одного start() мало — он уже отработал и выйдет
+       сразу, а кадр остался спрятанным. Ждём первый кадр заново. */
+    else if(vidno()){ if(started){ shown = false; zhdatKadr(); play() } else start() }
   });
 })();
 </script>
