@@ -2903,6 +2903,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    08.09.2026). Цвет, который в макете был у плашки, теперь у самой карточки. */
 
 .pgs{
+  /* Свободное место под ряд карточек и зазор между ними. Обе величины —
+     ДЛИНЫ, без процентов: из них считается ширина карточки, а она дальше
+     идёт и в высоту, и в кегль, где процент означал бы совсем другое. */
+  --inner: calc(min(94vw, 1462px) - 2 * clamp(16px, 3vw, 47.6px));
+  --gap: clamp(14px, 1.8vw, 34px);
+
   position:relative; overflow:hidden;   /* страховка от горизонтальной прокрутки */
   z-index:26;                           /* как у .pr-hold — экран стоит над формой */
   background:#001061;                   /* поле макета, на нём Серёга рисовал карточки */
@@ -2914,29 +2920,40 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-size:clamp(26px,3.7vw,57.8px); line-height:1.06; letter-spacing:.005em;
   text-transform:uppercase; text-wrap:balance; color:#fff;
 }
-/* Карточки идут рядом и переносятся сами. justify-content:center — чтобы
-   последний неполный ряд не липнул к левому краю. */
+/* РЯД КАРТОЧЕК. Число колонок задаётся ширинами ниже, а ширина карточки
+   считается из свободного места: сколько его есть минус зазоры, поделить
+   на колонки. Поэтому в ряду всегда ровно столько карточек, сколько положено,
+   без «одна не влезла».
+
+   Ряд НЕ лежит в `.cr-cont` намеренно: на телефоне у контейнера свои поля,
+   и карточка получалась уже, чем нужно. Тут поля свои — на телефоне узкие
+   (просьба Серёги 09.09.2026 «на мобиле карточки шире»), от 560 px обычные,
+   как у остальных экранов. */
 .pgs-row{display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start;
-  gap:calc(40 * var(--u))}
+  gap:var(--gap); padding:0 14px}
+@media (min-width:560px){
+  .pgs-row{width:min(94vw,1462px); margin:0 auto; padding:0 clamp(16px,3vw,47.6px)}
+}
 .pgs-defs{position:absolute; width:0; height:0; overflow:hidden}
 
 .pg{
-  /* Ширина карточки. 329 px — размер, утверждённый Серёгой 08.09.2026
-     (от первоначальных 430 минус 15 %, потом ещё минус 10 %). Второе слагаемое
-     в min() — внутренняя ширина контейнера `.cr-cont`, чтобы на узком телефоне
-     карточка не вылезла за экран.
+  /* ШИРИНА КАРТОЧКИ. Не число, а «сколько осталось на одну»: свободное место
+     минус зазоры, поделить на число колонок. Значение по умолчанию — телефон,
+     одна колонка во всю ширину за вычетом полей ряда.
 
      ПРОЦЕНТОВ ТУТ БЫТЬ НЕ ДОЛЖНО. Переменная идёт и в ширину, и в высоту,
      и в кегль, а `100%` в каждом из них считается от своего: от ширины
      родителя, от его высоты, от его кегля. Сначала так и было написано —
-     и заголовок вышел 1,5 px, а окно с фотографией схлопнулось в ноль. */
-  --w: min(329px, calc(94vw - 2 * clamp(16px, 3vw, 47.6px)));
+     и заголовок вышел 1,5 px, а окно с фотографией схлопнулось в ноль.
+     Процент остаётся ровно в одном месте — в самом `width` ниже, страховкой
+     на случай, если 100vw посчитает вместе с полосой прокрутки. */
+  --w: calc(100vw - 28px);
   --u2: calc(var(--w) / 1045);
   --tilt: -2.83deg;        /* наклон рамки; у чётных карточек он зеркалится */
   --tint: 222;             /* тон карточки; насыщенность и светлота у всех одни */
 
   position:relative; box-sizing:border-box;
-  width:var(--w);
+  width:min(var(--w), 100%);
   padding:0 0 calc(100 * var(--u2));
   border-radius:calc(76 * var(--u2));
   /* Поле карточки: сверху светлее, книзу чуть темнее (в макете — Gradient
@@ -3010,17 +3027,31 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   width:106.383%; margin-left:-3.1915%;
   transform:scaleX(.94);
 }
+/* КЕГЛЬ НЕ ПАДАЕТ НИЖЕ ПРЕДЕЛА. Всё остальное в карточке едет за её шириной,
+   а текст — только до предела: max() держит его читаемым. Иначе при четырёх
+   колонках на ноутбуке абзац уезжал бы до 13 px. Карточка при этом просто
+   становится выше — она и так тянется за текстом, это её работа. */
 .pg-t{
   margin-top:0; margin-bottom:0;
-  font:700 calc(76.8 * var(--u2))/1.05 "Blogger Sans","CR Blogger",Arial,sans-serif;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:max(20px, calc(76.8 * var(--u2))); line-height:1.05;
   /* тёмно-синий, не чёрный. Цвет не выдуман: #001B71 уже стоит на сайте */
   color:#001B71;
 }
 .pg-p{
   margin-top:calc(45 * var(--u2)); margin-bottom:0;
-  font:400 calc(57.3 * var(--u2))/calc(74.49 * var(--u2)) "CR Blogger","Blogger Sans",Arial,sans-serif;
+  font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
+  font-size:max(16.5px, calc(57.3 * var(--u2)));
+  line-height:max(21.5px, calc(74.49 * var(--u2)));
   color:#000;
 }
+
+/* ЧИСЛО КОЛОНОК. Ниже 560 px — одна, дальше две, три и четыре.
+   Порог четырёх колонок стоит на 1250 px: раньше карточка становится уже
+   250 px, и абзац в ней начинает ломаться на слишком короткие строки. */
+@media (min-width:560px){  .pg{--w: calc((var(--inner) -     var(--gap)) / 2)} }
+@media (min-width:900px){  .pg{--w: calc((var(--inner) - 2 * var(--gap)) / 3)} }
+@media (min-width:1250px){ .pg{--w: calc((var(--inner) - 3 * var(--gap)) / 4)} }
 </style>
 </head>
 <body>
@@ -3726,8 +3757,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
   </defs></svg>
 
-  <div class="cr-cont">
-    <div class="pgs-row">
+  <div class="pgs-row">
       <article class="pg" style="--tint:222">
         <div class="pg-shot">
           <div class="pg-win"></div>
@@ -3918,7 +3948,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <p class="pg-p">Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.</p>
         </div>
       </article>
-    </div>
   </div>
 </section>
 
