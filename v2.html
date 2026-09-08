@@ -2604,6 +2604,194 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* «Меньше движения»: ролик не подставляется вовсе (см. скрипт), на экране
    остаётся постер — первый кадр той же комнаты. */
 
+/* ==================== ЭКРАН 9: персонажи вселенной МНД ====================
+   Пространство имён `pr-`. Макет Серёги — `~/Desktop/новый сайт/экран персонажи/`:
+   семь готовых карточек («псд персонажи.psd», выгрузки PNG шириной 1018)
+   и снимок раскладки для компьютера «Снимок экрана — 2026-09-08 в 14.14.08.png»:
+   верхний ряд четыре карточки, нижний три по центру. Порядок карточек оттуда же.
+
+   ВСЯ КАРТОЧКА — ОДНА КАРТИНКА. Персонаж, золотое кольцо и плашка с подписью
+   нарисованы в файле, кодом тут ничего не собирается. Значит подпись — это
+   растр: держим выгрузку 900 px на карточку около 300 px, чтобы на ретине
+   буквы остались чистыми, а текст подписи дублируем в `alt`.
+
+   ХОЛСТЫ ВЫГРУЗОК РАЗНОЙ ВЫСОТЫ, и это не небрежность: над карточкой у каждого
+   персонажа своя нашлёпка — посох Деда Мороза, поднятая рука Байконкурочки.
+   Свёрстывать такие файлы «как есть» нельзя, карточки не встанут в ряд.
+   Поэтому `sayt-nn/instrumenty/personazhi.py` перекладывает все выгрузки
+   в ОДИН холст 1035x1850, где карточка всегда лежит на одном месте:
+   975x1525 с углом в точке (30, 285). Отсюда три числа ниже — и они
+   единственное, что связывает CSS с картинками:
+
+       ширина картинки  1035/975 = 106,1538 %
+       сдвиг влево        30/975 =   3,0769 %
+       сдвиг вверх       285/975 =  29,2308 %
+
+   Проценты у `margin` — И У ВЕРХНЕГО ТОЖЕ — считаются от ШИРИНЫ родителя.
+   Поэтому сдвиг вверх записан в долях ширины карточки, а не высоты.
+
+   ОПОРНЫЙ РАЗМЕР ОДИН — `--pc`, ширина карточки. Зазоры, скругление, тени
+   и подъём под курсором считаются от неё, как `--k` на восьмом экране.
+   На компьютере она выводится из ширины контейнера (четыре карточки и три
+   зазора по 22 % карточки: 4 + 3*0,22 = 4,66), на телефоне задаётся прямо. */
+.pr{
+  --pc:  calc((min(94vw,1462px) - 2*clamp(16px,3vw,47.6px)) / 4.66);
+  --pgx: calc(var(--pc) * 0.22);      /* зазор между карточками, снят с макета */
+  --pgy: calc(var(--pc) * 0.13);      /* зазор между рядами, снят с макета */
+  --pr-r: calc(var(--pc) * 0.0708);   /* скругление карточки: 69 px при карточке 975 */
+  --pr-gold: 255,224,158;             /* тон блика под курсором — золото МНД */
+
+  position:relative; overflow:hidden;  /* страховка от горизонтальной прокрутки */
+  background:#EEEDFD; color:#333;      /* цвет поля макета; текст как на светлых экранах 2 и 7 */
+  padding:calc(60 * var(--u)) 0 calc(64 * var(--u));
+}
+
+/* Сетка. Восемь колонок вместо четырёх — ради нижнего ряда: карточка занимает
+   две колонки, поэтому смещение на одну колонку с зазором это ровно половина
+   карточки с половиной зазора, и три карточки встают точно по центру.
+   Верхний ряд раскладывается сам, у пятой карточки начало задано явно. */
+.pr-grid{
+  display:grid; grid-template-columns:repeat(8,1fr);
+  column-gap:var(--pgx); row-gap:var(--pgy);
+  /* Тут живёт всё, что торчит выше карточки: у Деда Мороза посох поднимается
+     на 26,7 % ширины карточки. Без этого поля секция срезала бы ему навершие. */
+  padding-top:calc(var(--pc) * 0.29);
+}
+.pr-card{ position:relative; margin:0; grid-column:span 2; aspect-ratio:975 / 1525 }
+.pr-card:nth-child(5){ grid-column:2 / span 2 }
+
+.pr-in{ position:absolute; inset:0; border-radius:var(--pr-r) }
+.pr-3d{ position:absolute; inset:0; border-radius:inherit }
+.pr-3d > img{
+  position:absolute; left:0; top:0; display:block;
+  width:106.1538%; height:auto;
+  margin:-29.2308% 0 0 -3.0769%;
+  pointer-events:none; -webkit-user-drag:none;
+}
+/* Блик под курсором: коробка во всю карточку, скруглённая по ней же.
+   Радиальная заливка обрезается скруглением сама, `overflow:hidden` не нужен —
+   а он в движущемся слое оставляет в Safari хвосты по углам
+   (schedule-app/lessons/skruglenie-uglov-v-dvizhushchemsya-sloe). */
+.pr-spot{ position:absolute; inset:0; border-radius:inherit; pointer-events:none }
+
+/* ---- КОМПЬЮТЕР: реакция карточки на курсор ----
+   Три слоя, а не один, потому что движений три и сроки у них разные:
+     .pr-card — появление при прокрутке (медленно, один раз);
+     .pr-in   — подъём и увеличение под курсором (0,34 с, чтобы не «стреляло»);
+     .pr-3d   — наклон следом за курсором (0,12 с, иначе тянется за мышью).
+   Сложить их в один `transform` нельзя: у него одно значение и один срок.
+
+   Условие `hover:hover and pointer:fine` обязательно рядом с шириной: планшет
+   в альбомной ориентации проходит по ширине, но курсора у него нет, и наклон
+   там залипал бы после касания. Тот же признак у ролика восьмого экрана. */
+@media (min-width:1024px) and (hover:hover) and (pointer:fine){
+  .pr-in{
+    transform:translateY(var(--lift,0px)) scale(var(--sc,1));
+    transition:transform .34s cubic-bezier(.22,.75,.28,1);
+  }
+  .pr-card.hot .pr-in{ --lift:calc(var(--pc) * -.032); --sc:1.035 }
+
+  .pr-3d{
+    transform:perspective(1200px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+    transition:transform .5s cubic-bezier(.22,.75,.28,1);
+  }
+  /* Пока курсор внутри — короткий срок и без разгона: наклон обязан идти
+     за мышью, а не догонять её. Ушёл курсор — возврат снова плавный. */
+  .pr-card.hot .pr-3d{ transition-duration:.12s; transition-timing-function:linear }
+  .pr-card.hot .pr-in, .pr-card.hot .pr-3d{ will-change:transform }
+
+  /* Тень под карточкой. Лежит на своём уровне ПОД картинкой (`z-index:-1`
+     внутри слоя с `transform`), поэтому видна только вокруг карточки.
+     Тон фиолетовый, а не серый: серая тень на цветном поле читается
+     как грязное пятно (lessons/skruglenie-uglov-v-dvizhushchemsya-sloe). */
+  .pr-3d::before{
+    content:''; position:absolute; inset:0; border-radius:inherit; z-index:-1;
+    opacity:0; transition:opacity .4s ease;
+    box-shadow:
+      0 calc(var(--pc) * .055) calc(var(--pc) * .115) calc(var(--pc) * -.022) rgba(56,44,124,.36),
+      0 0 calc(var(--pc) * .13) rgba(227,179,78,.28);
+  }
+  .pr-card.hot .pr-3d::before{ opacity:1 }
+
+  /* Золотая обводка — то же золото, что у кнопок сайта (sayt-nn/standart-knopok.md). */
+  .pr-3d::after{
+    content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    opacity:0; transition:opacity .3s ease;
+    box-shadow:inset 0 0 0 max(1.5px, calc(var(--pc) * .0065)) rgba(227,179,78,.55);
+  }
+  .pr-card.hot .pr-3d::after{ opacity:1 }
+
+  /* Пятно света идёт за курсором. Центр стоит там, где мышь (`--mx`/`--my`
+     ставит скрипт), радиус задан явно и доходит до полной прозрачности —
+     иначе пятно срезает прямым углом (lessons/pyatno-sveta-gasnet-vnutri-korobki).
+     `screen` вместо обычного наложения: на тёмно-синей карточке это свет,
+     а не белёсая плёнка. */
+  .pr-spot{
+    opacity:0; transition:opacity .3s ease; mix-blend-mode:screen;
+    background:radial-gradient(circle calc(var(--pc) * .60) at var(--mx,50%) var(--my,50%),
+      rgba(var(--pr-gold),.34),
+      rgba(var(--pr-gold),.17) 40%,
+      rgba(var(--pr-gold),.05) 74%,
+      rgba(var(--pr-gold),0)   100%);
+  }
+  .pr-card.hot .pr-spot{ opacity:1 }
+}
+
+/* ---- КОМПЬЮТЕР: первое появление при прокрутке ----
+   Карточки выезжают снизу по очереди, слева направо, шагом 85 мс. Класс `on`
+   секции ставит наблюдатель и только один раз: назад при обратной прокрутке
+   не отматываем — на длинной странице мигание раздражает сильнее, чем радует. */
+@media (min-width:1024px){
+  .pr-card{
+    opacity:0; transform:translateY(calc(var(--pc) * .13)) scale(.945);
+    transition:opacity .75s ease, transform .75s cubic-bezier(.2,.72,.28,1);
+    transition-delay:calc(var(--i) * 85ms);
+  }
+  .pr.on .pr-card{ opacity:1; transform:none }
+}
+
+/* ---- ТЕЛЕФОН И ПЛАНШЕТ: лента с постоянной прокруткой ----
+   Тот же приём, что у ленты фотографий второго экрана: карточки повторены
+   дважды, лента едет справа налево сама и разгоняется пальцем. Скрипт —
+   блок «ПЕРСОНАЖИ» внизу файла.
+
+   Карточки для второй копии не докачиваются: это те же семь файлов,
+   браузер берёт их из кеша. Поэтому копию делает клонирование разметки,
+   а не второй набор картинок. */
+@media (max-width:1023px){
+  .pr{ --pc:min(62vw, 340px); --pgx:calc(var(--pc) * 0.10) }
+  .pr-wrap{
+    overflow:hidden;
+    padding:calc(var(--pc) * 0.29) 0 calc(var(--pc) * 0.05);
+    touch-action:pan-y;                         /* вертикаль отдаём странице */
+    user-select:none; -webkit-user-select:none; /* палец тянет ленту, а не выделяет */
+  }
+  .pr-grid{ display:flex; width:max-content; padding-top:0 }
+  .pr-card{ flex:0 0 auto; width:var(--pc); margin-right:var(--pgx) }
+  /* Появление на телефоне — одним движением всей ленты: карточки тут едут
+     сами, и вторая анимация поверх движения читалась бы как рывок. */
+  .pr-wrap{ opacity:0; transform:translateY(24px);
+            transition:opacity .8s ease, transform .8s cubic-bezier(.2,.72,.28,1) }
+  .pr.on .pr-wrap{ opacity:1; transform:none }
+}
+
+/* «Меньше движения»: ничего не выезжает, не наклоняется и не едет само.
+   Ленту при этом можно листать пальцем — скрипт в этом режиме её не собирает,
+   а прокрутку отдаёт браузеру. */
+@media (prefers-reduced-motion:reduce){
+  .pr-card, .pr-wrap{ opacity:1 !important; transform:none !important; transition:none !important }
+  .pr-in, .pr-3d{ transform:none !important; transition:none !important }
+}
+/* Листать пальцем вместо самохода — ТОЛЬКО там, где лента и есть. На компьютере
+   сетка стоит на месте, и `overflow-x:auto` там дал бы лишнюю полосу прокрутки:
+   картинки шире своих клеток на 3 % (поля холста), у крайней справа этот запас
+   вылезает за сетку. Поля по бокам ленты — про тот же запас, чтобы у первой
+   карточки не срезало кромку. */
+@media (prefers-reduced-motion:reduce) and (max-width:1023px){
+  .pr-wrap{ overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch }
+  .pr-grid{ padding-inline:calc(var(--pc) * 0.035) }
+}
+
 </style>
 </head>
 <body>
@@ -3187,6 +3375,80 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <span class="zs-t">Оставить заявку</span></button></p>
   </div>
 </section>
+
+<!-- ==================== ЭКРАН 9: персонажи вселенной МНД ====================
+     Макет Серёги: `~/Desktop/новый сайт/экран персонажи/` — семь готовых
+     карточек и снимок раскладки для компьютера «Снимок экрана — 2026-09-08
+     в 14.14.08.png». Порядок карточек взят оттуда: верхний ряд четыре,
+     нижний три по центру.
+
+     Картинки страницы делает `sayt-nn/instrumenty/personazhi.py` — он
+     приводит выгрузки PSD к одному холсту, иначе карточки не встают в ряд.
+     Устройство экрана → sayt-nn/ustroystvo.md, раздел «Экран 9».
+
+     Подпись у каждого персонажа нарисована внутри картинки, поэтому она
+     же стоит в `alt`: без этого читалка и поисковик видят пустое место.
+     `--i` — номер карточки, по нему считается задержка появления. -->
+<section class="cr pr" id="heroes" aria-labelledby="prT">
+  <div class="cr-cont">
+    <div class="cr-n">
+      <h2 class="cr-t cr-h2" id="prT"><span class="cr-red"><strong>НОВЫЕ И ПОСТОЯННЫЕ ПЕРСОНАЖИ&nbsp;</strong></span><span class="cr-blue"><strong>НАШЕЙ ВСЕЛЕННОЙ МНД:</strong></span></h2>
+    </div>
+
+    <div style="height:calc(26 * var(--u))"></div>
+
+    <div class="cr-n"><p class="cr-t cr-lead">Не банальные, запоминающиеся детям герои, которых можно встретить только у нас</p></div>
+
+    <div style="height:calc(6 * var(--u))"></div>
+
+    <div class="pr-wrap" id="prWrap">
+      <div class="pr-grid" id="prGrid">
+        <figure class="pr-card" style="--i:0"><div class="pr-in"><div class="pr-3d">
+          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+               src="pers/neznayka.webp"
+               alt="Незнайка с Луны в скафандре и с рюкзаком - яркий, весёлый и дружелюбный">
+          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
+
+        <figure class="pr-card" style="--i:1"><div class="pr-in"><div class="pr-3d">
+          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+               src="pers/ded.webp"
+               alt="Дед Мороз с посохом в роскошном синем костюме со звёздным декором">
+          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
+
+        <figure class="pr-card" style="--i:2"><div class="pr-in"><div class="pr-3d">
+          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+               src="pers/baykonkurochka.webp"
+               alt="Байконкурочка в серебристом костюме космонавта - с особым заданием в Министерстве">
+          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
+
+        <figure class="pr-card" style="--i:3"><div class="pr-in"><div class="pr-3d">
+          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+               src="pers/mandarianec.webp"
+               alt="Мандарианец, оранжевый уличный персонаж, любитель фото-вспышек">
+          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
+
+        <figure class="pr-card" style="--i:4"><div class="pr-in"><div class="pr-3d">
+          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+               src="pers/astrognomy.webp"
+               alt="Астрогном с подзорной трубой - помощники Деда Мороза в его обсерватории">
+          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
+
+        <figure class="pr-card" style="--i:5"><div class="pr-in"><div class="pr-3d">
+          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+               src="pers/ministr.webp"
+               alt="Министр Новогодних Дел с посохом - главный ведущий программы в доме">
+          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
+
+        <figure class="pr-card" style="--i:6"><div class="pr-in"><div class="pr-3d">
+          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+               src="pers/karamelshchiki.webp"
+               alt="Доктора карамельных наук - карамельщики, ведущие мастер-класса">
+          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
@@ -5988,6 +6250,225 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     /* Движение вернули: одного start() мало — он уже отработал и выйдет
        сразу, а кадр остался спрятанным. Ждём первый кадр заново. */
     else if(vidno()){ if(started){ shown = false; zhdatKadr(); play() } else start() }
+  });
+})();
+</script>
+
+
+<script>
+/* ==================== ПЕРСОНАЖИ: ДЕВЯТЫЙ ЭКРАН ====================
+   Три независимые вещи в одном блоке:
+
+   1. ПОЯВЛЕНИЕ. Секция получает класс `on`, когда сетка подъехала к окну,
+      и больше его не теряет. Дальше выезд карточек по очереди делает CSS
+      задержкой `--i * 85мс` — скрипту считать нечего.
+
+   2. РЕАКЦИЯ НА КУРСОР (только компьютер). Скрипт кладёт на карточку четыре
+      числа: где мышь (`--mx`/`--my`, для блика) и на сколько градусов
+      наклонить (`--rx`/`--ry`). Само движение — переходы в CSS.
+      Наклон считаем от НЕПОДВИЖНОЙ коробки карточки (`.pr-card`), а не от
+      наклонённой картинки: рамка вокруг наклонённого слоя больше его самого,
+      и числа поплыли бы от собственного наклона. Та же ловушка была у ленты
+      второго экрана с повёрнутыми полароидами.
+
+   3. ЛЕНТА НА ТЕЛЕФОНЕ. Ниже 1024 px карточки едут справа налево сами и
+      разгоняются пальцем — приём и числа взяты у ленты фотографий второго
+      экрана. Петля без шва: карточки повторены дважды, лента сдвигается на
+      остаток от ширины одного повтора, и в момент, когда первая семёрка
+      уезжает за левый край, вторая стоит ровно на её месте.
+
+      Вторая семёрка — клоны разметки, а не второй набор картинок: файлы те же,
+      браузер берёт их из кеша. Клоны помечены `aria-hidden` и с пустым `alt`,
+      иначе читалка прочитала бы всех персонажей дважды.
+
+   Растянул окно с телефонного до компьютерного — клоны убираются, и наоборот.
+   При «меньше движения» лента не собирается вовсе: прокрутку отдаём браузеру
+   (`overflow-x:auto` в стилях), карточки листаются пальцем. */
+(function(){
+  'use strict';
+  var sec  = document.getElementById('heroes');
+  var wrap = document.getElementById('prWrap');
+  var grid = document.getElementById('prGrid');
+  if (!sec || !wrap || !grid) return;
+
+  var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var lenta = window.matchMedia('(max-width:1023px)');
+  var mouse = window.matchMedia('(min-width:1024px) and (hover:hover) and (pointer:fine)');
+
+  var cards = Array.prototype.slice.call(grid.children);   /* семь настоящих, без клонов */
+  var N = cards.length;
+
+  function slushat(mq, fn){
+    if (mq.addEventListener) mq.addEventListener('change', fn);
+    else if (mq.addListener) mq.addListener(fn);
+  }
+
+  /* ---------- 1. появление ---------- */
+  if (!('IntersectionObserver' in window)) sec.classList.add('on');
+  else new IntersectionObserver(function(en, ob){
+    if (en[0].isIntersecting){ sec.classList.add('on'); ob.disconnect(); }
+  }, {rootMargin:'0px 0px -10% 0px'}).observe(grid);
+
+  /* Ленивая загрузка снимается ЗАРАНЕЕ, за пол-экрана до подъезда. Иначе
+     на телефоне карточка въезжает в кадр пустой: браузер начинает качать
+     файл только когда картинка уже пересекла край окна, а лента к этому
+     моменту уже её показывает. Семь файлов — 0,8 МБ, качать их с самого
+     верха страницы незачем, поэтому не `eager` в разметке, а вот так. */
+  var razleneno = false;
+  function razlenit(){
+    razleneno = true;
+    var im = grid.querySelectorAll('img[loading="lazy"]');
+    for (var i = 0; i < im.length; i++) im[i].loading = 'eager';
+  }
+  if (!('IntersectionObserver' in window)) razlenit();
+  else new IntersectionObserver(function(en, ob){
+    if (en[0].isIntersecting){ razlenit(); ob.disconnect(); }
+  }, {rootMargin:'60% 0px'}).observe(sec);
+
+  /* ---------- 2. реакция на курсор ---------- */
+  var TILT = 6.5;                     /* потолок наклона в градусах */
+
+  function svyazat(card){
+    function vesti(e){
+      var r = card.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      var x = (e.clientX - r.left) / r.width;
+      var y = (e.clientY - r.top)  / r.height;
+      var s = card.style;
+      s.setProperty('--mx', (x * 100).toFixed(1) + '%');
+      s.setProperty('--my', (y * 100).toFixed(1) + '%');
+      /* мышь правее середины — карточка отворачивается вправо, ближний край
+         поднимается: знак у rotateX обратный, ось X смотрит вниз экрана */
+      s.setProperty('--ry', ((x - 0.5) * 2 * TILT).toFixed(2) + 'deg');
+      s.setProperty('--rx', ((0.5 - y) * 2 * TILT).toFixed(2) + 'deg');
+    }
+    function uyti(){
+      card.classList.remove('hot');
+      card.style.setProperty('--rx', '0deg');
+      card.style.setProperty('--ry', '0deg');
+    }
+    card.addEventListener('pointerenter', function(e){
+      if (!mouse.matches || calm.matches) return;
+      vesti(e); card.classList.add('hot');
+    });
+    card.addEventListener('pointermove', function(e){
+      if (card.classList.contains('hot')) vesti(e);
+    });
+    card.addEventListener('pointerleave', uyti);
+    return uyti;
+  }
+  var otpustki = [];
+  for (var i = 0; i < N; i++) otpustki.push(svyazat(cards[i]));
+  /* Курсор может уехать не «через край», а вместе с исчезнувшим элементом:
+     окно сузилось до телефонного, карточка уехала в ленту. Тогда
+     pointerleave не придёт, и карточка осталась бы наклонённой. */
+  slushat(mouse, function(){
+    if (mouse.matches) return;
+    for (var i = 0; i < otpustki.length; i++) otpustki[i]();
+  });
+
+  /* ---------- 3. лента на телефоне ---------- */
+  var BASE = 26, LH0 = 240, MAXV = 2400, TAU = 0.75;   /* числа ленты второго экрана */
+  var sobrano = false, shag = 0, pos = 0, v = BASE, raf = 0, last = 0;
+  var tyanut = false, pid = null, x0 = 0, t0 = 0, vx = 0, proshel = 0;
+  var glaz = null;
+
+  function sobrat(){
+    if (sobrano) return;
+    for (var i = 0; i < N; i++){
+      var k = cards[i].cloneNode(true);
+      k.className += ' pr-clone';
+      k.setAttribute('aria-hidden', 'true');
+      var im = k.querySelector('img');
+      if (im) im.alt = '';
+      grid.appendChild(k);
+    }
+    sobrano = true;
+    /* Клоны унаследовали loading="lazy" у оригиналов. Снимаем её только
+       если экран уже подъехал: иначе лента, собранная при загрузке страницы,
+       утащила бы все 0,8 МБ с самого верха. */
+    if (razleneno) razlenit();
+    izmerit();
+  }
+  function razobrat(){
+    var k = grid.querySelectorAll('.pr-clone');
+    for (var i = 0; i < k.length; i++) k[i].parentNode.removeChild(k[i]);
+    sobrano = false; pos = 0; v = BASE; shag = 0;
+    grid.style.transform = '';
+  }
+  function izmerit(){
+    if (!sobrano) return;
+    var a = grid.children[0], b = grid.children[N];
+    shag = (a && b) ? (b.offsetLeft - a.offsetLeft) : 0;
+    /* крупнее карточка — быстрее лента: глаз мерит движение долями кадра,
+       а не пикселями. Ниже телефонной высоты не замедляемся. */
+    BASE = 26 * Math.max(1, (a ? a.offsetHeight : LH0) / LH0);
+    polozhit();
+  }
+  function polozhit(){
+    var x = shag ? -(((pos % shag) + shag) % shag) : 0;
+    grid.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+  }
+  function kadr(now){
+    raf = requestAnimationFrame(kadr);
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+    last = now;
+    if (!tyanut){
+      v += (BASE - v) * (1 - Math.exp(-dt / TAU));   /* бросок затухает к базовой */
+      pos += v * dt;
+    }
+    polozhit();
+  }
+  function pusk(){ if (!raf && sobrano){ last = 0; raf = requestAnimationFrame(kadr); } }
+  function stop(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+
+  wrap.addEventListener('pointerdown', function(e){
+    if (!sobrano) return;
+    tyanut = true; pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; proshel = 0;
+    try{ wrap.setPointerCapture(pid); }catch(err){}
+  });
+  wrap.addEventListener('pointermove', function(e){
+    if (!tyanut || e.pointerId !== pid) return;
+    var dx = e.clientX - x0, dt = (e.timeStamp - t0) / 1000;
+    pos -= dx;                                       /* лента идёт за пальцем */
+    proshel += Math.abs(dx);
+    if (dt > 0.004) vx = 0.7 * vx + 0.3 * (dx / dt); /* сглаженная скорость пальца */
+    x0 = e.clientX; t0 = e.timeStamp;
+    polozhit();
+  });
+  function otpustit(){
+    if (!tyanut) return;
+    tyanut = false;
+    if (pid !== null){ try{ wrap.releasePointerCapture(pid); }catch(err){} pid = null; }
+    if (proshel < 8) return;                         /* это была прокрутка страницы, не свайп */
+    v = Math.max(-MAXV, Math.min(MAXV, -vx));
+  }
+  wrap.addEventListener('pointerup', otpustit);
+  wrap.addEventListener('pointercancel', otpustit);
+  wrap.addEventListener('lostpointercapture', otpustit);
+
+  /* лента живёт только пока она на экране: за кадром кадры не считаем */
+  function smotret(){
+    if (glaz || !('IntersectionObserver' in window)){ pusk(); return; }
+    glaz = new IntersectionObserver(function(en){
+      if (en[0].isIntersecting) pusk(); else stop();
+    }, {rootMargin:'100px'});
+    glaz.observe(wrap);
+  }
+
+  var tmr = null;
+  function svet(){
+    if (lenta.matches && !calm.matches){ sobrat(); smotret(); }
+    else { stop(); razobrat(); }
+  }
+  svet();
+  slushat(lenta, svet);
+  slushat(calm, svet);
+  window.addEventListener('resize', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 150);
+  });
+  window.addEventListener('orientationchange', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 300);
   });
 })();
 </script>
