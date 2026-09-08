@@ -97,31 +97,34 @@
    меняется мгновенно. Страница-шаблон умеет их переключать кнопками наверху,
    чтобы выбрать глазами, а не по описанию. */
 
-   ВСЕ ПЕРЕХОДЫ КОРОЧЕ 0,15 с. Кадр живёт 0,2 с, и переход обязан успеть
-   закончиться внутри этого времени. Растянешь до 0,2 — следующий кадр
-   перебьёт предыдущий на полпути, и окно так и останется мыльным: картинка
-   никогда не дойдёт до резкости. */
+   ПЕРЕХОД ОБЯЗАН БЫТЬ КОРОЧЕ КАДРА. Кадр живёт 0,6 с (STEP в скрипте внизу),
+   переход — 0,26 с, то есть примерно две пятых. Оставшиеся 0,34 с кадр стоит
+   резким и его успевают рассмотреть. Сделаешь переход длиной в кадр —
+   следующий перебьёт предыдущий на полпути, и окно навсегда останется мыльным:
+   картинка просто не дойдёт до резкости. Меняешь STEP — проверь и это число. */
+.pg{--fx:.26s}
 
 /* растворение: новый кадр проявляется поверх предыдущего */
-.fx-fade .pg-win img.on{transition:opacity .12s linear}
+.fx-fade .pg-win img.on{transition:opacity var(--fx) linear}
 
 /* размытие: новый кадр приходит расфокусированным и наводится на резкость */
-.fx-blur .pg-win img{filter:blur(8px)}
+.fx-blur .pg-win img{filter:blur(10px)}
 .fx-blur .pg-win img.prev{filter:blur(0px)}
-.fx-blur .pg-win img.on{filter:blur(0px); transition:opacity .12s linear, filter .13s ease-out}
+.fx-blur .pg-win img.on{filter:blur(0px);
+  transition:opacity var(--fx) linear, filter var(--fx) ease-out}
 
 /* наплыв: новый кадр приходит чуть крупнее и садится на место */
-.fx-zoom .pg-win img{transform:rotate(calc(-1 * var(--tilt))) scale(1.07)}
+.fx-zoom .pg-win img{transform:rotate(calc(-1 * var(--tilt))) scale(1.08)}
 .fx-zoom .pg-win img.prev{transform:rotate(calc(-1 * var(--tilt))) scale(1.025)}
 .fx-zoom .pg-win img.on{transform:rotate(calc(-1 * var(--tilt))) scale(1.025);
-  transition:opacity .12s linear, transform .15s cubic-bezier(.2,.7,.3,1)}
+  transition:opacity var(--fx) linear, transform calc(var(--fx) + .06s) cubic-bezier(.2,.7,.3,1)}
 
 /* шторка: новый кадр выезжает косой полосой под тем же углом, что полоски
    на рамке (61° к горизонту) — переход рифмуется с леденцом */
 .fx-wipe .pg-win img{clip-path:polygon(-200% 0, 0% 0, -55% 100%, -200% 100%)}
 .fx-wipe .pg-win img.prev{clip-path:polygon(-200% 0, 155% 0, 100% 100%, -200% 100%)}
 .fx-wipe .pg-win img.on{clip-path:polygon(-200% 0, 155% 0, 100% 100%, -200% 100%);
-  transition:clip-path .14s cubic-bezier(.3,.8,.4,1)}
+  transition:clip-path calc(var(--fx) + .04s) cubic-bezier(.3,.8,.4,1)}
 
 @media (prefers-reduced-motion:reduce){
   .pg-win img{transition:none !important}
@@ -192,7 +195,7 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
 <div class="demo">
 <h1>Карточка программы — шаблон</h1>
 <p class="note">Высота карточки зависит только от длины текста. Окно с фотографией, рамка, поля и скругления у всех одинаковые.<br>
-Наклон рамки через одну зеркалится, тон карточки у каждой свой — насыщенность и светлота общие. Кадры в окне меняются каждые 0,2 секунды, во всех карточках одновременно.<br>Переход между кадрами выбери кнопками ниже — какой понравится, тот и оставим.</p>
+Наклон рамки через одну зеркалится, тон карточки у каждой свой — насыщенность и светлота общие. Кадры в окне меняются каждые 0,6 секунды, во всех карточках одновременно.<br>Переход между кадрами выбери кнопками ниже — какой понравится, тот и оставим.</p>
 
 <div class="fxbar" id="fxbar">
   <button type="button" data-fx="">Резко</button>
@@ -490,7 +493,7 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
    4. Карточка входит в общий такт, когда ВСЕ её кадры уже в памяти: иначе на
       медленном интернете в окне вместо фотографии вспыхивает пустая заливка. */
 (function(){
-  var STEP = 200;                                    /* сколько держится кадр, мс */
+  var STEP = 600;                                    /* сколько держится кадр, мс */
   var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
   var cards = [], timer = null;
 
