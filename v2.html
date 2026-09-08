@@ -2802,6 +2802,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Верхнее поле у ленты сжать нельзя: там живёт посох Деда Мороза,
    он поднимается на 26,7 % ширины карточки, и меньше 29 % ему тесно. */
 .pr .cr-lead{ font-size:calc(18.7 * var(--u)) }
+/* Перенос в заголовке: на компьютере «НАШЕЙ» уходит во вторую строку,
+   к «ВСЕЛЕННОЙ МНД» (просьба Серёги 08.09.2026). Порог 1024 px, а не 768:
+   на планшете первая половина и сама не влезает в строку, и разрыв дробил бы
+   заголовок на три строки с одиноким «ПЕРСОНАЖИ» посередине — проверено.
+   `&nbsp;` перед разрывом оставлен намеренно: там, где разрыва нет,
+   «ПЕРСОНАЖИ» и «НАШЕЙ» без него слиплись бы. Тот же приём у заголовка
+   третьего экрана. */
+.pr-br{ display:none }
+@media (min-width:1024px){ .pr-br{ display:inline } }
 .pr-gap1{ height:calc(26 * var(--u)) }
 .pr-gap2{ height:calc(6 * var(--u)) }
 @media (max-width:767px){
@@ -3440,7 +3449,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <section class="cr pr" id="heroes" aria-labelledby="prT">
   <div class="cr-cont">
     <div class="cr-n">
-      <h2 class="cr-t cr-h2" id="prT"><span class="cr-red"><strong>НОВЫЕ И ПОСТОЯННЫЕ ПЕРСОНАЖИ&nbsp;</strong></span><span class="cr-blue"><strong>НАШЕЙ ВСЕЛЕННОЙ МНД:</strong></span></h2>
+      <h2 class="cr-t cr-h2" id="prT"><span class="cr-red"><strong>НОВЫЕ И ПОСТОЯННЫЕ ПЕРСОНАЖИ&nbsp;</strong></span><br class="pr-br"><span class="cr-blue"><strong>НАШЕЙ ВСЕЛЕННОЙ МНД:</strong></span></h2>
     </div>
 
     <div class="pr-gap1"></div>
