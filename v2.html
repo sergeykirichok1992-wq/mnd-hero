@@ -2505,6 +2505,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
        низа кнопки карусели), плюс 0,022 — на столько ниже продлён сам
        низ карусели, чтобы дуге было во что упереться (см. .kr ниже). */
     margin-top:calc(var(--kw) * -0.0808);
+  }
   .km-in{width:100%; display:grid; grid-template-areas:"kadr"; align-items:start}
   .km-in > *{grid-area:kadr}
 
@@ -2535,8 +2536,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
        (обычный border-radius 50 %) в четверти ширины идёт на 29 px ниже
        макета — дуга у Серёги заметно площе. Подошёл эллипс с полуосями
        0,671 и 0,225 ширины окна, центр поднят на 0,1468 ширины над кадром.
-       Числа проверены по двенадцати точкам макета, среднее расхождение
-       2,5 px при ширине окна 1728. */
+       Числа проверены по шести точкам макета, расхождение до 2 px. */
     --arka-x:calc(var(--kw) * 0.671);   /* горизонтальная полуось */
     --arka-y:calc(var(--kw) * 0.225);   /* вертикальная */
     --arka-c:calc(var(--kw) * -0.1468); /* центр эллипса выше кадра */
@@ -2875,6 +2875,151 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .pr-in, .pr-3d{ transform:none !important; transition:none !important }
   .pr-wrap{ overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch }
   .pr-grid{ padding-inline:calc(var(--pc) * 0.035) }
+}
+</style>
+<!-- Стили десятого экрана вынесены в ОТДЕЛЬНЫЙ <style> намеренно, как и стили
+     девятого: файл правят из двух окон, и перекос скобок в соседнем блоке
+     не должен утаскивать этот экран внутрь чужого @media.
+     → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ==================== ЭКРАН 10: «Что ждёт детей» ====================
+   Карточки программы. Повторяют макет Серёги
+   `~/Desktop/новый сайт/экран что в программе/псд.psd` (холст 1080x1920,
+   карточка 1045 px шириной). Все размеры пересчитаны через переменную --u —
+   это ОДИН пиксель макета в нашем масштабе:
+
+       --u = ширина карточки / 1045
+
+   Меняешь ширину карточки — всё внутри едет пропорционально и пропорции
+   не плывут. Тот же приём, что на экранах 2-3.
+
+   ЧТО ТЯНЕТСЯ, А ЧТО НЕТ. Тянется только текст: сколько его — такая и высота,
+   карточка растёт вниз вслед за ним. Фото, карамельная рамка, поля,
+   скругления и кегли — постоянные. Поэтому в ряду карточки разной высоты,
+   а окно с фотографией у всех одинаковое.
+
+   Голубой плашки под текстом, которая есть в макете, тут нет: она забирала
+   по 140 px с каждой стороны и в строку помещалось мало (решение Серёги
+   08.09.2026). Цвет, который в макете был у плашки, теперь у самой карточки. */
+
+.pgs{
+  position:relative; overflow:hidden;   /* страховка от горизонтальной прокрутки */
+  z-index:26;                           /* как у .pr-hold — экран стоит над формой */
+  background:#001061;                   /* поле макета, на нём Серёга рисовал карточки */
+  padding:calc(70 * var(--u)) 0 calc(80 * var(--u));
+}
+.pgs-t{
+  margin:0 auto calc(46 * var(--u)); text-align:center;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(26px,3.7vw,57.8px); line-height:1.06; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+/* Карточки идут рядом и переносятся сами. justify-content:center — чтобы
+   последний неполный ряд не липнул к левому краю. */
+.pgs-row{display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start;
+  gap:calc(40 * var(--u))}
+.pgs-defs{position:absolute; width:0; height:0; overflow:hidden}
+
+.pg{
+  /* Ширина карточки. 329 px — размер, утверждённый Серёгой 08.09.2026
+     (от первоначальных 430 минус 15 %, потом ещё минус 10 %). Второе слагаемое
+     в min() — внутренняя ширина контейнера `.cr-cont`, чтобы на узком телефоне
+     карточка не вылезла за экран.
+
+     ПРОЦЕНТОВ ТУТ БЫТЬ НЕ ДОЛЖНО. Переменная идёт и в ширину, и в высоту,
+     и в кегль, а `100%` в каждом из них считается от своего: от ширины
+     родителя, от его высоты, от его кегля. Сначала так и было написано —
+     и заголовок вышел 1,5 px, а окно с фотографией схлопнулось в ноль. */
+  --w: min(329px, calc(94vw - 2 * clamp(16px, 3vw, 47.6px)));
+  --u2: calc(var(--w) / 1045);
+  --tilt: -2.83deg;        /* наклон рамки; у чётных карточек он зеркалится */
+  --tint: 222;             /* тон карточки; насыщенность и светлота у всех одни */
+
+  position:relative; box-sizing:border-box;
+  width:var(--w);
+  padding:0 0 calc(100 * var(--u2));
+  border-radius:calc(76 * var(--u2));
+  /* Поле карточки: сверху светлее, книзу чуть темнее (в макете — Gradient
+     Overlay). Тон свой у каждой, насыщенность и светлота — общие. */
+  background:linear-gradient(180deg,
+    hsl(var(--tint) 100% 99%) 0%, hsl(var(--tint) 100% 94.7%) 100%);
+  /* Снизу вверх: мягкая кромка по периметру и тень под карточкой (из макета),
+     дальше два слоя рассеянного свечения в тон самой карточки. Свечение
+     сделано тенью, а не размытием: размытие считает видеокарта каждый кадр,
+     тень рисуется один раз → lessons/cdp-disable-gpu-vret-pro-fps.md */
+  box-shadow:
+    inset 0 0 calc(18 * var(--u2)) rgba(0,0,0,.10),
+    inset 0 calc(-2 * var(--u2)) calc(10 * var(--u2)) rgba(0,0,0,.07),
+    calc(2 * var(--u2)) calc(2 * var(--u2)) calc(9 * var(--u2)) rgba(0,0,0,.5),
+    0 0 calc(62 * var(--u2))  hsl(var(--tint) 100% 80% / .34),
+    0 0 calc(175 * var(--u2)) hsl(var(--tint) 92% 70% / .24);
+}
+.pg:nth-child(even){--tilt:2.83deg}
+
+/* ---------- окно с фотографией ----------
+   Квадрат наклонён целиком вместе с рамкой, а фотография внутри развёрнута
+   обратно — в макете она стоит ровно, косое только окно. */
+.pg-shot{
+  position:relative; width:calc(899 * var(--u2)); height:calc(899 * var(--u2));
+  margin:calc(68 * var(--u2)) auto 0;
+  transform:rotate(var(--tilt));
+}
+.pg-win{
+  position:absolute; inset:calc(7.5 * var(--u2));
+  border-radius:calc(38.5 * var(--u2));
+  overflow:hidden;
+  /* заглушка, пока фотографий нет: ночное небо в тон сайта */
+  background:radial-gradient(120% 120% at 30% 25%, #16307F 0%, #050C33 100%);
+}
+.pg-win img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  /* Обратный разворот: окно косое, а фотография в нём стоит ровно, как в макете.
+     1.025 — ровно столько, чтобы косое окно нигде не осталось без картинки.
+     Больше не надо: углы у окна скруглены, и его дальняя точка ближе, чем
+     у острого квадрата. */
+  transform:rotate(calc(-1 * var(--tilt))) scale(1.025);
+  opacity:0; z-index:0;
+}
+/* Два слоя, а не один: виден и новый кадр, и предыдущий — он держит картинку,
+   пока новый проявляется. Без него в середине перехода окно проваливалось бы
+   в пустоту. Наплыв — выбор Серёги 08.09.2026 из четырёх вариантов. */
+.pg-win img.prev{opacity:1; z-index:1;
+  transform:rotate(calc(-1 * var(--tilt))) scale(1.025)}
+.pg-win img.on{opacity:1; z-index:2;
+  transform:rotate(calc(-1 * var(--tilt))) scale(1.025);
+  transition:opacity .52s linear, transform .58s cubic-bezier(.2,.7,.3,1)}
+.pg-win img:not(.on):not(.prev){transform:rotate(calc(-1 * var(--tilt))) scale(1.08)}
+@media (prefers-reduced-motion:reduce){ .pg-win img{transition:none} }
+
+/* ---------- карамельная рамка ----------
+   Рисуется кодом, а не картинкой: тогда наклон можно зеркалить, размер менять,
+   и она остаётся резкой на любом экране. Общие defs лежат в .pgs-defs один раз
+   на все карточки — узор и маски у всех одинаковые. */
+.pg-frame{position:absolute; inset:0; width:100%; height:100%; overflow:visible;
+  pointer-events:none}
+
+/* ---------- текст (единственное, что тянется) ---------- */
+.pg-panel{box-sizing:border-box; width:calc(899 * var(--u2));
+  margin:calc(136 * var(--u2)) auto 0; text-align:center}
+.pg-t, .pg-p{
+  /* В макете текст сжат по горизонтали (Horizontal Scale 96 %), высота букв
+     при этом полная. Берём 94 %, а не 96 %: Photoshop набирает эту гарнитуру
+     примерно на 2 % плотнее браузера, и на 94 % ширина строк и места переносов
+     совпадают с макетом ровно. Блок для этого делаем шире на 1/0.94, сдвигаем
+     влево на половину прибавки и жмём обратно — кегль остаётся тем же. */
+  width:106.383%; margin-left:-3.1915%;
+  transform:scaleX(.94);
+}
+.pg-t{
+  margin-top:0; margin-bottom:0;
+  font:700 calc(76.8 * var(--u2))/1.05 "Blogger Sans","CR Blogger",Arial,sans-serif;
+  /* тёмно-синий, не чёрный. Цвет не выдуман: #001B71 уже стоит на сайте */
+  color:#001B71;
+}
+.pg-p{
+  margin-top:calc(45 * var(--u2)); margin-bottom:0;
+  font:400 calc(57.3 * var(--u2))/calc(74.49 * var(--u2)) "CR Blogger","Blogger Sans",Arial,sans-serif;
+  color:#000;
 }
 </style>
 </head>
@@ -3538,6 +3683,244 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </section>
 </div>
 
+
+<!-- ==================== ЭКРАН 10: «Что ждёт детей» ====================
+     Карточки программы по макету Серёги «экран что в программе/псд.psd».
+     Тексты его же, 09.09.2026. ОКНА ПОКА ПУСТЫЕ: фотографии он присылает
+     папками, они добавятся кадрами внутрь .pg-win вместе со скриптом
+     мелькания (готов и обкатан на karta.html).
+
+     Тон каждой карточки записан числом в разметке, а не считается скриптом:
+     карточка не должна менять цвет при каждой загрузке страницы. Числа идут
+     шагом «золотого угла» от 222 (тон макета) — соседние заведомо не совпадут.
+
+     Наклон рамки у чётных карточек зеркалится сам, правилом :nth-child(even). -->
+<section class="cr pgs" id="whatawaits" aria-labelledby="pgsT">
+  <div class="cr-cont">
+    <h2 class="pgs-t" id="pgsT">Что ждёт детей:</h2>
+  </div>
+
+  <!-- Общие части рамки: узор полосок и маски фаски. Лежат один раз на все
+       карточки — каждая ссылается на них по имени. -->
+  <svg class="pgs-defs" aria-hidden="true" focusable="false"><defs>
+    <pattern id="pgCandy" width="77.6" height="77.6" patternUnits="userSpaceOnUse"
+             patternTransform="rotate(28.8)">
+      <rect width="77.6" height="77.6" fill="#FFFFFF"/>
+      <rect width="41.5" height="77.6" fill="#F4372B"/>
+    </pattern>
+    <g id="pgRing"><rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+       fill="none" stroke="#fff" stroke-width="15"/></g>
+    <!-- фаска: кольцо минус то же кольцо, сдвинутое вниз, — остаётся полоска
+         по верхней стороне каждой грани, ровно как свет сверху в макете -->
+    <mask id="pgHi"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
+      <use href="#pgRing"/><g transform="translate(0,3)"><rect x="0" y="0" width="899" height="899"
+      rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
+    <mask id="pgHi2"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
+      <use href="#pgRing"/><g transform="translate(0,7)"><rect x="0" y="0" width="899" height="899"
+      rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
+    <mask id="pgLo"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
+      <use href="#pgRing"/><g transform="translate(0,-3)"><rect x="0" y="0" width="899" height="899"
+      rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
+    <mask id="pgLo2"><rect x="-80" y="-80" width="1059" height="1059" fill="#000"/>
+      <use href="#pgRing"/><g transform="translate(0,-7)"><rect x="0" y="0" width="899" height="899"
+      rx="46" ry="46" fill="none" stroke="#000" stroke-width="15"/></g></mask>
+  </defs></svg>
+
+  <div class="cr-cont">
+    <div class="pgs-row">
+      <article class="pg" style="--tint:222">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Динамичное велком-шоу во дворе</h3>
+          <p class="pg-p">Приветственное шоу у 5-метровой елки с главными героями, космо-реквизитом, спецэффектами для разогрева (10-15 минут)</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:0">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Фонарики в темное время</h3>
+          <p class="pg-p">В темное время суток (примерно с 16:00) мы раздаем детям фонарики на время уличной программы. Они с ними выглядят как светлячки :) И получаются классные фото!</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:137">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Необычный сценарий мероприятия</h3>
+          <p class="pg-p">Оказывается в нашем Министерстве есть тайный отдел космических поздравлений. Астрогномы приглашают детей в обсерваторию Деда Мороза, чтобы поучаствовать в новогоднем задании межгалактического масштаба!</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:275">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Главное — карамельный мастер-класс</h3>
+          <p class="pg-p">Главная часть программы, вокруг которой строится весь сценарий! Каждый ребенок сделает красивые новогодние леденцы, прям как с прилавка. Мы сами производим натуральную вкуснейшую карамель по ГОСТу для наших МК.</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:52">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Экскурсия в кабинет-обсерваторию Деда Мороза</h3>
+          <p class="pg-p">Министр проведет деток в астро-кабинет, который будет исполнен в стиле ретро-футуризма. Это будет очень необыкновенно! Винтажные телескопы, интерактивный планетарий на потолке, винтажные звездные карты, пульт управления радио-телескопом и т.п. Максимальная детализация и погружение!</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:190">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Выставка настоящих метеоритов</h3>
+          <p class="pg-p">Коллекция настоящих метеоритов из разных уголков нашей Земли от Незнайки с Луны будет представлена в кабинете-обсерватории Деда Мороза. Некоторые будут размещены на левитирующих платформах. Это не бутафория, мы привезем настоящие экспонаты со своей историей!</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:327">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Выставка карамельного искусства</h3>
+          <p class="pg-p">Это уже традиция! В главном зале наш карамельный цех представит новую экспозицию больших авторских леденцов ручной работы в новогодней и космической тематике. На фото леденцы прошлого сезона.</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:105">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Пульт управления делами Деда Мороза</h3>
+          <p class="pg-p">Дед Мороз и Министр докажут детям, что следят за их поведением и знают о них все, показав фото каждого ребенка на экранах пульта управления делами Деда Мороза. Дети всегда в приятном шоке!</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:242">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Интерактив с настоящим терменвоксом</h3>
+          <p class="pg-p">Терменвокс — самый необыкновенный музыкальный синтезатор, создающий звуки с помощью электромагнитных полей. Используется в министерстве для шифрования новогодних поздравлений. Каждый ребенок попробует сыграть на нем. Такого еще не видели даже взрослые!</p>
+        </div>
+      </article>
+      <article class="pg" style="--tint:20">
+        <div class="pg-shot">
+          <div class="pg-win"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Интерактив с 3D-принтером</h3>
+          <p class="pg-p">Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
