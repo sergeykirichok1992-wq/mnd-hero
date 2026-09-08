@@ -397,68 +397,87 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
 /* КАДРЫ В ОКНЕ. Под каждой карточкой лежит несколько снимков, они мелькают
    по STEP миллисекунд, пока карточка видна. Список файлов — в data-shots.
 
+   ТАКТ ОДИН НА ВСЕХ. Часы тут единственные: все карточки на странице щёлкают
+   кадр в один и тот же момент. Если дать каждой карточке свой таймер, они
+   разъедутся (каждая заводится, когда доехала до экрана) и страница начнёт
+   дёргаться вразнобой.
+
    Четыре вещи, без которых это вредно:
    1. Кадры грузятся, только когда карточка подъезжает к окну браузера.
-   2. Пока карточка не в кадре или вкладка спрятана — таймер стоит.
-   3. Если в системе включено «меньше движения», мелькания нет.
-   4. Мелькать начинаем, когда ВСЕ кадры уже в памяти: иначе на медленном
-      интернете в окне вместо фотографии вспыхивает пустая заливка. */
+   2. Нет ни одной видимой карточки или вкладка спрятана — часы стоят.
+   3. Если в системе включено «меньше движения», мелькания нет вовсе.
+   4. Карточка входит в общий такт, когда ВСЕ её кадры уже в памяти: иначе на
+      медленном интернете в окне вместо фотографии вспыхивает пустая заливка. */
 (function(){
-  var STEP = 400;                                  /* сколько держится кадр, мс */
+  var STEP = 200;                                    /* сколько держится кадр, мс */
   var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var cards = [], timer = null;
 
-  document.querySelectorAll('.pg').forEach(function(card){
-    var win = card.querySelector('.pg-win');
-    var list = (card.getAttribute('data-shots')||'').split(',')
-                 .map(function(s){return s.trim()}).filter(Boolean);
+  function tick(){
+    for (var i = 0; i < cards.length; i++){
+      var c = cards[i];
+      if (c.seen && c.ready) c.step();
+    }
+  }
+  /* часы идут, только пока есть кому щёлкать */
+  function clock(){
+    var live = false;
+    for (var i = 0; i < cards.length; i++) if (cards[i].seen && cards[i].ready) live = true;
+    if (live && !document.hidden && !calm.matches){
+      if (!timer) timer = setInterval(tick, STEP);
+    } else if (timer){
+      clearInterval(timer); timer = null;
+    }
+  }
+
+  document.querySelectorAll('.pg').forEach(function(el){
+    var win  = el.querySelector('.pg-win');
+    var list = (el.getAttribute('data-shots') || '').split(',')
+                 .map(function(s){ return s.trim() }).filter(Boolean);
     var first = win.firstElementChild;
     var extra = list.filter(function(src){ return !first || !first.src.endsWith(src) });
     if (!extra.length) return;                       /* один кадр — мелькать нечем */
 
-    var shots=[first], cur=0, timer=null, seen=false, loaded=false, ready=false;
+    var c = { seen:false, ready:false, shots:[first], cur:0, loaded:false };
 
-    function load(){
-      if (loaded) return; loaded = true;
+    c.step = function(){
+      c.shots[c.cur].classList.remove('on');
+      c.cur = (c.cur + 1) % c.shots.length;
+      c.shots[c.cur].classList.add('on');
+    };
+    c.reset = function(){
+      c.shots[c.cur].classList.remove('on');
+      c.cur = 0; c.shots[0].classList.add('on');
+    };
+    c.load = function(){
+      if (c.loaded) return; c.loaded = true;
       var wait = extra.map(function(src){
         var im = document.createElement('img');
-        im.src = src; im.alt=''; im.width=903; im.height=904; im.decoding='async';
-        win.appendChild(im); shots.push(im);
+        im.src = src; im.alt = ''; im.width = 760; im.height = 760; im.decoding = 'async';
+        win.appendChild(im); c.shots.push(im);
         return im.decode ? im.decode().catch(function(){})
-                         : new Promise(function(r){ im.onload = im.onerror = r; });
+                         : new Promise(function(r){ im.onload = im.onerror = r });
       });
       Promise.all(wait).then(function(){
         /* кадр, который не доехал, из круга выкидываем: иначе на его такте
            окно вспыхивает пустой заливкой */
-        shots = shots.filter(function(im){ return im.naturalWidth > 0 });
-        if (shots.length < 2) return;
-        cur = 0; shots[0].classList.add('on');
-        ready = true; start();
+        c.shots = c.shots.filter(function(im){ return im.naturalWidth > 0 });
+        if (c.shots.length < 2) return;
+        c.reset(); c.ready = true; clock();
       });
-    }
-    function show(i){
-      shots[cur].classList.remove('on');
-      cur = i % shots.length;
-      shots[cur].classList.add('on');
-    }
-    function start(){
-      if (timer || !seen || document.hidden || calm.matches) return;
-      load();
-      if (!ready) return;
-      timer = setInterval(function(){ show(cur+1) }, STEP);
-    }
-    function stop(){
-      if (!timer) return;
-      clearInterval(timer); timer = null;
-      show(0);                                       /* вернулись — снова первый кадр */
-    }
+    };
+
+    cards.push(c);
     if ('IntersectionObserver' in window){
       new IntersectionObserver(function(es){
-        seen = es[0].isIntersecting;
-        seen ? start() : stop();
-      }, {threshold:.25}).observe(card);
-    } else { seen = true; start(); }
-    document.addEventListener('visibilitychange', function(){ document.hidden ? stop() : start() });
+        c.seen = es[0].isIntersecting;
+        if (c.seen) c.load(); else if (c.ready) c.reset();
+        clock();
+      }, {threshold:.25}).observe(el);
+    } else { c.seen = true; c.load() }
   });
+
+  document.addEventListener('visibilitychange', clock);
 })();
 </script>
 </body>
