@@ -2667,9 +2667,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 .pr{
   z-index:1;                          /* внутри обёртки, под бликом */
-  --pc:  calc((min(94vw,1462px) - 2*clamp(16px,3vw,47.6px)) / 4.66);
-  --pgx: calc(var(--pc) * 0.22);      /* зазор между карточками, снят с макета */
-  --pgy: calc(var(--pc) * 0.13);      /* зазор между рядами, снят с макета */
+  /* Ширина карточки. До 768 px считается от экрана, дальше — через общий
+     множитель `--u`, ровно как высота ленты фотографий второго экрана
+     (`calc(240 * var(--u))`). Значения на стыке подобраны так, чтобы карточка
+     не прыгнула: 275 px и там и там. Сверху рост упирается сам — `--u` растёт
+     вместе с контейнером, а тот стоит на потолке 1462 px, поэтому от 1556 px
+     карточка перестаёт расти и остаётся 342 px. */
+  --pc:  min(62vw, 275px);
+  --pgx: calc(var(--pc) * 0.10);      /* зазор между карточками в ленте */
   --pr-r: calc(var(--pc) * 0.0708);   /* скругление карточки: 69 px при карточке 975 */
   --pr-gold: 255,224,158;             /* тон блика под курсором — золото МНД */
 
@@ -2678,19 +2683,32 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   padding:calc(60 * var(--u)) 0 calc(64 * var(--u));
 }
 
-/* Сетка. Восемь колонок вместо четырёх — ради нижнего ряда: карточка занимает
-   две колонки, поэтому смещение на одну колонку с зазором это ровно половина
-   карточки с половиной зазора, и три карточки встают точно по центру.
-   Верхний ряд раскладывается сам, у пятой карточки начало задано явно. */
-.pr-grid{
-  display:grid; grid-template-columns:repeat(8,1fr);
-  column-gap:var(--pgx); row-gap:var(--pgy);
-  /* Тут живёт всё, что торчит выше карточки: у Деда Мороза посох поднимается
-     на 26,7 % ширины карточки. Без этого поля секция срезала бы ему навершие. */
-  padding-top:calc(var(--pc) * 0.29);
+/* ЛЕНТА — одна на все ширины, приём и числа взяты у ленты фотографий второго
+   экрана (просьба Серёги 08.09.2026; до этого на компьютере стояла сетка
+   4 + 3 по макету). Карточки едут справа налево сами, без остановок,
+   а пальцем или мышью их можно разогнать, отмотать назад и притормозить.
+   Сборку второй копии для петли делает скрипт, см. блок «ПЕРСОНАЖИ» внизу. */
+.pr-wrap{
+  overflow:hidden;
+  /* Сверху живёт всё, что торчит выше карточки: у Деда Мороза посох поднимается
+     на 26,7 % ширины карточки. Снизу — мягкая кромка вшитой в картинку тени. */
+  padding:calc(var(--pc) * 0.29) 0 calc(var(--pc) * 0.05);
+  touch-action:pan-y;                          /* вертикаль отдаём странице */
+  user-select:none; -webkit-user-select:none;  /* палец тянет ленту, а не выделяет */
 }
-.pr-card{ position:relative; margin:0; grid-column:span 2; aspect-ratio:975 / 1525 }
-.pr-card:nth-child(5){ grid-column:2 / span 2 }
+.pr-grid{ display:flex; width:max-content }
+.pr-card{
+  position:relative; flex:0 0 auto;
+  width:var(--pc); aspect-ratio:975 / 1525;
+  margin:0 var(--pgx) 0 0;
+}
+/* Компьютер и планшет: лента обрывается не по краю монитора, а чуть внутри —
+   те же поля, что у ленты снимков второго экрана. */
+@media (min-width:768px){
+  .pr{ --pc:calc(275 * var(--u)) }
+  .pr-wrap{ margin-inline:clamp(0px,2.6vw,44.2px); cursor:grab }
+  .pr-wrap.drag, .pr-wrap.drag *{ cursor:grabbing }
+}
 
 .pr-in{ position:absolute; inset:0; border-radius:var(--pr-r) }
 .pr-3d{ position:absolute; inset:0; border-radius:inherit }
@@ -2769,57 +2787,48 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .pr-card.hot .pr-spot{ opacity:1 }
 }
 
-/* ---- КОМПЬЮТЕР: первое появление при прокрутке ----
+/* Воздух вокруг подзаголовка стоит полосами, а не отступами у текста —
+   тот же приём, что на седьмом экране.
+
+   НА ТЕЛЕФОНЕ ВСЁ СЖАТО (просьба Серёги 08.09.2026): подзаголовок ровно
+   в полтора раза мельче (28 / 1,5), полосы вдвое уже, поля секции на треть.
+   Заголовок не трогали — он остался как на остальных светлых экранах.
+   Верхнее поле у ленты сжать нельзя: там живёт посох Деда Мороза,
+   он поднимается на 26,7 % ширины карточки, и меньше 29 % ему тесно. */
+.pr-gap1{ height:calc(26 * var(--u)) }
+.pr-gap2{ height:calc(6 * var(--u)) }
+@media (max-width:767px){
+  .pr{ padding:calc(34 * var(--u)) 0 calc(36 * var(--u)) }
+  .pr .cr-lead{ font-size:calc(18.7 * var(--u)) }
+  .pr-gap1{ height:calc(13 * var(--u)) }
+  .pr-gap2{ height:0 }
+}
+
+/* ---- ПЕРВОЕ ПОЯВЛЕНИЕ ПРИ ПРОКРУТКЕ ----
    Карточки выезжают снизу по очереди, слева направо, шагом 85 мс. Класс `on`
    секции ставит наблюдатель и только один раз: назад при обратной прокрутке
-   не отматываем — на длинной странице мигание раздражает сильнее, чем радует. */
-@media (min-width:1024px){
-  .pr-card{
-    opacity:0; transform:translateY(calc(var(--pc) * .13)) scale(.945);
-    transition:opacity .75s ease, transform .75s cubic-bezier(.2,.72,.28,1);
-    transition-delay:calc(var(--i) * 85ms);
-  }
-  .pr.on .pr-card{ opacity:1; transform:none }
-}
+   не отматываем — на длинной странице мигание раздражает сильнее, чем радует.
 
-/* ---- ТЕЛЕФОН И ПЛАНШЕТ: лента с постоянной прокруткой ----
-   Тот же приём, что у ленты фотографий второго экрана: карточки повторены
-   дважды, лента едет справа налево сама и разгоняется пальцем. Скрипт —
-   блок «ПЕРСОНАЖИ» внизу файла.
-
-   Карточки для второй копии не докачиваются: это те же семь файлов,
-   браузер берёт их из кеша. Поэтому копию делает клонирование разметки,
-   а не второй набор картинок. */
-@media (max-width:1023px){
-  .pr{ --pc:min(62vw, 340px); --pgx:calc(var(--pc) * 0.10) }
-  .pr-wrap{
-    overflow:hidden;
-    padding:calc(var(--pc) * 0.29) 0 calc(var(--pc) * 0.05);
-    touch-action:pan-y;                         /* вертикаль отдаём странице */
-    user-select:none; -webkit-user-select:none; /* палец тянет ленту, а не выделяет */
-  }
-  .pr-grid{ display:flex; width:max-content; padding-top:0 }
-  .pr-card{ flex:0 0 auto; width:var(--pc); margin-right:var(--pgx) }
-  /* Появление на телефоне — одним движением всей ленты: карточки тут едут
-     сами, и вторая анимация поверх движения читалась бы как рывок. */
-  .pr-wrap{ opacity:0; transform:translateY(24px);
-            transition:opacity .8s ease, transform .8s cubic-bezier(.2,.72,.28,1) }
-  .pr.on .pr-wrap{ opacity:1; transform:none }
+   Двигаем саму карточку, а лента едет своим `transform` у родителя — два
+   движения не спорят. Клоны для петли уносят `--i` с собой при копировании,
+   поэтому выезжают в том же порядке; на экране этого не видно, они в этот
+   момент ещё далеко справа. */
+.pr-card{
+  opacity:0; transform:translateY(calc(var(--pc) * .13)) scale(.945);
+  transition:opacity .75s ease, transform .75s cubic-bezier(.2,.72,.28,1);
+  transition-delay:calc(var(--i) * 85ms);
 }
+.pr.on .pr-card{ opacity:1; transform:none }
 
 /* «Меньше движения»: ничего не выезжает, не наклоняется и не едет само.
    Ленту при этом можно листать пальцем — скрипт в этом режиме её не собирает,
    а прокрутку отдаёт браузеру. */
+/* «Меньше движения»: карточки не выезжают, не наклоняются и лента не едет
+   сама — её листают пальцем или колесом. Поля по бокам про запас холста:
+   картинка шире карточки на 3 %, и без них у крайних срезало бы кромку. */
 @media (prefers-reduced-motion:reduce){
-  .pr-card, .pr-wrap{ opacity:1 !important; transform:none !important; transition:none !important }
+  .pr-card{ opacity:1 !important; transform:none !important; transition:none !important }
   .pr-in, .pr-3d{ transform:none !important; transition:none !important }
-}
-/* Листать пальцем вместо самохода — ТОЛЬКО там, где лента и есть. На компьютере
-   сетка стоит на месте, и `overflow-x:auto` там дал бы лишнюю полосу прокрутки:
-   картинки шире своих клеток на 3 % (поля холста), у крайней справа этот запас
-   вылезает за сетку. Поля по бокам ленты — про тот же запас, чтобы у первой
-   карточки не срезало кромку. */
-@media (prefers-reduced-motion:reduce) and (max-width:1023px){
   .pr-wrap{ overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch }
   .pr-grid{ padding-inline:calc(var(--pc) * 0.035) }
 }
@@ -3428,11 +3437,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <h2 class="cr-t cr-h2" id="prT"><span class="cr-red"><strong>НОВЫЕ И ПОСТОЯННЫЕ ПЕРСОНАЖИ&nbsp;</strong></span><span class="cr-blue"><strong>НАШЕЙ ВСЕЛЕННОЙ МНД:</strong></span></h2>
     </div>
 
-    <div style="height:calc(26 * var(--u))"></div>
+    <div class="pr-gap1"></div>
 
     <div class="cr-n"><p class="cr-t cr-lead">Не банальные, запоминающиеся детям герои, которых можно встретить только у нас</p></div>
 
-    <div style="height:calc(6 * var(--u))"></div>
+    <div class="pr-gap2"></div>
 
     <div class="pr-wrap" id="prWrap">
       <div class="pr-grid" id="prGrid">
@@ -6297,25 +6306,37 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       и больше его не теряет. Дальше выезд карточек по очереди делает CSS
       задержкой `--i * 85мс` — скрипту считать нечего.
 
-   2. РЕАКЦИЯ НА КУРСОР (только компьютер). Скрипт кладёт на карточку четыре
-      числа: где мышь (`--mx`/`--my`, для блика) и на сколько градусов
-      наклонить (`--rx`/`--ry`). Само движение — переходы в CSS.
-      Наклон считаем от НЕПОДВИЖНОЙ коробки карточки (`.pr-card`), а не от
-      наклонённой картинки: рамка вокруг наклонённого слоя больше его самого,
-      и числа поплыли бы от собственного наклона. Та же ловушка была у ленты
-      второго экрана с повёрнутыми полароидами.
-
-   3. ЛЕНТА НА ТЕЛЕФОНЕ. Ниже 1024 px карточки едут справа налево сами и
-      разгоняются пальцем — приём и числа взяты у ленты фотографий второго
-      экрана. Петля без шва: карточки повторены дважды, лента сдвигается на
-      остаток от ширины одного повтора, и в момент, когда первая семёрка
-      уезжает за левый край, вторая стоит ровно на её месте.
+   2. ЛЕНТА — одна на все ширины. Карточки едут справа налево сами и
+      разгоняются пальцем или мышью: приём и числа взяты у ленты фотографий
+      второго экрана. Петля без шва — карточки повторены дважды, лента
+      сдвигается на остаток от ширины одного повтора, и в момент, когда первая
+      семёрка уезжает за левый край, вторая стоит ровно на её месте.
 
       Вторая семёрка — клоны разметки, а не второй набор картинок: файлы те же,
       браузер берёт их из кеша. Клоны помечены `aria-hidden` и с пустым `alt`,
       иначе читалка прочитала бы всех персонажей дважды.
 
-   Растянул окно с телефонного до компьютерного — клоны убираются, и наоборот.
+   3. РЕАКЦИЯ НА КУРСОР (только компьютер). Скрипт кладёт на карточку четыре
+      числа: где мышь (`--mx`/`--my`, для блика) и на сколько градусов
+      наклонить (`--rx`/`--ry`). Само движение — переходы в CSS.
+
+      Два решения, без которых это не работает на едущей ленте:
+
+      - ЧИСЛА ПЕРЕСЧИТЫВАЮТСЯ КАЖДЫЙ КАДР, а не по движению мыши. Курсор может
+        стоять на месте, а карточка уезжает из-под него — считай мы один раз
+        по `pointermove`, наклон застыл бы и поехал вместе с карточкой.
+        Заодно каждый кадр проверяем, не ушла ли карточка из-под курсора
+        совсем: события `pointerout` браузер на движение слоя не обещает,
+        и без проверки карточка так и уехала бы наклонённой.
+      - СЛУШАЕМ ЛЕНТУ ЦЕЛИКОМ, а не каждую карточку. Половина карточек —
+        клоны, они появляются после запуска; делегирование через
+        `pointerover`/`pointerout` (они всплывают, в отличие от
+        `pointerenter`/`pointerleave`) само накрывает и оригиналы, и копии.
+
+      Наклон считаем от коробки самой карточки (`.pr-card`), а не от
+      наклонённого слоя внутри: рамка вокруг наклонённого слоя больше его
+      самого, и числа поплыли бы от собственного наклона.
+
    При «меньше движения» лента не собирается вовсе: прокрутку отдаём браузеру
    (`overflow-x:auto` в стилях), карточки листаются пальцем. */
 (function(){
@@ -6326,7 +6347,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   if (!sec || !wrap || !grid) return;
 
   var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
-  var lenta = window.matchMedia('(max-width:1023px)');
   var mouse = window.matchMedia('(min-width:1024px) and (hover:hover) and (pointer:fine)');
 
   var cards = Array.prototype.slice.call(grid.children);   /* семь настоящих, без клонов */
@@ -6360,46 +6380,57 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }, {rootMargin:'60% 0px'}).observe(sec);
 
   /* ---------- 2. реакция на курсор ---------- */
-  var TILT = 6.5;                     /* потолок наклона в градусах */
+  var TILT = 6.5;               /* потолок наклона в градусах */
+  var pod = null, mx = 0, my = 0;   /* карточка под курсором и где он стоит */
 
-  function svyazat(card){
-    function vesti(e){
-      var r = card.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      var x = (e.clientX - r.left) / r.width;
-      var y = (e.clientY - r.top)  / r.height;
-      var s = card.style;
-      s.setProperty('--mx', (x * 100).toFixed(1) + '%');
-      s.setProperty('--my', (y * 100).toFixed(1) + '%');
-      /* мышь правее середины — карточка отворачивается вправо, ближний край
-         поднимается: знак у rotateX обратный, ось X смотрит вниз экрана */
-      s.setProperty('--ry', ((x - 0.5) * 2 * TILT).toFixed(2) + 'deg');
-      s.setProperty('--rx', ((0.5 - y) * 2 * TILT).toFixed(2) + 'deg');
-    }
-    function uyti(){
-      card.classList.remove('hot');
-      card.style.setProperty('--rx', '0deg');
-      card.style.setProperty('--ry', '0deg');
-    }
-    card.addEventListener('pointerenter', function(e){
-      if (!mouse.matches || calm.matches) return;
-      vesti(e); card.classList.add('hot');
-    });
-    card.addEventListener('pointermove', function(e){
-      if (card.classList.contains('hot')) vesti(e);
-    });
-    card.addEventListener('pointerleave', uyti);
-    return uyti;
+  function karta(e){
+    return (e.target && e.target.closest) ? e.target.closest('.pr-card') : null;
   }
-  var otpustki = [];
-  for (var i = 0; i < N; i++) otpustki.push(svyazat(cards[i]));
-  /* Курсор может уехать не «через край», а вместе с исчезнувшим элементом:
-     окно сузилось до телефонного, карточка уехала в ленту. Тогда
-     pointerleave не придёт, и карточка осталась бы наклонённой. */
-  slushat(mouse, function(){
-    if (mouse.matches) return;
-    for (var i = 0; i < otpustki.length; i++) otpustki[i]();
+  function uyti(){
+    if (!pod) return;
+    pod.classList.remove('hot');
+    pod.style.setProperty('--rx', '0deg');
+    pod.style.setProperty('--ry', '0deg');
+    pod = null;
+  }
+  function vesti(){
+    if (!pod) return;
+    var r = pod.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    var x = (mx - r.left) / r.width;
+    var y = (my - r.top)  / r.height;
+    /* карточка уехала из-под курсора — отпускаем сами, событие может и не прийти */
+    if (x < -0.02 || x > 1.02 || y < -0.02 || y > 1.02){ uyti(); return; }
+    var st = pod.style;
+    st.setProperty('--mx', (x * 100).toFixed(1) + '%');
+    st.setProperty('--my', (y * 100).toFixed(1) + '%');
+    /* мышь правее середины — карточка отворачивается вправо, ближний край
+       поднимается: знак у rotateX обратный, ось X смотрит вниз экрана */
+    st.setProperty('--ry', ((x - 0.5) * 2 * TILT).toFixed(2) + 'deg');
+    st.setProperty('--rx', ((0.5 - y) * 2 * TILT).toFixed(2) + 'deg');
+  }
+  wrap.addEventListener('pointerover', function(e){
+    if (!mouse.matches || calm.matches) return;
+    var k = karta(e);
+    if (!k || k === pod) return;
+    uyti();
+    pod = k; mx = e.clientX; my = e.clientY;
+    vesti();
+    if (pod) pod.classList.add('hot');
   });
+  wrap.addEventListener('pointerout', function(e){
+    if (!pod || karta(e) !== pod) return;
+    /* курсор перешёл на внутренний слой той же карточки — это не уход */
+    if (e.relatedTarget && pod.contains(e.relatedTarget)) return;
+    uyti();
+  });
+  wrap.addEventListener('pointermove', function(e){
+    if (!pod) return;
+    mx = e.clientX; my = e.clientY; vesti();
+  });
+  /* Курсор может уехать не «через край», а вместе с изменившейся страницей:
+     окно сузилось, наклон выключился. Тогда `pointerout` не придёт. */
+  slushat(mouse, function(){ if (!mouse.matches) uyti(); });
 
   /* ---------- 3. лента на телефоне ---------- */
   var BASE = 26, LH0 = 240, MAXV = 2400, TAU = 0.75;   /* числа ленты второго экрана */
@@ -6452,6 +6483,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       pos += v * dt;
     }
     polozhit();
+    vesti();          /* карточка уехала под курсором — пересчитать наклон и блик */
   }
   function pusk(){ if (!raf && sobrano){ last = 0; raf = requestAnimationFrame(kadr); } }
   function stop(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
@@ -6459,6 +6491,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   wrap.addEventListener('pointerdown', function(e){
     if (!sobrano) return;
     tyanut = true; pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; proshel = 0;
+    wrap.classList.add('drag');                      /* курсор «зажатая рука» */
     try{ wrap.setPointerCapture(pid); }catch(err){}
   });
   wrap.addEventListener('pointermove', function(e){
@@ -6473,6 +6506,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   function otpustit(){
     if (!tyanut) return;
     tyanut = false;
+    wrap.classList.remove('drag');
     if (pid !== null){ try{ wrap.releasePointerCapture(pid); }catch(err){} pid = null; }
     if (proshel < 8) return;                         /* это была прокрутка страницы, не свайп */
     v = Math.max(-MAXV, Math.min(MAXV, -vx));
@@ -6492,11 +6526,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
   var tmr = null;
   function svet(){
-    if (lenta.matches && !calm.matches){ sobrat(); smotret(); }
-    else { stop(); razobrat(); }
+    if (!calm.matches){ sobrat(); smotret(); }
+    else { stop(); razobrat(); uyti(); }
   }
   svet();
-  slushat(lenta, svet);
   slushat(calm, svet);
   window.addEventListener('resize', function(){
     clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 150);
