@@ -79,14 +79,53 @@
 }
 .pg-win img{
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
-  /* обратный разворот + запас 6 %: иначе в углах косого окна вылезут поля */
-  /* 1.025 — ровно столько, чтобы косое окно нигде не осталось без картинки.
+  /* Обратный разворот: окно косое, а фотография в нём стоит ровно, как в макете.
+     1.025 — ровно столько, чтобы косое окно нигде не осталось без картинки.
      Больше не надо: углы у окна скруглены, и его дальняя точка ближе, чем
      у острого квадрата. Крупнее — и кадр начнёт резаться сильнее, чем в макете. */
   transform:rotate(calc(-1 * var(--tilt))) scale(1.025);
-  opacity:0;
+  opacity:0; z-index:0;
 }
-.pg-win img.on{opacity:1}      /* смена кадров резкая, мельканием, без плавности */
+/* ДВА СЛОЯ, А НЕ ОДИН. Виден не только новый кадр, но и предыдущий — он лежит
+   под ним и держит картинку, пока новый проявляется. Без него в середине
+   перехода окно на миг проваливалось бы в пустоту. */
+.pg-win img.prev{opacity:1; z-index:1}
+.pg-win img.on{opacity:1; z-index:2}
+
+/* ---------- переходы между кадрами ----------
+   Вид перехода включается классом на <body>. Без класса — как было: кадр
+   меняется мгновенно. Страница-шаблон умеет их переключать кнопками наверху,
+   чтобы выбрать глазами, а не по описанию. */
+
+   ВСЕ ПЕРЕХОДЫ КОРОЧЕ 0,15 с. Кадр живёт 0,2 с, и переход обязан успеть
+   закончиться внутри этого времени. Растянешь до 0,2 — следующий кадр
+   перебьёт предыдущий на полпути, и окно так и останется мыльным: картинка
+   никогда не дойдёт до резкости. */
+
+/* растворение: новый кадр проявляется поверх предыдущего */
+.fx-fade .pg-win img.on{transition:opacity .12s linear}
+
+/* размытие: новый кадр приходит расфокусированным и наводится на резкость */
+.fx-blur .pg-win img{filter:blur(8px)}
+.fx-blur .pg-win img.prev{filter:blur(0px)}
+.fx-blur .pg-win img.on{filter:blur(0px); transition:opacity .12s linear, filter .13s ease-out}
+
+/* наплыв: новый кадр приходит чуть крупнее и садится на место */
+.fx-zoom .pg-win img{transform:rotate(calc(-1 * var(--tilt))) scale(1.07)}
+.fx-zoom .pg-win img.prev{transform:rotate(calc(-1 * var(--tilt))) scale(1.025)}
+.fx-zoom .pg-win img.on{transform:rotate(calc(-1 * var(--tilt))) scale(1.025);
+  transition:opacity .12s linear, transform .15s cubic-bezier(.2,.7,.3,1)}
+
+/* шторка: новый кадр выезжает косой полосой под тем же углом, что полоски
+   на рамке (61° к горизонту) — переход рифмуется с леденцом */
+.fx-wipe .pg-win img{clip-path:polygon(-200% 0, 0% 0, -55% 100%, -200% 100%)}
+.fx-wipe .pg-win img.prev{clip-path:polygon(-200% 0, 155% 0, 100% 100%, -200% 100%)}
+.fx-wipe .pg-win img.on{clip-path:polygon(-200% 0, 155% 0, 100% 100%, -200% 100%);
+  transition:clip-path .14s cubic-bezier(.3,.8,.4,1)}
+
+@media (prefers-reduced-motion:reduce){
+  .pg-win img{transition:none !important}
+}
 
 /* ---------- карамельная рамка ----------
    Рисуется кодом, а не картинкой: тогда наклон можно зеркалить, размер
@@ -136,6 +175,14 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
 .row--one{--row-w:430px}
 .row--three{--row-w:330px}
 .note{font-size:13px; line-height:1.6; opacity:.62; margin:0 0 22px}
+/* переключалка переходов — только на этой странице-шаблоне, на сайт не едет */
+.fxbar{display:flex; gap:8px; flex-wrap:wrap; margin:0 0 26px}
+.fxbar button{
+  font:500 14px/1 "Blogger Sans", system-ui, sans-serif; color:#cdd6ff;
+  background:rgba(255,255,255,.07); border:1px solid rgba(205,214,255,.28);
+  border-radius:999px; padding:11px 18px; cursor:pointer}
+.fxbar button:hover{background:rgba(255,255,255,.14)}
+.fxbar button[aria-pressed="true"]{background:#FCD34D; border-color:#FCD34D; color:#451A03}
 </style>
 </head>
 <body>
@@ -143,7 +190,15 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
 <div class="demo">
 <h1>Карточка программы — шаблон</h1>
 <p class="note">Высота карточки зависит только от длины текста. Окно с фотографией, рамка, поля и скругления у всех одинаковые.<br>
-Наклон рамки через одну зеркалится, тон карточки у каждой свой — насыщенность и светлота общие. Кадры в окне меняются каждые 0,4 секунды.</p>
+Наклон рамки через одну зеркалится, тон карточки у каждой свой — насыщенность и светлота общие. Кадры в окне меняются каждые 0,2 секунды, во всех карточках одновременно.<br>Переход между кадрами выбери кнопками ниже — какой понравится, тот и оставим.</p>
+
+<div class="fxbar" id="fxbar">
+  <button type="button" data-fx="">Резко</button>
+  <button type="button" data-fx="fx-fade">Растворение</button>
+  <button type="button" data-fx="fx-blur">Размытие</button>
+  <button type="button" data-fx="fx-zoom">Наплыв</button>
+  <button type="button" data-fx="fx-wipe">Шторка по диагонали</button>
+</div>
 
 <div class="row row--one">
   <article class="pg" data-shots="karta/k1/01.webp,karta/k1/02.webp,karta/k1/03.webp,karta/k1/04.webp,karta/k1/05.webp,karta/k1/06.webp,karta/k1/07.webp,karta/k1/08.webp,karta/k1/09.webp,karta/k1/10.webp,karta/k1/11.webp,karta/k1/12.webp,karta/k1/13.webp,karta/k1/14.webp,karta/k1/15.webp,karta/k1/16.webp,karta/k1/17.webp">
@@ -379,6 +434,30 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
 </div>
 </div>
 <script>
+/* ВЫБОР ПЕРЕХОДА. Только для этой страницы-шаблона: кнопки вешают класс на
+   <body>, выбор запоминается в браузере, чтобы после перезагрузки остался
+   тот же. На сайт поедет один класс — тот, который выберет Серёга. */
+(function(){
+  var bar = document.getElementById('fxbar');
+  if (!bar) return;
+  var ALL = ['fx-fade','fx-blur','fx-zoom','fx-wipe'];
+  function set(fx){
+    document.body.classList.remove.apply(document.body.classList, ALL);
+    if (fx) document.body.classList.add(fx);
+    bar.querySelectorAll('button').forEach(function(b){
+      b.setAttribute('aria-pressed', b.dataset.fx === fx ? 'true' : 'false');
+    });
+    try { localStorage.setItem('pgFx', fx) } catch(e){}
+  }
+  var saved = null;
+  try { saved = localStorage.getItem('pgFx') } catch(e){}
+  set(saved === null ? 'fx-blur' : saved);
+  bar.addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (b) set(b.dataset.fx);
+  });
+})();
+
 /* ТОН КАРТОЧКИ. Насыщенность и светлота у всех одни (взяты из макета:
    hsl(222 100% 94.7%)), меняется только тон. Стартовый тон случайный, дальше
    шаг золотым углом — соседние карточки заведомо не окажутся одного цвета. */
@@ -440,13 +519,16 @@ body{background:#001061; font:16px/1.5 system-ui, sans-serif; color:#cdd6ff;
 
     var c = { seen:false, ready:false, shots:[first], cur:0, loaded:false };
 
+    /* уходящий кадр остаётся видимым слоем ниже, пока новый проявляется */
     c.step = function(){
-      c.shots[c.cur].classList.remove('on');
+      var was = c.shots[c.cur];
       c.cur = (c.cur + 1) % c.shots.length;
+      for (var i = 0; i < c.shots.length; i++) c.shots[i].classList.remove('prev');
+      was.classList.remove('on'); was.classList.add('prev');
       c.shots[c.cur].classList.add('on');
     };
     c.reset = function(){
-      c.shots[c.cur].classList.remove('on');
+      for (var i = 0; i < c.shots.length; i++) c.shots[i].classList.remove('on', 'prev');
       c.cur = 0; c.shots[0].classList.add('on');
     };
     c.load = function(){
