@@ -2412,6 +2412,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }
 }
 
+.km-vid{display:none}   /* ролик комнаты живёт только на компьютере, см. блок ниже */
 .km-pic{margin:calc(var(--k) * 0.015020) 0 0}   /* 16,2 px холста от заголовка */
 .km-pic img{display:block; width:100%; height:auto}
 
@@ -2428,6 +2429,95 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   letter-spacing:-0.0345em;
   color:#F8F8F6;
 }
+
+
+/* ---- ЭКРАН 8 НА КОМПЬЮТЕРЕ: комната во всю ширину, текст поверх неё ----
+   Макет: `~/Desktop/новый сайт/экран "комната"/комп версия/` —
+   `референс для комп версии.jpg` (холст 2736x1556) и `видео фон.mp4`.
+   Фон референса — кадр этого видео целиком, без обрезки: значит на странице
+   ролик идёт во всю ширину окна и своей пропорцией задаёт высоту экрана.
+
+   Числа — доли ширины окна (`--kw`), как на телефоне доли `--k`. Текст
+   обязан расти вместе с комнатой: он стоит НА потолке, и если кегли
+   ограничить потолком, на большом мониторе заголовок сползёт с потолка
+   на стену. Поэтому здесь `100vw` без ограничителя — это осознанно.
+
+   Порог 1024 px: ниже остаётся телефонная раскладка с фотографией.
+   Разметка одна на оба вида: текст в странице лежит один раз, а не
+   дублируется ради компьютера. Заголовок, абзац и кадр кладутся в ОДНУ
+   клетку сетки — так текст оказывается поверх видео. */
+@media (min-width:1024px){
+  .km{
+    --kw:100vw;
+    padding:0;
+    background:#02061A;          /* размытый синий фон не нужен: кадр закрывает всё */
+    background-image:none;
+  }
+  .km-in{width:100%; display:grid; grid-template-areas:"kadr"; align-items:start}
+  .km-in > *{grid-area:kadr}
+
+  .km-pic{display:none}          /* фотография с вшитым свечением — только на телефоне */
+  /* Кадр: снизу постер картинкой, сверху ролик. Ролик проявляется, только
+     когда реально пошёл (событие playing), и это не украшение, а страховка:
+     если Safari запретит автозапуск — в режиме энергосбережения или при
+     «никогда не запускать автоматически» — он рисует поверх кадра свою
+     панель с кнопкой и притемняет картинку. Прозрачный ролик её уносит,
+     а на экране остаётся постер, и человек ничего не замечает.
+     Тем же лечится нажатие по кадру: pointer-events снят, ролик ничем
+     не управляется. Первый экран страницы воевал с этой панелью отдельно,
+     см. комментарий у #v выше. */
+  .km-vid{
+    display:block; z-index:0; position:relative; overflow:hidden;
+    aspect-ratio:1920 / 1090;    /* пропорция файла: кадр показан целиком, обрезать нечего */
+    background:#02061A;          /* пока постер не отрисован, тут не белое пятно */
+  }
+  .km-still,.km-video{
+    position:absolute; inset:0; width:100%; height:100%;
+    display:block; object-fit:cover; pointer-events:none;
+  }
+  .km-video{opacity:0; transition:opacity .6s ease}
+  .km-video.on{opacity:1}
+  .km-video::-webkit-media-controls,
+  .km-video::-webkit-media-controls-enclosure,
+  .km-video::-webkit-media-controls-panel,
+  .km-video::-webkit-media-controls-panel-container,
+  .km-video::-webkit-media-controls-overlay-play-button,
+  .km-video::-webkit-media-controls-start-playback-button{
+    display:none !important; opacity:0 !important; -webkit-appearance:none;
+  }
+
+  .km-nl{display:none}           /* на компьютере заголовок в две строки, не в три */
+  .km-t{
+    z-index:1; position:relative;
+    margin:calc(var(--kw) * 0.205435) 0 0;   /* верх БУКВ встаёт на 576-й пиксель холста */
+    font-size:calc(var(--kw) * 0.0300365);   /* 82,2 px холста 2736 */
+    line-height:calc(var(--kw) * 0.0369152); /* 101 px холста */
+    letter-spacing:-0.0224em;                /* трекинг макета: -22, не -35 как на телефоне */
+  }
+  .km-p{
+    z-index:1; position:relative;
+    /* 45 % держит разбивку на три строки: самая длинная занимает 43 %,
+       а следующее слово при такой ширине уже не влезает. */
+    width:45%;
+    margin:calc(var(--kw) * 0.301767) auto 0; /* верх БУКВ на 834-м пикселе холста */
+    font-size:calc(var(--kw) * 0.0161257);    /* 44,1 px холста */
+    line-height:calc(var(--kw) * 0.0204678);  /* 56 px холста */
+    letter-spacing:-0.0104em;                 /* трекинг макета: -10 */
+    color:#fff;                               /* на макете абзац чисто белый */
+  }
+}
+/* Градиент заголовка на компьютере круче телефонного: на макете верхняя
+   строка почти белая, нижняя заметно голубее. Снято по двум строкам. */
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  @media (min-width:1024px){
+    /* Только background-IMAGE. Сокращённое `background` сбрасывает
+       background-clip в border-box, и заголовок заливается плашкой
+       вместо букв — уже наступали 08.09.2026. */
+    .km-t{background-image:linear-gradient(180deg,#FCFCFF,#C0DEF4)}
+  }
+}
+/* «Меньше движения»: ролик не подставляется вовсе (см. скрипт), на экране
+   остаётся постер — первый кадр той же комнаты. */
 
 </style>
 </head>
@@ -2992,7 +3082,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      `v2-room.webp`, кодом оно не рисуется. Устройство → sayt-nn/ustroystvo.md. -->
 <section class="cr km" id="room" aria-labelledby="kmT">
   <div class="km-in">
-    <h2 class="km-t" id="kmT">НОВЫЙ ГОД + КОСМОС =<br>НАСТОЯЩАЯ МАГИЯ<br>В ОФОРМЛЕНИИ ПЛОЩАДКИ!</h2>
+    <!-- Ролик комнаты. Источники лежат в data-атрибутах, а не в src: подставляет
+         их скрипт и только на широком экране — на телефоне тут фотография ниже,
+         и качать мегабайты незачем. Постер — первый кадр того же ролика. -->
+    <div class="km-vid" aria-hidden="true">
+      <img class="km-still" src="v2-room-poster.webp" width="1920" height="1090" alt=""
+           loading="lazy" decoding="async">
+      <video class="km-video" muted autoplay loop playsinline webkit-playsinline preload="none"
+             disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"
+             tabindex="-1" width="1920" height="1090"
+             data-wide="v2-room-1920.mp4" data-mid="v2-room-1280.mp4"></video>
+    </div>
+    <h2 class="km-t" id="kmT">НОВЫЙ ГОД + КОСМОС =<br class="km-nl"> НАСТОЯЩАЯ МАГИЯ<br>В ОФОРМЛЕНИИ ПЛОЩАДКИ!</h2>
     <p class="km-pic"><img src="v2-room.webp" width="1080" height="728"
         alt="Бревенчатая изба: на потолке звёздное небо с планетами, по краю гирлянды, у стены телескоп и старинные звёздные карты"
         loading="lazy" decoding="async"></p>
@@ -5681,6 +5782,114 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.addEventListener('pointermove', move, {passive:true});
   /* курсор ушёл из окна — шары возвращаются на место */
   document.addEventListener('pointerleave', function(){ px = py = 0; ask(); });
+})();
+</script>
+
+
+<script>
+/* ЭКРАН 8: ролик комнаты на компьютере.
+   Файл подставляется в <video> ТОЛЬКО когда экран настоящий компьютерный
+   и уже подъехал к окну. На телефоне ролика нет вовсе — там фотография,
+   а у <video> нет ни src, ни <source>. Это единственный надёжный способ
+   не качать мегабайты: display:none файл не отменяет, атрибут media
+   у <source> Chrome игнорирует, а preload="none" рядом с autoplay
+   не соблюдается. Ставишь src в разметке — телефон качает.
+
+   Признак «компьютер» — три условия сразу: ширина, наличие курсора
+   и его точность. По одной ширине планшет в альбомной ориентации
+   проскочит и утянет ролик. Тот же признак у первого экрана (TOUCH).
+
+   Если ролик не пошёл (энергосбережение Safari, «меньше движения»,
+   экономия трафика, медленная сеть) — на экране остаётся постер,
+   и экран выглядит целым. Ролик проявляется, только когда кадр
+   реально нарисован. */
+(function(){
+  var wrap = document.querySelector('.km-vid');
+  var v = wrap && wrap.querySelector('video');
+  if(!v) return;
+
+  var comp = window.matchMedia('(min-width:1024px) and (hover:hover) and (pointer:fine)');
+  var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var net  = navigator.connection || {};
+  /* Экономия трафика и медленная сеть. Признак есть только в Chrome
+     и Edge; остальных прикрывает то, что на телефоне ролика и так нет. */
+  var skupo = net.saveData === true || /(^|-)(slow-)?2g$|^3g$/.test(net.effectiveType || '');
+  var started = false, shown = false, tries = 0;
+
+  function mozhno(){ return comp.matches && !calm.matches && !skupo }
+
+  /* Показываем ролик только когда кадр действительно нарисован: Safari
+     присылает 'canplay' и 'loadeddata' раньше первой картинки, и на
+     этой разнице видно чёрную вспышку. */
+  function pokazat(){ if(!shown){ shown = true; v.className = 'km-video on' } }
+  function zhdatKadr(){
+    if(v.requestVideoFrameCallback) v.requestVideoFrameCallback(pokazat);
+    else v.addEventListener('playing', pokazat, {once:true});
+  }
+
+  function play(){
+    var p = v.play();
+    if(p && p.catch) p.catch(function(){
+      /* Safari в режиме энергосбережения запрещает автозапуск даже
+         беззвучного видео, и распознать этот режим нельзя. Пробуем
+         несколько раз, потом ждём любого жеста человека — жест снимает
+         запрет. Не вышло и так — молча остаёмся с постером. */
+      if(++tries < 4) setTimeout(play, 320);
+      else document.addEventListener('pointerdown', play, {once:true});
+    });
+  }
+
+  function start(){
+    if(started || !mozhno()) return;
+    started = true;
+    /* muted выставляем и свойством тоже, ДО src: Safari решает про звук
+       в момент подстановки файла, и одного атрибута в разметке ему мало. */
+    v.muted = true; v.defaultMuted = true; v.playsInline = true;
+    /* Какой файл: считаем по НАСТОЯЩИМ точкам экрана, а не по ширине окна.
+       На ретине 1440 точек вёрстки — это 2880 настоящих, и лёгкий файл
+       на них расплывётся. Плотность выше двух не учитываем: разницы
+       уже не видно, а вес растёт вдвое. */
+    var nado = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
+    v.src = (nado > 1360 ? v.getAttribute('data-wide') : v.getAttribute('data-mid'));
+    v.load();
+    zhdatKadr();
+    play();
+  }
+
+  function vidno(){
+    var r = wrap.getBoundingClientRect();
+    return r.bottom > 0 && r.top < (window.innerHeight || 0);
+  }
+  function tick(){
+    if(!started) return;
+    /* Невидимый ролик обязательно на паузу: декодер греет ноутбук,
+       а на этой странице он уже второй — первый экран крутит свой. */
+    if(mozhno() && vidno() && !document.hidden) play(); else v.pause();
+  }
+
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){
+      for(var i = 0; i < es.length; i++){
+        if(es[i].isIntersecting){ start(); play() }
+        else if(started) v.pause();
+      }
+    }, {rootMargin:'300px'}).observe(wrap);
+  } else {
+    start();
+    window.addEventListener('scroll', tick, {passive:true});
+  }
+
+  document.addEventListener('visibilitychange', tick);
+
+  /* Человек может передумать уже на открытой странице: включить
+     «меньше движения» или растянуть окно с телефонного до компьютерного. */
+  function slushat(mq, fn){ if(mq.addEventListener) mq.addEventListener('change', fn);
+    else if(mq.addListener) mq.addListener(fn) }
+  slushat(comp, function(){ if(mozhno()){ start(); tick() } else v.pause() });
+  slushat(calm, function(){
+    if(calm.matches){ v.pause(); shown = false; v.className = 'km-video' }
+    else if(vidno()){ start(); play() }
+  });
 })();
 </script>
 
