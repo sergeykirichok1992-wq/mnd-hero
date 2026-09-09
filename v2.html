@@ -1749,12 +1749,14 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   transform:translateY(1px); background:rgba(227,179,78,.16);
   box-shadow:inset 0 0 0 2px rgba(227,179,78,.9);
 }
-/* На белых экранах 2-3 прозрачная кнопка стоит на светлом: тонкое золото
-   на белом почти не видно, поэтому там обводка и надпись темнее. */
-.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost{
+/* На светлых экранах (2, 3 и одиннадцатый) прозрачная кнопка стоит на белом:
+   тонкое золото на нём почти не видно, поэтому там обводка и надпись темнее.
+   Заводишь новый светлый экран - добавляй его сюда, иначе кнопка на нём
+   выйдет бледной обводкой, которую не видно ни на солнце, ни на проекторе. */
+.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost,.sv .zs-btn--ghost{
   color:#8A6111; box-shadow:inset 0 0 0 2px rgba(160,116,32,.75);
 }
-.cr-s2 .zs-btn--ghost:hover,.cr-s3 .zs-btn--ghost:hover{
+.cr-s2 .zs-btn--ghost:hover,.cr-s3 .zs-btn--ghost:hover,.sv .zs-btn--ghost:hover{
   color:#3A2705; background:rgba(227,179,78,.16);
   box-shadow:inset 0 0 0 2px rgba(160,116,32,1), 0 16px 34px -18px rgba(160,116,32,.5);
 }
@@ -3111,6 +3113,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (min-width:560px){  .pg{--w: calc((var(--inner) -     var(--gap)) / 2)} }
 @media (min-width:900px){  .pg{--w: calc((var(--inner) - 2 * var(--gap)) / 3)} }
 @media (min-width:1250px){ .pg{--w: calc((var(--inner) - 3 * var(--gap)) / 4)} }
+</style>
+<!-- Стили одиннадцатого экрана вынесены в ОТДЕЛЬНЫЙ <style> намеренно, как
+     и стили девятого с десятым: файл правят из двух окон, и перекос скобок
+     в соседнем блоке не должен утаскивать этот экран внутрь чужого @media.
+     → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
 /* ==================== ЭКРАН 11: ЗАЯВКА НА СВЕТЛОМ ====================
    Та же форма, что на пятом экране, только день вместо ночи: после тёмно-синего
    поля с карточками программы страница выходит на дневной снег и там просит
@@ -3148,6 +3156,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      низ сугроба, и заголовок должен начинаться заведомо ниже его фактуры. */
   padding:clamp(96px,10vw,190px) 0 clamp(72px,7.4vw,124px);
 }
+/* ЗАЕЗД СУГРОБА НА КАРТОЧКИ ОГРАНИЧЕН. Общий класс .cr-snow поднимает картинку
+   на 30 % её высоты, а высота считается от ШИРИНЫ ОКНА и растёт без потолка.
+   Воздух под карточками десятого экрана считается от --u, а тот выше 1555 px
+   упирается в потолок и замирает на 99 px. Замер на живой странице: на 1440
+   гребни не доходят до карточек 17 px, на 1920 касаются, на 2560 накрывают
+   нижние 35 px - ровно ту полосу, где стоит плашка «входит в программу».
+   Поэтому подъём здесь ограничен сверху: до 1810 px он прежний, дальше стоит.
+   Второй стык (первый↔второй экран) не трогаем - там под снегом ночная сцена,
+   накрывать нечего. Общий класс менять нельзя: он держит оба стыка. */
+.sv .cr-snow{transform:translateY(max(-30%,-168px))}
+/* На телефоне у сугроба своя пропорция и свой заезд (34 %). Замер: на 390 px
+   всё в порядке, а в полосе 600-760 px гребни налезают на карточки на 15 px.
+   Потолок 108 px маленькие экраны не трогает и снимает наезд у больших. */
+@media (max-width:760px){ .sv .cr-snow{transform:translateY(max(-34%,-108px))} }
 /* Отблески дневного снега: два холодных голубых и один тёплый. Все круглые,
    с прозрачным краем, и все прижаты к низу - выше идёт сугроб, там любой
    оттенок дал бы черту. Без filter:blur, по той же причине, что на пятом
@@ -3180,7 +3202,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 .sv-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); font-family:"Golos Text",Arial,sans-serif;
   font-size:clamp(9.68px,.86vw,11.05px); font-weight:600; letter-spacing:.24em;
-  text-transform:uppercase; color:#6E7FA6}
+  text-transform:uppercase; color:#55638A}
 /* Заголовок в две строки, перенос принудительный - золотая часть не должна
    рваться. Ширину в ch не задавать: пока Blogger Sans не загрузился, строку
    рисует запасной Golos, он шире на 21 % → lessons/ch-zavisit-ot-shrifta.md.
@@ -3192,9 +3214,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* «по цене сентября» - золотом. Золото сайта (#E3B34E) взято для тёмного неба
    и на белом почти не читается, поэтому здесь оно на два тона гуще: сначала
    плоский цвет запасом, потом градиент по буквам там, где браузер умеет. */
-.sv-t b{font-weight:700; color:#C9861F}
+.sv-t b{font-weight:700; color:#A96D0D}
 @supports ((-webkit-background-clip:text) or (background-clip:text)){
-  .sv-t b{background:linear-gradient(180deg,#E4AE43 0%,#D2941F 42%,#B2760F 100%);
+  .sv-t b{background:linear-gradient(180deg,#BC8118 0%,#A96D0D 45%,#8F5B08 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
 }
 .sv-lede{margin:clamp(23px,2.6vw,33.15px) auto 0; max-width:92ch; text-wrap:balance;
@@ -3228,12 +3250,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* background-color, а не сокращение `background`: у выпадающего списка
      фоном лежит нарисованная стрелка, и сокращение стёрло бы ей и повтор,
      и положение - стрелка размножилась бы плиткой по всему полю. */
-  border:1px solid rgba(0,27,113,.16); background-color:#fff; color:#0B1B3F;
+  border:1px solid rgba(0,27,113,.5); background-color:#fff; color:#0B1B3F;
   box-shadow:inset 0 1px 2px rgba(0,27,113,.05);
 }
-.sv .zs-inp::placeholder{color:rgba(11,27,63,.36)}
-.sv .zs-inp:focus{border-color:#D2941F; background-color:#fff;
-  box-shadow:0 0 0 3px rgba(210,148,31,.22), inset 0 1px 2px rgba(0,27,113,.04)}
+.sv .zs-inp::placeholder{color:rgba(11,27,63,.55)}
+.sv .zs-inp:focus{border-color:#B0700F; background-color:#fff;
+  box-shadow:0 0 0 3px rgba(176,112,15,.35), inset 0 1px 2px rgba(0,27,113,.04)}
 .sv .zs-inp.bad{border-color:#D64550; box-shadow:0 0 0 3px rgba(214,69,80,.14)}
 /* стрелка выпадающего списка: серо-голубая вместо светлой, иначе на белом
    поле её не видно. Цвет вшит в адрес картинки, поэтому меняется вся картинка;
@@ -3241,11 +3263,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .sv .zs-sel{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none' stroke='%235A6A93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1l6 6 6-6'/%3E%3C/svg%3E");
 }
-.sv .zs-sel:invalid{color:rgba(11,27,63,.42)}
+.sv .zs-sel:invalid{color:rgba(11,27,63,.62)}
 .sv .zs-sel option{background:#fff; color:#0B1B3F}
 .sv .zs-sel option[value=""]{color:rgba(11,27,63,.5)}
 .sv .zs-opt{border:1px solid rgba(0,27,113,.16); background:#fff; color:#17264F}
-.sv .zs-opt em{color:#6B7CA5}
+.sv .zs-opt em{color:#55638A}
 .sv .zs-opt:hover{border-color:rgba(210,148,31,.5); background:#FFFDF6}
 .sv .zs-opt.on{
   border-color:#D2941F; color:#0B1B3F;
@@ -3255,11 +3277,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .sv .zs-opt.on em{color:#8A6111}
 .sv .zs-seg.bad .zs-opt{border-color:rgba(214,69,80,.55)}
 .sv .zs-err{color:#C2333B}
-.sv .zs-fine{color:#6B7CA5}
+.sv .zs-fine{color:#55638A}
 .sv .zs-fine a{color:#3F4F76}
-/* Кольцо фокуса у кнопки в общем правиле светлое (для тёмного неба).
-   На белом его не видно вовсе - здесь оно тёмно-золотое. */
+/* ФОКУС С КЛАВИАТУРЫ. В общих правилах он нарисован для тёмного неба:
+   светлое золото по чёрному. На белом его не видно вовсе, и человек, который
+   идёт по форме табом, теряет место - непонятно, в каком он поле. Поэтому на
+   всём экране один и тот же знак фокуса: тёмно-золотая обводка.
+   У полей она стоит на :focus-visible, а не на :focus: щелчок мышью не должен
+   обводить поле рамкой в три пикселя, там хватает мягкого кольца ниже. */
 .sv .zs-btn:focus-visible{outline-color:rgba(180,83,9,.9)}
+.sv .zs-inp:focus-visible{outline:3px solid rgba(180,83,9,.9); outline-offset:2px}
+.sv .zs-opt:has(input:focus-visible){outline-color:rgba(180,83,9,.9)}
 
 /* ---------- «заявка принята» ---------- */
 .sv-done[hidden]{display:none}
@@ -7548,6 +7576,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     window.zsBind(form, {
       source: '11-й экран, светлая форма',
       onDone: function(){
+        /* Экран последний на странице, и короткая плашка «заявка принята»
+           вместо высокой формы укоротила бы документ на 250-540 px - страницу
+           подбросило бы вверх ровно в тот момент, когда человек ждёт ответа.
+           Держим высоту бланка той, что была до отправки. */
+        var card = form.closest ? form.closest('.sv-card') : null;
+        if (card) card.style.minHeight = card.getBoundingClientRect().height + 'px';
         form.hidden = true;
         done.hidden = false;
         try { done.focus({preventScroll:true}); } catch(_){ }
