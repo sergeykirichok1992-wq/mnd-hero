@@ -2941,7 +2941,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .pgs .cr-cont{width:min(94vw,1462px); margin:0 auto;
     padding-inline:clamp(16px,3vw,47.6px)}
 }
-@media (max-width:559px){ .pgs .cr-cont{width:100%; padding-inline:25px} }
+@media (max-width:559px){ .pgs .cr-cont{width:100%; padding-inline:19px} }
 .pgs-lead{
   max-width:calc(620 * var(--u)); margin:0 auto calc(52 * var(--u));
   text-align:center; text-wrap:balance;
@@ -2971,9 +2971,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    ширины окна и на телефоне всегда упиралась бы в свой нижний предел. */
 @media (max-width:559px){
   .pgs{--gap:28px}
-  .pgs-row{padding:0 42px}
-  .pgs-t{font-size:52px}                    /* было 26 */
-  .pgs-lead{font-size:25.5px}               /* было 17 */
+  /* воздух над заголовком на 10 % меньше прежнего: было 100 px */
+  .pgs{padding-top:90px}
+  .pgs-row{padding:0 19px}
+  .pgs-t{font-size:52px}                    /* вдвое крупнее прежних 26 */
+  .pgs-lead{font-size:17.85px}              /* на 30 % меньше прежних 25,5 */
 }
 .pgs-defs{position:absolute; width:0; height:0; overflow:hidden}
 
@@ -2988,7 +2990,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      и заголовок вышел 1,5 px, а окно с фотографией схлопнулось в ноль.
      Процент остаётся ровно в одном месте — в самом `width` ниже, страховкой
      на случай, если 100vw посчитает вместе с полосой прокрутки. */
-  --w: calc(100vw - 84px);
+  --w: calc(100vw - 38px);
   --u2: calc(var(--w) / 1045);
   --tilt: -2.83deg;        /* наклон рамки; у чётных карточек он зеркалится */
   --tint: 222;             /* тон карточки; насыщенность и светлота у всех одни */
@@ -3082,10 +3084,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pg-p{
   margin-top:calc(45 * var(--u2)); margin-bottom:0;
   font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
-  /* 09.09.2026: кегль на 20 % меньше макетного (57,3 → 45,84), межстрочный
-     на 15 % (74,49 → 63,3) — просьба Серёги. Нижние пределы уменьшены
-     в той же пропорции. */
-  font-size:max(13.2px, calc(45.84 * var(--u2)));
+  /* Кегль макетный. Межстрочный на 15 % меньше макетного (74,49 → 63,3) —
+     просьба Серёги 09.09.2026, и она общая для всех ширин.
+     А кегль на 20 % меньше он просил ТОЛЬКО для телефона — это ниже,
+     в блоке @media (max-width:559px). */
+  font-size:max(16.5px, calc(57.3 * var(--u2)));
   line-height:max(18.3px, calc(63.3 * var(--u2)));
   color:#000;
 }
@@ -3130,6 +3133,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      и вылезают вверх, а flex центрует строку, а не буквы. Проверено замером:
      надпись упиралась в верхний край плашки. */
   line-height:1.25; letter-spacing:.01em;
+}
+
+/* Кегль абзаца на 20 % меньше макетного — ТОЛЬКО на телефоне (просьба Серёги
+   09.09.2026). Правило стоит здесь, ПОСЛЕ основного `.pg-p`, а не выше рядом
+   с остальными телефонными: вес у селекторов одинаковый, и решает порядок
+   в файле — сверху его перебивало обратно. */
+@media (max-width:559px){
+  .pg-p{font-size:max(13.2px, calc(45.84 * var(--u2)))}
 }
 
 /* ЧИСЛО КОЛОНОК. Ниже 560 px — одна, дальше две, три и четыре.
