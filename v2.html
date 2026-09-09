@@ -3560,16 +3560,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-size:calc(20 * var(--u)); line-height:1.45;
   max-width:calc(900 * var(--u)); margin:calc(18 * var(--u)) auto 0;
 }
-.mk-ceh-grid{
-  display:grid; grid-template-columns:minmax(0,.82fr) minmax(0,1fr);
-  gap:calc(50 * var(--u)); align-items:center; margin-top:calc(46 * var(--u));
-}
+/* Коллаж цеха на сайте лежит в двух видах, и здесь взяты оба: широкий
+   в карамельной рамке (1794x688) для компьютера и вертикальный (1080x1920)
+   для телефона. Поэтому и раскладка разная: на компьютере снимок идёт
+   во всю ширину блока, а пункты встают под ним в две колонки; на телефоне
+   всё столбиком. Переключает `<picture>` по той же границе 768 px. */
+.mk-ceh-grid{margin-top:calc(46 * var(--u))}
 .mk-ceh-shot{margin:0}
-.mk-ceh-shot img{
-  width:100%; height:auto; display:block; border-radius:calc(18 * var(--u));
-  box-shadow:0 14px 34px rgba(140,27,18,.18);
+.mk-ceh-shot img{width:100%; height:auto; display:block}
+.mk-ceh-list{
+  list-style:none; margin:calc(42 * var(--u)) 0 0; padding:0; display:grid;
+  grid-template-columns:1fr 1fr; gap:calc(26 * var(--u)) calc(48 * var(--u));
 }
-.mk-ceh-list{list-style:none; margin:0; padding:0; display:grid; gap:calc(24 * var(--u))}
 .mk-li{
   display:grid; grid-template-columns:calc(34 * var(--u)) 1fr; gap:calc(16 * var(--u));
   align-items:start; font-family:"CR Blogger",Arial,sans-serif;
@@ -3600,8 +3602,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk-ceh{margin-top:34px}
   .mk-ceh-t{font-size:21px}
   .mk-ceh-lead{font-size:14px; margin-top:12px}
-  .mk-ceh-grid{grid-template-columns:1fr; gap:20px; margin-top:22px}
-  .mk-ceh-list{gap:14px}
+  .mk-ceh-grid{margin-top:22px}
+  /* Вертикальный снимок - обычное фото без своей рамки, поэтому скругление
+     и тень тут свои. У широкого рамка нарисована в файле, ему не нужны. */
+  .mk-ceh-shot img{border-radius:14px; box-shadow:0 10px 26px rgba(140,27,18,.18)}
+  .mk-ceh-list{grid-template-columns:1fr; gap:14px; margin-top:20px}
   .mk-li{font-size:15px; grid-template-columns:26px 1fr; gap:10px}
   .mk-cta{margin-top:26px}
   .mk-dots{gap:7px; margin-top:16px}
@@ -4907,8 +4912,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
         <div class="mk-ceh-grid">
           <figure class="mk-ceh-shot">
-            <img src="mk/ceh.webp?v=1" width="900" height="1600" loading="lazy" decoding="async"
-                 alt="Карамельный цех: мастера в халатах и шапочках готовят заготовки на стальных столах">
+            <picture>
+              <source media="(min-width:768px)" srcset="mk/ceh-wide.webp?v=1" width="1600" height="614">
+              <img src="mk/ceh.webp?v=1" width="900" height="1600" loading="lazy" decoding="async"
+                   alt="Карамельный цех: мастера в халатах и шапочках готовят заготовки на стальных столах">
+            </picture>
           </figure>
 
           <ul class="mk-ceh-list">
