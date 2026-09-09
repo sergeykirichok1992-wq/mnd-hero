@@ -3275,6 +3275,46 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   left:0; right:0; top:clamp(10px,1.2vw,20px);
   width:100%; height:auto; display:block;
 }
+/* ---------- девушка-карамельщица ----------
+   Картинка Серёги (`~/Desktop/новый сайт/девушка длф формы.png`, 628x1418,
+   честная прозрачность, мягкая тень вшита в саму картинку). Стоит справа
+   от полей, наполовину на бланке: правым плечом заходит за его край, ногами
+   уходит ниже нижней кромки - как в макете.
+
+   ШИРИНА 19,5 %, НЕ БОЛЬШЕ. Поля формы идут посередине бланка полосой в 880 px,
+   и справа от них остаётся ~240 px пустого места. Девушка ровно в него и встаёт,
+   а недостающее добирает вылетом за правый край бланка. Сделаешь шире - встанет
+   на поле «Город» (замер: на 20,6 % зазор до поля 2 px).
+
+   ВЫЛЕТ ВПРАВО ОГРАНИЧЕН СВОБОДНЫМ МЕСТОМ. Бланк шире 1367 px не бывает никогда
+   (его держит контейнер сайта), а окно бывает любым. Считаем, сколько места
+   осталось между краем бланка и краем окна, и вылезаем не больше чем на него -
+   иначе на 1500 px девушка вышла бы за окно и появилась горизонтальная
+   прокрутка. Тот же приём, что у Сатурна и кометы пятого экрана.
+
+   z-index:-1 по той же причине, что у гирлянды: она элемент с position:absolute
+   и без своего слоя рисовалась бы поверх полей. Отрицательный слой ставит её
+   между фоном бланка и его начинкой - на текст и поля она наехать не может
+   ни при какой ширине окна. За правый край бланка при этом вылезает нормально:
+   слой считается внутри бланка, а сам бланк лежит выше фона экрана.
+
+   ТОЛЬКО НА КОМПЬЮТЕРЕ (от 1280 px). Просьба Серёги 09.09.2026: на телефоне
+   её не надо - там пустого места справа нет вовсе, она легла бы на форму.
+   Разметки у картинки в HTML нет, её создаёт скрипт экрана по факту ширины
+   окна, чтобы телефон не качал 150 КБ ради спрятанного
+   → lessons/skryvat-lentu-display-none-chtoby-ne-kachalos.md */
+.sv-dev{
+  /* сколько пустого места осталось сбоку от бланка; 24 px - зазор до края окна */
+  --free:max(0px, (100vw - 100%) / 2 - 24px);
+  position:absolute; z-index:-1; pointer-events:none;
+  right:calc(-1 * min(7%, var(--free))); bottom:-9%;
+  width:19.5%; height:auto; display:block;
+}
+/* Ниже 1500 px бланк становится уже, а полоса полей остаётся те же 880 px -
+   пустого места справа не хватает, и девушка встаёт на поле «Город» (замер:
+   на 1440 зазор 3 px, на 1280 наезд 46 px). Там её просто нет. */
+@media (max-width:1499px){ .sv-dev{display:none} }
+
 .sv-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); font-family:"Golos Text",Arial,sans-serif;
   font-size:clamp(9.68px,.86vw,11.05px); font-weight:600; letter-spacing:.24em;
   text-transform:uppercase; color:#4E5D82}
@@ -7856,6 +7896,29 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     clearTimeout(fitTimer);
     fitTimer = setTimeout(fitT, 150);
   }, {passive:true});
+
+  /* ---------- девушка-карамельщица ----------
+     Создаём картинку только на широком экране (от 1500 px): уже неё бланк
+     становится тесным для неё, а на телефоне её не
+     показываем по просьбе Серёги, и качать её туда незачем. `loading`
+     и `decoding` ставим ДО `src` - после `src` загрузка уже началась
+     и они опоздают → lessons/loading-lazy-stavit-do-src.md */
+  var card = document.querySelector('.sv-card');
+  var wide = window.matchMedia('(min-width:1500px)');
+  function makeDev(){
+    if (!card || card.querySelector('.sv-dev') || !wide.matches) return;
+    var im = document.createElement('img');
+    im.className = 'sv-dev';
+    im.loading = 'lazy'; im.decoding = 'async'; im.alt = ''; im.setAttribute('aria-hidden','true');
+    im.width = 628; im.height = 1418;
+    im.sizes = '18vw';
+    im.srcset = 'v2-sv-devushka-420.webp 420w, v2-sv-devushka.webp 628w';
+    im.src = 'v2-sv-devushka.webp';
+    card.appendChild(im);
+  }
+  makeDev();
+  wide.addEventListener ? wide.addEventListener('change', makeDev)
+                        : wide.addListener && wide.addListener(makeDev);
 
   var form = document.getElementById('svForm'), done = document.getElementById('svDone');
   if (!form || !done) return;
