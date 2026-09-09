@@ -3677,13 +3677,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    бы заодно каждую летающую конфету со своей вшитой тенью — тень поехала бы
    вместе с ними. */
 .mk{
-  /* Ширина рамки — единственный размер экрана. Потолок 1160 px, а на узких
-     окнах её ограничивает ВЫЛЕТ КОНФЕТ: левая уходит за рамку на 9,25 %
-     её ширины, правая на 7,12 %, и без запаса край окна срезал бы их
-     (проверено на 500, 768, 1024 и 1280 — резало на 4-22 px). Отсюда
-     делитель 1,24: половина рамки плюс вылет должны уместиться в половину
-     окна, плюс запас на полосу прокрутки, которую 100vw не учитывает. */
-  --mk-w: min(1160px, calc((100vw - 10px) / 1.24));
+  /* Ширина ХОЛСТА — единственный размер экрана. Холст это весь макет Серёги
+     2099x1098: рамка занимает в нём 1778 px по ширине, а по краям остаются
+     поля, в которых висят конфеты. Поэтому вылетать за блок нечему и запас
+     под конфеты больше не нужен. Видимая рамка = 84,7 % холста: при 1340
+     это те же 1135 px, что были у прежней рамки. */
+  --mk-w: min(1340px, 100%);
   --mk-arw: clamp(44px, 4.4vw, 62px);
   --mk-fl: 12%;                   /* размах полёта конфет, доля их высоты */
   background:#FFE2EA; position:relative; z-index:25; overflow-x:clip;
@@ -3698,11 +3697,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .mk-gap2{height:calc(52 * var(--u))}
 
 .mk-slider{position:relative; width:var(--mk-w); margin-inline:auto}
-.mk-box{position:relative; aspect-ratio:1783 / 1061}
+.mk-box{position:relative; aspect-ratio:2099 / 1098}
 .mk-view{
-  position:absolute; left:2.0191%; top:1.9793%; width:96.0179%; height:96.0415%;
-  border-radius:3.2% / 5.4%; overflow:hidden; background:#F6D2DA;
-  box-shadow:0 16px 34px rgba(140,27,18,.20);
+  position:absolute; left:9.5760%; top:2.4590%; width:81.5627%; height:92.8051%;
+  border-radius:3.5% / 5.9%; overflow:hidden; background:#F6D2DA;
   touch-action:pan-y; cursor:grab;
 }
 .mk-view:active{cursor:grabbing}
@@ -3716,8 +3714,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    применяет их как стиль, и без этой строки конфета остаётся 318 px высотой
    при ширине в 48: на телефоне обе конфеты вытягивались в полосы во весь экран. */
 .mk-candy{position:absolute; z-index:3; height:auto; pointer-events:none; animation:mk-float 4.4s ease-in-out infinite}
-.mk-candy--a{left:-9.2541%; top:14.9859%; width:17.3864%}
-.mk-candy--b{left:90.4094%; top:63.9962%; width:16.7134%; animation-duration:5.6s; animation-delay:-1.9s}
+.mk-candy--a{left:0%; top:15.0273%; width:14.7689%}
+.mk-candy--b{left:84.6594%; top:62.3862%; width:14.1972%; animation-duration:5.6s; animation-delay:-1.9s}
 @keyframes mk-float{
   0%,100%{transform:translateY(calc(var(--mk-fl) * -1))}
   50%    {transform:translateY(var(--mk-fl))}
@@ -3740,8 +3738,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   transition:transform .18s ease, box-shadow .18s ease, opacity .2s ease;
 }
 .mk-arw svg{width:34%; height:34%; fill:none; stroke:#8C1B12; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round}
-.mk-arw--prev{left:-5.8%}
-.mk-arw--next{right:-5.8%}
+.mk-arw--prev{left:0.8%}
+.mk-arw--next{right:0.8%}
 .mk-arw[disabled]{opacity:.3; cursor:default}
 .mk-arw:focus-visible{outline:3px solid #8C1B12; outline-offset:3px}
 @media (hover:hover) and (pointer:fine){
@@ -3761,9 +3759,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* Общий `.cr-cont` ниже 768 px идёт без полей — здесь они обязательны:
      в них помещается вылет летающих конфет (см. шапку блока). */
   .mk .cr-cont{padding-inline:16px}
-  /* На телефоне конфеты уведены ближе к рамке (вылет 4,2 %), поэтому и запас
-     нужен меньший — иначе рамка худела бы зря на и без того узком экране. */
-  .mk{padding:36px 0 42px; --mk-arw:36px; --mk-w:min(100%, calc((100vw - 10px) / 1.10))}
+  .mk{padding:36px 0 42px; --mk-arw:36px}
   /* Заголовок на телефоне мельче общих 13 px: строка «ВОТ КАКИЕ КРАСИВЫЕ
      ЛЕДЕНЦЫ» при 39 px готовой строки ломается на три и вместе со второй
      половиной съедает пол-экрана — на фотографию, ради которой экран
@@ -3773,10 +3769,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk-gap1{height:12px}
   .mk-gap2{height:24px}
   .mk-br{display:none}
-  .mk-candy--a{left:-4.2%; width:12.4%}
-  .mk-candy--b{left:92.4%; width:11.8%}
-  .mk-arw--prev{left:2.6%}
-  .mk-arw--next{right:2.6%}
+  .mk .cr-cont{padding-inline:8px}
+  .mk-arw--prev{left:1.4%}
+  .mk-arw--next{right:1.4%}
   .mk-dots{gap:7px; margin-top:16px}
   .mk-dot{width:8px; height:8px}
   .mk-dot.is-on{width:26px}
@@ -4873,7 +4868,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           </div>
         </div>
 
-        <img class="mk-frame" src="mk/frame.webp?v=1" width="1783" height="1061" alt="" aria-hidden="true" decoding="async">
+        <img class="mk-frame" src="mk/frame.webp?v=2" width="2099" height="1098" alt="" aria-hidden="true" decoding="async">
         <img class="mk-candy mk-candy--a" src="mk/candy-a.webp?v=1" width="310" height="318" alt="" aria-hidden="true" decoding="async">
         <img class="mk-candy mk-candy--b" src="mk/candy-b.webp?v=1" width="298" height="312" alt="" aria-hidden="true" decoding="async">
 
