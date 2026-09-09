@@ -7231,6 +7231,71 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </script>
 
 <script>
+/* ЭКРАН 7: НА КОМПЬЮТЕРЕ ПЕРВЫЕ ДВА СЛАЙДА МЕНЯЮТСЯ МЕСТАМИ (Серёга 09.09.2026).
+   Просьба была только про компьютерную версию: там экран открывается слайдом
+   с тремя вертикальными кадрами, а пара горизонтальных уходит на второе место.
+   На телефоне (до 768 px) порядок остаётся прежним — горизонтальная пара первая.
+
+   Почему скриптом, а не разметкой и не порядком в стилях:
+     - разметка одна на обе версии, а порядок нужен разный;
+     - `order` во флексбоксе меняет только картинку на экране, а карусель
+       берёт слайд по номеру в разметке (`strip.children[n]`) — высота окна
+       и стрелки начали бы считаться от чужого слайда.
+   Поэтому переставляем сами узлы, и для карусели это просто такой порядок.
+
+   Скрипт стоит ПЕРЕД блоком карусели намеренно: тот при запуске запоминает
+   миниатюры и сразу показывает первый слайд, и к этому моменту перестановка
+   уже должна быть сделана. Переставляем и полосу миниатюр, и номера слайдов
+   у них (`data-i`, подпись для читалки) — иначе щелчок по миниатюре увёл бы
+   не туда. Порог тот же 768 px, что и у сетки слайдов. */
+(function(){
+  var strip  = document.getElementById('krStrip'),
+      thumbs = document.getElementById('krThumbs');
+  if (!strip || !thumbs || !window.matchMedia) return;
+  if (strip.children.length < 2) return;
+
+  /* Группы миниатюр снимаем ОДИН раз, до первой перестановки: дальше номера
+     у них меняются, и искать по data-i было бы уже поздно. */
+  function group(n){
+    var out = [], all = thumbs.children;
+    for (var k = 0; k < all.length; k++)
+      if (+all[k].getAttribute('data-i') === n) out.push(all[k]);
+    return out;
+  }
+  var g0 = group(0), g1 = group(1);
+  if (!g0.length || !g1.length) return;
+
+  function renum(g, n){
+    for (var k = 0; k < g.length; k++){
+      g[k].setAttribute('data-i', n);
+      var t = g[k].getAttribute('aria-label') || '';
+      g[k].setAttribute('aria-label', t.replace(/^Слайд \d+/, 'Слайд ' + (n + 1)));
+    }
+  }
+
+  var swapped = false;
+  function apply(on){
+    if (on === swapped) return;
+    swapped = on;
+    strip.insertBefore(strip.children[1], strip.children[0]);
+    var first = on ? g1 : g0, second = on ? g0 : g1;
+    for (var k = 0; k < first.length; k++) thumbs.insertBefore(first[k], second[0]);
+    renum(first, 0); renum(second, 1);
+    /* Первый слайд качаем сразу: у вертикальных кадров в разметке стоит
+       `lazy`, и на компьютере они теперь открывают экран. */
+    var im = strip.children[0].querySelectorAll('img');
+    for (var j = 0; j < im.length; j++) im[j].loading = 'eager';
+  }
+
+  var mq = matchMedia('(min-width:768px)');
+  apply(mq.matches);
+  var onch = function(){ apply(mq.matches); };
+  if (mq.addEventListener) mq.addEventListener('change', onch);
+  else if (mq.addListener) mq.addListener(onch);
+})();
+</script>
+
+<script>
 /* ==================== ЭКРАН 7: КАРУСЕЛЬ ПЛОЩАДКИ ====================
    Пересказ присланного React-компонента на голом коде. Состояние одно —
    номер слайда; всё остальное из него следует:
