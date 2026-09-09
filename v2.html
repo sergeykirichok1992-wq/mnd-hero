@@ -3095,6 +3095,205 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (min-width:560px){  .pg{--w: calc((var(--inner) -     var(--gap)) / 2)} }
 @media (min-width:900px){  .pg{--w: calc((var(--inner) - 2 * var(--gap)) / 3)} }
 @media (min-width:1250px){ .pg{--w: calc((var(--inner) - 3 * var(--gap)) / 4)} }
+/* ==================== ЭКРАН 11: ЗАЯВКА НА СВЕТЛОМ ====================
+   Та же форма, что на пятом экране, только день вместо ночи: после тёмно-синего
+   поля с карточками программы страница выходит на дневной снег и там просит
+   оставить заявку. Логика формы общая на весь сайт (window.zsBind), своей
+   проверки телефона и своего приёмника у экрана нет - намеренно.
+
+   СТЫК С ДЕСЯТЫМ ЭКРАНОМ ДЕРЖИТ СУГРОБ - тот же класс .cr-snow, что стоит
+   на стыке первого и второго экранов. Одна картинка с прозрачным верхом:
+   гребни вылезают вверх, на тёмное поле карточек, а низ картинки - чистый
+   белый, ровно тот же, что у секции.
+
+   ПОЛЕ СЕКЦИИ ОБЯЗАНО БЫТЬ ЧИСТО БЕЛЫМ. Низ сугроба - сплошные 255,255,255
+   (замер картинок: фактура кончается на 41 % высоты, ниже ровное белое поле).
+   Стоит дать фону секции хоть какой-то оттенок - и по нижнему краю картинки
+   ляжет горизонтальная черта во всю ширину окна. Поэтому воздух экрану дают
+   не заливкой, а круглыми отблесками внизу: у них края прозрачные, черте
+   взяться неоткуда.
+
+   z-index:27 ОБЯЗАТЕЛЕН. Десятый экран стоит на 26 и рисует своё тёмно-синее
+   поле; сугроб, которому надо вылезти на него вверх, обязан быть выше
+   → lessons/element-na-shve-sekciy-z-index.md. Шапка сайта на 30, окно
+   заявки на 100 - под ними мы остаёмся.
+
+   ОБРЕЗКИ У СЕКЦИИ НЕТ И БЫТЬ НЕ МОЖЕТ: overflow:hidden срезал бы сугроб
+   ровно по верхней кромке. Поэтому от горизонтальной прокрутки страхуется
+   не секция, а сам слой отблесков - обрезка стоит у него.
+
+   Поля формы (.zs-*) сделаны под ТЁМНЫЙ фон: белый текст на полупрозрачном
+   белом. Здесь они перекрашены, но только внутри .sv - общие правила
+   не тронуты, ими живут и окно заявки, и пятый экран. */
+.sv{
+  position:relative; z-index:27;
+  background:#fff;
+  /* Воздуха сверху много намеренно: верхние ~22 % ширины окна занимает белый
+     низ сугроба, и заголовок должен начинаться заведомо ниже его фактуры. */
+  padding:clamp(96px,10vw,190px) 0 clamp(72px,7.4vw,124px);
+}
+/* Отблески дневного снега: два холодных голубых и один тёплый. Все круглые,
+   с прозрачным краем, и все прижаты к низу - выше идёт сугроб, там любой
+   оттенок дал бы черту. Без filter:blur, по той же причине, что на пятом
+   экране: мягкость даёт сам радиальный градиент, а размытие кругов роняет
+   частоту кадров втрое (замер 04.09.2026). */
+.sv-glow{position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden}
+.sv-glow i{position:absolute; display:block; border-radius:50%}
+.sv-glow i:nth-child(1){left:-16vw; bottom:-14%; width:66vw; height:58%;
+  background:radial-gradient(closest-side, rgba(198,219,255,.55) 0%, rgba(198,219,255,.3) 40%, rgba(198,219,255,0) 100%)}
+.sv-glow i:nth-child(2){right:-18vw; bottom:-6%; width:62vw; height:52%;
+  background:radial-gradient(closest-side, rgba(214,224,255,.5) 0%, rgba(214,224,255,.26) 40%, rgba(214,224,255,0) 100%)}
+.sv-glow i:nth-child(3){left:50%; bottom:-20%; width:74vw; height:46%; margin-left:-37vw;
+  background:radial-gradient(closest-side, rgba(255,232,186,.42) 0%, rgba(255,232,186,.2) 40%, rgba(255,232,186,0) 100%)}
+
+/* ---------- бланк ---------- */
+/* Светло-голубой лист на белом снегу. Тонкая кромка вместо тяжёлой тени:
+   на белом поле тень читается как грязь, а кромка держит форму листа.
+   Ширина и скругление - как у окна пятого экрана, чтобы два экрана заявки
+   на одной странице были одним и тем же бланком, а не двумя разными. */
+.sv-card{
+  position:relative; z-index:2; isolation:isolate;
+  width:min(100%,1400px); margin:0 auto; text-align:center;
+  padding:clamp(40px,4.6vw,74px) clamp(18px,3.8vw,61.2px) clamp(36px,4.2vw,66px);
+  border-radius:clamp(22px,2.1vw,30.6px);
+  background:linear-gradient(180deg,#FAFCFF 0%,#EDF3FF 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.10),
+    inset 0 1px 0 #fff,
+    0 34px 70px -46px rgba(0,27,113,.45);
+}
+.sv-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(9.68px,.86vw,11.05px); font-weight:600; letter-spacing:.24em;
+  text-transform:uppercase; color:#6E7FA6}
+/* Заголовок в две строки, перенос принудительный - золотая часть не должна
+   рваться. Ширину в ch не задавать: пока Blogger Sans не загрузился, строку
+   рисует запасной Golos, он шире на 21 % → lessons/ch-zavisit-ot-shrifta.md.
+   Страховку от лишней строки даёт скрипт экрана (он же уменьшит кегль). */
+.sv-t{margin:0 auto;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(26px,3.7vw,57.8px); line-height:1.06; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#001B71}
+/* «по цене сентября» - золотом. Золото сайта (#E3B34E) взято для тёмного неба
+   и на белом почти не читается, поэтому здесь оно на два тона гуще: сначала
+   плоский цвет запасом, потом градиент по буквам там, где браузер умеет. */
+.sv-t b{font-weight:700; color:#C9861F}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .sv-t b{background:linear-gradient(180deg,#E4AE43 0%,#D2941F 42%,#B2760F 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
+.sv-lede{margin:clamp(23px,2.6vw,33.15px) auto 0; max-width:92ch; text-wrap:balance;
+  font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(14.5px,1.12vw,16.57px); line-height:1.5; color:#3F4F76}
+.sv-lede b{font-weight:600; color:#8A6111}
+
+/* ---------- поля ----------
+   Раскладка ровно та же, что на пятом экране: лесенка от широкого к узкому,
+   поля 880 → плитки выбора 720 → кнопка 480. Ломается на тех же порогах. */
+.sv-form{margin-top:clamp(38px,4vw,56.1px); text-align:left}
+.sv-form[hidden]{display:none}
+.sv-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:clamp(14px,1.5vw,20.4px);
+  align-items:start; width:min(100%,880px); margin:0 auto}
+.sv-f{min-width:0}
+.sv-f--kind{grid-column:1 / -1; width:min(100%,720px); margin:clamp(2px,.4vw,6.8px) auto 0; text-align:center}
+.sv-f--kind .zs-lab{text-align:center}
+.sv-f--kind .zs-err{text-align:center}
+.sv-send{margin-top:clamp(36px,3.9vw,53.55px); display:flex; flex-direction:column; align-items:center}
+.sv-send .zs-btn{width:min(100%,480px)}
+.sv .zs-fine{max-width:72ch}
+@media (max-width:1300px){ .sv-grid{grid-template-columns:1fr 1fr} }
+@media (max-width:640px){  .sv-grid{grid-template-columns:1fr} }
+
+/* ---------- те же поля, только на светлом ----------
+   Перекрашиваем ТОЛЬКО внутри .sv. Общие правила .zs-* трогать нельзя:
+   на них стоят окно заявки и пятый экран, оба на ночном небе. */
+.sv .zs-lab{color:#5A6A93}
+.sv .zs-req{color:#C9861F}
+.sv .zs-inp{
+  /* background-color, а не сокращение `background`: у выпадающего списка
+     фоном лежит нарисованная стрелка, и сокращение стёрло бы ей и повтор,
+     и положение - стрелка размножилась бы плиткой по всему полю. */
+  border:1px solid rgba(0,27,113,.16); background-color:#fff; color:#0B1B3F;
+  box-shadow:inset 0 1px 2px rgba(0,27,113,.05);
+}
+.sv .zs-inp::placeholder{color:rgba(11,27,63,.36)}
+.sv .zs-inp:focus{border-color:#D2941F; background-color:#fff;
+  box-shadow:0 0 0 3px rgba(210,148,31,.22), inset 0 1px 2px rgba(0,27,113,.04)}
+.sv .zs-inp.bad{border-color:#D64550; box-shadow:0 0 0 3px rgba(214,69,80,.14)}
+/* стрелка выпадающего списка: серо-голубая вместо светлой, иначе на белом
+   поле её не видно. Цвет вшит в адрес картинки, поэтому меняется вся картинка;
+   повтор и положение приходят из общего .zs-sel и здесь не трогаются. */
+.sv .zs-sel{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9' fill='none' stroke='%235A6A93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1l6 6 6-6'/%3E%3C/svg%3E");
+}
+.sv .zs-sel:invalid{color:rgba(11,27,63,.42)}
+.sv .zs-sel option{background:#fff; color:#0B1B3F}
+.sv .zs-sel option[value=""]{color:rgba(11,27,63,.5)}
+.sv .zs-opt{border:1px solid rgba(0,27,113,.16); background:#fff; color:#17264F}
+.sv .zs-opt em{color:#6B7CA5}
+.sv .zs-opt:hover{border-color:rgba(210,148,31,.5); background:#FFFDF6}
+.sv .zs-opt.on{
+  border-color:#D2941F; color:#0B1B3F;
+  background:linear-gradient(180deg,#FFF6E2,#FBEBCB);
+  box-shadow:inset 0 1px 0 #fff, 0 12px 26px -18px rgba(178,118,15,.85);
+}
+.sv .zs-opt.on em{color:#8A6111}
+.sv .zs-seg.bad .zs-opt{border-color:rgba(214,69,80,.55)}
+.sv .zs-err{color:#C2333B}
+.sv .zs-fine{color:#6B7CA5}
+.sv .zs-fine a{color:#3F4F76}
+/* Кольцо фокуса у кнопки в общем правиле светлое (для тёмного неба).
+   На белом его не видно вовсе - здесь оно тёмно-золотое. */
+.sv .zs-btn:focus-visible{outline-color:rgba(180,83,9,.9)}
+
+/* ---------- «заявка принята» ---------- */
+.sv-done[hidden]{display:none}
+.sv-done{padding-top:clamp(6px,.8vw,10.2px)}
+.sv-seal{
+  width:clamp(73.92px,7vw,95.2px); height:clamp(73.92px,7vw,95.2px);
+  margin:0 auto clamp(16px,1.7vw,20.4px); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; color:#C9861F;
+  border:1px solid rgba(201,134,31,.45);
+  background:radial-gradient(closest-side, rgba(227,179,78,.24), rgba(227,179,78,0) 78%);
+  box-shadow:inset 0 0 24px rgba(227,179,78,.3), 0 14px 34px -18px rgba(178,118,15,.7);
+}
+.sv-seal svg{width:52%; height:52%; display:block}
+.sv-done:not([hidden]) .sv-seal{animation:svSeal .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes svSeal{
+  0%  {transform:scale(.6) rotate(-24deg); opacity:0}
+  60% {transform:scale(1.06) rotate(4deg); opacity:1}
+  100%{transform:none; opacity:1}
+}
+.sv-done-h{margin:0 auto; max-width:24ch;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(22px,2.4vw,35.7px); line-height:1.1; text-transform:uppercase;
+  color:#001B71; text-wrap:balance}
+
+/* появление: бланк всплывает. Прятать умеет только класс .rv, его вешает
+   скрипт - без скрипта всё видно сразу */
+.sv.rv .sv-card{opacity:0; transform:translateY(28px)}
+.sv.rv.on .sv-card{opacity:1; transform:none; transition:opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
+
+/* ---------- планшет и телефон ----------
+   Порог 1279, как на пятом экране: отступы внутри бланка там свои. */
+@media (max-width:1279px){
+  .sv{padding-top:clamp(76px,14vw,150px)}
+  .sv-card{
+    width:auto; margin:0 clamp(12px,4.2vw,18.7px);
+    padding:clamp(32px,9.5vw,40.8px) clamp(16px,4.4vw,25.5px);
+    border-radius:22px;
+  }
+  .sv-t{font-size:clamp(28px,8.2vw,37.4px)}
+  .sv-eyebrow{margin-bottom:clamp(20px,6.4vw,25.5px)}
+  .sv-lede{margin-top:clamp(20px,7vw,28.9px); font-size:clamp(13.2px,4vw,15.3px)}
+  .sv-form{margin-top:clamp(32px,9.5vw,40.8px)}
+  .sv-f--kind{margin-top:clamp(28px,8vw,34px)}
+  .sv-send{margin-top:clamp(58px,17vw,68px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .sv.rv .sv-card{opacity:1; transform:none; transition:none}
+  .sv-done:not([hidden]) .sv-seal{animation:none}
+}
+
 </style>
 </head>
 <body>
@@ -4043,6 +4242,84 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">входит в программу</div>
       </article>
+  </div>
+</section>
+
+<!-- ==================== ЭКРАН 11: заявка на светлом ====================
+     Та же форма, что на пятом экране, но день вместо ночи. Поля и кнопка -
+     из единого блока заявки (.zs-*), логику отправки даёт window.zsBind,
+     своей у экрана нет. Стык с десятым экраном держит сугроб (.cr-snow) -
+     тот же приём, что на стыке первого и второго экранов.
+     Все id внутри свои (sv*): на странице уже две такие формы, и повтор id
+     увёл бы клик по метке в чужое поле. -->
+<section class="cr sv" id="apply" aria-labelledby="svT">
+  <div class="cr-snow" aria-hidden="true"></div>
+  <div class="sv-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="cr-cont">
+    <div class="sv-card">
+      <p class="sv-eyebrow">Сезон 2026/27 · Нижний Новгород</p>
+      <h2 class="sv-t" id="svT">Успейте забрать лучшие даты<br class="sv-br"> <b>по цене сентября!</b></h2>
+      <p class="sv-lede">Оставьте заявку&nbsp;- мы перезвоним в течение <b>30&nbsp;минут</b>,
+        предложим лучшие даты и цены и ответим на все вопросы.</p>
+
+      <form class="sv-form" id="svForm" novalidate>
+        <div class="sv-grid">
+          <div class="sv-f">
+            <label class="zs-lab" for="svName">Ваше имя</label>
+            <input class="zs-inp" id="svName" name="name" type="text" autocomplete="given-name"
+                   placeholder="Как к вам обращаться" maxlength="60">
+          </div>
+          <div class="sv-f">
+            <label class="zs-lab" for="svPhone">Ваш телефон <span class="zs-req" aria-hidden="true">*</span></label>
+            <input class="zs-inp" id="svPhone" name="phone" type="tel" inputmode="tel"
+                   autocomplete="tel" placeholder="+7 (___) ___-__-__"
+                   aria-describedby="svErrPhone" required>
+            <p class="zs-err" id="svErrPhone" data-for="phone" hidden>Проверьте номер: нужно 11 цифр</p>
+          </div>
+          <!-- город обязателен: от него зависит воронка в CRM. Ярославля и
+               Екатеринбурга нет намеренно - они у партнёра по франшизе -->
+          <div class="sv-f">
+            <label class="zs-lab" for="svCity">Город <span class="zs-req" aria-hidden="true">*</span></label>
+            <select class="zs-inp zs-sel" id="svCity" name="city" aria-describedby="svErrCity" required>
+              <option value="" disabled selected>Выберите город</option>
+              <option>Нижний Новгород</option>
+              <option>Казань</option>
+              <option>Крым</option>
+              <option>Ставрополь</option>
+              <option>Тюмень</option>
+            </select>
+            <p class="zs-err" id="svErrCity" data-for="city" hidden>Выберите город</p>
+          </div>
+          <div class="sv-f sv-f--kind">
+            <span class="zs-lab" id="svKindLab">Как планируете прийти</span>
+            <div class="zs-seg" role="radiogroup" aria-labelledby="svKindLab">
+              <label class="zs-opt">
+                <input type="radio" name="visit" value="Индивидуальное">
+                Индивидуально<em>семьёй, с друзьями</em>
+              </label>
+              <label class="zs-opt">
+                <input type="radio" name="visit" value="Групповое">
+                Группой<em>класс, от 20 детей</em>
+              </label>
+            </div>
+            <p class="zs-err" data-for="visit" hidden>Выберите один из двух вариантов</p>
+          </div>
+        </div>
+        <div class="sv-send">
+          <button class="zs-btn" type="submit"><span class="zs-t">Оставить заявку</span></button>
+          <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+            и на звонок от менеджера. Телефон нужен только для связи по заявке.</p>
+        </div>
+      </form>
+
+      <div class="sv-done" id="svDone" tabindex="-1" hidden>
+        <div class="sv-seal" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z" fill="currentColor"/></svg>
+        </div>
+        <h3 class="sv-done-h">Заявка принята!</h3>
+        <p class="sv-lede">Мы перезвоним в течение <b>30&nbsp;минут</b>, предложим лучшие даты и цены и ответим на все вопросы.</p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -7190,5 +7467,81 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   document.addEventListener('visibilitychange', clock);
 })();
 </script>
+
+<script>
+/* ==================== ЭКРАН 11: появление и подключение формы ====================
+   Логика формы общая на весь сайт - window.zsBind из блока «Единая форма
+   заявки» (маска телефона, проверка, приёмник). Здесь только: когда экран
+   доезжает до глаз - всплывает бланк; заголовок держится в двух строках;
+   после отправки форма сменяется на «заявка принята». zsBind объявлен ниже
+   по файлу, поэтому подключаемся после разбора страницы. */
+(function(){
+  'use strict';
+  var s = document.getElementById('apply');
+  if (!s) return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (window.IntersectionObserver && !reduce){
+    s.classList.add('rv');
+    var io = new IntersectionObserver(function(es){
+      if (es[0].isIntersecting){ s.classList.add('on'); io.disconnect(); }
+    }, {threshold:.12});
+    io.observe(s);
+  }
+
+  /* Заголовок всегда в две строки (на телефоне в три). Разбивку задаёт
+     <br class="sv-br">, но она держится, только пока строка помещается
+     в ширину бланка. Если Blogger Sans ещё не загрузился, текст рисует
+     запасной Golos - он шире на 21 %, и строк становится больше задуманного.
+     Тогда уменьшаем кегль шагами по 6 %; после загрузки шрифта считаем
+     заново, там кегль вернётся к исходному. Тот же приём, что на пятом
+     экране → lessons/ch-zavisit-ot-shrifta.md */
+  var ttl = document.getElementById('svT');
+  function fitT(){
+    if (!ttl) return;
+    ttl.style.fontSize = '';
+    var cs = getComputedStyle(ttl);
+    var size = parseFloat(cs.fontSize);
+    var mult = parseFloat(cs.lineHeight) / size;
+    if (!size || !mult) return;
+    var max = window.innerWidth <= 640 ? 3 : 2;
+    for (var i = 0; i < 12; i++){
+      if (Math.round(ttl.getBoundingClientRect().height / (size * mult)) <= max) return;
+      size *= 0.94;
+      ttl.style.fontSize = size + 'px';
+    }
+  }
+  fitT();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitT);
+  var fitTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(fitTimer);
+    fitTimer = setTimeout(fitT, 150);
+  }, {passive:true});
+
+  var form = document.getElementById('svForm'), done = document.getElementById('svDone');
+  if (!form || !done) return;
+  var bound = false;
+  /* пока общая логика не подключена, обычная отправка формы (перезагрузка
+     страницы с телефоном в адресе) не должна случиться */
+  form.addEventListener('submit', function(e){ if (!bound) e.preventDefault(); });
+
+  function wire(){
+    if (bound || typeof window.zsBind !== 'function') return;
+    bound = true;
+    window.zsBind(form, {
+      source: '11-й экран, светлая форма',
+      onDone: function(){
+        form.hidden = true;
+        done.hidden = false;
+        try { done.focus({preventScroll:true}); } catch(_){ }
+      }
+    });
+  }
+  wire();
+  if (!bound) document.addEventListener('DOMContentLoaded', wire);
+})();
+</script>
+
 </body>
 </html>
