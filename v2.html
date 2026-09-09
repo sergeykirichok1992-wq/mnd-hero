@@ -2915,11 +2915,28 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   padding:calc(70 * var(--u)) 0 calc(80 * var(--u));
 }
 .pgs-t{
-  margin:0 auto calc(46 * var(--u)); text-align:center;
+  margin:0 auto calc(18 * var(--u)); text-align:center;
   font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
   font-size:clamp(26px,3.7vw,57.8px); line-height:1.06; letter-spacing:.005em;
   text-transform:uppercase; text-wrap:balance; color:#fff;
 }
+/* Подзаголовок экрана. Кегль и семейство — как у подзаголовков соседних
+   экранов (`.cr-lead`), только цвет светлый: поле тут тёмное. Ширина
+   ограничена ~62 знаками: длинная строка через весь широкий экран читается
+   плохо, глаз теряет начало следующей. */
+/* На телефоне общий контейнер сайта нарочно идёт без полей
+   (`@media (max-width:767px){ .cr-cont{width:100%; padding:0} }`), и заголовок
+   с подзаголовком упирались в края экрана. Возвращаем поля — те же 14 px,
+   что у ряда карточек, чтобы всё стояло по одной линии. */
+@media (max-width:767px){ .pgs .cr-cont{padding-inline:14px} }
+.pgs-lead{
+  max-width:calc(620 * var(--u)); margin:0 auto calc(52 * var(--u));
+  text-align:center; text-wrap:balance;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(15px, calc(20 * var(--u))); line-height:1.45;
+  color:#B9C8F5;
+}
+
 /* РЯД КАРТОЧЕК. Число колонок задаётся ширинами ниже, а ширина карточки
    считается из свободного места: сколько его есть минус зазоры, поделить
    на колонки. Поэтому в ряду всегда ровно столько карточек, сколько положено,
@@ -3044,6 +3061,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-size:max(16.5px, calc(57.3 * var(--u2)));
   line-height:max(21.5px, calc(74.49 * var(--u2)));
   color:#000;
+}
+
+/* Плашка внизу карточки. Тёмно-синяя, тем же цветом, что и заголовок карточки:
+   на бледном поле карточки она заметна, но её не спутать с кнопкой — кнопки
+   на сайте золотые и втрое выше (→ sayt-nn/standart-knopok.md).
+   Воздух над ней больше обычного: плашка должна читаться отдельным блоком,
+   а не последней строкой абзаца. */
+.pg-tag{
+  display:inline-block;
+  margin:calc(52 * var(--u2)) 0 0;
+  padding:calc(14 * var(--u2)) calc(32 * var(--u2));
+  border-radius:999px;
+  background:#001B71; color:#fff;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:max(12.5px, calc(46 * var(--u2)));
+  line-height:1.1; letter-spacing:.03em; text-transform:uppercase;
 }
 
 /* ЧИСЛО КОЛОНОК. Ниже 560 px — одна, дальше две, три и четыре.
@@ -3728,7 +3761,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      Наклон рамки у чётных карточек зеркалится сам, правилом :nth-child(even). -->
 <section class="cr pgs" id="whatawaits" aria-labelledby="pgsT">
   <div class="cr-cont">
-    <h2 class="pgs-t" id="pgsT">Что ждёт детей:</h2>
+    <h2 class="pgs-t" id="pgsT">Что же ждёт детей?</h2>
+    <p class="pgs-lead">Продолжительность программы 1 час 20 минут — самое оптимальное
+    время, чтобы дети получали всё, не утомляясь и не теряя внимание</p>
   </div>
 
   <!-- Общие части рамки: узор полосок и маски фаски. Лежат один раз на все
@@ -3775,6 +3810,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Динамичное велком-шоу во дворе</h3>
           <p class="pg-p">Приветственное шоу у 5-метровой елки с главными героями, космо-реквизитом, спецэффектами для разогрева (10-15 минут)</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k4/01.webp,karta/k4/02.webp,karta/k4/03.webp,karta/k4/04.webp,karta/k4/05.webp,karta/k4/06.webp,karta/k4/07.webp,karta/k4/08.webp,karta/k4/09.webp,karta/k4/10.webp,karta/k4/11.webp,karta/k4/12.webp,karta/k4/13.webp,karta/k4/14.webp,karta/k4/15.webp,karta/k4/16.webp,karta/k4/17.webp,karta/k4/18.webp,karta/k4/19.webp,karta/k4/20.webp,karta/k4/21.webp,karta/k4/22.webp,karta/k4/23.webp,karta/k4/24.webp,karta/k4/25.webp" style="--tint:0">
@@ -3794,6 +3830,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Главное — карамельный мастер-класс</h3>
           <p class="pg-p">Главная часть программы, вокруг которой строится весь сценарий! Каждый ребенок сделает красивые новогодние леденцы, прям как с прилавка. Мы сами производим натуральную вкуснейшую карамель по ГОСТу для наших МК.</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k3/01.webp,karta/k3/02.webp,karta/k3/03.webp,karta/k3/04.webp,karta/k3/05.webp,karta/k3/06.webp,karta/k3/07.webp" style="--tint:137">
@@ -3813,6 +3850,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Необычный сценарий мероприятия</h3>
           <p class="pg-p">Оказывается в нашем Министерстве есть тайный отдел космических поздравлений. Астрогномы приглашают детей в обсерваторию Деда Мороза, чтобы поучаствовать в новогоднем задании межгалактического масштаба!</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k2/01.webp,karta/k2/02.webp,karta/k2/03.webp,karta/k2/04.webp,karta/k2/05.webp,karta/k2/06.webp,karta/k2/07.webp,karta/k2/08.webp,karta/k2/09.webp" style="--tint:275">
@@ -3832,6 +3870,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Фонарики в темное время</h3>
           <p class="pg-p">В темное время суток (примерно с 16:00) мы раздаем детям фонарики на время уличной программы. Они с ними выглядят как светлячки :) И получаются классные фото!</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k5/01.webp,karta/k5/02.webp,karta/k5/03.webp,karta/k5/04.webp,karta/k5/05.webp,karta/k5/06.webp,karta/k5/07.webp,karta/k5/08.webp,karta/k5/09.webp,karta/k5/10.webp,karta/k5/11.webp,karta/k5/12.webp" style="--tint:52">
@@ -3851,6 +3890,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Экскурсия в кабинет-обсерваторию Деда Мороза</h3>
           <p class="pg-p">Министр проведет деток в астро-кабинет, который будет исполнен в стиле ретро-футуризма. Это будет очень необыкновенно! Винтажные телескопы, интерактивный планетарий на потолке, винтажные звездные карты, пульт управления радио-телескопом и т.п. Максимальная детализация и погружение!</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k6/01.webp,karta/k6/02.webp,karta/k6/03.webp,karta/k6/04.webp,karta/k6/05.webp,karta/k6/06.webp" style="--tint:190">
@@ -3870,6 +3910,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Выставка настоящих метеоритов</h3>
           <p class="pg-p">Коллекция настоящих метеоритов из разных уголков нашей Земли от Незнайки с Луны будет представлена в кабинете-обсерватории Деда Мороза. Некоторые будут размещены на левитирующих платформах. Это не бутафория, мы привезем настоящие экспонаты со своей историей!</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k7/01.webp,karta/k7/02.webp,karta/k7/03.webp,karta/k7/04.webp,karta/k7/05.webp,karta/k7/06.webp" style="--tint:327">
@@ -3889,6 +3930,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Выставка карамельного искусства</h3>
           <p class="pg-p">Это уже традиция! В главном зале наш карамельный цех представит новую экспозицию больших авторских леденцов ручной работы в новогодней и космической тематике. На фото леденцы прошлого сезона.</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k8/01.webp,karta/k8/02.webp,karta/k8/03.webp,karta/k8/04.webp,karta/k8/05.webp,karta/k8/06.webp,karta/k8/07.webp,karta/k8/08.webp,karta/k8/09.webp,karta/k8/10.webp,karta/k8/11.webp" style="--tint:105">
@@ -3908,6 +3950,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Пульт управления делами Деда Мороза</h3>
           <p class="pg-p">Дед Мороз и Министр докажут детям, что следят за их поведением и знают о них все, показав фото каждого ребенка на экранах пульта управления делами Деда Мороза. Дети всегда в приятном шоке!</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k9/01.webp,karta/k9/02.webp,karta/k9/03.webp" style="--tint:242">
@@ -3927,6 +3970,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Интерактив с настоящим терменвоксом</h3>
           <p class="pg-p">Терменвокс — самый необыкновенный музыкальный синтезатор, создающий звуки с помощью электромагнитных полей. Используется в министерстве для шифрования новогодних поздравлений. Каждый ребенок попробует сыграть на нем. Такого еще не видели даже взрослые!</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
       <article class="pg" data-shots="karta/k11/01.webp,karta/k11/02.webp" style="--tint:20">
@@ -3946,6 +3990,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Космофон — станция новогодней связи</h3>
           <p class="pg-p">Интерактив с еще одним супер-гаджетом Деда Мороза, который ни дети ни взрослые никогда не видели! Мы максимально наполняем программу различными технологичными штуками, используем ИИ и пишем свои программы, чтобы по-настоящему удивить современного ребенка!</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
 <article class="pg" data-shots="karta/k10/01.webp,karta/k10/02.webp" style="--tint:158">
@@ -3965,6 +4010,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Интерактив с 3D-принтером</h3>
           <p class="pg-p">Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
 <article class="pg" data-shots="karta/k12/01.webp,karta/k12/02.webp,karta/k12/03.webp,karta/k12/04.webp" style="--tint:295">
@@ -3984,6 +4030,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="pg-panel">
           <h3 class="pg-t">Десятки интересных фактов о связи космоса и Нового года</h3>
           <p class="pg-p">Во время экскурсии-шоу дети узнают множество интересных фактов из истории исследования космоса, внеземных цивилизаций, а также о взаимосвязи астрономии и Нового года.</p>
+          <div class="pg-tag">входит в программу</div>
         </div>
       </article>
   </div>
