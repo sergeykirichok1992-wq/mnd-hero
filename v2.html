@@ -3238,7 +3238,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .sv-card{
   position:relative; z-index:2; isolation:isolate;
   width:min(100%,1400px); margin:0 auto; text-align:center;
-  padding:clamp(40px,4.6vw,74px) clamp(18px,3.8vw,61.2px) clamp(36px,4.2vw,66px);
+  /* Сверху воздуха вдвое больше остального (было 40-74): в этой полосе висит
+     гирлянда, и надзаголовок должен начинаться ниже неё. Просьба Серёги
+     09.09.2026 - «увеличь в 2 раза отступ от заголовка до верхнего края». */
+  padding:clamp(80px,9.2vw,148px) clamp(18px,3.8vw,61.2px) clamp(36px,4.2vw,66px);
   border-radius:clamp(22px,2.1vw,30.6px);
   background:linear-gradient(180deg,#ECF2FE 0%,#DCE7F9 100%);
   box-shadow:
@@ -3246,6 +3249,26 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     inset 0 1px 0 rgba(255,255,255,.85),
     0 30px 60px -34px rgba(0,27,113,.42),
     0 4px 14px -6px rgba(0,27,113,.16);
+}
+/* ---------- гирлянда ----------
+   Картинка Серёги (`~/Desktop/новый сайт/гирлянда для формы.png`, 2774x151).
+   Висит в верхней полосе бланка, чуть ниже его края - как настоящая гирлянда
+   на кромке окна. Ширина во весь бланк, высота идёт за ней пропорцией.
+
+   z-index:-1 обязателен. Гирлянда - единственный в бланке элемент с
+   position:absolute, а такие рисуются ПОВЕРХ обычного текста, даже без своего
+   слоя. Отрицательный слой ставит её между фоном бланка и его начинкой:
+   накрыть заголовок она уже не сможет, как бы ни поехали отступы.
+   Работает это только потому, что у .sv-card стоит isolation:isolate -
+   иначе картинка провалилась бы за фон бланка и пропала совсем.
+
+   На телефоне бланк узкий, и гирлянда в нём выходит полоской в 20 px:
+   лампочки сливаются в точки. Поэтому там она шире бланка в полтора раза
+   и подрезается его краями - видно кусок настоящей гирлянды, а не миниатюру. */
+.sv-girl{
+  position:absolute; z-index:-1; pointer-events:none;
+  left:0; right:0; top:clamp(10px,1.2vw,20px);
+  width:100%; height:auto; display:block;
 }
 .sv-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); font-family:"Golos Text",Arial,sans-serif;
   font-size:clamp(9.68px,.86vw,11.05px); font-weight:600; letter-spacing:.24em;
@@ -3370,7 +3393,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .sv{padding-top:clamp(48px,9vw,100px)}
   .sv-card{
     width:auto; margin:0 clamp(12px,4.2vw,18.7px);
-    padding:clamp(32px,9.5vw,40.8px) clamp(16px,4.4vw,25.5px);
+    /* сверху вдвое против остальных полей - там висит гирлянда */
+    padding:clamp(64px,19vw,81.6px) clamp(16px,4.4vw,25.5px) clamp(32px,9.5vw,40.8px);
     border-radius:22px;
   }
   .sv-t{font-size:clamp(28px,8.2vw,37.4px)}
@@ -3379,6 +3403,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .sv-form{margin-top:clamp(32px,9.5vw,40.8px)}
   .sv-f--kind{margin-top:clamp(28px,8vw,34px)}
   .sv-send{margin-top:clamp(58px,17vw,68px)}
+}
+/* Ниже 560 px бланк совсем узкий: гирлянда во всю его ширину выходит полоской
+   в 20 px, лампочки сливаются в точки. Тут она в полтора раза шире бланка
+   и подрезается его краями - видно кусок настоящей гирлянды, а не миниатюру.
+   Выше 560 px бланк уже достаточно широк, и растягивать её незачем: она
+   подошла бы вплотную к надзаголовку (замер на 760 px: зазор 9 px). */
+@media (max-width:559px){
+  .sv-card{overflow:hidden}    /* гирлянда шире бланка, края режет он сам */
+  .sv-girl{left:-25%; right:-25%; width:150%; top:clamp(8px,2.6vw,14px)}
 }
 @media (prefers-reduced-motion:reduce){
   .sv.rv .sv-card{opacity:1; transform:none; transition:none}
@@ -4348,6 +4381,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="sv-glow" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="cr-cont">
     <div class="sv-card">
+      <!-- гирлянда на кромке бланка. loading и decoding до src не нужны:
+           картинка стоит в разметке, а не строится скриптом -->
+      <img class="sv-girl" src="v2-sv-girlyanda-1400.webp"
+           srcset="v2-sv-girlyanda-760.webp 760w, v2-sv-girlyanda-1400.webp 1400w, v2-sv-girlyanda.webp 2774w"
+           sizes="(max-width:559px) 150vw, (max-width:1279px) 94vw, min(94vw, 1400px)"
+           width="2774" height="151" loading="lazy" decoding="async" alt="" aria-hidden="true">
       <p class="sv-eyebrow">Сезон 2026/27 · Нижний Новгород</p>
       <h2 class="sv-t" id="svT">Успейте забрать лучшие даты<br class="sv-br"> <b>по цене сентября!</b></h2>
       <p class="sv-lede">Оставьте заявку&nbsp;- мы перезвоним в течение <b>30&nbsp;минут</b>,
