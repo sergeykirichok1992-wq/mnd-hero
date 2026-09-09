@@ -2908,7 +2908,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* Свободное место под ряд карточек и зазор между ними. Обе величины —
      ДЛИНЫ, без процентов: из них считается ширина карточки, а она дальше
      идёт и в высоту, и в кегль, где процент означал бы совсем другое. */
-  --inner: calc(min(94vw, 1462px) - 2 * clamp(16px, 3vw, 47.6px));
+  /* 09.09.2026: поля ряда ужаты с clamp(16..47,6) до 16 px — так карточки
+     на компьютере стали примерно на 5 % шире, о чём просил Серёга. Число тут
+     и в padding у .pgs-row обязано совпадать: из него считается ширина
+     карточки, и если разойдутся, в ряд перестанет влезать последняя. */
+  --inner: calc(min(94vw, 1462px) - 32px);
   --gap: clamp(14px, 1.8vw, 34px);
 
   position:relative; overflow:hidden;   /* страховка от горизонтальной прокрутки */
@@ -2962,7 +2966,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pgs-row{display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start;
   gap:var(--gap); padding:0 14px}
 @media (min-width:560px){
-  .pgs-row{width:min(94vw,1462px); margin:0 auto; padding:0 clamp(16px,3vw,47.6px)}
+  .pgs-row{width:min(94vw,1462px); margin:0 auto; padding:0 16px}
 }
 /* ТЕЛЕФОН. Просьбы Серёги 09.09.2026: воздуха между карточками вдвое больше
    (28 px вместо 14), карточка уже ещё на 10 % — поля 42 px вместо 25,
@@ -3077,7 +3081,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pg-t{
   margin-top:0; margin-bottom:0;
   font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
-  font-size:max(20px, calc(76.8 * var(--u2))); line-height:1.05;
+  font-size:max(21px, calc(76.8 * var(--u2))); line-height:1.05;
   /* тёмно-синий, не чёрный. Цвет не выдуман: #001B71 уже стоит на сайте */
   color:#001B71;
 }
@@ -3088,8 +3092,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      просьба Серёги 09.09.2026, и она общая для всех ширин.
      А кегль на 20 % меньше он просил ТОЛЬКО для телефона — это ниже,
      в блоке @media (max-width:559px). */
-  font-size:max(16.5px, calc(57.3 * var(--u2)));
-  line-height:max(18.3px, calc(63.3 * var(--u2)));
+  font-size:max(17.3px, calc(57.3 * var(--u2)));
+  line-height:max(19.2px, calc(63.3 * var(--u2)));
   color:#000;
 }
 
