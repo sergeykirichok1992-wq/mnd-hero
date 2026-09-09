@@ -3078,15 +3078,31 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pg-tag{
   position:absolute; left:50%; bottom:0;
   transform:translate(-50%, 50%);
+  /* inline-flex, а не inline-block: у строчной надписи буквы занимают не всю
+     высоту строки (сверху пусто там, где были бы прописные, снизу — хвост «р»),
+     и при обычных полях текст сидел выше середины. Flex ставит строку по центру
+     плашки, а не по её базовой линии. */
+  display:inline-flex; align-items:center; justify-content:center;
   white-space:nowrap;
-  padding:calc(8.75 * var(--u2)) calc(20 * var(--u2));
+  /* Поля сверху и снизу РАЗНЫЕ намеренно. Ровно посередине надпись должна
+     стоять не «чернилами», а ПРОПИСНЫМИ: у слова «программу» есть хвосты
+     букв «р» и «у», они тянут чернильный прямоугольник вниз, и если центровать
+     по нему, заглавная «В» уезжает к верхнему краю. Поэтому сверху воздуха
+     больше. Проверено метриками шрифта: верх «В» стоит в 4,58 px от края
+     при высоте плашки 15,38 — на 0,3 px от идеальной середины.
+     Доли кегля, а не макетные единицы: у кегля есть нижний предел, и в
+     пикселях этот перекос поехал бы вместе с ним. */
+  padding:.30em calc(20 * var(--u2)) .07em;
   border-radius:999px;
   background:#EF5A50; color:#fff;
   font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
   /* 09.09.2026: Серёга попросил в 1,6 раза меньше прежнего. Нижний предел
      9,5 px — дальше надпись перестаёт читаться. */
   font-size:max(9.5px, calc(28.75 * var(--u2)));
-  line-height:1.1; letter-spacing:.04em; text-transform:uppercase;
+  /* 1,25 — не меньше: при line-height:1 буквы не помещаются в строку
+     и вылезают вверх, а flex центрует строку, а не буквы. Проверено замером:
+     надпись упиралась в верхний край плашки. */
+  line-height:1.25; letter-spacing:.01em;
 }
 
 /* ЧИСЛО КОЛОНОК. Ниже 560 px — одна, дальше две, три и четыре.
@@ -4020,7 +4036,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Динамичное велком-шоу во дворе</h3>
           <p class="pg-p">Приветственное шоу у 5-метровой елки с главными героями, космо-реквизитом, спецэффектами для разогрева (10-15 минут)</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k4/01.webp,karta/k4/02.webp,karta/k4/03.webp,karta/k4/04.webp,karta/k4/05.webp,karta/k4/06.webp,karta/k4/07.webp,karta/k4/08.webp,karta/k4/09.webp,karta/k4/10.webp,karta/k4/11.webp,karta/k4/12.webp,karta/k4/13.webp,karta/k4/14.webp,karta/k4/15.webp,karta/k4/16.webp,karta/k4/17.webp,karta/k4/18.webp,karta/k4/19.webp,karta/k4/20.webp,karta/k4/21.webp,karta/k4/22.webp,karta/k4/23.webp,karta/k4/24.webp,karta/k4/25.webp,karta/k4/26.webp" style="--tint:0">
         <div class="pg-shot">
@@ -4040,7 +4056,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Главное — карамельный мастер-класс</h3>
           <p class="pg-p">Главная часть программы, вокруг которой строится весь сценарий! Каждый ребенок сделает красивые новогодние леденцы, прям как с прилавка. Мы сами производим натуральную вкуснейшую карамель по ГОСТу для наших МК.</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k3/01.webp,karta/k3/02.webp,karta/k3/03.webp,karta/k3/04.webp,karta/k3/05.webp,karta/k3/06.webp,karta/k3/07.webp" style="--tint:137">
         <div class="pg-shot">
@@ -4060,7 +4076,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Необычный сценарий мероприятия</h3>
           <p class="pg-p">Оказывается в нашем Министерстве есть тайный отдел космических поздравлений. Астрогномы приглашают детей в обсерваторию Деда Мороза, чтобы поучаствовать в новогоднем задании межгалактического масштаба!</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k2/01.webp,karta/k2/02.webp,karta/k2/03.webp,karta/k2/04.webp,karta/k2/05.webp,karta/k2/06.webp,karta/k2/07.webp,karta/k2/08.webp,karta/k2/09.webp" style="--tint:275">
         <div class="pg-shot">
@@ -4080,7 +4096,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Фонарики в темное время</h3>
           <p class="pg-p">В темное время суток (примерно с 16:00) мы раздаем детям фонарики на время уличной программы. Они с ними выглядят как светлячки :) И получаются классные фото!</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k5/01.webp,karta/k5/02.webp,karta/k5/03.webp,karta/k5/04.webp,karta/k5/05.webp,karta/k5/06.webp,karta/k5/07.webp,karta/k5/08.webp,karta/k5/09.webp,karta/k5/10.webp,karta/k5/11.webp,karta/k5/12.webp" style="--tint:52">
         <div class="pg-shot">
@@ -4100,7 +4116,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Экскурсия в кабинет-обсерваторию Деда Мороза</h3>
           <p class="pg-p">Министр проведет деток в астро-кабинет, который будет исполнен в стиле ретро-футуризма. Это будет очень необыкновенно! Винтажные телескопы, интерактивный планетарий на потолке, винтажные звездные карты, пульт управления радио-телескопом и т.п. Максимальная детализация и погружение!</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k6/01.webp,karta/k6/02.webp,karta/k6/03.webp,karta/k6/04.webp,karta/k6/05.webp,karta/k6/06.webp" style="--tint:190">
         <div class="pg-shot">
@@ -4120,7 +4136,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Выставка настоящих метеоритов</h3>
           <p class="pg-p">Коллекция настоящих метеоритов из разных уголков нашей Земли от Незнайки с Луны будет представлена в кабинете-обсерватории Деда Мороза. Некоторые будут размещены на левитирующих платформах. Это не бутафория, мы привезем настоящие экспонаты со своей историей!</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k7/01.webp,karta/k7/02.webp,karta/k7/03.webp,karta/k7/04.webp,karta/k7/05.webp,karta/k7/06.webp" style="--tint:327">
         <div class="pg-shot">
@@ -4140,7 +4156,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Выставка карамельного искусства</h3>
           <p class="pg-p">Это уже традиция! В главном зале наш карамельный цех представит новую экспозицию больших авторских леденцов ручной работы в новогодней и космической тематике. На фото леденцы прошлого сезона.</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k8/01.webp,karta/k8/02.webp,karta/k8/03.webp,karta/k8/04.webp,karta/k8/05.webp,karta/k8/06.webp,karta/k8/07.webp,karta/k8/08.webp,karta/k8/09.webp,karta/k8/10.webp,karta/k8/11.webp" style="--tint:105">
         <div class="pg-shot">
@@ -4160,7 +4176,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Пульт управления делами Деда Мороза</h3>
           <p class="pg-p">Дед Мороз и Министр докажут детям, что следят за их поведением и знают о них все, показав фото каждого ребенка на экранах пульта управления делами Деда Мороза. Дети всегда в приятном шоке!</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k9/01.webp,karta/k9/02.webp,karta/k9/03.webp" style="--tint:242">
         <div class="pg-shot">
@@ -4180,7 +4196,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Интерактив с настоящим терменвоксом</h3>
           <p class="pg-p">Терменвокс — самый необыкновенный музыкальный синтезатор, создающий звуки с помощью электромагнитных полей. Используется в министерстве для шифрования новогодних поздравлений. Каждый ребенок попробует сыграть на нем. Такого еще не видели даже взрослые!</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
       <article class="pg" data-shots="karta/k11/01.webp,karta/k11/02.webp" style="--tint:20">
         <div class="pg-shot">
@@ -4200,7 +4216,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Космофон — станция новогодней связи</h3>
           <p class="pg-p">Интерактив с еще одним супер-гаджетом Деда Мороза, который ни дети ни взрослые никогда не видели! Мы максимально наполняем программу различными технологичными штуками, используем ИИ и пишем свои программы, чтобы по-настоящему удивить современного ребенка!</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
 <article class="pg" data-shots="karta/k10/01.webp,karta/k10/02.webp" style="--tint:158">
         <div class="pg-shot">
@@ -4220,7 +4236,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Интерактив с 3D-принтером</h3>
           <p class="pg-p">Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
 <article class="pg" data-shots="karta/k12/01.webp,karta/k12/02.webp,karta/k12/03.webp,karta/k12/04.webp" style="--tint:295">
         <div class="pg-shot">
@@ -4240,7 +4256,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <h3 class="pg-t">Десятки интересных фактов о связи космоса и Нового года</h3>
           <p class="pg-p">Во время экскурсии-шоу дети узнают множество интересных фактов из истории исследования космоса, внеземных цивилизаций, а также о взаимосвязи астрономии и Нового года.</p>
         </div>
-        <div class="pg-tag">входит в программу</div>
+        <div class="pg-tag">Входит в программу</div>
       </article>
   </div>
 </section>
