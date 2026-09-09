@@ -2608,277 +2608,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 </style>
 
-<!-- Стили девятого экрана вынесены в ОТДЕЛЬНЫЙ <style> намеренно.
-     Файл правят из двух окон сразу, и одна незакрытая скобка выше уносит
-     внутрь чужого @media всё, что стоит ниже по стилю. Так и вышло
-     08.09.2026: у восьмого экрана не закрылось правило `.km`, и весь этот
-     экран заработал только от 1024 px, а на телефоне карточки рассыпались
-     столбиком. Отдельный <style> начинает разбор заново — перекос скобок
-     в соседнем блоке сюда не дотягивается.
-     Подробно → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
-<style>
-/* ==================== ЭКРАН 9: персонажи вселенной МНД ====================
-   Пространство имён `pr-`. Макет Серёги — `~/Desktop/новый сайт/экран персонажи/`:
-   семь готовых карточек («псд персонажи.psd», выгрузки PNG шириной 1018)
-   и снимок раскладки для компьютера «Снимок экрана — 2026-09-08 в 14.14.08.png»:
-   верхний ряд четыре карточки, нижний три по центру. Порядок карточек оттуда же.
-
-   ВСЯ КАРТОЧКА — ОДНА КАРТИНКА. Персонаж, золотое кольцо и плашка с подписью
-   нарисованы в файле, кодом тут ничего не собирается. Значит подпись — это
-   растр: держим выгрузку 900 px на карточку около 300 px, чтобы на ретине
-   буквы остались чистыми, а текст подписи дублируем в `alt`.
-
-   ХОЛСТЫ ВЫГРУЗОК РАЗНОЙ ВЫСОТЫ, и это не небрежность: над карточкой у каждого
-   персонажа своя нашлёпка — посох Деда Мороза, поднятая рука Байконкурочки.
-   Свёрстывать такие файлы «как есть» нельзя, карточки не встанут в ряд.
-   Поэтому `sayt-nn/instrumenty/personazhi.py` перекладывает все выгрузки
-   в ОДИН холст 1035x1850, где карточка всегда лежит на одном месте:
-   975x1525 с углом в точке (30, 285). Отсюда три числа ниже — и они
-   единственное, что связывает CSS с картинками:
-
-       ширина картинки  1035/975 = 106,1538 %
-       сдвиг влево        30/975 =   3,0769 %
-       сдвиг вверх       285/975 =  29,2308 %
-
-   Проценты у `margin` — И У ВЕРХНЕГО ТОЖЕ — считаются от ШИРИНЫ родителя.
-   Поэтому сдвиг вверх записан в долях ширины карточки, а не высоты.
-
-   ОПОРНЫЙ РАЗМЕР ОДИН — `--pc`, ширина карточки. Зазоры, скругление, тени
-   и подъём под курсором считаются от неё, как `--k` на восьмом экране.
-   На компьютере она выводится из ширины контейнера (четыре карточки и три
-   зазора по 22 % карточки: 4 + 3*0,22 = 4,66), на телефоне задаётся прямо. */
-/* Блик на верхнем стыке — та же горячая полоса и та же картинка, что на шве
-   пятого и шестого экранов (`.sm-blik`). Приём оттуда же целиком:
-
-   Обёртка нужна ровно ради блика. Сама секция обрезает всё лишнее
-   (`overflow:hidden` — страховка от горизонтальной прокрутки), а блику надо
-   вылезти ВВЕРХ, на экран с комнатой. Поэтому он живёт снаружи секции.
-
-   z-index:26 у обёртки обязателен. Экраны `.cr` стоят на 25 — без своего слоя
-   блик уезжает ПОД экран с комнатой, и над швом от него не остаётся ничего:
-   видна только нижняя половина. Выше 26 брать нельзя, там шапка (30).
-
-   У картинки светящееся ядро стоит на 48,5 % высоты — на столько её и
-   приподнимаем, иначе полоса окажется ниже шва. z-index:3 — выше секции (1),
-   чтобы низ блика не закрасился её светлым фоном. */
-.pr-hold{position:relative; z-index:26}
-.pr-blik{
-  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
-  aspect-ratio:2000/381; transform:translateY(-48.5%);
-  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
-}
-.pr{
-  z-index:1;                          /* внутри обёртки, под бликом */
-  /* Ширина карточки. До 768 px считается от экрана, дальше — через общий
-     множитель `--u`, ровно как высота ленты фотографий второго экрана
-     (`calc(240 * var(--u))`). Значения на стыке подобраны так, чтобы карточка
-     не прыгнула: 234 px и там и там. Сверху рост упирается сам — `--u` растёт
-     вместе с контейнером, а тот стоит на потолке 1462 px, поэтому от 1556 px
-     карточка перестаёт расти и остаётся 291 px.
-     08.09.2026 все три числа умножены на 0,85 — просьба Серёги «слайды
-     поменьше на 15 %». Было 62vw / 275 / 342. */
-  --pc:  min(52.7vw, 234px);
-  --pgx: calc(var(--pc) * 0.10);      /* зазор между карточками в ленте */
-  --pr-r: calc(var(--pc) * 0.0708);   /* скругление карточки: 69 px при карточке 975 */
-  --pr-gold: 255,224,158;             /* тон блика под курсором — золото МНД */
-
-  position:relative; overflow:hidden;  /* страховка от горизонтальной прокрутки */
-  background:#EEEDFD; color:#333;      /* цвет поля макета; текст как на светлых экранах 2 и 7 */
-  padding:calc(60 * var(--u)) 0 calc(64 * var(--u));
-}
-
-/* ЛЕНТА — одна на все ширины, приём и числа взяты у ленты фотографий второго
-   экрана (просьба Серёги 08.09.2026; до этого на компьютере стояла сетка
-   4 + 3 по макету). Карточки едут справа налево сами, без остановок,
-   а пальцем или мышью их можно разогнать, отмотать назад и притормозить.
-   Сборку второй копии для петли делает скрипт, см. блок «ПЕРСОНАЖИ» внизу. */
-.pr-wrap{
-  overflow:hidden;
-  /* Сверху живёт всё, что торчит выше карточки: у Деда Мороза посох поднимается
-     на 26,7 % ширины карточки. Снизу — мягкая кромка вшитой в картинку тени. */
-  padding:calc(var(--pc) * 0.29) 0 calc(var(--pc) * 0.05);
-  touch-action:pan-y;                          /* вертикаль отдаём странице */
-  user-select:none; -webkit-user-select:none;  /* палец тянет ленту, а не выделяет */
-}
-.pr-grid{ display:flex; width:max-content; will-change:transform }
-.pr-card{
-  position:relative; flex:0 0 auto;
-  width:var(--pc); aspect-ratio:975 / 1525;
-  margin:0 var(--pgx) 0 0;
-}
-/* Лента идёт ВО ВСЮ ШИРИНУ ОКНА и обрывается ровно по его краю — этим она
-   отличается от ленты снимков второго экрана, которую поля контейнера
-   обрывают в пяти сантиметрах от кромки (просьба Серёги 08.09.2026).
-   Держится это разметкой: блок ленты стоит снаружи `.cr-cont`. */
-@media (min-width:768px){
-  .pr{ --pc:calc(234 * var(--u)) }
-  .pr-wrap{ cursor:grab }
-  .pr-wrap.drag, .pr-wrap.drag *{ cursor:grabbing }
-}
-
-.pr-in{ position:absolute; inset:0; border-radius:var(--pr-r) }
-.pr-3d{ position:absolute; inset:0; border-radius:inherit }
-.pr-3d > img{
-  position:absolute; left:0; top:0; display:block;
-  width:106.1538%; height:auto;
-  margin:-29.2308% 0 0 -3.0769%;
-  pointer-events:none; -webkit-user-drag:none;
-}
-/* Блик под курсором: коробка во всю карточку, скруглённая по ней же.
-   Радиальная заливка обрезается скруглением сама, `overflow:hidden` не нужен —
-   а он в движущемся слое оставляет в Safari хвосты по углам
-   (schedule-app/lessons/skruglenie-uglov-v-dvizhushchemsya-sloe). */
-.pr-spot{ position:absolute; inset:0; border-radius:inherit; pointer-events:none }
-
-/* ---- КОМПЬЮТЕР: реакция карточки на курсор ----
-   Три слоя, а не один, потому что движений три и сроки у них разные:
-     .pr-card — появление при прокрутке (медленно, один раз);
-     .pr-in   — подъём и увеличение под курсором (0,34 с, чтобы не «стреляло»);
-     .pr-3d   — наклон следом за курсором (0,12 с, иначе тянется за мышью).
-   Сложить их в один `transform` нельзя: у него одно значение и один срок.
-
-   Условие `hover:hover and pointer:fine` обязательно рядом с шириной: планшет
-   в альбомной ориентации проходит по ширине, но курсора у него нет, и наклон
-   там залипал бы после касания. Тот же признак у ролика восьмого экрана. */
-@media (min-width:1024px) and (hover:hover) and (pointer:fine){
-  .pr-in{
-    transform:translateY(var(--lift,0px)) scale(var(--sc,1));
-    transition:transform .34s cubic-bezier(.22,.75,.28,1);
-  }
-  .pr-card.hot .pr-in{ --lift:calc(var(--pc) * -.032); --sc:1.035 }
-
-  .pr-3d{
-    transform:perspective(1200px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
-    transition:transform .5s cubic-bezier(.22,.75,.28,1);
-  }
-  /* Пока курсор внутри — короткий срок и без разгона: наклон обязан идти
-     за мышью, а не догонять её. Ушёл курсор — возврат снова плавный. */
-  .pr-card.hot .pr-3d{ transition-duration:.12s; transition-timing-function:linear }
-  .pr-card.hot .pr-in, .pr-card.hot .pr-3d{ will-change:transform }
-
-  /* Тень под карточкой. Лежит на своём уровне ПОД картинкой (`z-index:-1`
-     внутри слоя с `transform`), поэтому видна только вокруг карточки.
-     Тон фиолетовый, а не серый: серая тень на цветном поле читается
-     как грязное пятно (lessons/skruglenie-uglov-v-dvizhushchemsya-sloe). */
-  .pr-3d::before{
-    content:''; position:absolute; inset:0; border-radius:inherit; z-index:-1;
-    opacity:0; transition:opacity .4s ease;
-    box-shadow:
-      0 calc(var(--pc) * .055) calc(var(--pc) * .115) calc(var(--pc) * -.022) rgba(56,44,124,.36),
-      0 0 calc(var(--pc) * .13) rgba(227,179,78,.28);
-  }
-  .pr-card.hot .pr-3d::before{ opacity:1 }
-
-  /* Золотая обводка — то же золото, что у кнопок сайта (sayt-nn/standart-knopok.md). */
-  .pr-3d::after{
-    content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-    opacity:0; transition:opacity .3s ease;
-    box-shadow:inset 0 0 0 max(1.5px, calc(var(--pc) * .0065)) rgba(227,179,78,.55);
-  }
-  .pr-card.hot .pr-3d::after{ opacity:1 }
-
-  /* Пятно света идёт за курсором. Центр стоит там, где мышь (`--mx`/`--my`
-     ставит скрипт), радиус задан явно и доходит до полной прозрачности —
-     иначе пятно срезает прямым углом (lessons/pyatno-sveta-gasnet-vnutri-korobki).
-     `screen` вместо обычного наложения: на тёмно-синей карточке это свет,
-     а не белёсая плёнка. */
-  .pr-spot{
-    opacity:0; transition:opacity .3s ease; mix-blend-mode:screen;
-    background:radial-gradient(circle calc(var(--pc) * .60) at var(--mx,50%) var(--my,50%),
-      rgba(var(--pr-gold),.34),
-      rgba(var(--pr-gold),.17) 40%,
-      rgba(var(--pr-gold),.05) 74%,
-      rgba(var(--pr-gold),0)   100%);
-  }
-  .pr-card.hot .pr-spot{ opacity:1 }
-}
-
-/* Воздух вокруг подзаголовка стоит полосами, а не отступами у текста —
-   тот же приём, что на седьмом экране.
-
-   ПОДЗАГОЛОВОК РОВНО В ПОЛТОРА РАЗА МЕЛЬЧЕ ОБЩЕГО (28 / 1,5 = 18,7), и это
-   на всех ширинах — просьба Серёги 08.09.2026. Заголовок не трогали, он
-   остался как на остальных светлых экранах.
-
-   НА ТЕЛЕФОНЕ ВОЗДУХ ЕЩЁ И СЖАТ: полосы вдвое уже, поля секции на треть.
-   Верхнее поле у ленты сжать нельзя: там живёт посох Деда Мороза,
-   он поднимается на 26,7 % ширины карточки, и меньше 29 % ему тесно. */
-.pr .cr-lead{ font-size:calc(18.7 * var(--u)) }
-
-/* ПОЛЯ ПО КРАЯМ НА ТЕЛЕФОНЕ. Общий контейнер `.cr-cont` ниже 768 px идёт
-   во всю ширину без полей — так у копий старого сайта, там текст и должен
-   доходить до кромки. Здесь это читалось как «впритык»: подзаголовок
-   упирался в край в 15 px.
-
-   Поля даём ТОЛЬКО подзаголовку, а не всему контейнеру. Пробовал контейнеру —
-   заголовок сразу поехал с трёх строк на четыре: он крупный, и 26 px с каждой
-   стороны для него это целое слово. Заголовок остаётся как на остальных
-   светлых экранах сайта. Лента полей не получает вовсе: она стоит снаружи
-   контейнера и идёт во всю ширину окна.
-
-   КЕГЛЬ ПОДЗАГОЛОВКА ПОДЖИМАЕТСЯ, ЕСЛИ СТРОКА НЕ ВЛЕЗАЕТ. Первая строка
-   («Не банальные, запоминающиеся детям герои,») занимает 19,6 своих кеглей.
-   На узком телефоне при полном кегле она в поля не помещается и рвётся
-   пополам с сиротой «герои,» на отдельной строке. Поэтому кегль берём
-   меньшим из двух: заданные Серёгой 18,7 и «сколько влезает». На айфоне
-   с 430 px работает первое, на 390 и уже — второе, и разница там 1 px. */
-@media (max-width:767px){
-  .pr{ --pr-pad:clamp(16px, 5vw, 26px) }
-  .pr .cr-lead{
-    padding-inline:var(--pr-pad);
-    font-size:min(calc(18.7 * var(--u)),
-                  calc((100vw - 2 * var(--pr-pad) - 10px) / 19.6));
-  }
-}
-/* Перенос в подзаголовке: «которых» начинает вторую строку (просьба Серёги
-   08.09.2026). Без него на широком телефоне и в узком окне браузер утаскивает
-   это слово наверх, и первая строка становится длиннее второй вдвое.
-   На компьютере подзаголовок и так в одну строку, разрыв там не нужен. */
-.pr-br2{ display:none }
-@media (max-width:767px){ .pr-br2{ display:inline } }
-/* Перенос в заголовке: на компьютере «НАШЕЙ» уходит во вторую строку,
-   к «ВСЕЛЕННОЙ МНД» (просьба Серёги 08.09.2026). Порог 1024 px, а не 768:
-   на планшете первая половина и сама не влезает в строку, и разрыв дробил бы
-   заголовок на три строки с одиноким «ПЕРСОНАЖИ» посередине — проверено.
-   `&nbsp;` перед разрывом оставлен намеренно: там, где разрыва нет,
-   «ПЕРСОНАЖИ» и «НАШЕЙ» без него слиплись бы. Тот же приём у заголовка
-   третьего экрана. */
-.pr-br{ display:none }
-@media (min-width:1024px){ .pr-br{ display:inline } }
-.pr-gap1{ height:calc(26 * var(--u)) }
-.pr-gap2{ height:calc(6 * var(--u)) }
-@media (max-width:767px){
-  .pr{ padding:calc(34 * var(--u)) 0 calc(36 * var(--u)) }
-  .pr-gap1{ height:calc(13 * var(--u)) }
-  .pr-gap2{ height:0 }
-}
-
-/* ---- ПЕРВОЕ ПОЯВЛЕНИЕ ПРИ ПРОКРУТКЕ ----
-   Карточки выезжают снизу по очереди, слева направо, шагом 85 мс. Класс `on`
-   секции ставит наблюдатель и только один раз: назад при обратной прокрутке
-   не отматываем — на длинной странице мигание раздражает сильнее, чем радует.
-
-   Двигаем саму карточку, а лента едет своим `transform` у родителя — два
-   движения не спорят. Клоны для петли уносят `--i` с собой при копировании,
-   поэтому выезжают в том же порядке; на экране этого не видно, они в этот
-   момент ещё далеко справа. */
-.pr-card{
-  opacity:0; transform:translateY(calc(var(--pc) * .13)) scale(.945);
-  transition:opacity .75s ease, transform .75s cubic-bezier(.2,.72,.28,1);
-  transition-delay:calc(var(--i) * 85ms);
-}
-.pr.on .pr-card{ opacity:1; transform:none }
-
-/* «Меньше движения»: карточки не выезжают, не наклоняются и лента не едет
-   сама — её листают пальцем или колесом. Поля по бокам про запас холста:
-   картинка шире карточки на 3 %, и без них у крайних срезало бы кромку. */
-@media (prefers-reduced-motion:reduce){
-  .pr-card{ opacity:1 !important; transform:none !important; transition:none !important }
-  .pr-in, .pr-3d{ transform:none !important; transition:none !important }
-  .pr-wrap{ overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch }
-  .pr-grid{ padding-inline:calc(var(--pc) * 0.035) }
-}
-</style>
 <!-- Стили десятого экрана вынесены в ОТДЕЛЬНЫЙ <style> намеренно, как и стили
      девятого: файл правят из двух окон, и перекос скобок в соседнем блоке
      не должен утаскивать этот экран внутрь чужого @media.
@@ -2916,7 +2645,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   --gap: clamp(14px, 1.8vw, 34px);
 
   position:relative; overflow:hidden;   /* страховка от горизонтальной прокрутки */
-  z-index:26;                           /* как у .pr-hold — экран стоит над формой */
+  z-index:26;                           /* как у .cf-hold — экран стоит над формой */
   background:#001061;                   /* поле макета, на нём Серёга рисовал карточки */
   /* Снизу воздуха вдвое больше обычного (было 80) — просьба Серёги 09.09.2026.
      Под этим экраном начинается заявка на светлом, и её сугроб вылезает сюда
@@ -3505,17 +3234,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 
 </style>
-<!-- Стили двенадцатого экрана вынесены в ОТДЕЛЬНЫЙ <style> намеренно, как
-     и стили девятого, десятого и одиннадцатого: файл правят из двух окон,
+<!-- Стили девятого экрана вынесены в ОТДЕЛЬНЫЙ <style> намеренно, как
+     и стили десятого с одиннадцатым: файл правят из двух окон,
      и перекос скобок в соседнем блоке не должен утаскивать этот экран
      внутрь чужого @media.
      → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
 <style>
-/* ============ ЭКРАН 12: ПЕРСОНАЖИ КАРУСЕЛЬЮ-ОБЛОЖКАМИ (ПРОБА) ============
-   Пространство имён `cf-` (coverflow — «обложки»). Экран стоит в самом низу
-   как проба: понравится — заменит собой девятый экран с бегущей лентой,
-   не понравится — вырезается одним куском. Поэтому НИЧЕГО из `pr-` тут
-   не переиспользуется, только картинки те же.
+/* ============ ЭКРАН 9: ПЕРСОНАЖИ КАРУСЕЛЬЮ-ОБЛОЖКАМИ ============
+   Пространство имён `cf-` (coverflow — «обложки»). Экран прожил два дня
+   пробой в самом низу страницы и 10.09.2026 занял место прежнего девятого
+   экрана — бегущей ленты карточек (`pr-`). Та удалена целиком; картинки,
+   порядок карточек и верхний блик на шве перешли сюда без изменений.
 
    Код прислал Серёга готовым React-компонентом (shadcn + Tailwind). Наш сайт —
    одна HTML-страница без сборки, поэтому компонент переложен на голый CSS и JS;
@@ -3526,15 +3255,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
    ОПОРНЫЙ РАЗМЕР ОДИН — `--cf-card`, ширина карточки. Шаг между карточками,
    глубина, перспектива и высота сцены считаются от неё, поэтому карусель
-   целиком масштабируется одним числом (приём `--pc` девятого экрана).
-   На стыке 768 px прыжка нет: `--u` ниже 1556 px упирается в 1px, значит
-   `calc(300 * var(--u))` там даёт те же 300 px, что и телефонная формула.
+   целиком масштабируется одним числом (приём удалённой ленты и `--k`
+   восьмого экрана). На стыке 768 px прыжка нет: `--u` ниже 1556 px упирается
+   в 1px, значит `calc(240 * var(--u))` там даёт те же 240 px, что и
+   телефонная формула.
 
-   ХОЛСТ КАРТИНОК ТОТ ЖЕ, ЧТО НА ДЕВЯТОМ ЭКРАНЕ: `pers/*.webp` — 1035x1850,
-   сама карточка внутри 975x1525 с углом в точке (30, 285). Отсюда три
-   процента у картинки, они же стоят у `.pr-3d > img`. Над карточкой у части
-   персонажей торчит нашлёпка (посох Деда Мороза, рука Байконкурочки) —
-   поэтому у сцены сверху запас в 30 % ширины карточки, иначе рама срежет.
+   ХОЛСТ КАРТИНОК: `pers/*.webp` — 1035x1850, сама карточка внутри 975x1525
+   с углом в точке (30, 285). Отсюда три процента у картинки ниже. Над
+   карточкой у части персонажей торчит нашлёпка (посох Деда Мороза, рука
+   Байконкурочки) — поэтому у сцены сверху запас, замеренный по альфа-каналу
+   выгрузок, см. `.cf-frame`.
 
    ПОД КАРУСЕЛЬЮ НЕТ НИ ПОДПИСИ, НИ ЗАГОЛОВКА — просьба Серёги 09.09.2026.
    В присланном компоненте они были (`showCaption`), выброшены намеренно:
@@ -3542,7 +3272,28 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
    БЕЗ JS И ПРИ «МЕНЬШЕ ДВИЖЕНИЯ» ЭКРАН ОСТАЁТСЯ ЖИВЫМ. Разметка по умолчанию —
    обычная лента с прокруткой пальцем; трёхмерную раскладку включает скрипт,
-   ставя секции класс `cf-3d`. Так же устроен запасной вид девятого экрана. */
+   ставя секции класс `cf-3d`. */
+/* Блик на верхнем стыке — та же горячая полоса и та же картинка, что на шве
+   пятого и шестого экранов (`.sm-blik`). Приём достался от удалённой ленты
+   (`.pr-hold`/`.pr-blik`) и перенесён сюда один в один:
+
+   Обёртка нужна ровно ради блика. Сама секция обрезает всё лишнее
+   (`overflow:hidden` — страховка от горизонтальной прокрутки), а блику надо
+   вылезти ВВЕРХ, на экран с комнатой. Поэтому он живёт снаружи секции.
+
+   z-index:26 у обёртки обязателен. Экраны `.cr` стоят на 25 — без своего слоя
+   блик уезжает ПОД экран с комнатой, и над швом от него не остаётся ничего:
+   видна только нижняя половина. Выше 26 брать нельзя, там шапка (30).
+
+   У картинки светящееся ядро стоит на 48,5 % высоты — на столько её и
+   приподнимаем, иначе полоса окажется ниже шва. z-index:3 — выше секции (1),
+   чтобы низ блика не закрасился её светлым фоном. */
+.cf-hold{position:relative; z-index:26}
+.cf-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
 .cf{
   /* Ширина центральной карточки. 10.09.2026 уменьшена на 20 % — просьба
      Серёги; было 64vw / 300 / 300. Остальные размеры экрана считаются
@@ -3553,7 +3304,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   position:relative; overflow:hidden;  /* страховка от горизонтальной прокрутки */
   background:#EEEDFD; color:#333;      /* поле как на девятом экране */
   padding:calc(60 * var(--u)) 0 calc(64 * var(--u));
-  z-index:25;
+  z-index:1;                           /* внутри обёртки, под бликом */
 }
 @media (min-width:768px){ .cf{ --cf-card: calc(240 * var(--u)) } }
 
@@ -3699,20 +3450,25 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      «слайдер на 30 % меньше»: потолок с 1340 опущен до 938, и там, где холст
      раньше занимал всю ширину контейнера, теперь берётся 70 % от неё —
      иначе на средних окнах (768-1440) уменьшения не случилось бы вовсе. */
-  --mk-w: min(938px, 70%);
+  --mk-w: min(1079px, 80.5%);
   --mk-arw: clamp(44px, 4.4vw, 62px);
   --mk-fl: 12%;                   /* размах полёта конфет, доля их высоты */
-  /* Фон «Sunset Blush» с 21st.dev (просьба Серёги 10.09.2026): четыре круглых
-     пятна, каждое на своей точке, поверх медовой заливки — Rose milk, Blush,
-     Mauve и Honey. Прежний ровный розовый #FFE2EA снят вместе с ним. Пятна
-     заданы процентами, поэтому растягиваются вместе с экраном и на телефоне
-     дают ту же картинку, только гуще. */
-  background-color:#F6D9A8;
+  /* Фон — нежный розово-белый пастельный (просьба Серёги 10.09.2026:
+     «чтобы органично было»). Устроен в два слоя. Сверху и снизу линейная
+     растяжка, которая СШИВАЕТ ЭКРАН С СОСЕДЯМИ: над ним белое поле заявки,
+     под ним сиреневое поле персонажей (#EEEDFD), и без этих концов оба стыка
+     читались бы полосой. Между ними четыре бледных пятна — белое, розовое,
+     кремовое и сиреневое, все слабой заливкой: рамка и так яркая, фону
+     спорить с ней нельзя.
+     Прежний «Sunset Blush» с 21st.dev снят: его медовые углы забирали
+     внимание себе. */
+  background-color:#FCF5F8;
   background-image:
-    radial-gradient(circle at 65.24% 44.05%, rgba(251,239,242,1) 0%, rgba(251,239,242,.844) 9.57%, rgba(251,239,242,.5) 19.15%, rgba(251,239,242,.156) 28.72%, rgba(251,239,242,0) 38.3%),
-    radial-gradient(circle at 27.95% 75.05%, rgba(243,192,199,1) 0%, rgba(243,192,199,.844) 12.46%, rgba(243,192,199,.5) 24.92%, rgba(243,192,199,.156) 37.39%, rgba(243,192,199,0) 49.85%),
-    radial-gradient(circle at 52.34% 20.59%, rgba(231,210,240,1) 0%, rgba(231,210,240,.844) 15.44%, rgba(231,210,240,.5) 30.88%, rgba(231,210,240,.156) 46.31%, rgba(231,210,240,0) 61.75%),
-    radial-gradient(circle at 80.74% 84.5%,  rgba(246,217,168,1) 0%, rgba(246,217,168,.844) 18.32%, rgba(246,217,168,.5) 36.65%, rgba(246,217,168,.156) 54.97%, rgba(246,217,168,0) 73.3%);
+    linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0) 16%, rgba(238,237,253,0) 76%, #EFEDFB 100%),
+    radial-gradient(circle at 16% 14%, rgba(255,255,255,.92) 0%, rgba(255,255,255,0) 52%),
+    radial-gradient(circle at 80% 24%, rgba(252,228,236,.80) 0%, rgba(252,228,236,0) 50%),
+    radial-gradient(circle at 26% 76%, rgba(250,216,228,.72) 0%, rgba(250,216,228,0) 54%),
+    radial-gradient(circle at 86% 80%, rgba(236,227,248,.66) 0%, rgba(236,227,248,0) 56%);
   position:relative; z-index:25; overflow-x:clip;
   padding: calc(72 * var(--u)) 0 calc(80 * var(--u));
 }
@@ -3759,15 +3515,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   transform:translateY(-50%);
   /* Простой белый кружок с тенью — как стрелки карусели площадки. Полосатую
      кайму «под трость» Серёга забраковал 10.09.2026: на экране и так много
-     полосок, органу управления рисунок не нужен. */
+     полосок, органу управления рисунок не нужен.
+     Стрелки вынесены ЗА холст (отрицательный отступ): в самих полях холста
+     между краем блока и рамкой всего 8 % ширины, и кружок стоял почти
+     вплотную к кадру. Теперь между ним и рамкой около двух сантиметров.
+     Дальше отводить нельзя — упрутся в край окна на ноутбуке. */
   background:#fff;
   box-shadow:0 6px 16px rgba(140,27,18,.26);
   display:grid; place-items:center;
   transition:transform .18s ease, box-shadow .18s ease, opacity .2s ease;
 }
 .mk-arw svg{width:34%; height:34%; fill:none; stroke:#8C1B12; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round}
-.mk-arw--prev{left:0.8%}
-.mk-arw--next{right:0.8%}
+.mk-arw--prev{left:-4.4%}
+.mk-arw--next{right:-4.4%}
 .mk-arw[disabled]{opacity:.3; cursor:default}
 .mk-arw:focus-visible{outline:3px solid #8C1B12; outline-offset:3px}
 @media (hover:hover) and (pointer:fine){
@@ -3806,6 +3566,188 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk-dot{width:8px; height:8px}
   .mk-dot.is-on{width:26px}
 }
+/* ==================== ЭКРАН 14: КОРОТКИЕ ВИДЕО ====================
+   Пространство имён `vd-`. Семь роликов Rutube, сняты с боевого сайта
+   ministrynn.ru: шесть коротких сеткой и двадцатиминутный фильм отдельным
+   блоком под ними. Ссылки на ролики — те же, что на старом сайте.
+
+   ПОДПИСИ ИСПРАВЛЕНЫ ОТНОСИТЕЛЬНО СТАРОГО САЙТА. Там подписи со второй
+   по четвёртую съехали на соседний ролик: под «Про карамельный мастер-класс»
+   стоял ролик про Деда Мороза, под «Шоу рисования светом» — карамельный
+   мастер-класс, под «Пульт управления делами Деда Мороза» — люминесцентное
+   шоу, а ролик про Деда Мороза был вставлен дважды. Здесь каждый ролик стоит
+   под своим названием (сверено с названиями на самом Rutube), а подписи
+   «Пульт управления делами Деда Мороза» нет: такого ролика у нас не залито.
+
+   ПЛЕЕР НЕ ГРУЗИТСЯ, ПОКА НЕ НАЖМУТ. В разметке лежит обложка и кнопка,
+   а `<iframe>` создаётся скриптом по щелчку. Семь встроенных плееров Rutube
+   на одном экране — это семь чужих страниц со своими скриптами и рекламой:
+   грузились бы они разом, экран открывался бы секундами, а не мгновенно.
+   Ради этого же обложки лежат у нас (`video/*.webp`, кадры из середины
+   роликов), а не тянутся с rutube: их картинки идут с чужого CDN и при
+   VPN или блокировке экран остался бы пустыми прямоугольниками.
+
+   ИГРАЕТ ВСЕГДА ТОЛЬКО ОДИН. Открываешь второй ролик — первый сворачивается
+   обратно в обложку (плеер удаляется целиком, поэтому звук гарантированно
+   умолкает; ставить на паузу чужой плеер снаружи мы не можем).
+
+   Поле — ночное небо по рецепту пятого экрана: синяя ночь, размытые пурпурные
+   и лиловые пятна, зерно. Так же, как там, без `filter:blur` — мягкость даёт
+   сам радиальный градиент, а размытие роняет частоту кадров втрое. */
+.vd-hold{position:relative; z-index:26}   /* ради блика на шве: он вылезает вверх, на розовый экран */
+.vd{
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(56px,6.4vw,108px) 0 clamp(60px,6.8vw,114px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+/* блик на шве с розовым экраном — тот же снимок, что на шве пятого и шестого */
+.vd-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.vd-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.vd-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.vd-glow i:nth-child(1){left:-20vw; top:2%; width:70vw; height:60%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift1 36s ease-in-out infinite alternate}
+.vd-glow i:nth-child(2){right:-22vw; top:-8%; width:72vw; height:64%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.34) 0%, rgba(108,43,217,.22) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift2 43s ease-in-out infinite alternate}
+.vd-glow i:nth-child(3){left:6vw; bottom:2%; width:62vw; height:56%;
+  background:radial-gradient(closest-side, rgba(176,106,224,.22) 0%, rgba(176,106,224,.15) 32%, rgba(176,106,224,.05) 64%, rgba(176,106,224,0) 100%);
+  animation:bkDrift3 31s ease-in-out infinite alternate}
+.vd-glow i:nth-child(4){left:50%; bottom:-14%; width:76vw; height:52%; margin-left:-38vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.18) 0%, rgba(227,179,78,.12) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:bkDrift2 39s ease-in-out infinite alternate-reverse}
+.vd-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+.vd .cr-cont{z-index:7}
+
+/* Заголовок и подзаголовок — как на десятом экране (тоже тёмное поле):
+   Blogger Sans Bold прописными, белый, и светло-синий подзаголовок под ним. */
+.vd-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(24px,3.3vw,51px); line-height:1.08; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.vd-lead{
+  max-width:calc(660 * var(--u)); margin:0 auto clamp(28px,3.2vw,52px);
+  text-align:center; text-wrap:balance;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(14px, clamp(15px,1.25vw,20px)); line-height:1.45; color:#B9C8F5;
+}
+
+/* СЕТКА. Три колонки на компьютере, две на планшете, одна на телефоне. */
+.vd-grid{
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:clamp(16px,1.9vw,32px);
+}
+@media (max-width:1023px){ .vd-grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:599px){ .vd-grid{grid-template-columns:1fr} }
+
+.vd-card{margin:0}
+/* Окно ролика. Пропорция 16:9 задана `aspect-ratio` у самого окна, а не
+   высотой картинки: в него потом встаёт чужой `<iframe>`, и он обязан
+   получить ту же рамку, иначе после нажатия карточка меняет высоту
+   и вся сетка под ней прыгает. */
+.vd-box{
+  position:relative; width:100%; aspect-ratio:16/9; border-radius:clamp(12px,1.1vw,20px);
+  overflow:hidden; background:#0A1046;
+  box-shadow:0 0 0 1px rgba(251,191,36,.22), 0 14px 34px rgba(2,5,20,.5);
+}
+.vd-box iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:block}
+/* Кнопка занимает всё окно: нажимать можно в любое место обложки, как
+   у любого плеера. Это орган управления, а не кнопка действия, поэтому
+   стандарт `zs-btn` тут ни при чём (то же правило, что у стрелок слайдера
+   мастер-класса) — но золото взято то же, чтобы экран не выпадал из сайта. */
+.vd-open{
+  position:absolute; inset:0; display:block; width:100%; height:100%;
+  padding:0; border:0; background:none; cursor:pointer; color:inherit;
+}
+.vd-open img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
+  transition:transform .5s ease, filter .3s ease}
+/* Затемнение поверх кадра: под ним читается и кнопка, и время. Кадры разные,
+   часть из них светлая — без этой пелены золотой кружок на снегу и гирляндах
+   терялся бы. */
+.vd-open::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(4,7,26,.12) 0%, rgba(4,7,26,.30) 60%, rgba(4,7,26,.55) 100%);
+  transition:opacity .3s ease;
+}
+.vd-play{
+  position:absolute; left:50%; top:50%; z-index:2; transform:translate(-50%,-50%);
+  width:clamp(52px,5.4vw,78px); height:clamp(52px,5.4vw,78px); border-radius:50%;
+  background:linear-gradient(180deg,#FDE68A,#FCD34D 52%,#F59E0B);
+  box-shadow:0 0 0 1px rgba(251,191,36,.5), 0 6px 18px rgba(2,5,20,.5), 0 0 30px 4px rgba(245,158,11,.28);
+  display:grid; place-items:center;
+  transition:transform .22s ease, box-shadow .22s ease;
+}
+/* Треугольник смещён на 8 % вправо: у равнобедренного треугольника центр
+   тяжести левее геометрического центра, и поставленный ровно он выглядит
+   сдвинутым к левому краю кружка. */
+.vd-play svg{width:34%; height:34%; fill:#451A03; transform:translateX(8%)}
+.vd-time{
+  position:absolute; right:3.4%; bottom:5%; z-index:2;
+  padding:.24em .6em; border-radius:999px;
+  background:rgba(4,7,26,.72); color:#fff;
+  font-family:"CR Blogger",Arial,sans-serif; font-size:max(11px,.78vw); line-height:1.5;
+  letter-spacing:.02em; font-variant-numeric:tabular-nums;
+}
+@media (hover:hover) and (pointer:fine){
+  .vd-open:hover img{transform:scale(1.045)}
+  .vd-open:hover .vd-play{transform:translate(-50%,-50%) scale(1.09);
+    box-shadow:0 0 0 1px rgba(251,191,36,.6), 0 8px 22px rgba(2,5,20,.55), 0 0 44px 8px rgba(245,158,11,.36)}
+  .vd-open:hover::after{opacity:.72}
+}
+.vd-open:focus-visible{outline:3px solid #FCD34D; outline-offset:3px}
+.vd-cap{
+  margin:clamp(9px,.9vw,15px) 0 0; text-align:center;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(14px, clamp(15px,1.15vw,19px)); line-height:1.35; color:#D8E2FF;
+}
+
+/* ---------- фильм ---------- */
+/* Отдельный блок под сеткой: ролик на двадцать минут — это уже не «короткое
+   видео», у него своя подводка и окно вдвое шире карточки. */
+.vd-film{margin:clamp(40px,4.6vw,78px) auto 0; width:min(100%, 900px); text-align:center}
+.vd-film-t{
+  margin:0 auto clamp(8px,.8vw,14px);
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(19px,2.1vw,33px); line-height:1.15; text-wrap:balance; color:#FFE7B4;
+}
+.vd-film-p{
+  margin:0 auto clamp(18px,2vw,32px); max-width:640px;
+  font-family:"CR Blogger",Arial,sans-serif; font-size:max(14px, clamp(15px,1.15vw,19px));
+  line-height:1.45; text-wrap:balance; color:#B9C8F5;
+}
+/* Подсказка про VPN. На старом сайте она стоит под каждым роликом; здесь
+   одна на весь экран и мелко: у кого всё открылось, тому она не нужна. */
+.vd-note{
+  margin:clamp(22px,2.4vw,38px) auto 0; text-align:center;
+  font-family:"CR Blogger",Arial,sans-serif; font-size:max(12px,.85vw); line-height:1.5;
+  color:rgba(185,200,245,.62);
+}
+
+@media (max-width:767px){
+  /* Общий контейнер ниже 768 px идёт без полей — карточкам они нужны. */
+  .vd .cr-cont{width:100%; padding-inline:16px}
+  .vd{padding:38px 0 44px}
+  .vd-t{font-size:clamp(21px,6.2vw,30px)}
+  .vd-lead{font-size:14px; margin-bottom:22px}
+  .vd-cap{font-size:14px}
+  .vd-film{margin-top:34px}
+}
+/* Дыхание отблесков — как на пятом экране: движение не должно ловиться
+   боковым зрением, а при «меньше движения» его нет совсем. */
+@media (prefers-reduced-motion:reduce){
+  .vd-glow i{animation:none}
+  .vd-open img{transition:none}
+}
+
 </style>
 
 </head>
@@ -4391,79 +4333,79 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </div>
 </section>
 
-<!-- ==================== ЭКРАН 9: персонажи вселенной МНД ====================
-     Макет Серёги: `~/Desktop/новый сайт/экран персонажи/` — семь готовых
-     карточек и снимок раскладки для компьютера «Снимок экрана — 2026-09-08
-     в 14.14.08.png». Порядок карточек взят оттуда: верхний ряд четыре,
-     нижний три по центру.
+<!-- ==================== ЭКРАН 9: персонажи каруселью-обложками ====================
+     Семь карточек стопкой «обложек»: центральная стоит лицом, соседние уходят
+     вглубь и разворачиваются боком. Карусель едет сама (переезд 1 с, стоянка
+     0,5 с), а ещё листается перетаскиванием, щелчком по соседней карточке
+     и стрелками с клавиатуры.
 
-     Картинки страницы делает `sayt-nn/instrumenty/personazhi.py` — он
-     приводит выгрузки PSD к одному холсту, иначе карточки не встают в ряд.
-     Устройство экрана → sayt-nn/ustroystvo.md, раздел «Экран 9».
+     10.09.2026 ЭТОТ ЭКРАН ЗАМЕНИЛ СОБОЙ БЕГУЩУЮ ЛЕНТУ КАРТОЧЕК (пространство
+     имён `pr-`, сделана 08.09.2026, удалена целиком - стили, разметка, скрипт).
+     Карточки, их порядок и картинки те же, менялась только подача. Верхний
+     стык оставлен прежним: блик на шве с экраном «комната» - он и был у ленты.
 
-     Подпись у каждого персонажа нарисована внутри картинки, поэтому она
-     же стоит в `alt`: без этого читалка и поисковик видят пустое место.
-     `--i` — номер карточки, по нему считается задержка появления. -->
-<div class="pr-hold">
-<div class="pr-blik" aria-hidden="true"></div>
-<section class="cr pr" id="heroes" aria-labelledby="prT">
+     Картинки страницы делает `sayt-nn/instrumenty/personazhi.py` - он приводит
+     выгрузки PSD разной высоты к одному холсту 1035x1850, иначе карточки
+     не встают в ряд.
+
+     Подпись у каждого персонажа нарисована внутри картинки, поэтому она же
+     стоит в `alt`: без этого читалка и поисковик видят пустое место. -->
+<div class="cf-hold">
+<div class="cf-blik" aria-hidden="true"></div>
+<section class="cf cr" id="heroes" aria-labelledby="cfT">
   <div class="cr-cont">
     <div class="cr-n">
-      <h2 class="cr-t cr-h2" id="prT"><span class="cr-red"><strong>НОВЫЕ И ПОСТОЯННЫЕ ПЕРСОНАЖИ&nbsp;</strong></span><br class="pr-br"><span class="cr-blue"><strong>НАШЕЙ ВСЕЛЕННОЙ МНД:</strong></span></h2>
+      <h2 class="cr-t cr-h2" id="cfT"><span class="cr-red"><strong>НОВЫЕ И ПОСТОЯННЫЕ ПЕРСОНАЖИ&nbsp;</strong></span><br class="cf-br"><span class="cr-blue"><strong>НАШЕЙ ВСЕЛЕННОЙ МНД:</strong></span></h2>
     </div>
 
-    <div class="pr-gap1"></div>
+    <div class="cf-gap1"></div>
 
-    <div class="cr-n"><p class="cr-t cr-lead">Не банальные, запоминающиеся детям герои,<br class="pr-br2"> которых можно встретить только у нас</p></div>
+    <div class="cr-n"><p class="cr-t cr-lead">Не банальные, запоминающиеся детям герои,<br class="cf-br2"> которых можно встретить только у нас</p></div>
 
-    <div class="pr-gap2"></div>
+    <div class="cf-gap2"></div>
   </div>
 
-  <!-- Лента стоит СНАРУЖИ контейнера: она идёт во всю ширину окна,
-       в отличие от ленты снимков второго экрана (просьба Серёги 08.09.2026). -->
-  <div class="pr-wrap" id="prWrap">
-    <div class="pr-grid" id="prGrid">
-        <figure class="pr-card" style="--i:0"><div class="pr-in"><div class="pr-3d">
-          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-               src="pers/neznayka.webp"
-               alt="Незнайка с Луны в скафандре и с рюкзаком - яркий, весёлый и дружелюбный">
-          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
-
-        <figure class="pr-card" style="--i:1"><div class="pr-in"><div class="pr-3d">
-          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-               src="pers/ded.webp"
-               alt="Дед Мороз с посохом в роскошном синем костюме со звёздным декором">
-          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
-
-        <figure class="pr-card" style="--i:2"><div class="pr-in"><div class="pr-3d">
-          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-               src="pers/baykonkurochka.webp"
-               alt="Байконкурочка в серебристом костюме космонавта - с особым заданием в Министерстве">
-          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
-
-        <figure class="pr-card" style="--i:3"><div class="pr-in"><div class="pr-3d">
-          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-               src="pers/mandarianec.webp"
-               alt="Мандарианец, оранжевый уличный персонаж, любитель фото-вспышек">
-          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
-
-        <figure class="pr-card" style="--i:4"><div class="pr-in"><div class="pr-3d">
-          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-               src="pers/astrognomy.webp"
-               alt="Астрогном с подзорной трубой - помощники Деда Мороза в его обсерватории">
-          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
-
-        <figure class="pr-card" style="--i:5"><div class="pr-in"><div class="pr-3d">
-          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-               src="pers/ministr.webp"
-               alt="Министр Новогодних Дел с посохом - главный ведущий программы в доме">
-          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
-
-        <figure class="pr-card" style="--i:6"><div class="pr-in"><div class="pr-3d">
-          <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-               src="pers/karamelshchiki.webp"
-               alt="Доктора карамельных наук - карамельщики, ведущие мастер-класса">
-          <i class="pr-spot" aria-hidden="true"></i></div></div></figure>
+  <!-- Сцена стоит СНАРУЖИ контейнера: карточки уезжают вглубь и вбок
+       во всю ширину окна, поля контейнера обрезали бы их раньше времени.
+       tabindex у рамы — чтобы карусель листалась стрелками с клавиатуры. -->
+  <div class="cf-frame" id="cfFrame" tabindex="0" role="region"
+       aria-roledescription="карусель" aria-label="Персонажи вселенной МНД">
+    <div class="cf-track" id="cfTrack">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="1 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/neznayka.webp"
+             alt="Незнайка с Луны в скафандре и с рюкзаком - яркий, весёлый и дружелюбный">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="2 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/ded.webp"
+             alt="Дед Мороз с посохом в роскошном синем костюме со звёздным декором">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="3 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/baykonkurochka.webp"
+             alt="Байконкурочка в серебристом костюме космонавта - с особым заданием в Министерстве">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="4 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/mandarianec.webp"
+             alt="Мандарианец, оранжевый уличный персонаж, любитель фото-вспышек">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="5 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/astrognomy.webp"
+             alt="Астрогном с подзорной трубой - помощники Деда Мороза в его обсерватории">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="6 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/ministr.webp"
+             alt="Министр Новогодних Дел с посохом - главный ведущий программы в доме">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="7 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/karamelshchiki.webp"
+             alt="Доктора карамельных наук - карамельщики, ведущие мастер-класса">
+      </figure>
     </div>
   </div>
 </section>
@@ -4850,10 +4792,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      Макет — `~/Desktop/новый сайт/экран про МК/псд.psd`, устройство и все
      числа → sayt-nn/ustroystvo.md, раздел «Экран 13».
 
-     Стоит ВЫШЕ пробного экрана 12 (карусель-обложки) намеренно: тот проба
-     и когда-нибудь уедет, а этот экран — постоянный и по замыслу Серёги
-     идёт сразу за формой заявки.
-
      Рамка и конфеты — картинки из PSD (`mk/frame.webp`, `mk/candy-a.webp`,
      `mk/candy-b.webp`), кодом ничего не рисуется. Кадры (`mk/f01…f13.webp`)
      лежат в ленте один за другим, лента едет `transform`-ом.
@@ -4916,77 +4854,134 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </section>
 
 
-<!-- ======== ЭКРАН 12: персонажи каруселью-обложками (ПРОБА) ========
-     Проба нового вида девятого экрана: те же семь карточек, но не бегущей
-     лентой, а стопкой «обложек» — центральная стоит лицом, соседние уходят
-     вглубь и разворачиваются боком. Листается сама (переезд 1 с, стоянка 0,5 с),
-     а ещё перетаскиванием, щелчком по соседней карточке и стрелками
-     с клавиатуры.
+<!-- ==================== ЭКРАН 14: КОРОТКИЕ ВИДЕО ====================
+     Семь роликов Rutube с боевого сайта ministrynn.ru: шесть коротких сеткой
+     и двадцатиминутный фильм отдельным блоком. Устройство, почему плеер
+     не грузится заранее и почему подписи не такие, как на старом сайте
+     → sayt-nn/ustroystvo.md, раздел «Экран 14».
 
-     Ставится в самый низ страницы намеренно: девятый экран остаётся на месте,
-     чтобы Серёга мог сравнить оба вида. Понравится — заменит девятый,
-     не понравится — вырезается тремя кусками (стили, эта разметка, скрипт).
+     Обложки — кадры из середины роликов (`video/*.webp`), а не первые кадры
+     с Rutube: там у всех семи титры со вшитой плашкой и по кадру не понять,
+     о чём ролик.
 
-     Картинки те же, что на девятом экране (`pers/*.webp`), браузер берёт их
-     из кеша. Подписи персонажей нарисованы внутри картинок, поэтому они же
-     стоят в `alt` — и поэтому под каруселью нет ни строчки текста. -->
-<section class="cf cr" id="heroesFlow" aria-labelledby="cfT">
+     Идентификатор ролика лежит в `data-rt`, подпись для плеера — в `data-ti`.
+     Меняешь ролик — меняешь только эти два поля и картинку. -->
+<div class="vd-hold">
+<section class="vd" id="video" aria-labelledby="vdT">
+  <span class="vd-blik" aria-hidden="true"></span>
+  <div class="vd-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="vd-grain" aria-hidden="true"></div>
+
   <div class="cr-cont">
-    <div class="cr-n">
-      <h2 class="cr-t cr-h2" id="cfT"><span class="cr-red"><strong>НОВЫЕ И ПОСТОЯННЫЕ ПЕРСОНАЖИ&nbsp;</strong></span><br class="cf-br"><span class="cr-blue"><strong>НАШЕЙ ВСЕЛЕННОЙ МНД:</strong></span></h2>
+    <h2 class="vd-t" id="vdT">Просто посмотрите, как всё выглядит<br class="vd-br"> и происходит, на коротких видео</h2>
+    <p class="vd-lead">Всё снято на наших мероприятиях. Ролики открываются прямо здесь, уходить со страницы не нужно.</p>
+
+    <div class="vd-grid">
+      <figure class="vd-card">
+        <div class="vd-box">
+          <button class="vd-open" type="button"
+                  data-rt="01db694af6a781db78ca88a9ba5fd2dd"
+                  data-ti="Как выглядит наша локация"
+                  aria-label="Смотреть видео: как выглядит наша локация, 46 секунд">
+            <img src="video/lokaciya.webp?v=1" width="1000" height="562" alt="Деревянная изба с кирпичным камином, ёлкой и гирляндами" loading="lazy" decoding="async">
+            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+            <span class="vd-time" aria-hidden="true">0:46</span>
+          </button>
+        </div>
+        <figcaption class="vd-cap">Как выглядит наша локация</figcaption>
+      </figure>
+
+      <figure class="vd-card">
+        <div class="vd-box">
+          <button class="vd-open" type="button"
+                  data-rt="c3aac8bdc6e601f602fdb7438cb2c0d2"
+                  data-ti="Какой у нас шикарный Дед Мороз"
+                  aria-label="Смотреть видео: какой у нас шикарный Дед Мороз, 36 секунд">
+            <img src="video/ded.webp?v=1" width="1000" height="562" alt="Дед Мороз в расшитой шубе у пульта управления новогодними делами" loading="lazy" decoding="async">
+            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+            <span class="vd-time" aria-hidden="true">0:36</span>
+          </button>
+        </div>
+        <figcaption class="vd-cap">Какой у нас шикарный Дед Мороз</figcaption>
+      </figure>
+
+      <figure class="vd-card">
+        <div class="vd-box">
+          <button class="vd-open" type="button"
+                  data-rt="7dc568d06964706bdb9172e5f19de57d"
+                  data-ti="Про карамельный мастер-класс"
+                  aria-label="Смотреть видео: про карамельный мастер-класс, 37 секунд">
+            <img src="video/karamel.webp?v=1" width="1000" height="562" alt="Дети показывают готовые красно-белые леденцы в упаковке" loading="lazy" decoding="async">
+            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+            <span class="vd-time" aria-hidden="true">0:37</span>
+          </button>
+        </div>
+        <figcaption class="vd-cap">Про карамельный мастер-класс</figcaption>
+      </figure>
+
+      <figure class="vd-card">
+        <div class="vd-box">
+          <button class="vd-open" type="button"
+                  data-rt="9e325eef4e760e97690b80e66b69ac51"
+                  data-ti="Шоу рисования светом"
+                  aria-label="Смотреть видео: шоу рисования светом, 50 секунд">
+            <img src="video/svet.webp?v=1" width="1000" height="562" alt="Светящийся зелёный рисунок в темноте на шоу рисования светом" loading="lazy" decoding="async">
+            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+            <span class="vd-time" aria-hidden="true">0:50</span>
+          </button>
+        </div>
+        <figcaption class="vd-cap">Шоу рисования светом</figcaption>
+      </figure>
+
+      <figure class="vd-card">
+        <div class="vd-box">
+          <button class="vd-open" type="button"
+                  data-rt="a9043e2da960e702764475101888c6d6"
+                  data-ti="Про сервис на наших площадках"
+                  aria-label="Смотреть видео: про сервис на наших площадках, 42 секунды">
+            <img src="video/servis.webp?v=1" width="1000" height="562" alt="Гостиная площадки: диваны, гирлянды и экран с заставкой" loading="lazy" decoding="async">
+            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+            <span class="vd-time" aria-hidden="true">0:42</span>
+          </button>
+        </div>
+        <figcaption class="vd-cap">Про сервис на наших площадках</figcaption>
+      </figure>
+
+      <figure class="vd-card">
+        <div class="vd-box">
+          <button class="vd-open" type="button"
+                  data-rt="a8e2f72ae47a500019bb8ae918bace27"
+                  data-ti="Фееричная актёрская игра"
+                  aria-label="Смотреть видео: фееричная актёрская игра, 12 минут 35 секунд">
+            <img src="video/aktery.webp?v=1" width="1000" height="562" alt="Дед Мороз и ведущий у пульта, вокруг дети и родители" loading="lazy" decoding="async">
+            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+            <span class="vd-time" aria-hidden="true">12:35</span>
+          </button>
+        </div>
+        <figcaption class="vd-cap">Фееричная актёрская игра</figcaption>
+      </figure>
     </div>
 
-    <div class="cf-gap1"></div>
-
-    <div class="cr-n"><p class="cr-t cr-lead">Не банальные, запоминающиеся детям герои,<br class="cf-br2"> которых можно встретить только у нас</p></div>
-
-    <div class="cf-gap2"></div>
-  </div>
-
-  <!-- Сцена стоит СНАРУЖИ контейнера: карточки уезжают вглубь и вбок
-       во всю ширину окна, поля контейнера обрезали бы их раньше времени.
-       tabindex у рамы — чтобы карусель листалась стрелками с клавиатуры. -->
-  <div class="cf-frame" id="cfFrame" tabindex="0" role="region"
-       aria-roledescription="карусель" aria-label="Персонажи вселенной МНД">
-    <div class="cf-track" id="cfTrack">
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="1 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/neznayka.webp"
-             alt="Незнайка с Луны в скафандре и с рюкзаком - яркий, весёлый и дружелюбный">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="2 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/ded.webp"
-             alt="Дед Мороз с посохом в роскошном синем костюме со звёздным декором">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="3 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/baykonkurochka.webp"
-             alt="Байконкурочка в серебристом костюме космонавта - с особым заданием в Министерстве">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="4 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/mandarianec.webp"
-             alt="Мандарианец, оранжевый уличный персонаж, любитель фото-вспышек">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="5 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/astrognomy.webp"
-             alt="Астрогном с подзорной трубой - помощники Деда Мороза в его обсерватории">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="6 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/ministr.webp"
-             alt="Министр Новогодних Дел с посохом - главный ведущий программы в доме">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="7 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/karamelshchiki.webp"
-             alt="Доктора карамельных наук - карамельщики, ведущие мастер-класса">
-      </figure>
+    <div class="vd-film">
+      <p class="vd-film-t">Хотите полностью погрузиться в наш мир? Посмотрите 20-минутный фильм о нас!</p>
+      <p class="vd-film-p">У вас сложится полная картина о том, в какую сказку попадут ваши детки.</p>
+      <div class="vd-box">
+        <button class="vd-open" type="button"
+                data-rt="838ecf64473337f103fc545669103258"
+                data-ti="Документальный фильм о Министерстве Новогодних Дел"
+                aria-label="Смотреть документальный фильм о Министерстве Новогодних Дел, 20 минут 19 секунд">
+          <img src="video/film.webp?v=1" width="1280" height="720" alt="Пульт управления делами Деда Мороза со светящимися экранами" loading="lazy" decoding="async">
+          <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+          <span class="vd-time" aria-hidden="true">20:19</span>
+        </button>
+      </div>
     </div>
+
+    <p class="vd-note">Если видео не открылось, выключите VPN и обновите страницу.</p>
   </div>
 </section>
+</div>
+
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
@@ -7858,248 +7853,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </script>
 
 
-<script>
-/* ==================== ПЕРСОНАЖИ: ДЕВЯТЫЙ ЭКРАН ====================
-   Три независимые вещи в одном блоке:
-
-   1. ПОЯВЛЕНИЕ. Секция получает класс `on`, когда сетка подъехала к окну,
-      и больше его не теряет. Дальше выезд карточек по очереди делает CSS
-      задержкой `--i * 85мс` — скрипту считать нечего.
-
-   2. РЕАКЦИЯ НА КУРСОР (только компьютер). Скрипт кладёт на карточку четыре
-      числа: где мышь (`--mx`/`--my`, для блика) и на сколько градусов
-      наклонить (`--rx`/`--ry`). Само движение — переходы в CSS.
-
-      Два решения, без которых это не работает на едущей ленте:
-
-      - ЧИСЛА ПЕРЕСЧИТЫВАЮТСЯ КАЖДЫЙ КАДР, а не по движению мыши. Курсор может
-        стоять на месте, а карточка уезжает из-под него — считай мы один раз
-        по `pointermove`, наклон застыл бы и поехал вместе с карточкой.
-        Заодно каждый кадр проверяем, не ушла ли карточка из-под курсора
-        совсем: события `pointerout` браузер на движение слоя не обещает,
-        и без проверки карточка так и уехала бы наклонённой.
-      - СЛУШАЕМ ЛЕНТУ ЦЕЛИКОМ, а не каждую карточку. Половина карточек —
-        клоны, они появляются после запуска; делегирование через
-        `pointerover`/`pointerout` (они всплывают, в отличие от
-        `pointerenter`/`pointerleave`) само накрывает и оригиналы, и копии.
-
-      Наклон считаем от коробки самой карточки (`.pr-card`), а не от
-      наклонённого слоя внутри: рамка вокруг наклонённого слоя больше его
-      самого, и числа поплыли бы от собственного наклона.
-
-   3. ЛЕНТА — одна на все ширины. Карточки едут справа налево сами и
-      разгоняются пальцем или мышью: приём и числа взяты у ленты фотографий
-      второго экрана. Петля без шва — карточки повторены дважды, лента
-      сдвигается на остаток от ширины одного повтора, и в момент, когда первая
-      семёрка уезжает за левый край, вторая стоит ровно на её месте.
-
-      Вторая семёрка — клоны разметки, а не второй набор картинок: файлы те же,
-      браузер берёт их из кеша. Клоны помечены `aria-hidden` и с пустым `alt`,
-      иначе читалка прочитала бы всех персонажей дважды.
-
-   При «меньше движения» лента не собирается вовсе: прокрутку отдаём браузеру
-   (`overflow-x:auto` в стилях), карточки листаются пальцем. */
-(function(){
-  'use strict';
-  var sec  = document.getElementById('heroes');
-  var wrap = document.getElementById('prWrap');
-  var grid = document.getElementById('prGrid');
-  if (!sec || !wrap || !grid) return;
-
-  var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
-  var mouse = window.matchMedia('(min-width:1024px) and (hover:hover) and (pointer:fine)');
-
-  var cards = Array.prototype.slice.call(grid.children);   /* семь настоящих, без клонов */
-  var N = cards.length;
-
-  function slushat(mq, fn){
-    if (mq.addEventListener) mq.addEventListener('change', fn);
-    else if (mq.addListener) mq.addListener(fn);
-  }
-
-  /* ---------- 1. появление ---------- */
-  if (!('IntersectionObserver' in window)) sec.classList.add('on');
-  else new IntersectionObserver(function(en, ob){
-    if (en[0].isIntersecting){ sec.classList.add('on'); ob.disconnect(); }
-  }, {rootMargin:'0px 0px -10% 0px'}).observe(grid);
-
-  /* Ленивая загрузка снимается ЗАРАНЕЕ, за пол-экрана до подъезда. Иначе
-     на телефоне карточка въезжает в кадр пустой: браузер начинает качать
-     файл только когда картинка уже пересекла край окна, а лента к этому
-     моменту уже её показывает. Семь файлов — 0,8 МБ, качать их с самого
-     верха страницы незачем, поэтому не `eager` в разметке, а вот так. */
-  var razleneno = false;
-  function razlenit(){
-    razleneno = true;
-    var im = grid.querySelectorAll('img[loading="lazy"]');
-    for (var i = 0; i < im.length; i++) im[i].loading = 'eager';
-  }
-  if (!('IntersectionObserver' in window)) razlenit();
-  else new IntersectionObserver(function(en, ob){
-    if (en[0].isIntersecting){ razlenit(); ob.disconnect(); }
-  }, {rootMargin:'60% 0px'}).observe(sec);
-
-  /* ---------- 2. реакция на курсор ---------- */
-  var TILT = 6.5;               /* потолок наклона в градусах */
-  var pod = null, mx = 0, my = 0;   /* карточка под курсором и где он стоит */
-
-  function karta(e){
-    return (e.target && e.target.closest) ? e.target.closest('.pr-card') : null;
-  }
-  function uyti(){
-    if (!pod) return;
-    pod.classList.remove('hot');
-    pod.style.setProperty('--rx', '0deg');
-    pod.style.setProperty('--ry', '0deg');
-    pod = null;
-  }
-  function vesti(){
-    if (!pod) return;
-    var r = pod.getBoundingClientRect();
-    if (!r.width || !r.height) return;
-    var x = (mx - r.left) / r.width;
-    var y = (my - r.top)  / r.height;
-    /* карточка уехала из-под курсора — отпускаем сами, событие может и не прийти */
-    if (x < -0.02 || x > 1.02 || y < -0.02 || y > 1.02){ uyti(); return; }
-    var st = pod.style;
-    st.setProperty('--mx', (x * 100).toFixed(1) + '%');
-    st.setProperty('--my', (y * 100).toFixed(1) + '%');
-    /* мышь правее середины — карточка отворачивается вправо, ближний край
-       поднимается: знак у rotateX обратный, ось X смотрит вниз экрана */
-    st.setProperty('--ry', ((x - 0.5) * 2 * TILT).toFixed(2) + 'deg');
-    st.setProperty('--rx', ((0.5 - y) * 2 * TILT).toFixed(2) + 'deg');
-  }
-  wrap.addEventListener('pointerover', function(e){
-    if (!mouse.matches || calm.matches) return;
-    var k = karta(e);
-    if (!k || k === pod) return;
-    uyti();
-    pod = k; mx = e.clientX; my = e.clientY;
-    vesti();
-    if (pod) pod.classList.add('hot');
-  });
-  wrap.addEventListener('pointerout', function(e){
-    if (!pod || karta(e) !== pod) return;
-    /* курсор перешёл на внутренний слой той же карточки — это не уход */
-    if (e.relatedTarget && pod.contains(e.relatedTarget)) return;
-    uyti();
-  });
-  wrap.addEventListener('pointermove', function(e){
-    if (!pod) return;
-    mx = e.clientX; my = e.clientY; vesti();
-  });
-  /* Курсор может уехать не «через край», а вместе с изменившейся страницей:
-     окно сузилось, наклон выключился. Тогда `pointerout` не придёт. */
-  slushat(mouse, function(){ if (!mouse.matches) uyti(); });
-
-  /* ---------- 3. лента ---------- */
-  var BASE = 26, LH0 = 240, MAXV = 2400, TAU = 0.75;   /* числа ленты второго экрана */
-  var sobrano = false, shag = 0, pos = 0, v = BASE, raf = 0, last = 0;
-  var tyanut = false, pid = null, x0 = 0, t0 = 0, vx = 0, proshel = 0;
-  var glaz = null;
-
-  function sobrat(){
-    if (sobrano) return;
-    for (var i = 0; i < N; i++){
-      var k = cards[i].cloneNode(true);
-      k.className += ' pr-clone';
-      k.setAttribute('aria-hidden', 'true');
-      var im = k.querySelector('img');
-      if (im) im.alt = '';
-      grid.appendChild(k);
-    }
-    sobrano = true;
-    /* Клоны унаследовали loading="lazy" у оригиналов. Снимаем её только
-       если экран уже подъехал: иначе лента, собранная при загрузке страницы,
-       утащила бы все 0,8 МБ с самого верха. */
-    if (razleneno) razlenit();
-    izmerit();
-  }
-  function razobrat(){
-    var k = grid.querySelectorAll('.pr-clone');
-    for (var i = 0; i < k.length; i++) k[i].parentNode.removeChild(k[i]);
-    sobrano = false; pos = 0; v = BASE; shag = 0;
-    grid.style.transform = '';
-  }
-  function izmerit(){
-    if (!sobrano) return;
-    var a = grid.children[0], b = grid.children[N];
-    shag = (a && b) ? (b.offsetLeft - a.offsetLeft) : 0;
-    /* крупнее карточка — быстрее лента: глаз мерит движение долями кадра,
-       а не пикселями. Ниже телефонной высоты не замедляемся. */
-    BASE = 26 * Math.max(1, (a ? a.offsetHeight : LH0) / LH0);
-    polozhit();
-  }
-  function polozhit(){
-    var x = shag ? -(((pos % shag) + shag) % shag) : 0;
-    grid.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
-  }
-  function kadr(now){
-    raf = requestAnimationFrame(kadr);
-    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
-    last = now;
-    if (!tyanut){
-      v += (BASE - v) * (1 - Math.exp(-dt / TAU));   /* бросок затухает к базовой */
-      pos += v * dt;
-    }
-    polozhit();
-    vesti();          /* карточка уехала под курсором — пересчитать наклон и блик */
-  }
-  function pusk(){ if (!raf && sobrano){ last = 0; raf = requestAnimationFrame(kadr); } }
-  function stop(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
-
-  wrap.addEventListener('pointerdown', function(e){
-    if (!sobrano) return;
-    tyanut = true; pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; proshel = 0;
-    wrap.classList.add('drag');                      /* курсор «зажатая рука» */
-    try{ wrap.setPointerCapture(pid); }catch(err){}
-  });
-  wrap.addEventListener('pointermove', function(e){
-    if (!tyanut || e.pointerId !== pid) return;
-    var dx = e.clientX - x0, dt = (e.timeStamp - t0) / 1000;
-    pos -= dx;                                       /* лента идёт за пальцем */
-    proshel += Math.abs(dx);
-    if (dt > 0.004) vx = 0.7 * vx + 0.3 * (dx / dt); /* сглаженная скорость пальца */
-    x0 = e.clientX; t0 = e.timeStamp;
-    polozhit();
-  });
-  function otpustit(){
-    if (!tyanut) return;
-    tyanut = false;
-    wrap.classList.remove('drag');
-    if (pid !== null){ try{ wrap.releasePointerCapture(pid); }catch(err){} pid = null; }
-    if (proshel < 8) return;                         /* это была прокрутка страницы, не свайп */
-    v = Math.max(-MAXV, Math.min(MAXV, -vx));
-  }
-  wrap.addEventListener('pointerup', otpustit);
-  wrap.addEventListener('pointercancel', otpustit);
-  wrap.addEventListener('lostpointercapture', otpustit);
-
-  /* лента живёт только пока она на экране: за кадром кадры не считаем */
-  function smotret(){
-    if (glaz || !('IntersectionObserver' in window)){ pusk(); return; }
-    glaz = new IntersectionObserver(function(en){
-      if (en[0].isIntersecting) pusk(); else stop();
-    }, {rootMargin:'100px'});
-    glaz.observe(wrap);
-  }
-
-  var tmr = null;
-  function svet(){
-    if (!calm.matches){ sobrat(); smotret(); }
-    else { stop(); razobrat(); uyti(); }
-  }
-  svet();
-  slushat(calm, svet);
-  window.addEventListener('resize', function(){
-    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 150);
-  });
-  window.addEventListener('orientationchange', function(){
-    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 300);
-  });
-})();
-</script>
-
 <!-- Скрипт десятого экрана вынесен в ОТДЕЛЬНЫЙ <script> намеренно: файл правят
      из двух окон, и ошибка в соседнем блоке не должна его глушить. -->
 <script>
@@ -8303,7 +8056,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </script>
 
 <script>
-/* ============ ЭКРАН 12: КАРУСЕЛЬ-ОБЛОЖКИ (ПРОБА) ============
+/* ============ ЭКРАН 9: КАРУСЕЛЬ-ОБЛОЖКИ ============
    Перевод присланного React-компонента на голый JS. Компонент строил
    раскладку не состоянием React, а прямой записью в стили карточек —
    этот приём и перенесён, менять было нечего.
@@ -8341,7 +8094,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    с разгоном и торможением. Условия остановки — у самого автохода ниже. */
 (function(){
   'use strict';
-  var sec = document.getElementById('heroesFlow');
+  var sec = document.getElementById('heroes');
   if (!sec) return;
   var frame = document.getElementById('cfFrame');
   var track = document.getElementById('cfTrack');
@@ -8705,6 +8458,59 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   });
 
   show(0);
+})();
+</script>
+
+<script>
+/* ==================== ЭКРАН 14: ЗАПУСК РОЛИКОВ ====================
+   Пока не нажали — в окне лежит обложка. По щелчку на её место встаёт
+   встроенный плеер Rutube с автозапуском.
+
+   Почему не положить семь `<iframe>` сразу: каждый встроенный плеер это
+   чужая страница со своими скриптами и рекламой. Семь штук на одном экране
+   — это семь лишних загрузок ещё до того, как человек решил хоть что-то
+   смотреть. С обложками экран открывается мгновенно.
+
+   Играет всегда только один. Открываешь второй — первый сворачивается
+   обратно в обложку. Свернуть значит УДАЛИТЬ плеер: остановить чужой
+   плеер снаружи мы не можем (он в другом домене и команд не принимает),
+   а удалённый iframe умолкает гарантированно.
+
+   Кнопка не удаляется, а прячется через `hidden` — из неё же берётся
+   обложка обратно, когда ролик сворачивают. */
+(function(){
+  var boxes = [].slice.call(document.querySelectorAll('#video .vd-box'));
+  if(!boxes.length) return;
+  var open = null;                       /* окно, в котором сейчас играет ролик */
+
+  function close(box){
+    var f = box.querySelector('iframe');
+    if(f) f.remove();
+    var b = box.querySelector('.vd-open');
+    if(b) b.hidden = false;
+    if(open === box) open = null;
+  }
+
+  function play(box, btn){
+    if(open && open !== box) close(open);
+
+    var f = document.createElement('iframe');
+    f.src = 'https://rutube.ru/play/embed/' + btn.dataset.rt + '/?autoplay=1';
+    f.title = btn.dataset.ti || 'Видео';
+    f.setAttribute('frameborder', '0');
+    f.setAttribute('allow', 'clipboard-write; autoplay; encrypted-media; picture-in-picture; fullscreen');
+    f.setAttribute('allowfullscreen', '');
+    box.appendChild(f);
+
+    btn.hidden = true;
+    open = box;
+  }
+
+  boxes.forEach(function(box){
+    var btn = box.querySelector('.vd-open');
+    if(!btn) return;
+    btn.addEventListener('click', function(){ play(box, btn); });
+  });
 })();
 </script>
 
