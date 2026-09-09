@@ -3695,11 +3695,25 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      2099x1098: рамка занимает в нём 1778 px по ширине, а по краям остаются
      поля, в которых висят конфеты. Поэтому вылетать за блок нечему и запас
      под конфеты больше не нужен. Видимая рамка = 84,7 % холста: при 1340
-     это те же 1135 px, что были у прежней рамки. */
-  --mk-w: min(1340px, 100%);
+     это те же 1135 px, что были у прежней рамки. Просьба Серёги 10.09.2026 -
+     «слайдер на 30 % меньше»: потолок с 1340 опущен до 938, и там, где холст
+     раньше занимал всю ширину контейнера, теперь берётся 70 % от неё —
+     иначе на средних окнах (768-1440) уменьшения не случилось бы вовсе. */
+  --mk-w: min(938px, 70%);
   --mk-arw: clamp(44px, 4.4vw, 62px);
   --mk-fl: 12%;                   /* размах полёта конфет, доля их высоты */
-  background:#FFE2EA; position:relative; z-index:25; overflow-x:clip;
+  /* Фон «Sunset Blush» с 21st.dev (просьба Серёги 10.09.2026): четыре круглых
+     пятна, каждое на своей точке, поверх медовой заливки — Rose milk, Blush,
+     Mauve и Honey. Прежний ровный розовый #FFE2EA снят вместе с ним. Пятна
+     заданы процентами, поэтому растягиваются вместе с экраном и на телефоне
+     дают ту же картинку, только гуще. */
+  background-color:#F6D9A8;
+  background-image:
+    radial-gradient(circle at 65.24% 44.05%, rgba(251,239,242,1) 0%, rgba(251,239,242,.844) 9.57%, rgba(251,239,242,.5) 19.15%, rgba(251,239,242,.156) 28.72%, rgba(251,239,242,0) 38.3%),
+    radial-gradient(circle at 27.95% 75.05%, rgba(243,192,199,1) 0%, rgba(243,192,199,.844) 12.46%, rgba(243,192,199,.5) 24.92%, rgba(243,192,199,.156) 37.39%, rgba(243,192,199,0) 49.85%),
+    radial-gradient(circle at 52.34% 20.59%, rgba(231,210,240,1) 0%, rgba(231,210,240,.844) 15.44%, rgba(231,210,240,.5) 30.88%, rgba(231,210,240,.156) 46.31%, rgba(231,210,240,0) 61.75%),
+    radial-gradient(circle at 80.74% 84.5%,  rgba(246,217,168,1) 0%, rgba(246,217,168,.844) 18.32%, rgba(246,217,168,.5) 36.65%, rgba(246,217,168,.156) 54.97%, rgba(246,217,168,0) 73.3%);
+  position:relative; z-index:25; overflow-x:clip;
   padding: calc(72 * var(--u)) 0 calc(80 * var(--u));
 }
 /* Цвета заголовка на этом экране свои: общие `.cr-red` и `.cr-blue` взяты
@@ -3773,7 +3787,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* Общий `.cr-cont` ниже 768 px идёт без полей — здесь они обязательны:
      в них помещается вылет летающих конфет (см. шапку блока). */
   .mk .cr-cont{padding-inline:16px}
-  .mk{padding:36px 0 42px; --mk-arw:36px}
+  /* На телефоне холст остаётся во всю ширину: там 70 % дали бы рамку
+     в 260 px, на которой фотографию уже не разглядеть. */
+  .mk{padding:36px 0 42px; --mk-arw:36px; --mk-w:100%}
   /* Заголовок на телефоне мельче общих 13 px: строка «ВОТ КАКИЕ КРАСИВЫЕ
      ЛЕДЕНЦЫ» при 39 px готовой строки ломается на три и вместе со второй
      половиной съедает пол-экрана — на фотографию, ради которой экран
@@ -4883,8 +4899,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
 
         <img class="mk-frame" src="mk/frame.webp?v=2" width="2099" height="1098" alt="" aria-hidden="true" decoding="async">
-        <img class="mk-candy mk-candy--a" src="mk/candy-a.webp?v=1" width="310" height="318" alt="" aria-hidden="true" decoding="async">
-        <img class="mk-candy mk-candy--b" src="mk/candy-b.webp?v=1" width="298" height="312" alt="" aria-hidden="true" decoding="async">
+        <img class="mk-candy mk-candy--a" src="mk/candy-a.webp?v=2" width="310" height="318" alt="" aria-hidden="true" decoding="async">
+        <img class="mk-candy mk-candy--b" src="mk/candy-b.webp?v=2" width="298" height="312" alt="" aria-hidden="true" decoding="async">
 
         <button class="mk-arw mk-arw--prev" type="button" aria-label="Предыдущее фото">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 4 7 12l8 8"/></svg>
