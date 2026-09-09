@@ -3715,6 +3715,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   position:absolute; inset:0; display:block; width:100%; height:100%;
   padding:0; border:0; background:none; cursor:pointer; color:inherit;
 }
+/* Спрятанная кнопка обязана исчезнуть. Скрипт, запуская ролик, ставит ей
+   `hidden`, а браузерное правило `[hidden]{display:none}` слабее любого
+   своего `display` — без этой строки после нажатия обложка уходит, но
+   золотой кружок и время остаются висеть поверх чужого плеера. */
+.vd-open[hidden]{display:none}
 .vd-open img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
   transition:transform .5s ease, filter .3s ease}
 /* Затемнение поверх кадра: под ним читается и кнопка, и время. Кадры разные,
