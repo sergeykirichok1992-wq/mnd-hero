@@ -4591,8 +4591,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <!-- ======== ЭКРАН 12: персонажи каруселью-обложками (ПРОБА) ========
      Проба нового вида девятого экрана: те же семь карточек, но не бегущей
      лентой, а стопкой «обложек» — центральная стоит лицом, соседние уходят
-     вглубь и разворачиваются боком. Листается перетаскиванием, щелчком
-     по соседней карточке и стрелками с клавиатуры.
+     вглубь и разворачиваются боком. Листается сама (шаг раз в 3,2 с),
+     а ещё перетаскиванием, щелчком по соседней карточке и стрелками
+     с клавиатуры.
 
      Ставится в самый низ страницы намеренно: девятый экран остаётся на месте,
      чтобы Серёга мог сравнить оба вида. Понравится — заменит девятый,
@@ -7913,7 +7914,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    расстояния — при линейном росте вторая карточка складывается в щепку),
    потолок поворота 82 градуса (иначе дальняя встаёт к зрителю ребром),
    потеря непрозрачности 0,1 за шаг, зазор 0,05 ширины, притяжение к цели
-   0,16 за кадр, бросок пальцем не дальше двух карточек. */
+   0,16 за кадр, бросок пальцем не дальше двух карточек.
+
+   АВТОХОД ШАГАМИ, А НЕ ПЛАВНЫМ СНОСОМ (просьба Серёги 09.09.2026). У обложек
+   весь смысл в том, что центральная карточка стоит лицом; при непрерывном
+   ходе она лицом не стоит никогда. Поэтому карусель раз в 3,2 с переезжает
+   на одну карточку тем же `settle`, которым её листает человек. Условия
+   остановки — у самого автохода ниже. */
 (function(){
   'use strict';
   var sec = document.getElementById('heroesFlow');
@@ -7932,6 +7939,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
   var ROTATE = 44, DEPTH = 0.6, FALLOFF = 0.56, FADE = 0.1, GAP = 0.05;
   var TIGHT = 0.16, THROW = 0.18, MAXTHROW = 2, CAP = 82;
+  /* Автоход: шаг раз в 3,2 с. Подъезд к следующей карточке занимает около
+     0,75 с (затухание 0,16 за кадр), значит карточка стоит лицом примерно
+     2,5 с — успеваешь прочитать подпись. Вмешался человек — ждём дольше,
+     чтобы карусель не спорила с рукой. */
+  var AUTO = 3200, AUTOWAIT = 6500;
 
   sec.classList.add('cf-3d');
 
@@ -7968,7 +7980,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     target = to;
     (function step(){
       var left = target - pos;
-      if (Math.abs(left) < 0.0004){ pos = target; paint(); raf = null; return; }
+      if (Math.abs(left) < 0.0004){
+        pos = target;
+        /* Приехали — сматываем накопленные круги. Раскладка считает `pos`
+           по кольцу, поэтому вычесть целое число кругов ей всё равно,
+           зато число не растёт часами и остаётся читаемым при отладке. */
+        var krugov = Math.floor(pos / N);
+        if (krugov){ pos -= krugov * N; target = pos; }
+        paint(); raf = null; return;
+      }
       pos += left * TIGHT;              /* затухание, а не пружина: без перелёта */
       paint();
       raf = requestAnimationFrame(step);
@@ -7980,10 +8000,54 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     settle(i + Math.round((target - i) / N) * N);
   }
 
+  /* ---------- автоход ----------
+     Карусель листается сама, шагами по одной карточке (просьба Серёги
+     09.09.2026). Шагами, а не плавным сносом, как бегущая лента девятого
+     экрана: у обложек весь смысл в том, что центральная стоит лицом,
+     а при непрерывном ходе она лицом не стоит никогда.
+
+     Ход останавливается в четырёх случаях, и все четыре обязательны:
+       - карусель ушла с экрана — иначе браузер считает кадры вслепую;
+       - вкладку свернули — то же самое, но `IntersectionObserver`
+         этого не видит;
+       - курсор стоит на карусели — человек разглядывает карточку,
+         и уводить её из-под него нельзя (только там, где курсор есть:
+         на телефоне `pointerenter` приходит от касания, и ход замирал бы
+         после каждого тычка);
+       - человек тянет пальцем.
+     После любого вмешательства пауза длиннее обычной. */
+  var tik = null, vidno = false, navisli = false;
+  var kursor = window.matchMedia('(hover:hover) and (pointer:fine)');
+
+  function avtoStop(){ if (tik){ clearTimeout(tik); tik = null; } }
+  function avtoPusk(pauza){
+    avtoStop();
+    if (!vidno || navisli || drag || document.hidden) return;
+    tik = setTimeout(function(){
+      tik = null;
+      nudge(1);
+      avtoPusk(AUTO);
+    }, pauza || AUTO);
+  }
+
+  if (kursor.matches){
+    frame.addEventListener('pointerenter', function(e){
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      navisli = true; avtoStop();
+    });
+    frame.addEventListener('pointerleave', function(){
+      navisli = false; avtoPusk(AUTOWAIT);
+    });
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (document.hidden) avtoStop(); else avtoPusk(AUTOWAIT);
+  });
+
   /* ---------- палец и мышь ---------- */
   var moved = 0;
   frame.addEventListener('pointerdown', function(e){
     if (e.button && e.button !== 0) return;
+    avtoStop();
     if (raf !== null){ cancelAnimationFrame(raf); raf = null; }
     try { frame.setPointerCapture(e.pointerId); } catch(_){ }
     target = pos; moved = 0;
@@ -8010,6 +8074,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     frame.classList.remove('drag');
     var carried = Math.max(-MAXTHROW, Math.min(MAXTHROW, v * THROW));
     settle(Math.round(pos + carried));
+    avtoPusk(AUTOWAIT);
   }
   frame.addEventListener('pointerup', otpustit);
   frame.addEventListener('pointercancel', otpustit);
@@ -8021,13 +8086,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var card = e.target && e.target.closest ? e.target.closest('.cf-card') : null;
     if (!card) return;
     var i = cards.indexOf(card);
-    if (i >= 0) goTo(i);
+    if (i >= 0){ goTo(i); avtoPusk(AUTOWAIT); }
   });
 
   /* ---------- клавиатура ---------- */
   frame.addEventListener('keydown', function(e){
-    if (e.key === 'ArrowLeft'){ e.preventDefault(); nudge(-1); }
-    else if (e.key === 'ArrowRight'){ e.preventDefault(); nudge(1); }
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); nudge(-1); avtoPusk(AUTOWAIT); }
+    else if (e.key === 'ArrowRight'){ e.preventDefault(); nudge(1); avtoPusk(AUTOWAIT); }
   });
 
   /* ---------- замер ---------- */
@@ -8047,11 +8112,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.addEventListener('load', merit);
 
   /* ---------- появление и ленивая загрузка ---------- */
-  if (!('IntersectionObserver' in window)) sec.classList.add('cf-noio');
+  if (!('IntersectionObserver' in window)){
+    sec.classList.add('cf-noio');
+    vidno = true; avtoPusk(AUTO);          /* без наблюдателя крутим всегда */
+  }
   else {
     new IntersectionObserver(function(en, ob){
       if (en[0].isIntersecting){ sec.classList.add('on'); ob.disconnect(); }
     }, {rootMargin:'0px 0px -10% 0px'}).observe(track);
+    /* Наблюдатель автохода НЕ отключается после первого срабатывания,
+       в отличие от соседнего: он и дальше включает и глушит ход, когда
+       карусель въезжает в окно и уезжает из него. */
+    new IntersectionObserver(function(en){
+      vidno = en[0].isIntersecting;
+      if (vidno) avtoPusk(AUTO); else avtoStop();
+    }, {rootMargin:'0px'}).observe(frame);
     /* Ленивую загрузку снимаем за полэкрана до подъезда: иначе карточка
        въезжает в кадр пустой (тот же приём на девятом экране). */
     new IntersectionObserver(function(en, ob){
