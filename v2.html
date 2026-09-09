@@ -2934,9 +2934,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    плохо, глаз теряет начало следующей. */
 /* На телефоне общий контейнер сайта нарочно идёт без полей
    (`@media (max-width:767px){ .cr-cont{width:100%; padding:0} }`), и заголовок
-   с подзаголовком упирались в края экрана. Возвращаем поля — те же 14 px,
-   что у ряда карточек, чтобы всё стояло по одной линии. */
-@media (max-width:767px){ .pgs .cr-cont{padding-inline:14px} }
+   с подзаголовком упирались в края экрана. Возвращаем их, повторяя ровно ту
+   ширину и те поля, что у ряда карточек, — иначе заголовок стоит не по одной
+   линии с карточками под ним. */
+@media (max-width:767px){
+  .pgs .cr-cont{width:min(94vw,1462px); margin:0 auto;
+    padding-inline:clamp(16px,3vw,47.6px)}
+}
+@media (max-width:559px){ .pgs .cr-cont{width:100%; padding-inline:25px} }
 .pgs-lead{
   max-width:calc(620 * var(--u)); margin:0 auto calc(52 * var(--u));
   text-align:center; text-wrap:balance;
@@ -2959,6 +2964,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (min-width:560px){
   .pgs-row{width:min(94vw,1462px); margin:0 auto; padding:0 clamp(16px,3vw,47.6px)}
 }
+/* ТЕЛЕФОН. 09.09.2026 по просьбе Серёги: карточка чуть уже (поля 25 px вместо
+   14), а воздуха между карточками вдвое больше — 28 px вместо 14. Зазор тут
+   задан числом, а не общей формулой: она считается от ширины окна и на
+   телефоне всегда упиралась бы в свой нижний предел. */
+@media (max-width:559px){
+  .pgs{--gap:28px}
+  .pgs-row{padding:0 25px}
+}
 .pgs-defs{position:absolute; width:0; height:0; overflow:hidden}
 
 .pg{
@@ -2972,7 +2985,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      и заголовок вышел 1,5 px, а окно с фотографией схлопнулось в ноль.
      Процент остаётся ровно в одном месте — в самом `width` ниже, страховкой
      на случай, если 100vw посчитает вместе с полосой прокрутки. */
-  --w: calc(100vw - 28px);
+  --w: calc(100vw - 50px);
   --u2: calc(var(--w) / 1045);
   --tilt: -2.83deg;        /* наклон рамки; у чётных карточек он зеркалится */
   --tint: 222;             /* тон карточки; насыщенность и светлота у всех одни */
