@@ -3450,25 +3450,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      «слайдер на 30 % меньше»: потолок с 1340 опущен до 938, и там, где холст
      раньше занимал всю ширину контейнера, теперь берётся 70 % от неё —
      иначе на средних окнах (768-1440) уменьшения не случилось бы вовсе. */
-  --mk-w: min(1079px, 80.5%);
+  --mk-w: min(938px, 70%);
   --mk-arw: clamp(44px, 4.4vw, 62px);
   --mk-fl: 12%;                   /* размах полёта конфет, доля их высоты */
-  /* Фон — нежный розово-белый пастельный (просьба Серёги 10.09.2026:
-     «чтобы органично было»). Устроен в два слоя. Сверху и снизу линейная
-     растяжка, которая СШИВАЕТ ЭКРАН С СОСЕДЯМИ: над ним белое поле заявки,
-     под ним сиреневое поле персонажей (#EEEDFD), и без этих концов оба стыка
-     читались бы полосой. Между ними четыре бледных пятна — белое, розовое,
-     кремовое и сиреневое, все слабой заливкой: рамка и так яркая, фону
-     спорить с ней нельзя.
-     Прежний «Sunset Blush» с 21st.dev снят: его медовые углы забирали
-     внимание себе. */
-  background-color:#FCF5F8;
+  /* Фон «Sunset Blush» с 21st.dev (просьба Серёги 10.09.2026): четыре круглых
+     пятна, каждое на своей точке, поверх медовой заливки — Rose milk, Blush,
+     Mauve и Honey. Прежний ровный розовый #FFE2EA снят вместе с ним. Пятна
+     заданы процентами, поэтому растягиваются вместе с экраном и на телефоне
+     дают ту же картинку, только гуще. */
+  background-color:#F6D9A8;
   background-image:
-    linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,0) 16%, rgba(238,237,253,0) 76%, #EFEDFB 100%),
-    radial-gradient(circle at 16% 14%, rgba(255,255,255,.92) 0%, rgba(255,255,255,0) 52%),
-    radial-gradient(circle at 80% 24%, rgba(252,228,236,.80) 0%, rgba(252,228,236,0) 50%),
-    radial-gradient(circle at 26% 76%, rgba(250,216,228,.72) 0%, rgba(250,216,228,0) 54%),
-    radial-gradient(circle at 86% 80%, rgba(236,227,248,.66) 0%, rgba(236,227,248,0) 56%);
+    radial-gradient(circle at 65.24% 44.05%, rgba(251,239,242,1) 0%, rgba(251,239,242,.844) 9.57%, rgba(251,239,242,.5) 19.15%, rgba(251,239,242,.156) 28.72%, rgba(251,239,242,0) 38.3%),
+    radial-gradient(circle at 27.95% 75.05%, rgba(243,192,199,1) 0%, rgba(243,192,199,.844) 12.46%, rgba(243,192,199,.5) 24.92%, rgba(243,192,199,.156) 37.39%, rgba(243,192,199,0) 49.85%),
+    radial-gradient(circle at 52.34% 20.59%, rgba(231,210,240,1) 0%, rgba(231,210,240,.844) 15.44%, rgba(231,210,240,.5) 30.88%, rgba(231,210,240,.156) 46.31%, rgba(231,210,240,0) 61.75%),
+    radial-gradient(circle at 80.74% 84.5%,  rgba(246,217,168,1) 0%, rgba(246,217,168,.844) 18.32%, rgba(246,217,168,.5) 36.65%, rgba(246,217,168,.156) 54.97%, rgba(246,217,168,0) 73.3%);
   position:relative; z-index:25; overflow-x:clip;
   padding: calc(72 * var(--u)) 0 calc(80 * var(--u));
 }
@@ -3515,19 +3510,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   transform:translateY(-50%);
   /* Простой белый кружок с тенью — как стрелки карусели площадки. Полосатую
      кайму «под трость» Серёга забраковал 10.09.2026: на экране и так много
-     полосок, органу управления рисунок не нужен.
-     Стрелки вынесены ЗА холст (отрицательный отступ): в самих полях холста
-     между краем блока и рамкой всего 8 % ширины, и кружок стоял почти
-     вплотную к кадру. Теперь между ним и рамкой около двух сантиметров.
-     Дальше отводить нельзя — упрутся в край окна на ноутбуке. */
+     полосок, органу управления рисунок не нужен. */
   background:#fff;
   box-shadow:0 6px 16px rgba(140,27,18,.26);
   display:grid; place-items:center;
   transition:transform .18s ease, box-shadow .18s ease, opacity .2s ease;
 }
 .mk-arw svg{width:34%; height:34%; fill:none; stroke:#8C1B12; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round}
-.mk-arw--prev{left:-4.4%}
-.mk-arw--next{right:-4.4%}
+.mk-arw--prev{left:0.8%}
+.mk-arw--next{right:0.8%}
 .mk-arw[disabled]{opacity:.3; cursor:default}
 .mk-arw:focus-visible{outline:3px solid #8C1B12; outline-offset:3px}
 @media (hover:hover) and (pointer:fine){
@@ -3566,188 +3557,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk-dot{width:8px; height:8px}
   .mk-dot.is-on{width:26px}
 }
-/* ==================== ЭКРАН 14: КОРОТКИЕ ВИДЕО ====================
-   Пространство имён `vd-`. Семь роликов Rutube, сняты с боевого сайта
-   ministrynn.ru: шесть коротких сеткой и двадцатиминутный фильм отдельным
-   блоком под ними. Ссылки на ролики — те же, что на старом сайте.
-
-   ПОДПИСИ ИСПРАВЛЕНЫ ОТНОСИТЕЛЬНО СТАРОГО САЙТА. Там подписи со второй
-   по четвёртую съехали на соседний ролик: под «Про карамельный мастер-класс»
-   стоял ролик про Деда Мороза, под «Шоу рисования светом» — карамельный
-   мастер-класс, под «Пульт управления делами Деда Мороза» — люминесцентное
-   шоу, а ролик про Деда Мороза был вставлен дважды. Здесь каждый ролик стоит
-   под своим названием (сверено с названиями на самом Rutube), а подписи
-   «Пульт управления делами Деда Мороза» нет: такого ролика у нас не залито.
-
-   ПЛЕЕР НЕ ГРУЗИТСЯ, ПОКА НЕ НАЖМУТ. В разметке лежит обложка и кнопка,
-   а `<iframe>` создаётся скриптом по щелчку. Семь встроенных плееров Rutube
-   на одном экране — это семь чужих страниц со своими скриптами и рекламой:
-   грузились бы они разом, экран открывался бы секундами, а не мгновенно.
-   Ради этого же обложки лежат у нас (`video/*.webp`, кадры из середины
-   роликов), а не тянутся с rutube: их картинки идут с чужого CDN и при
-   VPN или блокировке экран остался бы пустыми прямоугольниками.
-
-   ИГРАЕТ ВСЕГДА ТОЛЬКО ОДИН. Открываешь второй ролик — первый сворачивается
-   обратно в обложку (плеер удаляется целиком, поэтому звук гарантированно
-   умолкает; ставить на паузу чужой плеер снаружи мы не можем).
-
-   Поле — ночное небо по рецепту пятого экрана: синяя ночь, размытые пурпурные
-   и лиловые пятна, зерно. Так же, как там, без `filter:blur` — мягкость даёт
-   сам радиальный градиент, а размытие роняет частоту кадров втрое. */
-.vd-hold{position:relative; z-index:26}   /* ради блика на шве: он вылезает вверх, на розовый экран */
-.vd{
-  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
-  padding:clamp(56px,6.4vw,108px) 0 clamp(60px,6.8vw,114px);
-  background:
-    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
-    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
-}
-/* блик на шве с розовым экраном — тот же снимок, что на шве пятого и шестого */
-.vd-blik{
-  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
-  aspect-ratio:2000/381; transform:translateY(-48.5%);
-  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
-}
-.vd-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
-.vd-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
-.vd-glow i:nth-child(1){left:-20vw; top:2%; width:70vw; height:60%;
-  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
-  animation:bkDrift1 36s ease-in-out infinite alternate}
-.vd-glow i:nth-child(2){right:-22vw; top:-8%; width:72vw; height:64%;
-  background:radial-gradient(closest-side, rgba(108,43,217,.34) 0%, rgba(108,43,217,.22) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
-  animation:bkDrift2 43s ease-in-out infinite alternate}
-.vd-glow i:nth-child(3){left:6vw; bottom:2%; width:62vw; height:56%;
-  background:radial-gradient(closest-side, rgba(176,106,224,.22) 0%, rgba(176,106,224,.15) 32%, rgba(176,106,224,.05) 64%, rgba(176,106,224,0) 100%);
-  animation:bkDrift3 31s ease-in-out infinite alternate}
-.vd-glow i:nth-child(4){left:50%; bottom:-14%; width:76vw; height:52%; margin-left:-38vw;
-  background:radial-gradient(closest-side, rgba(227,179,78,.18) 0%, rgba(227,179,78,.12) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
-  animation:bkDrift2 39s ease-in-out infinite alternate-reverse}
-.vd-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
-.vd .cr-cont{z-index:7}
-
-/* Заголовок и подзаголовок — как на десятом экране (тоже тёмное поле):
-   Blogger Sans Bold прописными, белый, и светло-синий подзаголовок под ним. */
-.vd-t{
-  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
-  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
-  font-size:clamp(24px,3.3vw,51px); line-height:1.08; letter-spacing:.005em;
-  text-transform:uppercase; text-wrap:balance; color:#fff;
-}
-.vd-lead{
-  max-width:calc(660 * var(--u)); margin:0 auto clamp(28px,3.2vw,52px);
-  text-align:center; text-wrap:balance;
-  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
-  font-size:max(14px, clamp(15px,1.25vw,20px)); line-height:1.45; color:#B9C8F5;
-}
-
-/* СЕТКА. Три колонки на компьютере, две на планшете, одна на телефоне. */
-.vd-grid{
-  display:grid; grid-template-columns:repeat(3,1fr);
-  gap:clamp(16px,1.9vw,32px);
-}
-@media (max-width:1023px){ .vd-grid{grid-template-columns:repeat(2,1fr)} }
-@media (max-width:599px){ .vd-grid{grid-template-columns:1fr} }
-
-.vd-card{margin:0}
-/* Окно ролика. Пропорция 16:9 задана `aspect-ratio` у самого окна, а не
-   высотой картинки: в него потом встаёт чужой `<iframe>`, и он обязан
-   получить ту же рамку, иначе после нажатия карточка меняет высоту
-   и вся сетка под ней прыгает. */
-.vd-box{
-  position:relative; width:100%; aspect-ratio:16/9; border-radius:clamp(12px,1.1vw,20px);
-  overflow:hidden; background:#0A1046;
-  box-shadow:0 0 0 1px rgba(251,191,36,.22), 0 14px 34px rgba(2,5,20,.5);
-}
-.vd-box iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:block}
-/* Кнопка занимает всё окно: нажимать можно в любое место обложки, как
-   у любого плеера. Это орган управления, а не кнопка действия, поэтому
-   стандарт `zs-btn` тут ни при чём (то же правило, что у стрелок слайдера
-   мастер-класса) — но золото взято то же, чтобы экран не выпадал из сайта. */
-.vd-open{
-  position:absolute; inset:0; display:block; width:100%; height:100%;
-  padding:0; border:0; background:none; cursor:pointer; color:inherit;
-}
-.vd-open img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block;
-  transition:transform .5s ease, filter .3s ease}
-/* Затемнение поверх кадра: под ним читается и кнопка, и время. Кадры разные,
-   часть из них светлая — без этой пелены золотой кружок на снегу и гирляндах
-   терялся бы. */
-.vd-open::after{
-  content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg, rgba(4,7,26,.12) 0%, rgba(4,7,26,.30) 60%, rgba(4,7,26,.55) 100%);
-  transition:opacity .3s ease;
-}
-.vd-play{
-  position:absolute; left:50%; top:50%; z-index:2; transform:translate(-50%,-50%);
-  width:clamp(52px,5.4vw,78px); height:clamp(52px,5.4vw,78px); border-radius:50%;
-  background:linear-gradient(180deg,#FDE68A,#FCD34D 52%,#F59E0B);
-  box-shadow:0 0 0 1px rgba(251,191,36,.5), 0 6px 18px rgba(2,5,20,.5), 0 0 30px 4px rgba(245,158,11,.28);
-  display:grid; place-items:center;
-  transition:transform .22s ease, box-shadow .22s ease;
-}
-/* Треугольник смещён на 8 % вправо: у равнобедренного треугольника центр
-   тяжести левее геометрического центра, и поставленный ровно он выглядит
-   сдвинутым к левому краю кружка. */
-.vd-play svg{width:34%; height:34%; fill:#451A03; transform:translateX(8%)}
-.vd-time{
-  position:absolute; right:3.4%; bottom:5%; z-index:2;
-  padding:.24em .6em; border-radius:999px;
-  background:rgba(4,7,26,.72); color:#fff;
-  font-family:"CR Blogger",Arial,sans-serif; font-size:max(11px,.78vw); line-height:1.5;
-  letter-spacing:.02em; font-variant-numeric:tabular-nums;
-}
-@media (hover:hover) and (pointer:fine){
-  .vd-open:hover img{transform:scale(1.045)}
-  .vd-open:hover .vd-play{transform:translate(-50%,-50%) scale(1.09);
-    box-shadow:0 0 0 1px rgba(251,191,36,.6), 0 8px 22px rgba(2,5,20,.55), 0 0 44px 8px rgba(245,158,11,.36)}
-  .vd-open:hover::after{opacity:.72}
-}
-.vd-open:focus-visible{outline:3px solid #FCD34D; outline-offset:3px}
-.vd-cap{
-  margin:clamp(9px,.9vw,15px) 0 0; text-align:center;
-  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
-  font-size:max(14px, clamp(15px,1.15vw,19px)); line-height:1.35; color:#D8E2FF;
-}
-
-/* ---------- фильм ---------- */
-/* Отдельный блок под сеткой: ролик на двадцать минут — это уже не «короткое
-   видео», у него своя подводка и окно вдвое шире карточки. */
-.vd-film{margin:clamp(40px,4.6vw,78px) auto 0; width:min(100%, 900px); text-align:center}
-.vd-film-t{
-  margin:0 auto clamp(8px,.8vw,14px);
-  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
-  font-size:clamp(19px,2.1vw,33px); line-height:1.15; text-wrap:balance; color:#FFE7B4;
-}
-.vd-film-p{
-  margin:0 auto clamp(18px,2vw,32px); max-width:640px;
-  font-family:"CR Blogger",Arial,sans-serif; font-size:max(14px, clamp(15px,1.15vw,19px));
-  line-height:1.45; text-wrap:balance; color:#B9C8F5;
-}
-/* Подсказка про VPN. На старом сайте она стоит под каждым роликом; здесь
-   одна на весь экран и мелко: у кого всё открылось, тому она не нужна. */
-.vd-note{
-  margin:clamp(22px,2.4vw,38px) auto 0; text-align:center;
-  font-family:"CR Blogger",Arial,sans-serif; font-size:max(12px,.85vw); line-height:1.5;
-  color:rgba(185,200,245,.62);
-}
-
-@media (max-width:767px){
-  /* Общий контейнер ниже 768 px идёт без полей — карточкам они нужны. */
-  .vd .cr-cont{width:100%; padding-inline:16px}
-  .vd{padding:38px 0 44px}
-  .vd-t{font-size:clamp(21px,6.2vw,30px)}
-  .vd-lead{font-size:14px; margin-bottom:22px}
-  .vd-cap{font-size:14px}
-  .vd-film{margin-top:34px}
-}
-/* Дыхание отблесков — как на пятом экране: движение не должно ловиться
-   боковым зрением, а при «меньше движения» его нет совсем. */
-@media (prefers-reduced-motion:reduce){
-  .vd-glow i{animation:none}
-  .vd-open img{transition:none}
-}
-
 </style>
 
 </head>
@@ -4852,135 +4661,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
   </div>
 </section>
-
-
-<!-- ==================== ЭКРАН 14: КОРОТКИЕ ВИДЕО ====================
-     Семь роликов Rutube с боевого сайта ministrynn.ru: шесть коротких сеткой
-     и двадцатиминутный фильм отдельным блоком. Устройство, почему плеер
-     не грузится заранее и почему подписи не такие, как на старом сайте
-     → sayt-nn/ustroystvo.md, раздел «Экран 14».
-
-     Обложки — кадры из середины роликов (`video/*.webp`), а не первые кадры
-     с Rutube: там у всех семи титры со вшитой плашкой и по кадру не понять,
-     о чём ролик.
-
-     Идентификатор ролика лежит в `data-rt`, подпись для плеера — в `data-ti`.
-     Меняешь ролик — меняешь только эти два поля и картинку. -->
-<div class="vd-hold">
-<section class="vd" id="video" aria-labelledby="vdT">
-  <span class="vd-blik" aria-hidden="true"></span>
-  <div class="vd-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <div class="vd-grain" aria-hidden="true"></div>
-
-  <div class="cr-cont">
-    <h2 class="vd-t" id="vdT">Просто посмотрите, как всё выглядит<br class="vd-br"> и происходит, на коротких видео</h2>
-    <p class="vd-lead">Всё снято на наших мероприятиях. Ролики открываются прямо здесь, уходить со страницы не нужно.</p>
-
-    <div class="vd-grid">
-      <figure class="vd-card">
-        <div class="vd-box">
-          <button class="vd-open" type="button"
-                  data-rt="01db694af6a781db78ca88a9ba5fd2dd"
-                  data-ti="Как выглядит наша локация"
-                  aria-label="Смотреть видео: как выглядит наша локация, 46 секунд">
-            <img src="video/lokaciya.webp?v=1" width="1000" height="562" alt="Деревянная изба с кирпичным камином, ёлкой и гирляндами" loading="lazy" decoding="async">
-            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-            <span class="vd-time" aria-hidden="true">0:46</span>
-          </button>
-        </div>
-        <figcaption class="vd-cap">Как выглядит наша локация</figcaption>
-      </figure>
-
-      <figure class="vd-card">
-        <div class="vd-box">
-          <button class="vd-open" type="button"
-                  data-rt="c3aac8bdc6e601f602fdb7438cb2c0d2"
-                  data-ti="Какой у нас шикарный Дед Мороз"
-                  aria-label="Смотреть видео: какой у нас шикарный Дед Мороз, 36 секунд">
-            <img src="video/ded.webp?v=1" width="1000" height="562" alt="Дед Мороз в расшитой шубе у пульта управления новогодними делами" loading="lazy" decoding="async">
-            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-            <span class="vd-time" aria-hidden="true">0:36</span>
-          </button>
-        </div>
-        <figcaption class="vd-cap">Какой у нас шикарный Дед Мороз</figcaption>
-      </figure>
-
-      <figure class="vd-card">
-        <div class="vd-box">
-          <button class="vd-open" type="button"
-                  data-rt="7dc568d06964706bdb9172e5f19de57d"
-                  data-ti="Про карамельный мастер-класс"
-                  aria-label="Смотреть видео: про карамельный мастер-класс, 37 секунд">
-            <img src="video/karamel.webp?v=1" width="1000" height="562" alt="Дети показывают готовые красно-белые леденцы в упаковке" loading="lazy" decoding="async">
-            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-            <span class="vd-time" aria-hidden="true">0:37</span>
-          </button>
-        </div>
-        <figcaption class="vd-cap">Про карамельный мастер-класс</figcaption>
-      </figure>
-
-      <figure class="vd-card">
-        <div class="vd-box">
-          <button class="vd-open" type="button"
-                  data-rt="9e325eef4e760e97690b80e66b69ac51"
-                  data-ti="Шоу рисования светом"
-                  aria-label="Смотреть видео: шоу рисования светом, 50 секунд">
-            <img src="video/svet.webp?v=1" width="1000" height="562" alt="Светящийся зелёный рисунок в темноте на шоу рисования светом" loading="lazy" decoding="async">
-            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-            <span class="vd-time" aria-hidden="true">0:50</span>
-          </button>
-        </div>
-        <figcaption class="vd-cap">Шоу рисования светом</figcaption>
-      </figure>
-
-      <figure class="vd-card">
-        <div class="vd-box">
-          <button class="vd-open" type="button"
-                  data-rt="a9043e2da960e702764475101888c6d6"
-                  data-ti="Про сервис на наших площадках"
-                  aria-label="Смотреть видео: про сервис на наших площадках, 42 секунды">
-            <img src="video/servis.webp?v=1" width="1000" height="562" alt="Гостиная площадки: диваны, гирлянды и экран с заставкой" loading="lazy" decoding="async">
-            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-            <span class="vd-time" aria-hidden="true">0:42</span>
-          </button>
-        </div>
-        <figcaption class="vd-cap">Про сервис на наших площадках</figcaption>
-      </figure>
-
-      <figure class="vd-card">
-        <div class="vd-box">
-          <button class="vd-open" type="button"
-                  data-rt="a8e2f72ae47a500019bb8ae918bace27"
-                  data-ti="Фееричная актёрская игра"
-                  aria-label="Смотреть видео: фееричная актёрская игра, 12 минут 35 секунд">
-            <img src="video/aktery.webp?v=1" width="1000" height="562" alt="Дед Мороз и ведущий у пульта, вокруг дети и родители" loading="lazy" decoding="async">
-            <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-            <span class="vd-time" aria-hidden="true">12:35</span>
-          </button>
-        </div>
-        <figcaption class="vd-cap">Фееричная актёрская игра</figcaption>
-      </figure>
-    </div>
-
-    <div class="vd-film">
-      <p class="vd-film-t">Хотите полностью погрузиться в наш мир? Посмотрите 20-минутный фильм о нас!</p>
-      <p class="vd-film-p">У вас сложится полная картина о том, в какую сказку попадут ваши детки.</p>
-      <div class="vd-box">
-        <button class="vd-open" type="button"
-                data-rt="838ecf64473337f103fc545669103258"
-                data-ti="Документальный фильм о Министерстве Новогодних Дел"
-                aria-label="Смотреть документальный фильм о Министерстве Новогодних Дел, 20 минут 19 секунд">
-          <img src="video/film.webp?v=1" width="1280" height="720" alt="Пульт управления делами Деда Мороза со светящимися экранами" loading="lazy" decoding="async">
-          <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-          <span class="vd-time" aria-hidden="true">20:19</span>
-        </button>
-      </div>
-    </div>
-
-    <p class="vd-note">Если видео не открылось, выключите VPN и обновите страницу.</p>
-  </div>
-</section>
-</div>
 
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
@@ -8458,59 +8138,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   });
 
   show(0);
-})();
-</script>
-
-<script>
-/* ==================== ЭКРАН 14: ЗАПУСК РОЛИКОВ ====================
-   Пока не нажали — в окне лежит обложка. По щелчку на её место встаёт
-   встроенный плеер Rutube с автозапуском.
-
-   Почему не положить семь `<iframe>` сразу: каждый встроенный плеер это
-   чужая страница со своими скриптами и рекламой. Семь штук на одном экране
-   — это семь лишних загрузок ещё до того, как человек решил хоть что-то
-   смотреть. С обложками экран открывается мгновенно.
-
-   Играет всегда только один. Открываешь второй — первый сворачивается
-   обратно в обложку. Свернуть значит УДАЛИТЬ плеер: остановить чужой
-   плеер снаружи мы не можем (он в другом домене и команд не принимает),
-   а удалённый iframe умолкает гарантированно.
-
-   Кнопка не удаляется, а прячется через `hidden` — из неё же берётся
-   обложка обратно, когда ролик сворачивают. */
-(function(){
-  var boxes = [].slice.call(document.querySelectorAll('#video .vd-box'));
-  if(!boxes.length) return;
-  var open = null;                       /* окно, в котором сейчас играет ролик */
-
-  function close(box){
-    var f = box.querySelector('iframe');
-    if(f) f.remove();
-    var b = box.querySelector('.vd-open');
-    if(b) b.hidden = false;
-    if(open === box) open = null;
-  }
-
-  function play(box, btn){
-    if(open && open !== box) close(open);
-
-    var f = document.createElement('iframe');
-    f.src = 'https://rutube.ru/play/embed/' + btn.dataset.rt + '/?autoplay=1';
-    f.title = btn.dataset.ti || 'Видео';
-    f.setAttribute('frameborder', '0');
-    f.setAttribute('allow', 'clipboard-write; autoplay; encrypted-media; picture-in-picture; fullscreen');
-    f.setAttribute('allowfullscreen', '');
-    box.appendChild(f);
-
-    btn.hidden = true;
-    open = box;
-  }
-
-  boxes.forEach(function(box){
-    var btn = box.querySelector('.vd-open');
-    if(!btn) return;
-    btn.addEventListener('click', function(){ play(box, btn); });
-  });
 })();
 </script>
 
