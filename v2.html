@@ -3731,22 +3731,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   position:absolute; top:50%; z-index:4; width:var(--mk-arw); height:var(--mk-arw);
   border:0; padding:0; border-radius:50%; cursor:pointer;
   transform:translateY(-50%);
-  /* Полосы КОСЫЕ, а не лучами из центра: конический градиент давал звёздочку,
-     в которой не читалась ни кнопка, ни стрелка. Ширина полосы задана в
-     процентах от самой кнопки, поэтому на телефоне она ужимается сама. */
-  background:repeating-linear-gradient(45deg, #E1251B 0 14%, #fff 0 28%);
-  box-shadow:0 7px 18px rgba(140,27,18,.34), 0 0 0 1.5px rgba(140,27,18,.30);
+  /* Простой белый кружок с тенью — как стрелки карусели площадки. Полосатую
+     кайму «под трость» Серёга забраковал 10.09.2026: на экране и так много
+     полосок, органу управления рисунок не нужен. */
+  background:#fff;
+  box-shadow:0 6px 16px rgba(140,27,18,.26);
   display:grid; place-items:center;
   transition:transform .18s ease, box-shadow .18s ease, opacity .2s ease;
 }
-.mk-arw::before{content:''; position:absolute; inset:21%; border-radius:50%; background:#fff; box-shadow:inset 0 0 0 1px rgba(140,27,18,.12)}
-.mk-arw svg{position:relative; width:36%; height:36%; fill:none; stroke:#8C1B12; stroke-width:3.6; stroke-linecap:round; stroke-linejoin:round}
+.mk-arw svg{width:34%; height:34%; fill:none; stroke:#8C1B12; stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round}
 .mk-arw--prev{left:-5.8%}
 .mk-arw--next{right:-5.8%}
 .mk-arw[disabled]{opacity:.3; cursor:default}
 .mk-arw:focus-visible{outline:3px solid #8C1B12; outline-offset:3px}
 @media (hover:hover) and (pointer:fine){
-  .mk-arw:not([disabled]):hover{transform:translateY(-50%) scale(1.08); box-shadow:0 8px 22px rgba(140,27,18,.38), 0 0 0 1px rgba(140,27,18,.2)}
+  .mk-arw:not([disabled]):hover{transform:translateY(-50%) scale(1.08); box-shadow:0 8px 22px rgba(140,27,18,.34)}
 }
 .mk-arw:not([disabled]):active{transform:translateY(-50%) scale(.96)}
 
