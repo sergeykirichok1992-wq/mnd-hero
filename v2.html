@@ -3423,6 +3423,137 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 
 </style>
+<!-- Стили двенадцатого экрана вынесены в ОТДЕЛЬНЫЙ <style> намеренно, как
+     и стили девятого, десятого и одиннадцатого: файл правят из двух окон,
+     и перекос скобок в соседнем блоке не должен утаскивать этот экран
+     внутрь чужого @media.
+     → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ============ ЭКРАН 12: ПЕРСОНАЖИ КАРУСЕЛЬЮ-ОБЛОЖКАМИ (ПРОБА) ============
+   Пространство имён `cf-` (coverflow — «обложки»). Экран стоит в самом низу
+   как проба: понравится — заменит собой девятый экран с бегущей лентой,
+   не понравится — вырезается одним куском. Поэтому НИЧЕГО из `pr-` тут
+   не переиспользуется, только картинки те же.
+
+   Код прислал Серёга готовым React-компонентом (shadcn + Tailwind). Наш сайт —
+   одна HTML-страница без сборки, поэтому компонент переложен на голый CSS и JS;
+   тот же путь прошла карусель площадки на седьмом экране. Раскладка перенесена
+   число в число: поворот 44 градуса, уход вглубь 0,6 ширины карточки,
+   перспектива 3 ширины, показатель затухания 0,56, потеря непрозрачности 0,1
+   за шаг от центра, зазор между карточками 0,05 ширины.
+
+   ОПОРНЫЙ РАЗМЕР ОДИН — `--cf-card`, ширина карточки. Шаг между карточками,
+   глубина, перспектива и высота сцены считаются от неё, поэтому карусель
+   целиком масштабируется одним числом (приём `--pc` девятого экрана).
+   На стыке 768 px прыжка нет: `--u` ниже 1556 px упирается в 1px, значит
+   `calc(300 * var(--u))` там даёт те же 300 px, что и телефонная формула.
+
+   ХОЛСТ КАРТИНОК ТОТ ЖЕ, ЧТО НА ДЕВЯТОМ ЭКРАНЕ: `pers/*.webp` — 1035x1850,
+   сама карточка внутри 975x1525 с углом в точке (30, 285). Отсюда три
+   процента у картинки, они же стоят у `.pr-3d > img`. Над карточкой у части
+   персонажей торчит нашлёпка (посох Деда Мороза, рука Байконкурочки) —
+   поэтому у сцены сверху запас в 30 % ширины карточки, иначе рама срежет.
+
+   ПОД КАРУСЕЛЬЮ НЕТ НИ ПОДПИСИ, НИ ЗАГОЛОВКА — просьба Серёги 09.09.2026.
+   В присланном компоненте они были (`showCaption`), выброшены намеренно:
+   имена персонажей и так нарисованы внутри карточек.
+
+   БЕЗ JS И ПРИ «МЕНЬШЕ ДВИЖЕНИЯ» ЭКРАН ОСТАЁТСЯ ЖИВЫМ. Разметка по умолчанию —
+   обычная лента с прокруткой пальцем; трёхмерную раскладку включает скрипт,
+   ставя секции класс `cf-3d`. Так же устроен запасной вид девятого экрана. */
+.cf{
+  --cf-card: min(64vw, 300px);        /* ширина центральной карточки */
+  --cf-gap: 0.05;                     /* зазор в долях ширины, из компонента */
+  position:relative; overflow:hidden;  /* страховка от горизонтальной прокрутки */
+  background:#EEEDFD; color:#333;      /* поле как на девятом экране */
+  padding:calc(60 * var(--u)) 0 calc(64 * var(--u));
+  z-index:25;
+}
+@media (min-width:768px){ .cf{ --cf-card: calc(300 * var(--u)) } }
+
+.cf-gap1{ height:calc(26 * var(--u)) }
+.cf-gap2{ height:calc(10 * var(--u)) }
+.cf .cr-lead{ font-size:calc(18.7 * var(--u)) }   /* подзаголовок как на девятом */
+
+/* Поля по краям на телефоне даём ТОЛЬКО подзаголовку: общий `.cr-cont`
+   ниже 768 px идёт во всю ширину, и без полей текст упирался бы в кромку.
+   Заголовку полей не даём — он крупный, и они добавляют ему лишнюю строку
+   (проверено на девятом экране). */
+/* Кегль подзаголовка поджимается, если строка не влезает: первая строка
+   занимает 19,6 своих кеглей, и на узком телефоне при полном кегле она
+   рвётся пополам с сиротой «герои,» на отдельной строке. Числа и приём
+   те же, что на девятом экране. */
+@media (max-width:767px){
+  .cf{ padding:calc(34 * var(--u)) 0 calc(36 * var(--u)); --cf-pad:clamp(16px,5vw,26px) }
+  .cf .cr-lead{
+    padding-inline:var(--cf-pad);
+    font-size:min(calc(18.7 * var(--u)),
+                  calc((100vw - 2 * var(--cf-pad) - 10px) / 19.6));
+  }
+  .cf-gap1{ height:calc(13 * var(--u)) }
+  .cf-gap2{ height:0 }
+}
+.cf-br{ display:none }
+@media (min-width:1024px){ .cf-br{ display:inline } }
+.cf-br2{ display:none }
+@media (max-width:767px){ .cf-br2{ display:inline } }
+
+/* ---- ЗАПАСНОЙ ВИД: обычная лента с прокруткой ----
+   Работает, пока скрипт не включил трёхмерную раскладку, и остаётся
+   насовсем, если человек попросил «меньше движения» или JS не выполнился. */
+.cf-frame{
+  overflow-x:auto; overflow-y:hidden; -webkit-overflow-scrolling:touch;
+  scroll-snap-type:x mandatory;
+  padding:calc(var(--cf-card) * 0.30) 0 calc(var(--cf-card) * 0.08);
+}
+.cf-track{ display:flex; width:max-content; padding-inline:calc(var(--cf-card) * 0.06) }
+.cf-card{
+  position:relative; flex:0 0 auto; scroll-snap-align:center;
+  width:var(--cf-card); aspect-ratio:975 / 1525;
+  margin-right:calc(var(--cf-card) * var(--cf-gap));
+}
+/* Картинка шире карточки: холст выгрузки с запасом на нашлёпку сверху.
+   Проценты у `margin` — И У ВЕРХНЕГО ТОЖЕ — считаются от ширины родителя,
+   поэтому сдвиг вверх записан в долях ширины (комментарий девятого экрана). */
+.cf-card img{
+  position:absolute; left:0; top:0; display:block;
+  width:106.1538%; height:auto;
+  margin:-29.2308% 0 0 -3.0769%;
+  pointer-events:none; -webkit-user-drag:none;
+}
+
+/* ---- ТРЁХМЕРНАЯ РАСКЛАДКА (класс ставит скрипт) ----
+   Рама больше не прокручивается: горизонталь забирает себе перетаскивание,
+   вертикаль остаётся странице (`touch-action:pan-y`). Все карточки лежат
+   в одной точке — на середине сцены, а разводит их по местам скрипт,
+   выставляя каждой свой `transform`: смещение вбок, уход вглубь и поворот. */
+.cf-3d .cf-frame{
+  overflow:hidden; scroll-snap-type:none; touch-action:pan-y;
+  cursor:grab; outline:none;
+  perspective:calc(var(--cf-card) * 3);
+  user-select:none; -webkit-user-select:none;
+}
+.cf-3d .cf-frame.drag, .cf-3d .cf-frame.drag *{ cursor:grabbing }
+.cf-3d .cf-frame:focus-visible{ outline:2px solid rgba(227,179,78,.9); outline-offset:4px }
+.cf-3d .cf-track{
+  display:block; position:relative; width:auto; padding:0;
+  height:calc(var(--cf-card) * 1.5641);       /* 1525/975 — высота карточки */
+  transform-style:preserve-3d;
+}
+.cf-3d .cf-card{
+  position:absolute; left:50%; top:0; margin:0;
+  will-change:transform; backface-visibility:hidden;
+}
+
+/* Появление при подъезде к экрану: карусель проявляется целиком, по очереди
+   карточки не выезжают — в трёхмерной раскладке они и так стоят стопкой,
+   и поочерёдный выезд читался бы рябью. */
+.cf-frame{ opacity:0; transition:opacity .7s ease }
+.cf.on .cf-frame, .cf.cf-noio .cf-frame{ opacity:1 }
+@media (prefers-reduced-motion:reduce){
+  .cf-frame{ opacity:1; transition:none }
+}
+</style>
 </head>
 <body>
 
@@ -4453,6 +4584,77 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <h3 class="sv-done-h">Заявка принята!</h3>
         <p class="sv-lede">Мы перезвоним в течение <b>30&nbsp;минут</b>, предложим лучшие даты и цены и ответим на все вопросы.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======== ЭКРАН 12: персонажи каруселью-обложками (ПРОБА) ========
+     Проба нового вида девятого экрана: те же семь карточек, но не бегущей
+     лентой, а стопкой «обложек» — центральная стоит лицом, соседние уходят
+     вглубь и разворачиваются боком. Листается перетаскиванием, щелчком
+     по соседней карточке и стрелками с клавиатуры.
+
+     Ставится в самый низ страницы намеренно: девятый экран остаётся на месте,
+     чтобы Серёга мог сравнить оба вида. Понравится — заменит девятый,
+     не понравится — вырезается тремя кусками (стили, эта разметка, скрипт).
+
+     Картинки те же, что на девятом экране (`pers/*.webp`), браузер берёт их
+     из кеша. Подписи персонажей нарисованы внутри картинок, поэтому они же
+     стоят в `alt` — и поэтому под каруселью нет ни строчки текста. -->
+<section class="cf cr" id="heroesFlow" aria-labelledby="cfT">
+  <div class="cr-cont">
+    <div class="cr-n">
+      <h2 class="cr-t cr-h2" id="cfT"><span class="cr-red"><strong>НОВЫЕ И ПОСТОЯННЫЕ ПЕРСОНАЖИ&nbsp;</strong></span><br class="cf-br"><span class="cr-blue"><strong>НАШЕЙ ВСЕЛЕННОЙ МНД:</strong></span></h2>
+    </div>
+
+    <div class="cf-gap1"></div>
+
+    <div class="cr-n"><p class="cr-t cr-lead">Не банальные, запоминающиеся детям герои,<br class="cf-br2"> которых можно встретить только у нас</p></div>
+
+    <div class="cf-gap2"></div>
+  </div>
+
+  <!-- Сцена стоит СНАРУЖИ контейнера: карточки уезжают вглубь и вбок
+       во всю ширину окна, поля контейнера обрезали бы их раньше времени.
+       tabindex у рамы — чтобы карусель листалась стрелками с клавиатуры. -->
+  <div class="cf-frame" id="cfFrame" tabindex="0" role="region"
+       aria-roledescription="карусель" aria-label="Персонажи вселенной МНД">
+    <div class="cf-track" id="cfTrack">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="1 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/neznayka.webp"
+             alt="Незнайка с Луны в скафандре и с рюкзаком - яркий, весёлый и дружелюбный">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="2 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/ded.webp"
+             alt="Дед Мороз с посохом в роскошном синем костюме со звёздным декором">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="3 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/baykonkurochka.webp"
+             alt="Байконкурочка в серебристом костюме космонавта - с особым заданием в Министерстве">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="4 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/mandarianec.webp"
+             alt="Мандарианец, оранжевый уличный персонаж, любитель фото-вспышек">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="5 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/astrognomy.webp"
+             alt="Астрогном с подзорной трубой - помощники Деда Мороза в его обсерватории">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="6 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/ministr.webp"
+             alt="Министр Новогодних Дел с посохом - главный ведущий программы в доме">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="7 из 7">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/karamelshchiki.webp"
+             alt="Доктора карамельных наук - карамельщики, ведущие мастер-класса">
+      </figure>
     </div>
   </div>
 </section>
@@ -7680,6 +7882,185 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }
   wire();
   if (!bound) document.addEventListener('DOMContentLoaded', wire);
+})();
+</script>
+
+<script>
+/* ============ ЭКРАН 12: КАРУСЕЛЬ-ОБЛОЖКИ (ПРОБА) ============
+   Перевод присланного React-компонента на голый JS. Компонент строил
+   раскладку не состоянием React, а прямой записью в стили карточек —
+   этот приём и перенесён, менять было нечего.
+
+   ГЛАВНОЕ ЧИСЛО ОДНО — `pos`, ДРОБНЫЙ НОМЕР КАРТОЧКИ В ЦЕНТРЕ. Целое
+   значение — карточка стоит ровно по центру, 2,5 — середина пути между
+   третьей и четвёртой. Всё остальное (места, повороты, прозрачность)
+   считается из него, поэтому карусель и в покое, и на лету, и под пальцем
+   описывается одной величиной.
+
+   ПЕТЛЯ БЕЗ КЛОНОВ. Расстояние до карточки складывается «по кольцу»:
+   если до неё больше половины круга в одну сторону — значит ближе в другую.
+   Поэтому седьмая карточка спокойно оказывается слева от первой, и второй
+   набор картинок в разметке не нужен (девятому экрану он нужен: там лента
+   едет линейно). Перескок происходит ровно на полкруга, где карточка уже
+   невидима — за это отвечает `edge`, гасящий её к этому моменту в ноль.
+
+   ЦЕЛЬ ХРАНИТСЯ ОТДЕЛЬНО ОТ `pos` (`target`). Шаг стрелкой считается от цели,
+   а не от текущего места: иначе нажатие в середине хода, до того как круглое
+   число «догонит» карточку, съедалось бы округлением.
+
+   ЧИСЛА КОМПОНЕНТА СОХРАНЕНЫ: поворот 44 градуса на первой соседке, уход
+   вглубь 0,6 ширины, показатель 0,56 (наклон и глубина растут медленнее
+   расстояния — при линейном росте вторая карточка складывается в щепку),
+   потолок поворота 82 градуса (иначе дальняя встаёт к зрителю ребром),
+   потеря непрозрачности 0,1 за шаг, зазор 0,05 ширины, притяжение к цели
+   0,16 за кадр, бросок пальцем не дальше двух карточек. */
+(function(){
+  'use strict';
+  var sec = document.getElementById('heroesFlow');
+  if (!sec) return;
+  var frame = document.getElementById('cfFrame');
+  var track = document.getElementById('cfTrack');
+  if (!frame || !track) return;
+
+  var cards = Array.prototype.slice.call(track.children);
+  var N = cards.length;
+  if (!N) return;
+
+  /* «Меньше движения» — трёхмерную раскладку не включаем вовсе: остаётся
+     обычная лента с прокруткой, как в разметке. Тот же уговор на девятом. */
+  if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+
+  var ROTATE = 44, DEPTH = 0.6, FALLOFF = 0.56, FADE = 0.1, GAP = 0.05;
+  var TIGHT = 0.16, THROW = 0.18, MAXTHROW = 2, CAP = 82;
+
+  sec.classList.add('cf-3d');
+
+  var pos = 0, target = 0, width = 0, raf = null, drag = null;
+
+  /* ---------- раскладка ---------- */
+  function paint(){
+    if (!width) return;
+    var pitch = width * (1 + GAP);
+    for (var i = 0; i < N; i++){
+      /* расстояние по кольцу: короткой стороной */
+      var off = ((i - pos) % N + N) % N;
+      if (off > N / 2) off -= N;
+
+      var d = Math.abs(off);
+      var ramp = Math.pow(d, FALLOFF);
+      var tilt = Math.min(ROTATE * ramp, CAP) * (off > 0 ? 1 : (off < 0 ? -1 : 0));
+
+      var st = cards[i].style;
+      st.transform =
+        'translateX(calc(-50% + ' + (off * pitch).toFixed(2) + 'px)) ' +
+        'translateZ(' + (-DEPTH * width * ramp).toFixed(2) + 'px) ' +
+        'rotateY(' + (-tilt).toFixed(2) + 'deg)';
+      /* карточка обязана погаснуть до перескока через полкруга */
+      var edge = Math.min(1, Math.max(0, N / 2 - d));
+      st.opacity = Math.max(0, 1 - FADE * d) * edge;
+      st.zIndex = 100 - Math.round(d);
+    }
+  }
+
+  /* ---------- подъезд к цели ---------- */
+  function settle(to){
+    if (raf !== null) cancelAnimationFrame(raf);
+    target = to;
+    (function step(){
+      var left = target - pos;
+      if (Math.abs(left) < 0.0004){ pos = target; paint(); raf = null; return; }
+      pos += left * TIGHT;              /* затухание, а не пружина: без перелёта */
+      paint();
+      raf = requestAnimationFrame(step);
+    })();
+  }
+  function nudge(by){ settle(Math.round(target) + by); }
+  function goTo(i){
+    /* идём короткой стороной кольца, а не разматываем весь круг */
+    settle(i + Math.round((target - i) / N) * N);
+  }
+
+  /* ---------- палец и мышь ---------- */
+  var moved = 0;
+  frame.addEventListener('pointerdown', function(e){
+    if (e.button && e.button !== 0) return;
+    if (raf !== null){ cancelAnimationFrame(raf); raf = null; }
+    try { frame.setPointerCapture(e.pointerId); } catch(_){ }
+    target = pos; moved = 0;
+    frame.classList.add('drag');
+    drag = {id:e.pointerId, x:e.clientX, pos:pos, v:0, t:performance.now()};
+  });
+  frame.addEventListener('pointermove', function(e){
+    if (!drag || drag.id !== e.pointerId) return;
+    var pitch = width * (1 + GAP);
+    if (!pitch) return;
+    var now = performance.now(), was = pos;
+    var shift = e.clientX - drag.x;
+    if (Math.abs(shift) > moved) moved = Math.abs(shift);
+    pos = drag.pos - shift / pitch;
+    /* скорость в карточках за секунду — она и понесёт после броска */
+    drag.v = (pos - was) / Math.max(now - drag.t, 1) * 1000;
+    drag.t = now;
+    paint();
+  });
+  function otpustit(e){
+    if (!drag || drag.id !== e.pointerId) return;
+    var v = drag.v;
+    drag = null;
+    frame.classList.remove('drag');
+    var carried = Math.max(-MAXTHROW, Math.min(MAXTHROW, v * THROW));
+    settle(Math.round(pos + carried));
+  }
+  frame.addEventListener('pointerup', otpustit);
+  frame.addEventListener('pointercancel', otpustit);
+
+  /* Щелчок по соседней карточке подводит её в центр. Порог в 6 пикселей —
+     чтобы конец перетаскивания не считался щелчком. */
+  frame.addEventListener('click', function(e){
+    if (moved > 6) return;
+    var card = e.target && e.target.closest ? e.target.closest('.cf-card') : null;
+    if (!card) return;
+    var i = cards.indexOf(card);
+    if (i >= 0) goTo(i);
+  });
+
+  /* ---------- клавиатура ---------- */
+  frame.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); nudge(-1); }
+    else if (e.key === 'ArrowRight'){ e.preventDefault(); nudge(1); }
+  });
+
+  /* ---------- замер ---------- */
+  /* Мерить надо только ширину карточки: от неё считаются шаг, глубина
+     и перспектива. Меряем при каждом изменении рамы — поворот телефона,
+     смена ширины окна, подгрузка шрифта, меняющая высоту заголовка. */
+  function merit(){
+    var w = cards[0].offsetWidth;
+    if (!w || w === width) { paint(); return; }
+    width = w; paint();
+  }
+  merit();
+  if (window.ResizeObserver) new ResizeObserver(merit).observe(frame);
+  else window.addEventListener('resize', merit, {passive:true});
+  /* Картинки берутся из кеша девятого экрана, но если человек попал сюда
+     по якорю - размеры доедут позже загрузки: пересчитываем по событию. */
+  window.addEventListener('load', merit);
+
+  /* ---------- появление и ленивая загрузка ---------- */
+  if (!('IntersectionObserver' in window)) sec.classList.add('cf-noio');
+  else {
+    new IntersectionObserver(function(en, ob){
+      if (en[0].isIntersecting){ sec.classList.add('on'); ob.disconnect(); }
+    }, {rootMargin:'0px 0px -10% 0px'}).observe(track);
+    /* Ленивую загрузку снимаем за полэкрана до подъезда: иначе карточка
+       въезжает в кадр пустой (тот же приём на девятом экране). */
+    new IntersectionObserver(function(en, ob){
+      if (!en[0].isIntersecting) return;
+      var im = track.querySelectorAll('img[loading="lazy"]');
+      for (var i = 0; i < im.length; i++) im[i].loading = 'eager';
+      ob.disconnect();
+    }, {rootMargin:'60% 0px'}).observe(sec);
+  }
 })();
 </script>
 
