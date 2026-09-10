@@ -4128,7 +4128,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .gb{
   position:relative; z-index:28; overflow:hidden;
   background:#fff;
-  padding:clamp(52px,5.2vw,104px) 0 clamp(56px,5.8vw,112px);
+  padding:clamp(24px,2.2vw,44px) 0 clamp(56px,5.8vw,112px);
   --gb-bleed: calc((100vw - min(94vw,1462px))/2 + clamp(16px,3vw,47.6px));
 }
 .gb-glow{position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden}
@@ -4142,17 +4142,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   gap:clamp(24px,2.8vw,52px); align-items:center}
 
 /* ---------- левая колонка ---------- */
-.gb-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px);
-  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
-  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#4E5D82}
 /* Заголовок тот же, что на экране цен, только по левому краю и на ступень
-   мельче: справа стоит фотография, и во всю ширину он бы её задавил. */
+   мельче: справа стоит фотография, и во всю ширину он бы её задавил.
+   Надзаголовка на этом экране нет: «(от 20 детей)» стоит третьей строкой
+   самого заголовка, как на боевом сайте (просьба Серёги 10.09.2026), и
+   надзаголовок повторял бы его слово в слово. */
 .gb-t{margin:0 0 clamp(12px,1.2vw,18px);
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:clamp(24px,3.1vw,52px); line-height:1.07; letter-spacing:.005em;
   text-transform:uppercase; text-wrap:balance}
 .gb-blue{color:#083182}
 .gb-red{color:#8C1B12}
+/* Уточнение «(от 20 детей)» - часть заголовка, но не равная ему по весу:
+   кегль в долях (em), поэтому оно едет вместе с заголовком на любой ширине
+   и его не надо править отдельно. */
+.gb-sub{display:inline-block; margin-top:.22em; font-size:.55em;
+  letter-spacing:.01em; color:#4E5D82}
 .gb-lead{margin:0; max-width:48ch;
   font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.12vw,17.4px);
   line-height:1.5; color:#3F4F76}
@@ -4181,6 +4186,48 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .gb-tx{font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.18vw,18.6px);
   line-height:1.45; color:#3F4F76}
 .gb-tx b{font-weight:700; color:#0B2A6B}
+
+/* ---------- кнопка ----------
+   ПРОЗРАЧНАЯ, НО С БОРТИКОМ И ТЕНЬЮ - прямая просьба Серёги 10.09.2026
+   («прозрачную жёлтую кнопку с бортиком и тенью, по размеру как в ценах»).
+   Это сознательное отступление от стандарта: там у прозрачной кнопки бортика
+   нет и не было → sayt-nn/standart-knopok.md, отступление записано туда же.
+
+   ОБВОДКУ И БОРТИК ПЕРЕЧИСЛЯТЬ ОДНИМ СПИСКОМ. Обводка у прозрачной сделана
+   внутренней тенью, а box-shadow заменяет список целиком: напишешь один
+   бортик - обводка пропадёт. И :hover, и :active переписывать следом, иначе
+   на наведении вернётся общее правило без бортика, а кнопка перестанет
+   съезжать вниз при нажатии.
+
+   ЦВЕТ ТЁМНОГО ЗОЛОТА, а не светлого: экран белый, и светлое золото на нём
+   не видно ни на солнце, ни на проекторе - то же правило, что у прозрачных
+   кнопок на остальных светлых экранах. */
+.gb-send{margin-top:clamp(22px,2.2vw,34px)}
+.gb .zs-btn--ghost{
+  color:#8A6111;
+  box-shadow:inset 0 0 0 2px rgba(160,116,32,.75),
+             0 4px 0 #C99A2E,
+             0 12px 18px -6px rgba(120,86,20,.26),
+             0 0 30px 4px rgba(245,158,11,.2);
+}
+.gb .zs-btn--ghost:hover{
+  color:#3A2705; background:rgba(227,179,78,.16); transform:none; filter:none;
+  box-shadow:inset 0 0 0 2px rgba(160,116,32,1),
+             0 4px 0 #B8871F,
+             0 14px 22px -6px rgba(120,86,20,.32),
+             0 0 44px 8px rgba(245,158,11,.3);
+}
+.gb .zs-btn--ghost:active{
+  transform:translateY(2px); background:rgba(227,179,78,.2);
+  box-shadow:inset 0 0 0 2px rgba(160,116,32,1),
+             0 2px 0 #B8871F,
+             0 6px 10px -4px rgba(120,86,20,.28);
+}
+/* Ширина - как у кнопки экрана цен: на телефоне во всю ширину бланка,
+   от 768 по длине надписи. Меняешь одну - меняй обе, иначе две кнопки
+   подряд перестанут быть одной кнопкой. */
+.gb-send .zs-btn{width:min(100%,480px)}
+@media (min-width:768px){ .gb-send .zs-btn{width:auto} }
 
 /* ---------- фотография ----------
    Слева у кадра мягкий уход в прозрачность: там снег светлее белого поля
@@ -5665,7 +5712,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      групп от 20 детей») и business/core/sales-objections.md. МЕНЯЕШЬ УСЛОВИЯ -
      правь сначала там, а сюда переноси: сайт тут не источник, а витрина.
 
-     У КАРТИНКИ МЕТКА ВЕРСИИ `?v=1`. Имя файла останется прежним, а кадр
+     У КАРТИНКИ МЕТКА ВЕРСИИ `?v=2`. Имя файла останется прежним, а кадр
      Серёга ещё может поменять - без метки браузер покажет старый из кеша.
      Меняешь фотографию - поднимай число сразу у обоих файлов.
 
@@ -5686,8 +5733,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <div class="gb-grid">
 
       <div class="gb-text">
-        <p class="gb-eyebrow">Организованная группа &middot; от 20 детей</p>
-        <h2 class="gb-t" id="gbT"><span class="gb-blue">Условия и бонусы</span><br><span class="gb-red">для групп</span></h2>
+        <h2 class="gb-t" id="gbT"><span class="gb-blue">Условия и бонусы</span><br><span class="gb-red">для групп</span><br><span class="gb-sub">(от 20 детей)</span></h2>
         <p class="gb-lead">Мы всегда можем предложить альтернативные условия под ваш бюджет:
           по количеству детей и не только. Всё обсуждаемо&nbsp;- звоните!</p>
 
@@ -5713,12 +5759,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             <span class="gb-tx"><b>Скидка 5%</b> детям участников СВО, инвалидам и многодетным</span>
           </li>
         </ul>
+
+        <div class="gb-send">
+          <button class="zs-btn zs-btn--ghost" type="button" data-zs="экран бонусов - оставить заявку"
+                  data-zs-sub="Перезвоним в течение 30 минут, подберём дату и посчитаем цену для вашей группы со всеми бонусами.">
+            <span class="zs-t">Оставить заявку</span></button>
+        </div>
       </div>
 
       <div class="gb-photo">
         <picture>
-          <source media="(max-width:767px)" srcset="gb-bus-mob.webp?v=1">
-          <img src="gb-bus.webp?v=1" width="1373" height="1146" loading="lazy" decoding="async"
+          <source media="(max-width:767px)" srcset="gb-bus-mob.webp?v=2">
+          <img src="gb-bus.webp?v=2" width="1373" height="960" loading="lazy" decoding="async"
                alt="Украшенный автобус с надписью «Дети» и группа школьников рядом с ним на снегу">
         </picture>
       </div>
