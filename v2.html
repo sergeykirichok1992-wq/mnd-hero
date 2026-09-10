@@ -4037,7 +4037,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pr{
   position:relative; z-index:27;
   background:#fff;
-  padding:clamp(64px,6.6vw,128px) 0 clamp(64px,6.8vw,116px);
+  /* Поле снизу вдвое меньше прежнего (просьба Серёги 10.09.2026): под кнопкой
+     теперь стоит разделитель следующего экрана, и воздух до него делится
+     на двоих. Меняешь тут - смотри и на поле сверху у .gb, они работают парой. */
+  padding:clamp(64px,6.6vw,128px) 0 clamp(30px,3.2vw,62px);
 }
 /* Страховка от наезда снега на карточки на очень широких мониторах - ровно
    та же, что на одиннадцатом экране: высота сугроба считается от ширины окна
@@ -4259,7 +4262,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (max-width:767px){
   /* Общий контейнер ниже 768 идёт без полей - карточкам они нужны */
   .pr .cr-cont{width:100%; padding-inline:20px}
-  .pr{padding:44px 0 52px}
+  .pr{padding:44px 0 28px}
   .vd{padding-bottom:96px}          /* тот же стык, телефонное значение */
 
   /* Крупнее и просторнее - просьба Серёги 10.09.2026. На телефоне карточка одна
@@ -4387,7 +4390,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .gb{
   position:relative; z-index:28; overflow:hidden;
   background:#fff;
-  padding:clamp(18px,1.7vw,34px) 0 clamp(56px,5.8vw,112px);
+  padding:clamp(12px,1.1vw,22px) 0 clamp(56px,5.8vw,112px);
   --gb-bleed: calc((100vw - min(94vw,1462px))/2 + clamp(16px,3vw,47.6px));
 }
 /* ---------- РАЗДЕЛИТЕЛЬ СО СТЫКА С ЭКРАНОМ ЦЕН ----------
@@ -4536,7 +4539,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    тексту даёт сам экран - теми же числами, что на шестом. Фотография
    при этом лежит от края до края, и выход за контейнер ей уже не нужен. */
 @media (max-width:767px){
-  .gb{--gb-bleed:0px; padding:clamp(40px,9vw,64px) 0 clamp(44px,10vw,72px)}
+  .gb{--gb-bleed:0px; padding:clamp(20px,4.5vw,30px) 0 clamp(44px,10vw,72px)}
   .gb-text{padding:0 clamp(16px,4.6vw,25.5px)}
   /* СВОЙ КЕГЛЬ ЗАГОЛОВКА, теми же числами, что у экрана цен. Общий
      clamp(24px,3.1vw,52px) на телефоне и планшете стоит намертво на нижнем
