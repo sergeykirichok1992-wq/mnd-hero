@@ -4097,6 +4097,143 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    и до цены надо листать через все четырнадцать дат VIP. */
 </style>
 
+<!-- Экран бонусов держит свой <style>: незакрытая скобка в чужом блоке не уронит
+     ни его, ни соседей → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ==================== ЭКРАН 16: УСЛОВИЯ И БОНУСЫ ДЛЯ ГРУПП ====================
+   Тот же блок, что на боевом ministrynn.ru («Условия и бонусы для групп»),
+   но набран нашим стилем: надзаголовок, заголовок в два цвета, лид, пять
+   строк с золотыми подарками. Фотография автобуса с детьми лежит справа
+   и УХОДИТ ЗА ПРАВЫЙ КРАЙ ОКНА - её снежный фон и есть белое поле экрана.
+
+   ПОЛЕ ОБЯЗАНО БЫТЬ ЧИСТО БЕЛЫМ. У фотографии фон 253-255 по всем каналам:
+   на белом она сливается без единой черты, а на любом оттенке по её кромке
+   ляжет прямоугольник. Воздух экрану даёт круглый отблеск за фотографией -
+   у него края прозрачные, черте взяться неоткуда. Тот же приём, что на
+   экранах цен и заявки на светлом.
+
+   ВЫХОД ЗА КРАЙ СЧИТАЕТСЯ ПЕРЕМЕННОЙ --gb-bleed, а не «на глаз». Это
+   расстояние от кромки общего контейнера до края окна: половина того, что
+   осталось от окна за вычетом контейнера, плюс его собственное поле. Меняешь
+   контейнер сайта - меняй и эту строку, иначе фотография отойдёт от края.
+   overflow:hidden у секции обязателен: 100vw шире видимой части окна на
+   ширину полосы прокрутки, и без него внизу страницы появилась бы
+   горизонтальная прокрутка.
+
+   z-index:28 - следующая ступень за экраном цен (27). Секции на странице
+   идут лестницей, и своя ступень нужна каждой → lessons/element-na-shve-sekciy-z-index.md
+
+   Цифры и формулировки - из business/core/customer-journey.md (раздел 9)
+   и business/core/sales-objections.md. МЕНЯЕШЬ УСЛОВИЯ - правь там же. */
+.gb{
+  position:relative; z-index:28; overflow:hidden;
+  background:#fff;
+  padding:clamp(52px,5.2vw,104px) 0 clamp(56px,5.8vw,112px);
+  --gb-bleed: calc((100vw - min(94vw,1462px))/2 + clamp(16px,3vw,47.6px));
+}
+.gb-glow{position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden}
+.gb-glow i{position:absolute; display:block; border-radius:50%;
+  right:-14vw; top:6%; width:58vw; height:76%;
+  background:radial-gradient(closest-side, rgba(198,219,255,.45) 0%, rgba(198,219,255,.22) 42%, rgba(198,219,255,0) 100%)}
+
+/* Текст слева, фотография справа. Колонка с фотографией чуть шире: она уходит
+   за край окна, и при равных долях текст выглядел бы прижатым. */
+.gb-grid{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.08fr);
+  gap:clamp(24px,2.8vw,52px); align-items:center}
+
+/* ---------- левая колонка ---------- */
+.gb-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#4E5D82}
+/* Заголовок тот же, что на экране цен, только по левому краю и на ступень
+   мельче: справа стоит фотография, и во всю ширину он бы её задавил. */
+.gb-t{margin:0 0 clamp(12px,1.2vw,18px);
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(24px,3.1vw,52px); line-height:1.07; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance}
+.gb-blue{color:#083182}
+.gb-red{color:#8C1B12}
+.gb-lead{margin:0; max-width:48ch;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.12vw,17.4px);
+  line-height:1.5; color:#3F4F76}
+.gb-lead b{font-weight:600; color:#1B2C57}
+
+/* ---------- список бонусов ----------
+   Строки разделены пунктиром, а не пустотой: пунктир - примета этого сайта
+   (кромка карточек цен, черта над следующим повышением), и он держит пять
+   строк одним предметом, не заводя ещё одну плашку на белом поле. */
+.gb-list{margin:clamp(20px,2.1vw,32px) 0 0; padding:0; list-style:none}
+.gb-i{display:flex; align-items:flex-start; gap:clamp(11px,1vw,16px);
+  padding:clamp(11px,1.05vw,16px) 0;
+  border-top:1px dashed rgba(0,27,113,.17)}
+.gb-i:first-child{border-top:0; padding-top:0}
+.gb-i:last-child{padding-bottom:0}
+/* Золотой кружок с подарком. Золото ровно то же, что у кнопки сайта
+   (#FDE68A→#FCD34D→#F59E0B) и надпись того же тёмного золота #451A03:
+   на странице одно золото, а не три похожих.
+   РАЗМЕР КРУЖКА ЗАДАН В em, а не в пикселях: он обязан совпадать с высотой
+   первой строки текста. Уедет кегль строки - кружок уедет вместе с ним. */
+.gb-ic{flex:none; width:1.62em; height:1.62em; margin-top:-.07em; border-radius:50%;
+  display:grid; place-items:center;
+  background:linear-gradient(180deg,#FDE68A,#FCD34D 52%,#F59E0B);
+  box-shadow:0 0 0 1px rgba(251,191,36,.55), 0 8px 15px -10px rgba(180,83,9,.8)}
+.gb-ic svg{width:64%; height:64%; display:block; fill:#451A03}
+.gb-tx{font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.18vw,18.6px);
+  line-height:1.45; color:#3F4F76}
+.gb-tx b{font-weight:700; color:#0B2A6B}
+
+/* ---------- фотография ----------
+   Слева у кадра мягкий уход в прозрачность: там снег светлее белого поля
+   всего на один-два пункта, но на широком мониторе кромка всё же читается
+   ступенькой. Справа маски нет и быть не должно - там кадр уходит за окно. */
+.gb-photo{position:relative; z-index:2; margin-right:calc(-1 * var(--gb-bleed))}
+.gb-photo img{display:block; width:100%; height:auto;
+  -webkit-mask-image:linear-gradient(90deg, rgba(0,0,0,0) 0, #000 11%);
+          mask-image:linear-gradient(90deg, rgba(0,0,0,0) 0, #000 11%)}
+
+/* ОТ 1600 ДОЛИ ВЫРАВНИВАЮТСЯ. Контейнер выше 1462 не растёт, а фотография
+   растёт: к её колонке прибавляется выход за край окна (на 2560 это ещё
+   почти 600 px). Оставь доли прежними - на большом мониторе кадр вырастает
+   вдвое против текста, и текст рядом с ним выглядит мелким. */
+@media (min-width:1600px){
+  .gb-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+}
+
+/* ---------- планшет: фотография под текстом, во всю ширину окна ---------- */
+@media (max-width:1023px){
+  .gb-grid{grid-template-columns:1fr; gap:clamp(22px,3.2vw,34px)}
+  .gb-photo{margin:0 calc(-1 * var(--gb-bleed))}
+  /* Кадр высокий (1373x1146), а поперёк экрана нужен широкий: режем его до
+     16:10 и держим в кадре детей - они в нижней половине снимка. */
+  .gb-photo img{aspect-ratio:16/10; object-fit:cover; object-position:50% 62%;
+    -webkit-mask-image:none; mask-image:none}
+}
+
+/* ---------- телефон ----------
+   Ниже 768 общий контейнер идёт без полей (см. .cr-cont), поэтому поля
+   тексту даёт сам экран - теми же числами, что на шестом. Фотография
+   при этом лежит от края до края, и выход за контейнер ей уже не нужен. */
+@media (max-width:767px){
+  .gb{--gb-bleed:0px; padding:clamp(40px,9vw,64px) 0 clamp(44px,10vw,72px)}
+  .gb-text{padding:0 clamp(16px,4.6vw,25.5px)}
+  .gb-photo img{aspect-ratio:4/3}
+}
+/* ---------- появление при прокрутке ----------
+   Прятать умеет только класс .rv, и вешает его скрипт: без JS и при «меньше
+   движения» экран виден сразу, как на всех остальных экранах страницы.
+   Фотография едет на десятую долю секунды позже текста - иначе два предмета
+   всплывают как один и движение читается толчком. */
+.gb.rv .gb-text{opacity:0; transform:translateY(24px)}
+.gb.rv .gb-photo{opacity:0; transform:translateY(18px)}
+.gb.rv.on .gb-text,
+.gb.rv.on .gb-photo{opacity:1; transform:none;
+  transition:opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
+.gb.rv.on .gb-photo{transition-delay:.1s}
+@media (prefers-reduced-motion:reduce){
+  .gb.rv .gb-text,.gb.rv .gb-photo{opacity:1; transform:none; transition:none}
+}
+</style>
+
 </head>
 <body>
 
@@ -5489,7 +5626,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
 
     <div class="pr-notes">
-      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b> каждого 1 числа месяца: 1 октября, 1 ноября, 1 декабря.
+      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b> каждого 1 числа месяца!
         Чем раньше забронируете, тем дешевле&nbsp;- дата за вами закрепляется по той цене, которая была в день брони.</p>
 
       <div class="pr-two">
@@ -5514,6 +5651,78 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
               data-zs-title="Пришлём предложение в МАХ"
               data-zs-sub="Оставьте заявку - мы перезвоним в течение 30 минут, подберём дату и назовём точную цену для вашей группы.">
         <span class="zs-t">Получить предложение в МАХ</span></button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ==================== ЭКРАН 16: УСЛОВИЯ И БОНУСЫ ДЛЯ ГРУПП ====================
+     Копия блока «Условия и бонусы для групп» с боевого ministrynn.ru, набранная
+     нашим стилем. Устройство и замеры → блок «ЭКРАН 16» в стилях выше.
+
+     ТЕКСТ - НЕ ВЫДУМАННЫЙ. Пять пунктов взяты с боевого сайта и сверены с
+     business/core/customer-journey.md (раздел 9 «Бонусы для организованных
+     групп от 20 детей») и business/core/sales-objections.md. МЕНЯЕШЬ УСЛОВИЯ -
+     правь сначала там, а сюда переноси: сайт тут не источник, а витрина.
+
+     У КАРТИНКИ МЕТКА ВЕРСИИ `?v=1`. Имя файла останется прежним, а кадр
+     Серёга ещё может поменять - без метки браузер покажет старый из кеша.
+     Меняешь фотографию - поднимай число сразу у обоих файлов.
+
+     ПОДАРОК НАРИСОВАН ОДИН РАЗ и подставлен пять раз через <use>: пять копий
+     одного и того же <svg> в разметке - это пять шансов, что при правке они
+     разъедутся. -->
+<section class="cr gb" id="bonuses" aria-labelledby="gbT">
+  <div class="gb-glow" aria-hidden="true"><i></i></div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="gbGift" viewBox="0 0 24 24">
+      <path d="M8.15 3.6c1.63 0 2.98.97 3.85 2.46.87-1.49 2.22-2.46 3.85-2.46 1.42 0 2.5.87 2.5 2.04 0 .43-.12.82-.34 1.15h1.79c.72 0 1.3.58 1.3 1.3v2.06c0 .72-.58 1.3-1.3 1.3H4.2c-.72 0-1.3-.58-1.3-1.3V8.09c0-.72.58-1.3 1.3-1.3h1.79a2 2 0 0 1-.34-1.15c0-1.17 1.08-2.04 2.5-2.04Zm2.02 3.19c-.72-1.27-1.5-1.85-2.29-1.85-.55 0-.87.3-.87.7 0 .68.72 1.15 1.94 1.15h1.22Zm3.66 0h1.22c1.22 0 1.94-.47 1.94-1.15 0-.4-.32-.7-.87-.7-.79 0-1.57.58-2.29 1.85Z"/>
+      <path d="M4.35 12.98h6.35v7.42H6.6c-1.24 0-2.25-1-2.25-2.25v-5.17Zm8.95 0h6.35v5.17c0 1.24-1 2.25-2.25 2.25H13.3v-7.42Z"/>
+    </symbol>
+  </svg>
+
+  <div class="cr-cont">
+    <div class="gb-grid">
+
+      <div class="gb-text">
+        <p class="gb-eyebrow">Организованная группа &middot; от 20 детей</p>
+        <h2 class="gb-t" id="gbT"><span class="gb-blue">Условия и бонусы</span><br><span class="gb-red">для групп</span></h2>
+        <p class="gb-lead">Мы всегда можем предложить альтернативные условия под ваш бюджет:
+          по количеству детей и не только. Всё обсуждаемо&nbsp;- звоните!</p>
+
+        <ul class="gb-list">
+          <li class="gb-i">
+            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-tx"><b>1 детский билет</b> организатору группы в подарок</span>
+          </li>
+          <li class="gb-i">
+            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-tx"><b>1 взрослый билет</b> организатору группы в подарок</span>
+          </li>
+          <li class="gb-i">
+            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-tx"><b>4 сопровождающих</b> взрослых бесплатно</span>
+          </li>
+          <li class="gb-i">
+            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-tx">Родителей развлекаем по полной, угощаем игристым или чаем</span>
+          </li>
+          <li class="gb-i">
+            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-tx"><b>Скидка 5%</b> детям участников СВО, инвалидам и многодетным</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="gb-photo">
+        <picture>
+          <source media="(max-width:767px)" srcset="gb-bus-mob.webp?v=1">
+          <img src="gb-bus.webp?v=1" width="1373" height="1146" loading="lazy" decoding="async"
+               alt="Украшенный автобус с надписью «Дети» и группа школьников рядом с ним на снегу">
+        </picture>
+      </div>
+
     </div>
   </div>
 </section>
@@ -9135,19 +9344,40 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     if(adBase) ad.textContent = 'от ' + money(adBase + cur.add);
   }
 
-  /* Объяснение под таблицей перечисляет только ТЕ повышения, которые ещё
-     впереди. Оставь его написанным намертво - в декабре экран обещал бы
-     повышение 1 октября, которое давно прошло. */
+  /* Объяснение под таблицей БОЛЬШЕ НЕ ПЕРЕЧИСЛЯЕТ даты повышений: Серёга
+     попросил 10.09.2026 сказать короче - «растут каждого 1 числа месяца!».
+     Написать его намертво в разметке всё равно нельзя: после 1 декабря
+     повышений не остаётся, и обещание роста стало бы неправдой - тогда
+     строка меняется на финальную. */
   var grow = sec.querySelector('.pr-grow');
   if(grow){
-    var rest = STEPS.slice(i + 1).map(function(s){ return '1 ' + s.from; });
-    grow.innerHTML = rest.length
-      ? 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца: ' + rest.join(', ') +
-        '. Чем раньше забронируете, тем дешевле - дата за вами закрепляется по той цене, ' +
-        'которая была в день брони.'
+    grow.innerHTML = next
+      ? 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца! Чем раньше забронируете, ' +
+        'тем дешевле - дата за вами закрепляется по той цене, которая была в день брони.'
       : 'Это финальные цены сезона: последнее повышение было 1 декабря. ' +
         'Дата за вами закрепляется по той цене, которая была в день брони.';
   }
+})();
+</script>
+
+
+<script>
+/* ==================== ЭКРАН 16: ПОЯВЛЕНИЕ ПРИ ПРОКРУТКЕ ====================
+   Тот же приём, что у бланка заявки на светлом: скрипт вешает на секцию
+   класс .rv (он и прячет содержимое), а когда экран въезжает в окно -
+   класс .on. Порядок важен: без скрипта и при «меньше движения» класса .rv
+   нет вовсе, поэтому текст и фотография видны сразу. */
+(function(){
+  var s = document.getElementById('bonuses');
+  if(!s) return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(!window.IntersectionObserver) return;
+
+  s.classList.add('rv');
+  var io = new IntersectionObserver(function(es){
+    if(es[0].isIntersecting){ s.classList.add('on'); io.disconnect(); }
+  }, {threshold:.12});
+  io.observe(s);
 })();
 </script>
 
