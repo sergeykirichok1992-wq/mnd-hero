@@ -3811,6 +3811,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     box-shadow:0 0 0 1px rgba(251,191,36,.6), 0 8px 22px rgba(2,5,20,.55), 0 0 44px 8px rgba(245,158,11,.36)}
   .vd-open:hover::after{opacity:.72}
 }
+/* КОЛЬЦО ФОКУСА РИСУЕМ НА РАМКЕ КАДРА, А НЕ НА САМОЙ КНОПКЕ. Кнопка лежит
+   внутри рамки с `overflow:hidden` и заполняет её ровно целиком: кольцо
+   со смещением наружу срезает рамка, а кольцо внутрь закрывает собственная
+   пелена кнопки (`::after` с `inset:0` рисуется поверх). Итого до 10.09.2026
+   кольца не было видно ни у одного из семи роликов - замером: жёлтых
+   пикселей 2567 (это только кружок пуска) против 12220 с кольцом на рамке.
+   Правило ниже оставлено запасным: в браузере без `:has()` оно хотя бы
+   не хуже прежнего. */
+.vd-box:has(.vd-open:focus-visible){outline:3px solid #FCD34D; outline-offset:3px}
 .vd-open:focus-visible{outline:3px solid #FCD34D; outline-offset:3px}
 .vd-cap{
   margin:clamp(9px,.9vw,15px) 0 0; text-align:center;
@@ -6631,7 +6640,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
   <div class="cr-cont">
     <div class="cr-n">
-      <h2 class="cr-t cr-h2" id="rdT"><span class="cr-red"><strong>РАЗВЛЕКАЕМ И УГОЩАЕМ</strong></span> <span class="cr-blue"><strong>РОДИТЕЛЕЙ!</strong></span></h2>
+      <h2 class="cr-t cr-h2" id="rdT"><span class="cr-red"><strong>РАЗВЛЕКАЕМ И УГОЩАЕМ </strong></span><span class="cr-blue"><strong>РОДИТЕЛЕЙ!</strong></span></h2>
     </div>
 
     <div class="cr-n"><p class="cr-t cr-lead rd-lead">Праздничное игристое, вкусный чай, хороводы,
