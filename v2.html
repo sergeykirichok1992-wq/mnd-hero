@@ -4399,6 +4399,128 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (prefers-reduced-motion:reduce){
   .gb.rv .gb-text,.gb.rv .gb-photo{opacity:1; transform:none; transition:none}
 }
+
+/* ==================== ЭКРАН 17: О НАШЕМ ДЕДЕ МОРОЗЕ ====================
+   Последний экран страницы. Пространство имён `dm-`. Десять фотографий одной
+   бегущей лентой во всю ширину окна: едет справа налево сама и медленно,
+   а пальцем или мышью её можно разогнать, отмотать назад и притормозить.
+
+   ЭТО ТОТ ЖЕ ПРИЁМ, ЧТО У ПЕРВОГО ЗАХОДА В ЭКРАН ПЕРСОНАЖЕЙ (пространство
+   имён `pr-`, жило на странице 08-10.09.2026, потом заменено каруселью-
+   обложками). Просьба Серёги 10.09.2026: «вот здесь давай первый формат».
+   Скорость, разгон и затухание взяты у ленты второго экрана - язык на
+   странице один.
+
+   ПОЛЕ - НОЧНОЕ НЕБО по рецепту экрана с видео: синяя ночь, размытые пурпурные
+   и лиловые пятна, зерно. Фотографии тёплые, на тёмном они светятся; на белом
+   (а выше стоят три белых экрана подряд) слились бы в серую полосу.
+
+   ВЫСОТА КАДРА - ОДНА ФОРМУЛА НА ВСЕ ШИРИНЫ: `min(58vw, 340*--u)`. До 1250 px
+   множитель --u упирается в свой пол 1px, поэтому там высота ровно 340 px,
+   а на телефоне её ограничивает 58vw. Отдельного телефонного правила и стыка,
+   на котором кадр мог бы прыгнуть, тут нет.
+
+   z-index:29 - следующая ступень за экраном бонусов (28). Секции на странице
+   идут лестницей → lessons/element-na-shve-sekciy-z-index.md
+
+   Картинки делает `sayt-nn/instrumenty/ded_moroz.py`: приводит снимки из папки
+   Серёги к высоте 860 px и печатает готовую разметку с шириной каждого кадра. */
+.dm-hold{position:relative; z-index:29}
+/* Блик на шве с белым экраном бонусов - тот же снимок, что на швах пятого,
+   шестого и четырнадцатого экранов. Стоит СНАРУЖИ секции: у неё
+   `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. */
+.dm-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.dm{
+  --dh: min(58vw, calc(340 * var(--u)));   /* высота кадра ленты */
+  --dg: calc(var(--dh) * .052);            /* зазор между кадрами */
+  --dr: calc(var(--dh) * .052);            /* скругление углов кадра */
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(52px,6vw,102px) 0 clamp(56px,6.4vw,108px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+.dm-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.dm-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.dm-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:58%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift1 38s ease-in-out infinite alternate}
+.dm-glow i:nth-child(2){right:-20vw; top:-6%; width:70vw; height:62%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift2 45s ease-in-out infinite alternate}
+.dm-glow i:nth-child(3){left:50%; bottom:-16%; width:78vw; height:54%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:bkDrift3 33s ease-in-out infinite alternate}
+.dm-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Заголовок и подзаголовок - как на экране с видео (тоже тёмное поле):
+   Blogger Sans Bold прописными, белый, светло-синий подзаголовок под ним.
+   ЦИТАТА ДЕТЕЙ ВЫДЕЛЕНА ЗОЛОТОМ - тем же, что у кнопок сайта: это и есть
+   мысль экрана, а на тёмном поле два белых куска слились бы в одну строку.
+   Восклицательный знак стоит ЗА кавычкой: восклицают не дети, а мы. */
+.dm-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.dm-q{color:#F0C97A}
+.dm-lead{
+  max-width:calc(760 * var(--u)); margin:0 auto;
+  text-align:center; text-wrap:balance;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(14px, clamp(15px,1.25vw,20px)); line-height:1.45; color:#B9C8F5;
+}
+
+/* ---------- ЛЕНТА ----------
+   Стоит СНАРУЖИ `.cr-cont`: она идёт во всю ширину окна и обрывается ровно
+   по его краю, а не в пяти сантиметрах от кромки, как лента второго экрана. */
+.dm-wrap{
+  margin-top:clamp(26px,3.1vw,54px);
+  overflow:hidden;
+  padding:calc(var(--dh) * .035) 0;            /* запас, чтобы не срезало тень */
+  touch-action:pan-y;                          /* вертикаль отдаём странице */
+  user-select:none; -webkit-user-select:none;  /* палец тянет ленту, а не выделяет */
+}
+.dm-band{display:flex; align-items:center; width:max-content; will-change:transform}
+/* Скругление задано И коробке, И самой картинке. В Safari скруглённый блок
+   с overflow:hidden внутри едущего слоя оставляет по углам прямоугольные
+   хвосты → lessons/skruglenie-uglov-v-dvizhushchemsya-sloe.md
+   Подложки под картинкой нет по той же причине: она просвечивала бы
+   сквозь эти хвосты серой кромкой. */
+.dm-card{
+  flex:0 0 auto; margin:0 var(--dg) 0 0;
+  height:var(--dh); border-radius:var(--dr); overflow:hidden;
+  box-shadow:0 calc(var(--dh) * .028) calc(var(--dh) * .07) rgba(2,5,22,.55);
+}
+.dm-card img{
+  display:block; height:100%; width:auto; max-width:none;
+  border-radius:inherit; -webkit-user-drag:none;
+}
+/* КУРСОР-РУКА НАД ЛЕНТОЙ: по нему видно, что кадры можно тянуть мышью.
+   Тот же приём, что у ленты второго экрана и карусели площадки. Правило
+   только там, где курсор вообще есть: на тач-экране оно бессмысленно. */
+@media (hover:hover) and (pointer:fine){
+  .dm-wrap{cursor:grab}
+  .dm-wrap.drag, .dm-wrap.drag *{cursor:grabbing}
+}
+/* «Меньше движения»: лента не едет сама, её листают пальцем или колесом */
+@media (prefers-reduced-motion:reduce){
+  .dm-wrap{overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch}
+}
+/* На телефоне общий контейнер отдаёт поля целиком
+   (`@media (max-width:767px){ .cr-cont{width:100%; padding:0} }`), и заголовок
+   упёрся бы в кромку экрана. Возвращаем их тексту - ровно как на экране
+   с видео. Ленты это не касается: она снаружи контейнера и обязана
+   обрываться по краю окна. */
+@media (max-width:767px){
+  .dm .cr-cont{width:100%; padding-inline:20px}
+}
 </style>
 
 </head>
@@ -5944,6 +6066,75 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </div>
 </section>
 
+
+<!-- ==================== ЭКРАН 17: О НАШЕМ ДЕДЕ МОРОЗЕ ====================
+     Последний экран страницы. Десять фотографий Деда Мороза одной бегущей
+     лентой во всю ширину окна, на ночном небе. Устройство, скорость и почему
+     поле тёмное → блок «ЭКРАН 17» в стилях выше и sayt-nn/ustroystvo.md.
+
+     ПОРЯДОК КАДРОВ - НЕ ПО НОМЕРАМ ФАЙЛОВ, А ПО СМЫСЛУ: похожие сюжеты
+     (два «за столом», два на красном занавесе, четыре «с детьми») разведены
+     минимум через один - то же правило, что у ленты второго экрана.
+     Переставить кадр = переставить <figure>; имена файлов трогать не нужно.
+
+     `dm-start` НА ШЕСТОМ КАДРЕ - тот, что стоит ровно посередине окна, когда
+     экран открывается (просьба Серёги 10.09.2026). Скрипт считает по нему
+     начальный сдвиг ленты. Переносишь метку на другой кадр - середина
+     переедет за ней, больше править нечего.
+
+     Картинки и эта разметка сделаны `sayt-nn/instrumenty/ded_moroz.py`.
+     Меняешь набор снимков - гоняй его, а не правь ширины руками: без верной
+     ширины лента прыгает, пока кадры грузятся. -->
+<div class="dm-hold">
+<div class="dm-blik" aria-hidden="true"></div>
+<section class="cr dm" id="ded" aria-labelledby="dmT">
+  <div class="dm-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="dm-grain" aria-hidden="true"></div>
+
+  <div class="cr-cont">
+    <h2 class="dm-t" id="dmT">О нашем Деде Морозе дети говорят<br>
+      <span class="dm-q">«А этот, видимо, настоящий»!</span></h2>
+    <p class="dm-lead">Потрясающие актёры (мужчины 50-60 лет) без грима, высокие,
+      статные, харизматичные! А какая борода! Из настоящего волоса буйвола!</p>
+  </div>
+
+  <!-- Лента стоит снаружи `.cr-cont`: она идёт во всю ширину окна. -->
+  <div class="dm-wrap" id="dmWrap">
+    <div class="dm-band" id="dmBand">
+      <figure class="dm-card"><img src="ded/f01.webp" width="936" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дед Мороз за столом разбирает письма детей: настольная лампа, ёлка, старая книга"></figure>
+      <figure class="dm-card"><img src="ded/f02.webp" width="830" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дед Мороз с посохом наклонился к мальчику и девочке, снимок снизу"></figure>
+      <figure class="dm-card"><img src="ded/f03.webp" width="906" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дед Мороз в синих рукавицах на фоне красного занавеса, борода до пояса"></figure>
+      <figure class="dm-card"><img src="ded/f04.webp" width="966" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дед Мороз со светящимся посохом рядом с мальчиком у окна с морозным узором"></figure>
+      <figure class="dm-card"><img src="ded/f05.webp" width="938" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дед Мороз в синей шубе у наряженной ёлки и камина в бревенчатой избе"></figure>
+      <figure class="dm-card dm-start"><img src="ded/f06.webp" width="998" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дед Мороз развёл руки навстречу детям: настоящий дедушка без грима, борода из волоса буйвола"></figure>
+      <figure class="dm-card"><img src="ded/f07.webp" width="859" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дед Мороз в кабинете со свечами и старыми книгами"></figure>
+      <figure class="dm-card"><img src="ded/f08.webp" width="952" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Девочка обнимает Деда Мороза у ёлки, в руке карамельный леденец"></figure>
+      <figure class="dm-card"><img src="ded/f09.webp" width="998" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дед Мороз с посохом в дверях бревенчатого дома"></figure>
+      <figure class="dm-card"><img src="ded/f10.webp" width="857" height="860"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Дети окружили Деда Мороза под вывеской «Министерство Новогодних Дел»"></figure>
+    </div>
+  </div>
+</section>
+</div>
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
@@ -9601,6 +9792,202 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     if(es[0].isIntersecting){ s.classList.add('on'); io.disconnect(); }
   }, {threshold:.12});
   io.observe(s);
+})();
+</script>
+
+
+<script>
+/* ==================== ЭКРАН 17: ЛЕНТА ФОТОГРАФИЙ ДЕДА МОРОЗА ====================
+   Лента едет справа налево сама и разгоняется пальцем или мышью. Приём и числа
+   взяты у ленты фотографий второго экрана - язык на странице один.
+
+   ПЕТЛЯ БЕЗ ШВА. Кадры повторены дважды, лента сдвигается на остаток от ширины
+   одного повтора, и в момент, когда первая десятка уезжает за левый край,
+   вторая стоит ровно на её месте. Вторая десятка - копии разметки, а не второй
+   набор файлов: браузер берёт картинки из кеша. Копии помечены `aria-hidden`
+   и с пустым `alt`, иначе читалка прочитала бы все снимки дважды.
+
+   НАЧАЛЬНЫЙ СДВИГ. Кадр с меткой `dm-start` стоит ровно посередине окна, пока
+   лента не тронулась (просьба Серёги 10.09.2026). Середина пересчитывается
+   при каждом замере, но только до первого кадра движения: после него сдвигать
+   ленту под курсором нельзя - она бы прыгнула.
+
+   ЛЕНТА ЖИВЁТ, ПОКА ОНА НА ЭКРАНЕ. За кадром кадры не считаем: это последний
+   экран длинной страницы, и крутиться впустую всю дорогу ему незачем.
+
+   При «меньше движения» лента не собирается вовсе: прокрутку отдаём браузеру
+   (`overflow-x:auto` в стилях), кадры листаются пальцем. */
+(function(){
+  'use strict';
+  var wrap = document.getElementById('dmWrap');
+  var band = document.getElementById('dmBand');
+  if (!wrap || !band) return;
+
+  var calm  = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var cards = Array.prototype.slice.call(band.children);   /* настоящие, без копий */
+  var N = cards.length;
+  var start = band.querySelector('.dm-start') || cards[0];
+  if (!N) return;
+
+  function slushat(mq, fn){
+    if (mq.addEventListener) mq.addEventListener('change', fn);
+    else if (mq.addListener) mq.addListener(fn);
+  }
+
+  /* Ленивая загрузка снимается ЗАРАНЕЕ, за пол-экрана до подъезда. Иначе кадр
+     въезжает в окно пустым: браузер начинает качать файл только когда картинка
+     уже пересекла край окна, а лента к этому моменту её уже показывает.
+     Десять файлов - 0,7 МБ, тянуть их с самого верха страницы незачем,
+     поэтому не `eager` в разметке, а вот так. */
+  var razleneno = false;
+  function razlenit(){
+    razleneno = true;
+    var im = band.querySelectorAll('img[loading="lazy"]');
+    for (var i = 0; i < im.length; i++) im[i].loading = 'eager';
+  }
+  if (!('IntersectionObserver' in window)) razlenit();
+  else new IntersectionObserver(function(en, ob){
+    if (en[0].isIntersecting){ razlenit(); ob.disconnect(); }
+  }, {rootMargin:'60% 0px'}).observe(wrap);
+
+  var BASE = 26, LH0 = 240, MAXV = 2400, TAU = 0.75;   /* числа ленты второго экрана */
+  var sobrano = false, shag = 0, pos = 0, v = BASE, raf = 0, last = 0, poehali = false;
+  var tyanut = false, pid = null, x0 = 0, t0 = 0, vx = 0, proshel = 0;
+  var glaz = null;
+
+  function sobrat(){
+    if (sobrano) return;
+    for (var i = 0; i < N; i++){
+      var k = cards[i].cloneNode(true);
+      /* метку середины у копии снимаем: она должна быть на странице одна,
+         иначе поиск кадра со временем начнёт находить копию */
+      k.className = k.className.replace(' dm-start', '') + ' dm-clone';
+      k.setAttribute('aria-hidden', 'true');
+      var im = k.querySelector('img');
+      if (im) im.alt = '';
+      band.appendChild(k);
+    }
+    sobrano = true;
+    /* Копии унаследовали loading="lazy" у оригиналов. Снимаем её только если
+       экран уже подъехал: иначе лента, собранная при загрузке страницы,
+       утащила бы все файлы с самого верха. */
+    if (razleneno) razlenit();
+    izmerit();
+  }
+  function razobrat(){
+    var k = band.querySelectorAll('.dm-clone');
+    for (var i = 0; i < k.length; i++) k[i].parentNode.removeChild(k[i]);
+    sobrano = false; pos = 0; v = BASE; shag = 0; poehali = false;
+    band.style.transform = '';
+    /* Без движения ленту листает сам браузер. Кадр с меткой ставим посередине
+       окна прокруткой: просьба «этот кадр по центру» касается и этого режима. */
+    var rw = wrap.getBoundingClientRect(), rs = start.getBoundingClientRect();
+    wrap.scrollLeft = Math.max(0, rs.left + rs.width / 2 - rw.left + wrap.scrollLeft - rw.width / 2);
+  }
+  /* МЕРЯЕМ ПРЯМОУГОЛЬНИКАМИ, А НЕ offsetLeft/offsetWidth: те округлены до целых
+     пикселей, а ширины кадров дробные (высота задана формулой, ширину считает
+     пропорция), и на десяти кадрах округление копится. Кадр с меткой от этого
+     промахнулся бы мимо середины окна на пару пикселей, а шаг петли - на столько
+     же, и лента дёргалась бы на каждом обороте. */
+  function izmerit(){
+    if (!sobrano) return;
+    var a = band.children[0], b = band.children[N];
+    if (!a || !b){ shag = 0; return; }
+    var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    shag = rb.left - ra.left;
+    /* крупнее кадр - быстрее лента: глаз мерит движение долями кадра,
+       а не пикселями. Ниже телефонной высоты не замедляемся. */
+    BASE = 26 * Math.max(1, (ra.height || LH0) / LH0);
+    if (!poehali) posredine();
+    polozhit();
+  }
+  /* Кадр с меткой стоит ровно посередине окна. Лента сдвинута на -pos, значит
+     середина кадра окажется в середине окна при pos = (её место) - (полширины
+     окна); остаток по ширине повтора берём сразу, чтобы не копить лишнее. */
+  function posredine(){
+    if (!shag){ pos = 0; return; }
+    /* Сдвиг ленты на время замера снимаем: иначе пришлось бы вычитать его
+       из прямоугольника, а после смены ширины окна он уже посчитан по старому
+       шагу и вычитание врало бы. Считаем от неподвинутой ленты - и всё. */
+    band.style.transform = 'none';
+    var rw = wrap.getBoundingClientRect(), rs = start.getBoundingClientRect();
+    var c = rs.left + rs.width / 2 - rw.left;      /* место кадра внутри ленты */
+    pos = (((c - rw.width / 2) % shag) + shag) % shag;
+  }
+  function polozhit(){
+    var x = shag ? -(((pos % shag) + shag) % shag) : 0;
+    band.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+  }
+  function kadr(now){
+    raf = requestAnimationFrame(kadr);
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+    last = now;
+    if (!tyanut){
+      v += (BASE - v) * (1 - Math.exp(-dt / TAU));   /* бросок затухает к базовой */
+      pos += v * dt;
+      if (dt) poehali = true;
+    }
+    polozhit();
+  }
+  function pusk(){ if (!raf && sobrano){ last = 0; raf = requestAnimationFrame(kadr); } }
+  function stop(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+
+  wrap.addEventListener('pointerdown', function(e){
+    if (!sobrano) return;
+    tyanut = true; poehali = true;
+    pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; proshel = 0;
+    wrap.classList.add('drag');                      /* курсор «схваченная рука» */
+    try{ wrap.setPointerCapture(pid); }catch(err){}
+  });
+  wrap.addEventListener('pointermove', function(e){
+    if (!tyanut || e.pointerId !== pid) return;
+    var dx = e.clientX - x0, dt = (e.timeStamp - t0) / 1000;
+    pos -= dx;                                       /* лента идёт за пальцем */
+    proshel += Math.abs(dx);
+    if (dt > 0.004) vx = 0.7 * vx + 0.3 * (dx / dt); /* сглаженная скорость пальца */
+    x0 = e.clientX; t0 = e.timeStamp;
+    polozhit();
+  });
+  function otpustit(){
+    if (!tyanut) return;
+    tyanut = false;
+    wrap.classList.remove('drag');
+    if (pid !== null){ try{ wrap.releasePointerCapture(pid); }catch(err){} pid = null; }
+    if (proshel < 8) return;                         /* это была прокрутка страницы, не свайп */
+    v = Math.max(-MAXV, Math.min(MAXV, -vx));
+  }
+  wrap.addEventListener('pointerup', otpustit);
+  wrap.addEventListener('pointercancel', otpustit);
+  wrap.addEventListener('lostpointercapture', otpustit);
+
+  function smotret(){
+    if (glaz || !('IntersectionObserver' in window)){ pusk(); return; }
+    glaz = new IntersectionObserver(function(en){
+      if (en[0].isIntersecting) pusk(); else stop();
+    }, {rootMargin:'100px'});
+    glaz.observe(wrap);
+  }
+
+  function svet(){
+    if (!calm.matches){ sobrat(); smotret(); }
+    else { stop(); razobrat(); }
+  }
+  svet();
+  slushat(calm, svet);
+
+  /* Замер повторяем после полной загрузки: шрифт заголовка и картинки могли
+     поменять высоту секции, а вместе с ней и ширину кадров. Лента к этому
+     моменту ещё стоит (экран последний на странице), поэтому середина
+     пересчитается без рывка. */
+  window.addEventListener('load', function(){ if (sobrano) izmerit(); });
+
+  var tmr = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 150);
+  });
+  window.addEventListener('orientationchange', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 300);
+  });
 })();
 </script>
 
