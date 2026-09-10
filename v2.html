@@ -3757,12 +3757,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-size:max(14px, clamp(15px,1.15vw,19px)); line-height:1.35; color:#D8E2FF;
 }
 
-/* Подсказка про VPN. На старом сайте она стоит под каждым роликом; здесь
-   одна на весь экран и мелко: у кого всё открылось, тому она не нужна. */
-.vd-note{
-  margin:clamp(22px,2.4vw,38px) auto 0; text-align:center;
-  font-family:"CR Blogger",Arial,sans-serif; font-size:max(12px,.85vw); line-height:1.5;
-  color:rgba(185,200,245,.62);
+/* Подсказка про VPN — под каждым роликом, как на старом сайте (просьба
+   Серёги 10.09.2026; до этого стояла одна общая внизу экрана). Светло-красный
+   взят светлее обычного красного сайта: на ночном небе тёмно-красный
+   не читается вовсе. */
+.vd-vpn{
+  margin:clamp(4px,.45vw,8px) 0 0; text-align:center;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(12px, clamp(12.5px,.92vw,15px)); line-height:1.35;
+  color:#FF8C8C;
 }
 
 @media (max-width:767px){
@@ -4958,6 +4961,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           </button>
         </div>
         <figcaption class="vd-cap">Как выглядит наша локация</figcaption>
+        <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
       </figure>
 
       <figure class="vd-card">
@@ -4972,6 +4976,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           </button>
         </div>
         <figcaption class="vd-cap">Какой у нас шикарный Дед Мороз</figcaption>
+        <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
       </figure>
 
       <figure class="vd-card">
@@ -4986,6 +4991,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           </button>
         </div>
         <figcaption class="vd-cap">Про карамельный мастер-класс</figcaption>
+        <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
       </figure>
 
       <figure class="vd-card">
@@ -5000,6 +5006,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           </button>
         </div>
         <figcaption class="vd-cap">Шоу рисования светом</figcaption>
+        <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
       </figure>
 
       <figure class="vd-card">
@@ -5014,6 +5021,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           </button>
         </div>
         <figcaption class="vd-cap">Про сервис на наших площадках</figcaption>
+        <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
       </figure>
 
       <figure class="vd-card">
@@ -5028,6 +5036,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           </button>
         </div>
         <figcaption class="vd-cap">Фееричная актёрская игра</figcaption>
+        <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
       </figure>
     </div>
 
@@ -5035,8 +5044,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
          обложка video/film.webp) убран 10.09.2026 по просьбе Серёги: на старом
          сайте он стоит не здесь, а ниже отдельным экраном, и сюда его добавил
          я сам. Вернётся позже — разметка и стили лежат в коммите 5f94e0c. -->
-
-    <p class="vd-note">Если видео не открылось, выключите VPN и обновите страницу.</p>
   </div>
 </section>
 </div>
