@@ -261,6 +261,13 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 
 .city{
   font-family:"Prata",Georgia,serif; line-height:1.14;
+  /* У «Й» краткая стоит ВЫШЕ строки, а буквы залиты градиентом через
+     background-clip:text — фон красит только коробку элемента, и краткая
+     в неё не помещалась: город читался «НИЖНИИ» (на компьютере — с ровной
+     чёрточкой вместо дужки). Поднимаем верх коробки на .22em и тем же
+     числом возвращаем блок на место: текст не сдвинулся, дужка появилась.
+     Трогать line-height нельзя — разъедутся две строки на компьютере. */
+  padding-top:.22em; margin-top:-.22em;
   font-size:clamp(19px,2.15vw,32.3px);
   text-transform:uppercase; letter-spacing:.045em;
   background:
@@ -287,32 +294,28 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .facts li + li{color:rgba(196,210,234,.72)}
 
 @media (max-aspect-ratio:1/1), (max-width:820px){
-  /* Оба блока стартуют с одной линии: слева сезон, справа город.
-     Правый растянут на всю ширину, чтобы даты и возраст встали по центру экрана,
-     а город с адресом остались прижаты вправо. */
+  /* ОДИН СТОЛБЕЦ ПО ЦЕНТРУ, ПОД ЛОГОТИПОМ (просьба Серёги 11.09.2026):
+     город, адрес, даты, возраст — друг под другом.
+     Блок про сезон («СЕЗОН 2026/2027, экскурсия-шоу») с телефона убран совсем:
+     он делил узкий кадр надвое, а логотип в ролике и так говорит и про сезон,
+     и про экскурсию-шоу. На компьютере блок остаётся, тут только прячем. */
   /* ниже дюз (на 63vh текст лежал на сосульках) и ещё на полтора сантиметра вниз.
      Второе значение — предохранитель: на коротком экране блок иначе уезжает за нижний край. */
   .side{ top:min(calc(72vh + 1.5cm), calc(100vh - 170px)); bottom:auto; transform:none; }
-  .side.left { left:0; right:auto; width:auto; text-align:left;  padding:0 18px; }
-  .side.right{ left:0; right:0;   width:100%;  text-align:right; padding:0 18px; }
+  .side.left { display:none }
+  .side.right{ left:0; right:0; width:100%; text-align:center; padding:0 18px; }
 
-  .season{ display:block; margin:0 0 5px; font-size:12px; letter-spacing:.30em }
-  .years { display:block; font-size:31px; line-height:1 }
-  .years .fill, .years .outline{ display:inline }
-  .years .outline{ -webkit-text-stroke-width:1px }
-  .kicker{ margin-top:8px; font-size:10px; letter-spacing:.26em }
-
-  .city{ display:block; font-size:20px; letter-spacing:.04em; line-height:1.12 }
+  .city{ display:block; font-size:22px; letter-spacing:.04em; line-height:1.12 }
+  .city br{ display:none }                                          /* «Нижний Новгород» — одной строкой */
   .rule{ display:none }
-  .facts li{ display:block; font-size:13px; line-height:1.5 }
-  .facts li:nth-child(1){ text-align:right; margin-top:7px }        /* адрес — под городом */
-  .facts li:nth-child(2){ text-align:center; margin-top:26px }      /* даты — по центру */
-  .facts li:nth-child(3){ text-align:center; margin-top:4px }       /* возраст — ещё ниже */
+  .facts li{ display:block; text-align:center; font-size:13px; line-height:1.5 }
+  .facts li:nth-child(1){ margin-top:10px }                         /* адрес */
+  .facts li:nth-child(2){ margin-top:6px }                          /* даты */
+  .facts li:nth-child(3){ margin-top:4px }                          /* возраст */
   .facts li + li::before{ content:none }
 }
 @media (prefers-reduced-motion:reduce){ .years .fill,.city,.season{animation:none} }
 @media (max-width:819px){
-  .curtain{display:none}                    /* на телефоне кулис нет — и файл бархата не грузится */
   /* низ кадра занят огнями набережной, и белый текст на них терялся — кладём мягкую подложку */
   .vig::after{
     content:''; position:absolute; left:0; right:0; bottom:0; height:34vh; pointer-events:none;
@@ -329,6 +332,16 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 #curtainL{left:0;  background-position:left top;  transform-origin:0% 0%}
 #curtainR{right:0; background-position:right top; transform-origin:100% 0%}
 @media (max-aspect-ratio:1/1){ .curtain{width:62%} }
+/* КУЛИСЫ НА ТЕЛЕФОНЕ — СТАТИКОЙ, БЕЗ ВЫЕЗДА (просьба Серёги 11.09.2026).
+   На тач-устройстве ролик «запечённый»: прокрутка его не ведёт, разъезжаться
+   кулисам не по чему — поэтому они просто висят сверху кадра. Класс .touch вешает
+   скрипт первого экрана, он же там их больше не трогает (см. ветку BAKED).
+   ШИРИНА. У картинки бархат занимает только внешние 40 % своей половины, поэтому
+   две кулисы по 100 % ширины НЕ смыкаются, а оставляют просвет посередине.
+   Потолок 46vh — предохранитель для альбомной ориентации: высота кулисы это
+   0,565 её ширины, и без потолка она заняла бы там пол-экрана. */
+html.touch .curtain{opacity:1}
+@media (max-width:819px){ html.touch .curtain{width:min(100%, 46vh)} }
 #vstatus{
   position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:40;
   background:rgba(5,8,15,.9); border:1px solid var(--line); border-radius:5px;
@@ -420,9 +433,13 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-snow{
   position:absolute; left:0; right:0; top:0; z-index:2; pointer-events:none;
   aspect-ratio:3400/1050;
-  /* насколько снег заезжает на первый экран: 30 % своей высоты, из них верхние 13 %
-     прозрачны — над стыком остаются одни гребни, «немножечко» нижнего края сцены */
-  transform:translateY(-30%);
+  /* насколько снег заезжает на первый экран: 22 % своей высоты, из них верхние 13 %
+     прозрачны — над стыком остаются одни гребни, «немножечко» нижнего края сцены.
+     БЫЛО 30 % — при прокрутке сугробы доезжали до самых сосулек летающего острова
+     с логотипом, зазор между ними держался всего в палец на любой ширине окна
+     (просьба Серёги 11.09.2026 опустить их). Ниже 20 % уводить нельзя: над стыком
+     останется белая полоска и он прочитается ровной линией, а не сугробами. */
+  transform:translateY(-22%);
   background:url(snow-1500.webp) center bottom/100% 100% no-repeat;
 }
 @media (min-width:900px){ .cr-snow{background-image:url(snow-2400.webp)} }
@@ -450,38 +467,6 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-blue{color:rgb(47,49,146)}
 .cr-lead{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(28 * var(--u)); line-height:1.4}
 @media (max-width:767px){ .cr-h2{font-size:13px} }
-
-/* ---- ЗАГОЛОВОК ВТОРОГО ЭКРАНА: свой кегль и настоящий Bold (Серёга, 11.09.2026) ----
-   Всё через .cr-s2: теми же классами .cr-h2 набраны ещё четыре заголовка
-   (локация, персонажи, леденцы, родители), их правка не касается.
-
-   1) КЕГЛЬ НА 15 % МЕНЬШЕ: 16 -> 13,6 (строка-span берёт 300 % от него, 48 -> 40,8).
-      Это не только «покрасивее». Настоящий Bold шире дорисованного на 8,5 %:
-      на прежнем кегле вторая строка «ДЛЯ ШКОЛЬНИКОВ, АНАЛОГОВ КОТОРОМУ НЕТ
-      В РОССИИ!» перестаёт помещаться в контейнер и заголовок распадается
-      на три строки. На 13,6 она занимает 96 % ширины — две строки держатся
-      на любой ширине от 1250 px, где множитель --u ещё растёт.
-   2) НАЧЕРТАНИЕ — настоящий "CR Blogger Bold" (файл blogger-sans-bold.woff уже
-      лежит в репозитории, им набраны подписи городов на карте). Сознательное
-      отличие от старого сайта: там жирный дорисовывал браузер сам, и буквы
-      выходили тоньше и рыхлее.
-   3) ПЕРЕНОС ТОЛЬКО ПО ПРОБЕЛАМ. У .cr-t стоит word-break:break-word — он рвёт
-      слово посередине, даже когда оно целиком помещается в следующую строку.
-      На телефоне из-за этого «АНАЛОГОВ» разваливалось на «АНАЛОГ / ОВ».
-      overflow-wrap:break-word оставлен страховкой: слово шире экрана всё-таки
-      разорвётся, а не вылезет за край. */
-.cr-s2 .cr-h2{
-  font-family:"CR Blogger Bold","CR Blogger",Arial,sans-serif; font-weight:700;
-  font-size:calc(13.6 * var(--u));
-  word-break:normal; word-wrap:normal; overflow-wrap:break-word;
-}
-/* Телефон: кегль ровно как у заголовка светлого окна заявки «Успейте забрать
-   лучшие даты по цене сентября!» (.sv-t). У того clamp(28px,8.2vw,37.4px),
-   у нас строка-span множит базу на 300 % — значит база втрое меньше.
-   Было 13 px (то есть 39 px строкой), стало 32 px на экране 390. */
-@media (max-width:767px){
-  .cr-s2 .cr-h2{font-size:clamp(9.333px,2.7333vw,12.4667px)}
-}
 
 /* ---- ГОДА НА ФОНЕ ВТОРОГО ЭКРАНА ----
    За лентой снимков вспыхивают и сразу гаснут года прошлых сезонов: 2018 ... 2026.
@@ -584,49 +569,16 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-grid{margin-left:calc(-10 * var(--u)); margin-right:calc(-10 * var(--u))}
 .cr-gridwrap{display:table; table-layout:fixed; width:100%}
 .cr-col{display:table-cell; padding:0 calc(10 * var(--u)); vertical-align:top; width:25%}
-/* Кегль цифры и подписи с 11.09.2026 на 15 % меньше оригинальных (64 -> 54,4
-   и 20 -> 17) — просьба Серёги, только для компьютера и планшета. На телефоне
-   размеры прежние: там цифра давно живёт своим числом (51 px), а подписи
-   оставлены как были, про них разговора не было. */
 .cr-num{
   margin:0; text-align:center; font-family:"CR Yeseva",Georgia,serif; font-weight:500;
-  font-size:calc(54.4 * var(--u)); line-height:1.1; color:rgb(251,176,90);
+  font-size:calc(64 * var(--u)); line-height:1.1; color:rgb(251,176,90);
 }
-.cr-cap{margin:0; text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(17 * var(--u)); line-height:1.4}
-
-/* ---- ВОЛОСЯНЫЕ РАЗДЕЛИТЕЛИ МЕЖДУ ЦИФРАМИ (Серёга, 11.09.2026) ----
-   Линия рисуется псевдоэлементом, а не border-left у ячейки. У border высота
-   всегда равна высоте строки таблицы, а в неё входит нижняя распорка 20*--u —
-   линия висела бы заметно ниже подписей. У псевдоэлемента концы ставятся точно.
-
-   left:0 у ячейки — это стык двух соседних колонок. Поле у каждой 10*--u,
-   значит линия оказывается ровно посередине зазора, без подгонки.
-
-   Концы растворяются в белом: волосяная линия с жёстким обрезом читается
-   на светлом поле как обрубок, а не как разделитель. */
-.cr-col{position:relative}
-.cr-col + .cr-col::before{
-  content:''; position:absolute; left:0; top:calc(4 * var(--u)); bottom:calc(24 * var(--u));
-  width:1px; pointer-events:none;
-  background:linear-gradient(180deg,
-    rgba(51,51,51,0) 0%, rgba(51,51,51,.17) 13%,
-    rgba(51,51,51,.17) 87%, rgba(51,51,51,0) 100%);
-}
+.cr-cap{margin:0; text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(20 * var(--u)); line-height:1.4}
 @media (max-width:767px){
   .cr-grid{margin-left:0; margin-right:0}
   .cr-gridwrap{display:block}
   .cr-col{display:block; width:100% !important; padding-left:0; padding-right:0}
   .cr-num{font-size:51px}
-  .cr-cap{font-size:20px}
-  /* Колонки встали в столбик — разделитель ложится поперёк. Воздух над линией
-     даёт распорка 20*--u предыдущей колонки, под линией — это поле. */
-  .cr-col + .cr-col{padding-top:calc(20 * var(--u))}
-  .cr-col + .cr-col::before{
-    left:0; right:0; top:0; bottom:auto; width:auto; height:1px;
-    background:linear-gradient(90deg,
-      rgba(51,51,51,0) 0%, rgba(51,51,51,.17) 11%,
-      rgba(51,51,51,.17) 89%, rgba(51,51,51,0) 100%);
-  }
 }
 
 /* ---------- ЭКРАН 3: карта городов ----------
@@ -2177,16 +2129,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .kr{
   --kr-gap:clamp(8px,1.1vw,20px);
 
-  /* СТРЕЛКИ ВЫНЕСЕНЫ ЗА КАДРЫ (просьба Серёги 11.09.2026): раньше они лежали
-     поверх крайних снимков и на светлых кадрах терялись. Теперь они стоят
-     в полях по бокам карусели, а поля под них резервирует сама ширина:
-     `--kr-w` на компьютере вычитает по стрелке с воздухом с каждой стороны.
-     Ширину карусели и полосы миниатюр берём ТОЛЬКО отсюда — иначе полоса
-     разъедется с кадрами. */
-  --kr-arrow:clamp(38px,3.4vw,50px);      /* диаметр кружка стрелки */
-  --kr-arrow-gap:clamp(6px,.8vw,16px);    /* воздух между кадром и стрелкой */
-  --kr-w:min(100%, 124vh, 1240px);        /* телефон: стрелки остаются на кадрах */
-
   /* ШАРЫ. Всё, что у них регулируется, объявлено здесь — размер, размах
      качания и СКОРОСТЬ. Больше секунд = плывёт медленнее. Два разных срока
      нужны, чтобы шары не качались строем: глаз сразу замечает синхрон. */
@@ -2202,40 +2144,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   --kr-ball-pull:46px;                    /* насколько шар тянется за курсором */
 
   position:relative; overflow:hidden;     /* краями экрана шары и обрезает */
-  /* низ на 10 % меньше верха-исходника: было 70, Серёга попросил
-     поджать воздух под кнопкой (11.09.2026) */
-  color:#333; padding:calc(60 * var(--u)) 0 calc(63 * var(--u));
+  color:#333; padding:calc(60 * var(--u)) 0 calc(70 * var(--u));
   background-color:#E4EFF9;
   background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.100'/></svg>"),
     radial-gradient(125% 95% at 50% 40%,#F3F8FD 0%,#E3EFF9 46%,#CDE1F1 100%);
   background-size:120px 120px, auto;
   background-blend-mode:overlay, normal;
 }
-
-/* ЗАГОЛОВОК В ОДНУ СТРОКУ (11.09.2026). Новый заголовок промахивается мимо
-   строки на 0,6 % — «ДЕТИ!» уезжало вниз одиноким словом. Общие 300 % кегля
-   (то есть 48 «пикселей старого сайта») заменены на 47: разницы глазом
-   не видно, а строка встаёт целиком. Только компьютер: на телефоне заголовок
-   всё равно в четыре строки и живёт своим правилом ниже.
-   Если менять текст заголовка — проверить, что он всё ещё влезает:
-   строка этим шрифтом занимает 22,84 своих кегля, а места ровно 1090 `--u`. */
-@media (min-width:768px){
-  .kr .cr-h2 span{font-size:calc(47 * var(--u))}
-}
-
-/* ПОДЗАГОЛОВОК ЭКРАНА МЕЛЬЧЕ ОБЩЕГО (11.09.2026). Общий `.cr-lead` — 28 «пикселей
-   старого сайта»; здесь строка длинная и на 28 ломалась надвое. Серёга попросил
-   одну строку, поэтому кегль опущен до 25 — это те же -11 %, что дала бы ручная
-   подгонка, но записанные через `--u`, а значит одинаковые на всех ширинах.
-
-   ВТОРОЕ ЧИСЛО (2,55 % ширины окна) — страховка для узкого компьютера. Ниже
-   1170 px множитель `--u` упирается в 1 px и перестаёт уменьшаться, а контейнер
-   продолжает сужаться — и в полосе 768-980 px строка снова ломалась надвое.
-   Берём меньшее из двух: выше 980 px работает первое число и ничего не меняется,
-   у самого края включается второе. Само число не на глаз: строка этим шрифтом
-   занимает 32,4 своих кегля, а контейнеру достаётся 94 % окна минус поля —
-   отсюда предельные 2,68 %, и взято с запасом. */
-.kr .cr-lead{font-size:min(calc(25 * var(--u)), 2.55vw)}
 
 /* ТЕНЬ ОТ КРОМОК ЭКРАНА. Не отдельная картинка, а внутренняя тень на всю
    секцию: сверху и снизу сильная, по бокам едва заметная. Лежит НАД фоном
@@ -2300,20 +2215,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   to{transform:translateY(var(--kr-ball-sw))}
 }
 
-/* ПОДСКАЗКА «Листайте до конца!». До 11.09.2026 стояла хвостом подзаголовка,
-   и подзаголовок из-за неё ломался на две строки. Серёга попросил опустить её
-   к самому слайдеру и уменьшить: это подсказка, а не часть обещания, поэтому
-   кегль мельче подзаголовка. На телефоне она ещё и красная (просьба того же
-   дня) — на компьютере цвет обычный. */
-.kr-swipe{
-  margin:0 0 calc(8 * var(--u)); text-align:center;
-  font-family:"CR Blogger",Arial,sans-serif;
-  font-size:calc(20 * var(--u)); line-height:1.4; color:#3a3a46;
-}
-@media (max-width:767px){
-  .kr-swipe{font-size:15px; margin-bottom:8px; color:rgb(157,10,15)}
-}
-
 /* Строчка под слайдером. Ширина ограничена 46 знаками в строке: это абзац,
    а не заголовок, и во всю ширину карусели он читался бы полосой текста.
    Кегль между подписью экрана и обычным текстом. */
@@ -2322,8 +2223,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"CR Blogger",Arial,sans-serif;
   font-size:calc(22 * var(--u)); line-height:1.45; color:#3a3a46;
 }
-/* 11.09.2026 кегль на телефоне поднят с 16 до 18 px (просьба Серёги) */
-@media (max-width:767px){ .kr-note{font-size:18px; margin-top:1cm} }
+@media (max-width:767px){ .kr-note{font-size:16px; margin-top:1cm} }
 
 /* Кнопка под слайдером: 2,5 см воздуха от полосы миниатюр (просьба Серёги
    07.09.2026). Вид обычный, золотой — по стандарту кнопок сайта.
@@ -2331,27 +2231,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    экрана (её снимок Серёга и прислал). На компьютере 480 px оказались велики,
    и там кнопка вернулась к стандарту сайта: ширину не задаём, её держит
    длина надписи. */
-/* 11.09.2026: воздух над кнопкой ужат на 30 % — было 2,5 см, стало 1,75. */
-.kr-send{margin:1.75cm 0 0; text-align:center}
+.kr-send{margin:2.5cm 0 0; text-align:center}
 .kr-send .zs-btn{width:min(100%, 480px)}
 @media (min-width:768px){ .kr-send .zs-btn{width:auto} }
 
-/* КОРОБКА КАРУСЕЛИ — обёртка, в которой окно с кадрами и стрелки лежат рядом.
-   Появилась 11.09.2026 ровно ради стрелок: у окна `overflow:hidden` (иначе
-   видны были бы все слайды сразу), а значит вынести из него что-либо за край
-   нельзя — обрежется. Поэтому стрелки переехали на уровень выше, к окну
-   в соседи, и встают в поля по бокам отрицательным отступом.
-
-   ШИРИНА ОБЩАЯ (`--kr-w`) у коробки и у полосы миниатюр: они должны стоять
-   ровно друг под другом. На компьютере из неё уже вычтены поля под стрелки,
-   поэтому кадры на узком мониторе становятся чуть уже — это плата за то,
-   чтобы стрелки всегда были видны, а не только там, где место осталось. */
-.kr-stage{position:relative; width:var(--kr-w); margin-inline:auto}
-@media (min-width:768px){
-  .kr{--kr-w:min(100% - 2 * (var(--kr-arrow) + var(--kr-arrow-gap)), 124vh, 1240px)}
-}
-
-/* ОКНО КАРУСЕЛИ. Ширину держит коробка выше, окно занимает её целиком.
+/* ОКНО КАРУСЕЛИ. Ширину ограничивают три вещи, и меньшая побеждает: ширина
+   контейнера, высота окна браузера и потолок 1240 px.
 
    ВЫСОТУ СТАВИТ СКРИПТ в `--kr-h` — по фактической высоте открытого слайда,
    и она переезжает тем же движением, что и сама лента. Поэтому у ленты
@@ -2364,7 +2249,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   position:relative; isolation:isolate; overflow:hidden;
   container-type:inline-size;                  /* даёт cqw для расчётов внутри */
   box-sizing:content-box;
-  width:100%;
+  width:min(100%, 124vh, 1240px); margin-inline:auto;
   height:var(--kr-h, auto);
   padding-bottom:clamp(6px,.9vw,14px);
   transition:height .45s cubic-bezier(.22,.61,.36,1);
@@ -2476,25 +2361,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    которой некуда вести. */
 .kr-nav{
   position:absolute; z-index:3; top:50%; transform:translateY(-50%);
-  width:var(--kr-arrow); aspect-ratio:1; border:0; border-radius:999px;
+  width:clamp(38px,3.4vw,50px); aspect-ratio:1; border:0; border-radius:999px;
   background:#fff; color:#1b1630; opacity:.78; cursor:pointer; padding:0;
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 6px 18px rgba(20,16,40,.28);
   transition:opacity .2s ease, transform .2s ease;
 }
 .kr-nav svg{width:52%; height:52%; display:block}
-/* Телефон: места по бокам нет, стрелки остаются на кадрах, как и были. */
 .kr-prev{left:clamp(8px,.9vw,16px)}
 .kr-next{right:clamp(8px,.9vw,16px)}
-/* Компьютер: стрелки стоят В ПОЛЯХ, за кадрами. Отрицательный отступ ровно
-   на свою ширину плюс воздух — то самое, что вычтено из `--kr-w` выше.
-   Непрозрачность поднята: на светло-голубом поле белый кружок в 78 %
-   почти сливался с фоном, а на снимке он был контрастным. */
-@media (min-width:768px){
-  .kr-prev{left:calc(-1 * (var(--kr-arrow) + var(--kr-arrow-gap)))}
-  .kr-next{right:calc(-1 * (var(--kr-arrow) + var(--kr-arrow-gap)))}
-  .kr-nav{opacity:.95}
-}
 @media (hover:hover){ .kr-nav:not(:disabled):hover{opacity:1; transform:translateY(-50%) scale(1.1)} }
 .kr-nav:disabled{opacity:.3; cursor:default}
 .kr-nav:focus-visible{outline:3px solid rgb(47,49,146); outline-offset:3px}
@@ -2516,7 +2391,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    горизонтальная — 1,5 высоты (тот же кадр 3:2), свёрнутые — 26 % высоты. */
 .kr-thumbs{
   --th-h:clamp(56px,5.2vw,92px);
-  width:var(--kr-w); margin:clamp(10px,1vw,16px) auto 0;
+  width:min(100%, 124vh, 1240px); margin:clamp(10px,1vw,16px) auto 0;
   display:flex; gap:3px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
   scroll-behavior:smooth; padding-bottom:2px;
   /* Края полосы растворяются — по обрезанной миниатюре у кромки видно,
@@ -2575,9 +2450,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .kr .cr-h2{font-size:13.05px}
   /* подпись уменьшена вслед за заголовком: 28 px оригинала оказались БОЛЬШЕ
      нового заголовка, и подпись начинала спорить с ним за главное место.
-     Держим то же отношение, что на втором экране (заголовок / подпись = 1,4).
-     11.09.2026 Серёга попросил «чуть-чуть больше»: 18 -> 19 px. */
-  .kr .cr-lead{font-size:19px}
+     Держим то же отношение, что на втором экране (заголовок / подпись = 1,4). */
+  .kr .cr-lead{font-size:18px}
   /* ШАРОВ НА ТЕЛЕФОНЕ НЕТ (решение Серёги 07.09.2026). Пробовали и общий
      слой секции, и отдельный у кромок слайдера — на узком экране шар либо
      наезжает на подпись, либо закрывает кадры. Оставили только на компьютере. */
@@ -2591,7 +2465,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    не видно, экран восьмой поднят ровно на столько же. Трогать только
    вместе с margin-top у .km. */
 @media (min-width:1024px){
-  .kr{padding-bottom:calc(63 * var(--u) + 100vw * 0.022)}
+  .kr{padding-bottom:calc(70 * var(--u) + 100vw * 0.022)}
 }
 
 /* «Меньше движения»: слайды, высота и миниатюры меняются мгновенно. */
@@ -2880,10 +2754,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      и в padding у .pgs-row обязано совпадать: из него считается ширина
      карточки, и если разойдутся, в ряд перестанет влезать последняя. */
   --inner: calc(min(94vw, 1462px) - 32px);
-  /* 11.09.2026: зазор ужат (было clamp(14..34)) — Серёга просил меньше воздуха
-     между карточками, чтобы они стали чуть шире. Ширина карточки считается
-     из этого числа, так что уже зазор = шире карточка. */
-  --gap: clamp(12px, 1.35vw, 26px);
+  --gap: clamp(14px, 1.8vw, 34px);
 
   position:relative; overflow:hidden;   /* страховка от горизонтальной прокрутки */
   z-index:26;                           /* как у .cf-hold — экран стоит над формой */
@@ -2894,9 +2765,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      гребни НЕ доходят до карточек. Уменьшишь — снег ляжет на нижний ряд
      и накроет плашку «входит в программу».
      → schedule-app/lessons/dekoraciya-na-shve-rastyot-ot-shiriny-okna.md */
-  /* Сверху 80 макетных единиц вместо 100 — просьба Серёги 11.09.2026
-     «чуть чуть меньше отступ над заголовком до края экрана». */
-  padding:calc(80 * var(--u)) 0 calc(160 * var(--u));
+  padding:calc(100 * var(--u)) 0 calc(160 * var(--u));
 }
 .pgs-t{
   margin:0 auto calc(34 * var(--u)); text-align:center;   /* 09.09.2026: воздуха под заголовком больше, было 18 */
@@ -2925,13 +2794,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-size:max(14px, calc(17 * var(--u))); line-height:1.45;   /* 09.09.2026: чуть мельче, было 20 */
   color:#B9C8F5;
 }
-/* Первая фраза — жирным (просьба Серёги 11.09.2026). Семейство меняется
-   намеренно: у «CR Blogger» есть только начертание 400, и браузер нарисовал бы
-   поддельный жир — размазанный, с рваными краями. «Blogger Sans» это тот же
-   шрифт, но с настоящим файлом на 700. Цвет светлее соседнего текста: на
-   тёмно-синем поле один только жир читается слабо. */
-.pgs-lead b{font-family:"Blogger Sans","CR Blogger",Arial,sans-serif;
-  font-weight:700; color:#EDF2FF}
 
 /* РЯД КАРТОЧЕК. Число колонок задаётся ширинами ниже, а ширина карточки
    считается из свободного места: сколько его есть минус зазоры, поделить
@@ -2953,15 +2815,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Зазор и кегли заданы числами, а не общей формулой: формула считается от
    ширины окна и на телефоне всегда упиралась бы в свой нижний предел. */
 @media (max-width:559px){
-  /* 11.09.2026: зазор 24 вместо 28 и поля ряда 16 вместо 19 — Серёга просил
-     меньше воздуха между карточками и карточку чуть шире. Поля ряда обязаны
-     совпадать с числом в `--w` у .pg (100vw минус два поля), иначе карточка
-     разъедется с рядом. */
-  .pgs{--gap:24px}
-  /* воздух над заголовком: 72 px. Было 100, потом 90 (09.09.2026),
-     11.09.2026 Серёга попросил ещё чуть меньше */
-  .pgs{padding-top:72px}
-  .pgs-row{padding:0 16px}
+  .pgs{--gap:28px}
+  /* воздух над заголовком на 10 % меньше прежнего: было 100 px */
+  .pgs{padding-top:90px}
+  .pgs-row{padding:0 19px}
   .pgs-t{font-size:52px}                    /* вдвое крупнее прежних 26 */
   .pgs-lead{font-size:17.85px}              /* на 30 % меньше прежних 25,5 */
 }
@@ -2978,7 +2835,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      и заголовок вышел 1,5 px, а окно с фотографией схлопнулось в ноль.
      Процент остаётся ровно в одном месте — в самом `width` ниже, страховкой
      на случай, если 100vw посчитает вместе с полосой прокрутки. */
-  --w: calc(100vw - 32px);   /* 100vw минус два поля ряда по 16px (было 19) */
+  --w: calc(100vw - 38px);
   --u2: calc(var(--w) / 1045);
   --tilt: -2.83deg;        /* наклон рамки; у чётных карточек он зеркалится */
   --tint: 222;             /* тон карточки; насыщенность и светлота у всех одни */
@@ -3003,35 +2860,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     0 0 calc(175 * var(--u2)) hsl(var(--tint) 92% 70% / .24);
 }
 .pg:nth-child(even){--tilt:2.83deg}
-
-/* ПОД КУРСОРОМ карточка чуть приподнимается и подсвечивается сзади своим же
-   цветом — те же числа, что у карточек цен (.pr-card), просьба Серёги
-   11.09.2026 «как карточки с ценами». Подсветка сделана ТЕНЬЮ, а не отдельным
-   слоем под карточкой: `transform` на наведении создаёт свой контекст
-   наложения, и слой с `z-index:-1` перестал бы уходить за фон — свечение
-   вылезло бы поверх карточки ровно в момент увеличения.
-   `z-index:3` обязателен: приподнятая карточка залезает на соседнюю, и без
-   него сосед накрыл бы ей край, а заодно срезал бы плашку «входит в программу»,
-   которая висит верхом на нижней границе.
-   Только там, где есть настоящий курсор: на телефоне :hover прилипает после
-   касания и карточка осталась бы поднятой навсегда. */
-@media (hover:hover) and (min-width:768px){
-  .pg{transition:transform .3s cubic-bezier(.2,.7,.3,1),
-                box-shadow .3s cubic-bezier(.2,.7,.3,1)}
-  .pg:hover{
-    z-index:3; transform:translateY(-8px) scale(1.022);
-    box-shadow:
-      inset 0 0 calc(18 * var(--u2)) rgba(0,0,0,.10),
-      inset 0 calc(-2 * var(--u2)) calc(10 * var(--u2)) rgba(0,0,0,.07),
-      calc(2 * var(--u2)) calc(7 * var(--u2)) calc(22 * var(--u2)) rgba(0,0,0,.5),
-      0 0 calc(96 * var(--u2)) calc(10 * var(--u2)) hsl(var(--tint) 100% 80% / .55),
-      0 0 calc(240 * var(--u2)) hsl(var(--tint) 92% 70% / .34);
-  }
-}
-@media (prefers-reduced-motion:reduce){
-  .pg{transition:none}
-  .pg:hover{transform:none}
-}
 
 /* ---------- окно с фотографией ----------
    Квадрат наклонён целиком вместе с рамкой, а фотография внутри развёрнута
@@ -3082,18 +2910,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* ---------- текст (единственное, что тянется) ---------- */
 .pg-panel{box-sizing:border-box; width:calc(899 * var(--u2));
   margin:calc(136 * var(--u2)) auto 0; text-align:center}
-.pg-t{
+.pg-t, .pg-p{
   /* В макете текст сжат по горизонтали (Horizontal Scale 96 %), высота букв
      при этом полная. Берём 94 %, а не 96 %: Photoshop набирает эту гарнитуру
      примерно на 2 % плотнее браузера, и на 94 % ширина строк и места переносов
      совпадают с макетом ровно. Блок для этого делаем шире на 1/0.94, сдвигаем
-     влево на половину прибавки и жмём обратно — кегль остаётся тем же.
-
-     СЖАТИЕ ТОЛЬКО У ЗАГОЛОВКА. Раньше правило стояло и на абзаце — тогда он
-     был набран тем же шрифтом, что в макете, и сжатие подгоняло его переносы
-     под макет. 11.09.2026 абзац переехал на «Golos Text» (шрифт экрана цен),
-     подгонять под макет стало нечего, а сжимать наборный шрифт по горизонтали
-     без нужды нельзя: буквы перестают быть собой. */
+     влево на половину прибавки и жмём обратно — кегль остаётся тем же. */
   width:106.383%; margin-left:-3.1915%;
   transform:scaleX(.94);
 }
@@ -3110,21 +2932,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 .pg-p{
   margin-top:calc(45 * var(--u2)); margin-bottom:0;
-  /* «Golos Text» — тот же шрифт, что в блоке с ценами (просьба Серёги
-     11.09.2026). Заголовок карточки остался прежним, поменялся только абзац:
-     теперь в карточке два шрифта, ровно как на экране цен.
-     КЕГЛЬ ПРИШЛОСЬ УМЕНЬШИТЬ, А МЕЖСТРОЧНЫЙ УВЕЛИЧИТЬ. Golos шире прежнего
-     шрифта примерно на 21 % в пересчёте на кегль (это уже мерили — см. подписи
-     городов на карте) и с более высокой строчной буквой: оставь прежние 57,3 —
-     и абзац стал бы заметно крупнее заголовка по «весу». Межстрочный у Golos
-     тоже свой: прежние 1,18 кегля слипались, взяли 1,4.
-     ЧИСЛО 53 НЕ НА ГЛАЗ. Оно подобрано по ВЫСОТЕ СТРОЧНОЙ БУКВЫ: у прежнего
-     шрифта на его кегле она была 9,41 px, у Golos на 53 — 9,16 px. Разница
-     3 %, глазом текст остался того же размера, хотя число кегля стало меньше.
-     Тот же приём, что с подписями городов на карте. Карточка от этого стала длиннее, Серёга этого и ждал. */
-  font-family:"Golos Text",Arial,sans-serif; font-weight:400;
-  font-size:max(16.2px, calc(53 * var(--u2)));
-  line-height:1.4;
+  font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
+  /* Кегль макетный. Межстрочный меньше макетного: сначала на 15 % (74,49 → 63,3),
+     потом Серёга попросил чуть вернуть — сейчас 67,5, то есть на 9 % меньше
+     макета. Правило общее для всех ширин.
+     А кегль на 20 % меньше он просил ТОЛЬКО для телефона — это ниже,
+     в блоке @media (max-width:559px). */
+  font-size:max(17.3px, calc(57.3 * var(--u2)));
+  line-height:max(20.5px, calc(67.5 * var(--u2)));
   color:#000;
 }
 
@@ -3175,7 +2990,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    с остальными телефонными: вес у селекторов одинаковый, и решает порядок
    в файле — сверху его перебивало обратно. */
 @media (max-width:559px){
-  .pg-p{font-size:max(13px, calc(42.4 * var(--u2)))}
+  .pg-p{font-size:max(13.2px, calc(45.84 * var(--u2)))}
 }
 
 /* ЧИСЛО КОЛОНОК. Ниже 560 px — одна, дальше две, три и четыре.
@@ -5338,7 +5153,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <div class="kicker">Экскурсия-шоу</div>
     </div>
     <div class="side right" id="sideR">
-      <div class="city">Нижний<br>Новгород</div>
+      <div class="city">Нижний<br> Новгород</div>
       <div class="rule"></div>
       <ul class="facts">
         <li>Ольгино, 62</li>
@@ -5670,27 +5485,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <span class="kr-ball kr-ball--gold"><img src="shar-gold.webp" width="520" height="701" alt="" loading="lazy" decoding="async" draggable="false"></span>
   </div>
   <div class="cr-cont">
-    <!-- ПРОБЕЛ МЕЖДУ ЦВЕТАМИ ЛЕЖИТ ВНУТРИ СИНЕГО span, а не между ними:
-         у `.cr-h2` сам заголовок мелкий, а 300 % кегля висят на span. Пробел,
-         оставленный СНАРУЖИ, набирается мелким кеглем и слова слипаются
-         («ПОСМОТРИТЕВ КАКУЮ»). Проверено 11.09.2026. -->
     <div class="cr-n">
-      <h2 class="cr-t cr-h2" id="krT"><span class="cr-red"><strong>ПОСМОТРИТЕ</strong></span><span class="cr-blue"><strong> В КАКУЮ КРАСОТУ ПОПАДУТ ВАШИ ДЕТИ!</strong></span></h2>
+      <h2 class="cr-t cr-h2" id="krT"><span class="cr-red"><strong>НАША ЛОКАЦИЯ КАК ПРОИЗВЕДЕНИЕ НОВОГОДНЕГО ИСКУССТВА&nbsp;-&nbsp;</strong></span><span class="cr-blue"><strong>СОСТОИТ ИЗ МЕЛЬЧАЙШИХ ДЕТАЛЕЙ</strong></span></h2>
     </div>
 
     <div style="height:calc(26 * var(--u))"></div>
 
-    <div class="cr-n"><p class="cr-t cr-lead">Оцените уровень и масштаб застройки, украшений и детализации площадки!</p></div>
+    <div class="cr-n"><p class="cr-t cr-lead">Оцените уровень и масштаб застройки, украшений и детализации площадки! Листайте до конца!</p></div>
 
     <div style="height:calc(30 * var(--u))"></div>
 
-    <!-- Подсказка стоит вплотную к слайдеру, а не хвостом подзаголовка
-         (Серёга, 11.09.2026): её задача — объяснить кадры под ней. -->
-    <p class="kr-swipe">Листайте до конца!</p>
-
-    <!-- Коробка `.kr-stage`: окно с кадрами и стрелки рядом. Стрелки лежат
-         ВНЕ окна намеренно — у окна `overflow:hidden`, оно бы их обрезало. -->
-    <div class="kr-stage">
     <div class="kr-view" id="krView" role="group" aria-roledescription="карусель" aria-label="Фотографии площадки">
       <div class="kr-strip" id="krStrip">
         <div class="kr-slide kr-slide--hor">
@@ -5791,15 +5595,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
       </div>
 
-      <p class="kr-count" aria-hidden="true"><span id="krNum">1</span> / <span id="krAll">12</span></p>
-    </div>
-
       <button class="kr-nav kr-prev" id="krPrev" type="button" aria-label="Предыдущие снимки">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg>
       </button>
       <button class="kr-nav kr-next" id="krNext" type="button" aria-label="Следующие снимки">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
       </button>
+
+      <p class="kr-count" aria-hidden="true"><span id="krNum">1</span> / <span id="krAll">12</span></p>
     </div>
 
     <div class="kr-thumbs" id="krThumbs" aria-label="Кадры площадки">
@@ -5999,7 +5802,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <section class="cr pgs" id="whatawaits" aria-labelledby="pgsT">
   <div class="cr-cont">
     <h2 class="pgs-t" id="pgsT">Что же ждёт детей?</h2>
-    <p class="pgs-lead"><b>Продолжительность программы 1 час 20 минут</b> — самое оптимальное
+    <p class="pgs-lead">Продолжительность программы 1 час 20 минут — самое оптимальное
     время, чтобы дети получали всё, не утомляясь и не теряя внимание</p>
   </div>
 
@@ -6030,7 +5833,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </defs></svg>
 
   <div class="pgs-row">
-            <article class="pg" data-shots="karta/k1/01.webp,karta/k1/02.webp,karta/k1/03.webp,karta/k1/04.webp,karta/k1/05.webp,karta/k1/06.webp,karta/k1/07.webp,karta/k1/08.webp,karta/k1/09.webp,karta/k1/10.webp,karta/k1/11.webp,karta/k1/12.webp,karta/k1/13.webp,karta/k1/14.webp,karta/k1/15.webp,karta/k1/16.webp,karta/k1/17.webp" style="--tint:222">
+      <article class="pg" data-shots="karta/k1/01.webp,karta/k1/02.webp,karta/k1/03.webp,karta/k1/04.webp,karta/k1/05.webp,karta/k1/06.webp,karta/k1/07.webp,karta/k1/08.webp,karta/k1/09.webp,karta/k1/10.webp,karta/k1/11.webp,karta/k1/12.webp,karta/k1/13.webp,karta/k1/14.webp,karta/k1/15.webp,karta/k1/16.webp,karta/k1/17.webp" style="--tint:222">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k1/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -6050,7 +5853,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-            <article class="pg" data-shots="karta/k4/01.webp,karta/k4/02.webp,karta/k4/03.webp,karta/k4/04.webp,karta/k4/05.webp,karta/k4/06.webp,karta/k4/07.webp,karta/k4/08.webp,karta/k4/09.webp,karta/k4/10.webp,karta/k4/11.webp,karta/k4/12.webp,karta/k4/13.webp,karta/k4/14.webp,karta/k4/15.webp,karta/k4/16.webp,karta/k4/17.webp,karta/k4/18.webp,karta/k4/19.webp,karta/k4/20.webp,karta/k4/21.webp,karta/k4/22.webp,karta/k4/23.webp,karta/k4/24.webp,karta/k4/25.webp,karta/k4/26.webp" style="--tint:0">
+      <article class="pg" data-shots="karta/k4/01.webp,karta/k4/02.webp,karta/k4/03.webp,karta/k4/04.webp,karta/k4/05.webp,karta/k4/06.webp,karta/k4/07.webp,karta/k4/08.webp,karta/k4/09.webp,karta/k4/10.webp,karta/k4/11.webp,karta/k4/12.webp,karta/k4/13.webp,karta/k4/14.webp,karta/k4/15.webp,karta/k4/16.webp,karta/k4/17.webp,karta/k4/18.webp,karta/k4/19.webp,karta/k4/20.webp,karta/k4/21.webp,karta/k4/22.webp,karta/k4/23.webp,karta/k4/24.webp,karta/k4/25.webp,karta/k4/26.webp" style="--tint:0">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k4/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -6070,7 +5873,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-            <article class="pg" data-shots="karta/k3/01.webp,karta/k3/02.webp,karta/k3/03.webp,karta/k3/04.webp,karta/k3/05.webp,karta/k3/06.webp,karta/k3/07.webp" style="--tint:137">
+      <article class="pg" data-shots="karta/k3/01.webp,karta/k3/02.webp,karta/k3/03.webp,karta/k3/04.webp,karta/k3/05.webp,karta/k3/06.webp,karta/k3/07.webp" style="--tint:137">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k3/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -6090,7 +5893,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-            <article class="pg" data-shots="karta/k5/01.webp,karta/k5/02.webp,karta/k5/03.webp,karta/k5/04.webp,karta/k5/05.webp,karta/k5/06.webp,karta/k5/07.webp,karta/k5/08.webp,karta/k5/09.webp,karta/k5/10.webp,karta/k5/11.webp,karta/k5/12.webp" style="--tint:52">
+      <article class="pg" data-shots="karta/k2/01.webp,karta/k2/02.webp,karta/k2/03.webp,karta/k2/04.webp,karta/k2/05.webp,karta/k2/06.webp,karta/k2/07.webp,karta/k2/08.webp,karta/k2/09.webp" style="--tint:275">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k2/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Фонарики в темное время</h3>
+          <p class="pg-p">В темное время суток (примерно с 16:00) мы раздаем детям фонарики на время уличной программы. Они с ними выглядят как светлячки :) И получаются классные фото!</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+      <article class="pg" data-shots="karta/k5/01.webp,karta/k5/02.webp,karta/k5/03.webp,karta/k5/04.webp,karta/k5/05.webp,karta/k5/06.webp,karta/k5/07.webp,karta/k5/08.webp,karta/k5/09.webp,karta/k5/10.webp,karta/k5/11.webp,karta/k5/12.webp" style="--tint:52">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k5/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -6110,7 +5933,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-            <article class="pg" data-shots="karta/k6/01.webp,karta/k6/02.webp,karta/k6/03.webp,karta/k6/04.webp,karta/k6/05.webp,karta/k6/06.webp" style="--tint:190">
+      <article class="pg" data-shots="karta/k6/01.webp,karta/k6/02.webp,karta/k6/03.webp,karta/k6/04.webp,karta/k6/05.webp,karta/k6/06.webp" style="--tint:190">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k6/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -6125,108 +5948,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </svg>
         </div>
         <div class="pg-panel">
-          <h3 class="pg-t">Экспозиция настоящих метеоритов от Незнайки с Луны</h3>
-          <p class="pg-p">Коллекция настоящих метеоритов из разных уголков нашей Земли будет представлена в кабинете-обсерватории Деда Мороза. Некоторые будут размещены на левитирующих платформах. Это не бутафория, мы привезем настоящие экспонаты со своей историей!</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-            <article class="pg" data-shots="karta/k8/01.webp,karta/k8/02.webp,karta/k8/03.webp,karta/k8/04.webp,karta/k8/05.webp,karta/k8/06.webp,karta/k8/07.webp,karta/k8/08.webp,karta/k8/09.webp,karta/k8/10.webp,karta/k8/11.webp" style="--tint:105">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k8/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Пульт управления делами Деда Мороза</h3>
-          <p class="pg-p">Дед Мороз и Министр докажут детям, что следят за их поведением и знают о них все, показав фото каждого ребенка на экранах пульта управления делами Деда Мороза. Дети всегда в приятном шоке!</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-            <article class="pg" data-shots="karta/k9/01.webp,karta/k9/02.webp,karta/k9/03.webp" style="--tint:242">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k9/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Терменвокс-шоу</h3>
-          <p class="pg-p">Терменвокс — самый необыкновенный музыкальный синтезатор, создающий звуки с помощью электромагнитных полей. Используется в министерстве для шифрования новогодних поздравлений. Каждый ребенок попробует сыграть на нем. Такого еще не видели даже взрослые!</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-            <article class="pg" data-shots="karta/k11/01.webp,karta/k11/02.webp" style="--tint:20">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k11/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Космофон — станция новогодней связи</h3>
-          <p class="pg-p">Интерактив с еще одним супер-гаджетом Деда Мороза, который ни дети ни взрослые никогда не видели! Мы максимально наполняем программу различными технологичными штуками, используем ИИ и пишем свои программы, чтобы по-настоящему удивить современного ребенка!</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-      <article class="pg" data-shots="karta/k10/01.webp,karta/k10/02.webp" style="--tint:158">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k10/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Интерактив с 3D-принтером</h3>
-          <p class="pg-p">Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-      <article class="pg" data-shots="karta/k12/01.webp,karta/k12/02.webp,karta/k12/03.webp,karta/k12/04.webp,karta/k12/05.webp" style="--tint:295">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k12/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Десятки интересных фактов о связи космоса и Нового года</h3>
-          <p class="pg-p">Во время экскурсии-шоу дети узнают множество интересных фактов из истории исследования космоса, внеземных цивилизаций, а также о взаимосвязи астрономии и Нового года.</p>
+          <h3 class="pg-t">Выставка настоящих метеоритов</h3>
+          <p class="pg-p">Коллекция настоящих метеоритов из разных уголков нашей Земли от Незнайки с Луны будет представлена в кабинете-обсерватории Деда Мороза. Некоторые будут размещены на левитирующих платформах. Это не бутафория, мы привезем настоящие экспонаты со своей историей!</p>
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
@@ -6250,9 +5973,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-            <article class="pg" data-shots="karta/k2/01.webp,karta/k2/02.webp,karta/k2/03.webp,karta/k2/04.webp,karta/k2/05.webp,karta/k2/06.webp,karta/k2/07.webp,karta/k2/08.webp,karta/k2/09.webp" style="--tint:275">
+      <article class="pg" data-shots="karta/k8/01.webp,karta/k8/02.webp,karta/k8/03.webp,karta/k8/04.webp,karta/k8/05.webp,karta/k8/06.webp,karta/k8/07.webp,karta/k8/08.webp,karta/k8/09.webp,karta/k8/10.webp,karta/k8/11.webp" style="--tint:105">
         <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k2/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+          <div class="pg-win"><img class="on" src="karta/k8/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
           <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
             <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
@@ -6265,12 +5988,92 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </svg>
         </div>
         <div class="pg-panel">
-          <h3 class="pg-t">Фонарики в темное время</h3>
-          <p class="pg-p">В темное время суток (примерно с 16:00) мы раздаем детям фонарики на время уличной программы. Они с ними выглядят как светлячки :) И получаются классные фото!</p>
+          <h3 class="pg-t">Пульт управления делами Деда Мороза</h3>
+          <p class="pg-p">Дед Мороз и Министр докажут детям, что следят за их поведением и знают о них все, показав фото каждого ребенка на экранах пульта управления делами Деда Мороза. Дети всегда в приятном шоке!</p>
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
+      <article class="pg" data-shots="karta/k9/01.webp,karta/k9/02.webp,karta/k9/03.webp" style="--tint:242">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k9/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
         </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Интерактив с настоящим терменвоксом</h3>
+          <p class="pg-p">Терменвокс — самый необыкновенный музыкальный синтезатор, создающий звуки с помощью электромагнитных полей. Используется в министерстве для шифрования новогодних поздравлений. Каждый ребенок попробует сыграть на нем. Такого еще не видели даже взрослые!</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+      <article class="pg" data-shots="karta/k11/01.webp,karta/k11/02.webp" style="--tint:20">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k11/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Космофон — станция новогодней связи</h3>
+          <p class="pg-p">Интерактив с еще одним супер-гаджетом Деда Мороза, который ни дети ни взрослые никогда не видели! Мы максимально наполняем программу различными технологичными штуками, используем ИИ и пишем свои программы, чтобы по-настоящему удивить современного ребенка!</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+<article class="pg" data-shots="karta/k10/01.webp,karta/k10/02.webp" style="--tint:158">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k10/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Интерактив с 3D-принтером</h3>
+          <p class="pg-p">Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+<article class="pg" data-shots="karta/k12/01.webp,karta/k12/02.webp,karta/k12/03.webp,karta/k12/04.webp,karta/k12/05.webp" style="--tint:295">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k12/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Десятки интересных фактов о связи космоса и Нового года</h3>
+          <p class="pg-p">Во время экскурсии-шоу дети узнают множество интересных фактов из истории исследования космоса, внеземных цивилизаций, а также о взаимосвязи астрономии и Нового года.</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+  </div>
 </section>
 
 <!-- ==================== ЭКРАН 11: заявка на светлом ====================
@@ -7729,7 +7532,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }
 
   if (BAKED){
-    var off = [logo, glow, curL, curR, cvLL, cvFX, cvSB, cvSF];   // лучи оставляем, они светят на остров
+    // кулисы тут НЕ гасим: на телефоне они висят статикой, их показывает CSS по классу .touch
+    var off = [logo, glow, cvLL, cvFX, cvSB, cvSF];   // лучи оставляем, они светят на остров
     for (var oi=0; oi<off.length; oi++) if(off[oi]) off[oi].style.display='none';
   }
 
@@ -9767,10 +9571,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var t = e.target.closest ? e.target.closest('.kr-th') : null;
     if (t) show(+t.getAttribute('data-i'));
   });
-  /* Клавиши слушаем на коробке `.kr-stage`, а не на окне: с 11.09.2026
-     стрелки лежат ВНЕ окна (вынесены за кадры), и события с них всплывают
-     уже в коробку. На окне слушатель ловил бы только пустоту. */
-  (view.parentNode || view).addEventListener('keydown', function(e){
+  view.addEventListener('keydown', function(e){
     if (e.key === 'ArrowLeft'){ e.preventDefault(); show(i - 1); }
     if (e.key === 'ArrowRight'){ e.preventDefault(); show(i + 1); }
   });
@@ -9999,8 +9800,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      из двух окон, и ошибка в соседнем блоке не должна его глушить. -->
 <script>
 /* ==================== ЭКРАН 10: КАДРЫ В ОКНАХ КАРТОЧЕК ====================
-   Под каждой карточкой лежит несколько снимков, они сменяют друг друга
-   через полсекунды с небольшим. Список файлов — в data-shots.
+   Под каждой карточкой лежит несколько снимков, они меняются по STEP
+   миллисекунд, пока карточка видна. Список файлов — в data-shots.
 
    КАЖДАЯ КАРТОЧКА ЩЁЛКАЕТ САМА ПО СЕБЕ. Сначала часы были одни на весь экран
    и все окна менялись разом; 10.09.2026 Серёга попросил вразнобой. Просто
@@ -10009,15 +9810,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    каждой карточки свой СДВИГ ФАЗЫ — задержка перед первым щелчком, разная
    у соседей и одна и та же при каждом запуске.
 
-   ДВА РЕЖИМА (11.09.2026, просьба Серёги).
-   • НА КОМПЬЮТЕРЕ (есть настоящий курсор и окно от 768 px) кадры меняются
-     ТОЛЬКО пока курсор на карточке. Увёл курсор — карточка замирает на том
-     кадре, который показывала; к первому не отматывается, это выглядело бы
-     как рывок. Разброс фаз тут не нужен: под курсором всегда одна карточка.
-   • НА ТЕЛЕФОНЕ всё как было — карточка мелькает сама, пока видна, — только
-     кадр держится дольше: 0,65 с вместо 0,5 («чуть чуть медленнее»).
-
-   ПЕРЕХОД КОРОЧЕ КАДРА. Кадр живёт 0,5-0,65 с, наплыв — 0,26 с (числа в стилях,
+   ПЕРЕХОД КОРОЧЕ КАДРА. Кадр живёт 0,5 с, наплыв — 0,26 с (числа в стилях,
    `.pg-win img.on`). Растянешь переход до длины кадра — следующий перебьёт
    предыдущий на полпути, и окно навсегда останется мыльным.
 
@@ -10029,13 +9822,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    4. Карточка начинает мелькать, когда ВСЕ её кадры уже в памяти: иначе
       на медленном интернете в окне вместо фотографии вспыхивает заглушка. */
 (function(){
-  var FAST = 500, SLOW = 650;      /* сколько держится кадр: под курсором и сам по себе */
-  var LEAD = 120;                  /* пауза перед первым кадром под курсором, мс */
-  var STEP = 500;                  /* шаг, от которого считается разброс фаз */
-  /* Тот же порог, что у подсветки карточки в стилях (@media (hover:hover) and
-     (min-width:768px)). Обязан совпадать: иначе на планшете карточка будет
-     подниматься под курсором, но не мелькать, или наоборот. */
-  var hov  = window.matchMedia('(hover:hover) and (min-width:768px)');
+  var STEP = 500;                                    /* сколько держится кадр, мс */
   var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
   var cards = [];
 
@@ -10048,7 +9835,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var extra = srcs.filter(function(src){ return !first || !first.src.endsWith(src) });
     if (!extra.length) return;                       /* один кадр — мелькать нечем */
 
-    var c = { seen:false, ready:false, hot:false, shots:[first], cur:0, loaded:false,
+    var c = { seen:false, ready:false, shots:[first], cur:0, loaded:false,
               timer:null, wait:null,
               /* сдвиг фазы. Шаг 137 — «золотой угол» в миллисекундах: остатки
                  от деления ложатся по кругу далеко друг от друга, поэтому даже
@@ -10068,13 +9855,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     };
     c.start = function(){
       if (c.timer || c.wait || !c.seen || !c.ready || document.hidden || calm.matches) return;
-      var byHand = hov.matches;                      /* компьютер: ждём курсор */
-      if (byHand && !c.hot) return;
-      var step = byHand ? FAST : SLOW;
       c.wait = setTimeout(function(){
         c.wait = null; c.step();
-        c.timer = setInterval(c.step, step);
-      }, byHand ? LEAD : c.phase);
+        c.timer = setInterval(c.step, STEP);
+      }, c.phase);
     };
     c.stop = function(){
       if (c.wait){ clearTimeout(c.wait); c.wait = null }
@@ -10098,19 +9882,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       });
     };
 
-    /* Слушатели вешаем всегда, а работают они только на компьютере: на телефоне
-       mouseenter приходит и от касания, и c.stop() в mouseleave погасил бы
-       карточку, которая по правилам телефона обязана мелькать сама.
-       Кадры при этом грузятся по-прежнему при подъезде карточки к окну,
-       а не по наведению: иначе первое наведение упиралось бы в загрузку
-       и карточка секунду стояла бы мёртвой. */
-    el.addEventListener('mouseenter', function(){
-      if (!hov.matches) return; c.hot = true; c.load(); c.start();
-    });
-    el.addEventListener('mouseleave', function(){
-      if (!hov.matches) return; c.hot = false; c.stop();
-    });
-
     cards.push(c);
     if ('IntersectionObserver' in window){
       new IntersectionObserver(function(es){
@@ -10126,15 +9897,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       if (document.hidden) cards[i].stop(); else cards[i].start();
     }
   });
-
-  /* Окно перетащили через порог 768 px (или подключили мышь к планшету) —
-     режим меняется на лету. Без этого страница осталась бы в том режиме,
-     в котором её открыли: на узком окне карточки замерли бы навсегда. */
-  var swap = function(){
-    for (var i = 0; i < cards.length; i++){ cards[i].hot = false; cards[i].stop(); cards[i].start(); }
-  };
-  if (hov.addEventListener) hov.addEventListener('change', swap);
-  else if (hov.addListener) hov.addListener(swap);
 })();
 </script>
 
