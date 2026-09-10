@@ -2737,7 +2737,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      и в padding у .pgs-row обязано совпадать: из него считается ширина
      карточки, и если разойдутся, в ряд перестанет влезать последняя. */
   --inner: calc(min(94vw, 1462px) - 32px);
-  --gap: clamp(14px, 1.8vw, 34px);
+  /* 11.09.2026: зазор ужат (было clamp(14..34)) — Серёга просил меньше воздуха
+     между карточками, чтобы они стали чуть шире. Ширина карточки считается
+     из этого числа, так что уже зазор = шире карточка. */
+  --gap: clamp(12px, 1.35vw, 26px);
 
   position:relative; overflow:hidden;   /* страховка от горизонтальной прокрутки */
   z-index:26;                           /* как у .cf-hold — экран стоит над формой */
@@ -2748,7 +2751,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      гребни НЕ доходят до карточек. Уменьшишь — снег ляжет на нижний ряд
      и накроет плашку «входит в программу».
      → schedule-app/lessons/dekoraciya-na-shve-rastyot-ot-shiriny-okna.md */
-  padding:calc(100 * var(--u)) 0 calc(160 * var(--u));
+  /* Сверху 80 макетных единиц вместо 100 — просьба Серёги 11.09.2026
+     «чуть чуть меньше отступ над заголовком до края экрана». */
+  padding:calc(80 * var(--u)) 0 calc(160 * var(--u));
 }
 .pgs-t{
   margin:0 auto calc(34 * var(--u)); text-align:center;   /* 09.09.2026: воздуха под заголовком больше, было 18 */
@@ -2777,6 +2782,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-size:max(14px, calc(17 * var(--u))); line-height:1.45;   /* 09.09.2026: чуть мельче, было 20 */
   color:#B9C8F5;
 }
+/* Первая фраза — жирным (просьба Серёги 11.09.2026). Семейство меняется
+   намеренно: у «CR Blogger» есть только начертание 400, и браузер нарисовал бы
+   поддельный жир — размазанный, с рваными краями. «Blogger Sans» это тот же
+   шрифт, но с настоящим файлом на 700. Цвет светлее соседнего текста: на
+   тёмно-синем поле один только жир читается слабо. */
+.pgs-lead b{font-family:"Blogger Sans","CR Blogger",Arial,sans-serif;
+  font-weight:700; color:#EDF2FF}
 
 /* РЯД КАРТОЧЕК. Число колонок задаётся ширинами ниже, а ширина карточки
    считается из свободного места: сколько его есть минус зазоры, поделить
@@ -2798,10 +2810,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Зазор и кегли заданы числами, а не общей формулой: формула считается от
    ширины окна и на телефоне всегда упиралась бы в свой нижний предел. */
 @media (max-width:559px){
-  .pgs{--gap:28px}
-  /* воздух над заголовком на 10 % меньше прежнего: было 100 px */
-  .pgs{padding-top:90px}
-  .pgs-row{padding:0 19px}
+  /* 11.09.2026: зазор 24 вместо 28 и поля ряда 16 вместо 19 — Серёга просил
+     меньше воздуха между карточками и карточку чуть шире. Поля ряда обязаны
+     совпадать с числом в `--w` у .pg (100vw минус два поля), иначе карточка
+     разъедется с рядом. */
+  .pgs{--gap:24px}
+  /* воздух над заголовком: 72 px. Было 100, потом 90 (09.09.2026),
+     11.09.2026 Серёга попросил ещё чуть меньше */
+  .pgs{padding-top:72px}
+  .pgs-row{padding:0 16px}
   .pgs-t{font-size:52px}                    /* вдвое крупнее прежних 26 */
   .pgs-lead{font-size:17.85px}              /* на 30 % меньше прежних 25,5 */
 }
@@ -2818,7 +2835,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      и заголовок вышел 1,5 px, а окно с фотографией схлопнулось в ноль.
      Процент остаётся ровно в одном месте — в самом `width` ниже, страховкой
      на случай, если 100vw посчитает вместе с полосой прокрутки. */
-  --w: calc(100vw - 38px);
+  --w: calc(100vw - 32px);   /* 100vw минус два поля ряда по 16px (было 19) */
   --u2: calc(var(--w) / 1045);
   --tilt: -2.83deg;        /* наклон рамки; у чётных карточек он зеркалится */
   --tint: 222;             /* тон карточки; насыщенность и светлота у всех одни */
@@ -2843,6 +2860,35 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     0 0 calc(175 * var(--u2)) hsl(var(--tint) 92% 70% / .24);
 }
 .pg:nth-child(even){--tilt:2.83deg}
+
+/* ПОД КУРСОРОМ карточка чуть приподнимается и подсвечивается сзади своим же
+   цветом — те же числа, что у карточек цен (.pr-card), просьба Серёги
+   11.09.2026 «как карточки с ценами». Подсветка сделана ТЕНЬЮ, а не отдельным
+   слоем под карточкой: `transform` на наведении создаёт свой контекст
+   наложения, и слой с `z-index:-1` перестал бы уходить за фон — свечение
+   вылезло бы поверх карточки ровно в момент увеличения.
+   `z-index:3` обязателен: приподнятая карточка залезает на соседнюю, и без
+   него сосед накрыл бы ей край, а заодно срезал бы плашку «входит в программу»,
+   которая висит верхом на нижней границе.
+   Только там, где есть настоящий курсор: на телефоне :hover прилипает после
+   касания и карточка осталась бы поднятой навсегда. */
+@media (hover:hover) and (min-width:768px){
+  .pg{transition:transform .3s cubic-bezier(.2,.7,.3,1),
+                box-shadow .3s cubic-bezier(.2,.7,.3,1)}
+  .pg:hover{
+    z-index:3; transform:translateY(-8px) scale(1.022);
+    box-shadow:
+      inset 0 0 calc(18 * var(--u2)) rgba(0,0,0,.10),
+      inset 0 calc(-2 * var(--u2)) calc(10 * var(--u2)) rgba(0,0,0,.07),
+      calc(2 * var(--u2)) calc(7 * var(--u2)) calc(22 * var(--u2)) rgba(0,0,0,.5),
+      0 0 calc(96 * var(--u2)) calc(10 * var(--u2)) hsl(var(--tint) 100% 80% / .55),
+      0 0 calc(240 * var(--u2)) hsl(var(--tint) 92% 70% / .34);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .pg{transition:none}
+  .pg:hover{transform:none}
+}
 
 /* ---------- окно с фотографией ----------
    Квадрат наклонён целиком вместе с рамкой, а фотография внутри развёрнута
@@ -2893,12 +2939,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* ---------- текст (единственное, что тянется) ---------- */
 .pg-panel{box-sizing:border-box; width:calc(899 * var(--u2));
   margin:calc(136 * var(--u2)) auto 0; text-align:center}
-.pg-t, .pg-p{
+.pg-t{
   /* В макете текст сжат по горизонтали (Horizontal Scale 96 %), высота букв
      при этом полная. Берём 94 %, а не 96 %: Photoshop набирает эту гарнитуру
      примерно на 2 % плотнее браузера, и на 94 % ширина строк и места переносов
      совпадают с макетом ровно. Блок для этого делаем шире на 1/0.94, сдвигаем
-     влево на половину прибавки и жмём обратно — кегль остаётся тем же. */
+     влево на половину прибавки и жмём обратно — кегль остаётся тем же.
+
+     СЖАТИЕ ТОЛЬКО У ЗАГОЛОВКА. Раньше правило стояло и на абзаце — тогда он
+     был набран тем же шрифтом, что в макете, и сжатие подгоняло его переносы
+     под макет. 11.09.2026 абзац переехал на «Golos Text» (шрифт экрана цен),
+     подгонять под макет стало нечего, а сжимать наборный шрифт по горизонтали
+     без нужды нельзя: буквы перестают быть собой. */
   width:106.383%; margin-left:-3.1915%;
   transform:scaleX(.94);
 }
@@ -2915,14 +2967,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 .pg-p{
   margin-top:calc(45 * var(--u2)); margin-bottom:0;
-  font-family:"CR Blogger","Blogger Sans",Arial,sans-serif; font-weight:400;
-  /* Кегль макетный. Межстрочный меньше макетного: сначала на 15 % (74,49 → 63,3),
-     потом Серёга попросил чуть вернуть — сейчас 67,5, то есть на 9 % меньше
-     макета. Правило общее для всех ширин.
-     А кегль на 20 % меньше он просил ТОЛЬКО для телефона — это ниже,
-     в блоке @media (max-width:559px). */
-  font-size:max(17.3px, calc(57.3 * var(--u2)));
-  line-height:max(20.5px, calc(67.5 * var(--u2)));
+  /* «Golos Text» — тот же шрифт, что в блоке с ценами (просьба Серёги
+     11.09.2026). Заголовок карточки остался прежним, поменялся только абзац:
+     теперь в карточке два шрифта, ровно как на экране цен.
+     КЕГЛЬ ПРИШЛОСЬ УМЕНЬШИТЬ, А МЕЖСТРОЧНЫЙ УВЕЛИЧИТЬ. Golos шире прежнего
+     шрифта примерно на 21 % в пересчёте на кегль (это уже мерили — см. подписи
+     городов на карте) и с более высокой строчной буквой: оставь прежние 57,3 —
+     и абзац стал бы заметно крупнее заголовка по «весу». Межстрочный у Golos
+     тоже свой: прежние 1,18 кегля слипались, взяли 1,4.
+     ЧИСЛО 53 НЕ НА ГЛАЗ. Оно подобрано по ВЫСОТЕ СТРОЧНОЙ БУКВЫ: у прежнего
+     шрифта на его кегле она была 9,41 px, у Golos на 53 — 9,16 px. Разница
+     3 %, глазом текст остался того же размера, хотя число кегля стало меньше.
+     Тот же приём, что с подписями городов на карте. Карточка от этого стала длиннее, Серёга этого и ждал. */
+  font-family:"Golos Text",Arial,sans-serif; font-weight:400;
+  font-size:max(16.2px, calc(53 * var(--u2)));
+  line-height:1.4;
   color:#000;
 }
 
@@ -2973,7 +3032,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    с остальными телефонными: вес у селекторов одинаковый, и решает порядок
    в файле — сверху его перебивало обратно. */
 @media (max-width:559px){
-  .pg-p{font-size:max(13.2px, calc(45.84 * var(--u2)))}
+  .pg-p{font-size:max(13px, calc(42.4 * var(--u2)))}
 }
 
 /* ЧИСЛО КОЛОНОК. Ниже 560 px — одна, дальше две, три и четыре.
@@ -5785,7 +5844,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <section class="cr pgs" id="whatawaits" aria-labelledby="pgsT">
   <div class="cr-cont">
     <h2 class="pgs-t" id="pgsT">Что же ждёт детей?</h2>
-    <p class="pgs-lead">Продолжительность программы 1 час 20 минут — самое оптимальное
+    <p class="pgs-lead"><b>Продолжительность программы 1 час 20 минут</b> — самое оптимальное
     время, чтобы дети получали всё, не утомляясь и не теряя внимание</p>
   </div>
 
@@ -5816,7 +5875,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </defs></svg>
 
   <div class="pgs-row">
-      <article class="pg" data-shots="karta/k1/01.webp,karta/k1/02.webp,karta/k1/03.webp,karta/k1/04.webp,karta/k1/05.webp,karta/k1/06.webp,karta/k1/07.webp,karta/k1/08.webp,karta/k1/09.webp,karta/k1/10.webp,karta/k1/11.webp,karta/k1/12.webp,karta/k1/13.webp,karta/k1/14.webp,karta/k1/15.webp,karta/k1/16.webp,karta/k1/17.webp" style="--tint:222">
+            <article class="pg" data-shots="karta/k1/01.webp,karta/k1/02.webp,karta/k1/03.webp,karta/k1/04.webp,karta/k1/05.webp,karta/k1/06.webp,karta/k1/07.webp,karta/k1/08.webp,karta/k1/09.webp,karta/k1/10.webp,karta/k1/11.webp,karta/k1/12.webp,karta/k1/13.webp,karta/k1/14.webp,karta/k1/15.webp,karta/k1/16.webp,karta/k1/17.webp" style="--tint:222">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k1/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -5836,7 +5895,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-      <article class="pg" data-shots="karta/k4/01.webp,karta/k4/02.webp,karta/k4/03.webp,karta/k4/04.webp,karta/k4/05.webp,karta/k4/06.webp,karta/k4/07.webp,karta/k4/08.webp,karta/k4/09.webp,karta/k4/10.webp,karta/k4/11.webp,karta/k4/12.webp,karta/k4/13.webp,karta/k4/14.webp,karta/k4/15.webp,karta/k4/16.webp,karta/k4/17.webp,karta/k4/18.webp,karta/k4/19.webp,karta/k4/20.webp,karta/k4/21.webp,karta/k4/22.webp,karta/k4/23.webp,karta/k4/24.webp,karta/k4/25.webp,karta/k4/26.webp" style="--tint:0">
+            <article class="pg" data-shots="karta/k4/01.webp,karta/k4/02.webp,karta/k4/03.webp,karta/k4/04.webp,karta/k4/05.webp,karta/k4/06.webp,karta/k4/07.webp,karta/k4/08.webp,karta/k4/09.webp,karta/k4/10.webp,karta/k4/11.webp,karta/k4/12.webp,karta/k4/13.webp,karta/k4/14.webp,karta/k4/15.webp,karta/k4/16.webp,karta/k4/17.webp,karta/k4/18.webp,karta/k4/19.webp,karta/k4/20.webp,karta/k4/21.webp,karta/k4/22.webp,karta/k4/23.webp,karta/k4/24.webp,karta/k4/25.webp,karta/k4/26.webp" style="--tint:0">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k4/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -5856,7 +5915,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-      <article class="pg" data-shots="karta/k3/01.webp,karta/k3/02.webp,karta/k3/03.webp,karta/k3/04.webp,karta/k3/05.webp,karta/k3/06.webp,karta/k3/07.webp" style="--tint:137">
+            <article class="pg" data-shots="karta/k3/01.webp,karta/k3/02.webp,karta/k3/03.webp,karta/k3/04.webp,karta/k3/05.webp,karta/k3/06.webp,karta/k3/07.webp" style="--tint:137">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k3/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -5876,27 +5935,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-      <article class="pg" data-shots="karta/k2/01.webp,karta/k2/02.webp,karta/k2/03.webp,karta/k2/04.webp,karta/k2/05.webp,karta/k2/06.webp,karta/k2/07.webp,karta/k2/08.webp,karta/k2/09.webp" style="--tint:275">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k2/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Фонарики в темное время</h3>
-          <p class="pg-p">В темное время суток (примерно с 16:00) мы раздаем детям фонарики на время уличной программы. Они с ними выглядят как светлячки :) И получаются классные фото!</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-      <article class="pg" data-shots="karta/k5/01.webp,karta/k5/02.webp,karta/k5/03.webp,karta/k5/04.webp,karta/k5/05.webp,karta/k5/06.webp,karta/k5/07.webp,karta/k5/08.webp,karta/k5/09.webp,karta/k5/10.webp,karta/k5/11.webp,karta/k5/12.webp" style="--tint:52">
+            <article class="pg" data-shots="karta/k5/01.webp,karta/k5/02.webp,karta/k5/03.webp,karta/k5/04.webp,karta/k5/05.webp,karta/k5/06.webp,karta/k5/07.webp,karta/k5/08.webp,karta/k5/09.webp,karta/k5/10.webp,karta/k5/11.webp,karta/k5/12.webp" style="--tint:52">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k5/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -5916,7 +5955,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-      <article class="pg" data-shots="karta/k6/01.webp,karta/k6/02.webp,karta/k6/03.webp,karta/k6/04.webp,karta/k6/05.webp,karta/k6/06.webp" style="--tint:190">
+            <article class="pg" data-shots="karta/k6/01.webp,karta/k6/02.webp,karta/k6/03.webp,karta/k6/04.webp,karta/k6/05.webp,karta/k6/06.webp" style="--tint:190">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k6/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -5931,8 +5970,108 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </svg>
         </div>
         <div class="pg-panel">
-          <h3 class="pg-t">Выставка настоящих метеоритов</h3>
-          <p class="pg-p">Коллекция настоящих метеоритов из разных уголков нашей Земли от Незнайки с Луны будет представлена в кабинете-обсерватории Деда Мороза. Некоторые будут размещены на левитирующих платформах. Это не бутафория, мы привезем настоящие экспонаты со своей историей!</p>
+          <h3 class="pg-t">Экспозиция настоящих метеоритов от Незнайки с Луны</h3>
+          <p class="pg-p">Коллекция настоящих метеоритов из разных уголков нашей Земли будет представлена в кабинете-обсерватории Деда Мороза. Некоторые будут размещены на левитирующих платформах. Это не бутафория, мы привезем настоящие экспонаты со своей историей!</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+            <article class="pg" data-shots="karta/k8/01.webp,karta/k8/02.webp,karta/k8/03.webp,karta/k8/04.webp,karta/k8/05.webp,karta/k8/06.webp,karta/k8/07.webp,karta/k8/08.webp,karta/k8/09.webp,karta/k8/10.webp,karta/k8/11.webp" style="--tint:105">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k8/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Пульт управления делами Деда Мороза</h3>
+          <p class="pg-p">Дед Мороз и Министр докажут детям, что следят за их поведением и знают о них все, показав фото каждого ребенка на экранах пульта управления делами Деда Мороза. Дети всегда в приятном шоке!</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+            <article class="pg" data-shots="karta/k9/01.webp,karta/k9/02.webp,karta/k9/03.webp" style="--tint:242">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k9/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Терменвокс-шоу</h3>
+          <p class="pg-p">Терменвокс — самый необыкновенный музыкальный синтезатор, создающий звуки с помощью электромагнитных полей. Используется в министерстве для шифрования новогодних поздравлений. Каждый ребенок попробует сыграть на нем. Такого еще не видели даже взрослые!</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+            <article class="pg" data-shots="karta/k11/01.webp,karta/k11/02.webp" style="--tint:20">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k11/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Космофон — станция новогодней связи</h3>
+          <p class="pg-p">Интерактив с еще одним супер-гаджетом Деда Мороза, который ни дети ни взрослые никогда не видели! Мы максимально наполняем программу различными технологичными штуками, используем ИИ и пишем свои программы, чтобы по-настоящему удивить современного ребенка!</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+      <article class="pg" data-shots="karta/k10/01.webp,karta/k10/02.webp" style="--tint:158">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k10/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Интерактив с 3D-принтером</h3>
+          <p class="pg-p">Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.</p>
+        </div>
+        <div class="pg-tag">Входит в программу</div>
+      </article>
+      <article class="pg" data-shots="karta/k12/01.webp,karta/k12/02.webp,karta/k12/03.webp,karta/k12/04.webp,karta/k12/05.webp" style="--tint:295">
+        <div class="pg-shot">
+          <div class="pg-win"><img class="on" src="karta/k12/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
+          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
+            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
+                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
+          </g>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
+          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
+        </svg>
+        </div>
+        <div class="pg-panel">
+          <h3 class="pg-t">Десятки интересных фактов о связи космоса и Нового года</h3>
+          <p class="pg-p">Во время экскурсии-шоу дети узнают множество интересных фактов из истории исследования космоса, внеземных цивилизаций, а также о взаимосвязи астрономии и Нового года.</p>
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
@@ -5956,9 +6095,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-      <article class="pg" data-shots="karta/k8/01.webp,karta/k8/02.webp,karta/k8/03.webp,karta/k8/04.webp,karta/k8/05.webp,karta/k8/06.webp,karta/k8/07.webp,karta/k8/08.webp,karta/k8/09.webp,karta/k8/10.webp,karta/k8/11.webp" style="--tint:105">
+            <article class="pg" data-shots="karta/k2/01.webp,karta/k2/02.webp,karta/k2/03.webp,karta/k2/04.webp,karta/k2/05.webp,karta/k2/06.webp,karta/k2/07.webp,karta/k2/08.webp,karta/k2/09.webp" style="--tint:275">
         <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k8/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
+          <div class="pg-win"><img class="on" src="karta/k2/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
           <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
             <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
@@ -5971,92 +6110,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </svg>
         </div>
         <div class="pg-panel">
-          <h3 class="pg-t">Пульт управления делами Деда Мороза</h3>
-          <p class="pg-p">Дед Мороз и Министр докажут детям, что следят за их поведением и знают о них все, показав фото каждого ребенка на экранах пульта управления делами Деда Мороза. Дети всегда в приятном шоке!</p>
+          <h3 class="pg-t">Фонарики в темное время</h3>
+          <p class="pg-p">В темное время суток (примерно с 16:00) мы раздаем детям фонарики на время уличной программы. Они с ними выглядят как светлячки :) И получаются классные фото!</p>
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-      <article class="pg" data-shots="karta/k9/01.webp,karta/k9/02.webp,karta/k9/03.webp" style="--tint:242">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k9/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
         </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Интерактив с настоящим терменвоксом</h3>
-          <p class="pg-p">Терменвокс — самый необыкновенный музыкальный синтезатор, создающий звуки с помощью электромагнитных полей. Используется в министерстве для шифрования новогодних поздравлений. Каждый ребенок попробует сыграть на нем. Такого еще не видели даже взрослые!</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-      <article class="pg" data-shots="karta/k11/01.webp,karta/k11/02.webp" style="--tint:20">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k11/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Космофон — станция новогодней связи</h3>
-          <p class="pg-p">Интерактив с еще одним супер-гаджетом Деда Мороза, который ни дети ни взрослые никогда не видели! Мы максимально наполняем программу различными технологичными штуками, используем ИИ и пишем свои программы, чтобы по-настоящему удивить современного ребенка!</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-<article class="pg" data-shots="karta/k10/01.webp,karta/k10/02.webp" style="--tint:158">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k10/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Интерактив с 3D-принтером</h3>
-          <p class="pg-p">Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-<article class="pg" data-shots="karta/k12/01.webp,karta/k12/02.webp,karta/k12/03.webp,karta/k12/04.webp,karta/k12/05.webp" style="--tint:295">
-        <div class="pg-shot">
-          <div class="pg-win"><img class="on" src="karta/k12/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
-        <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
-          <g style="filter:drop-shadow(14px 2px 15px rgba(126,16,8,.46)) drop-shadow(0 0 9px rgba(90,12,6,.30))">
-            <rect x="0" y="0" width="899" height="899" rx="46" ry="46"
-                  fill="none" stroke="url(#pgCandy)" stroke-width="15"/>
-          </g>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo2)" opacity=".18"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#4A0A05" mask="url(#pgLo)"  opacity=".26"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi2)" opacity=".40"/>
-          <rect x="-80" y="-80" width="1059" height="1059" fill="#fff"    mask="url(#pgHi)"  opacity=".75"/>
-        </svg>
-        </div>
-        <div class="pg-panel">
-          <h3 class="pg-t">Десятки интересных фактов о связи космоса и Нового года</h3>
-          <p class="pg-p">Во время экскурсии-шоу дети узнают множество интересных фактов из истории исследования космоса, внеземных цивилизаций, а также о взаимосвязи астрономии и Нового года.</p>
-        </div>
-        <div class="pg-tag">Входит в программу</div>
-      </article>
-  </div>
 </section>
 
 <!-- ==================== ЭКРАН 11: заявка на светлом ====================
@@ -9782,8 +9841,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      из двух окон, и ошибка в соседнем блоке не должна его глушить. -->
 <script>
 /* ==================== ЭКРАН 10: КАДРЫ В ОКНАХ КАРТОЧЕК ====================
-   Под каждой карточкой лежит несколько снимков, они меняются по STEP
-   миллисекунд, пока карточка видна. Список файлов — в data-shots.
+   Под каждой карточкой лежит несколько снимков, они сменяют друг друга
+   через полсекунды с небольшим. Список файлов — в data-shots.
 
    КАЖДАЯ КАРТОЧКА ЩЁЛКАЕТ САМА ПО СЕБЕ. Сначала часы были одни на весь экран
    и все окна менялись разом; 10.09.2026 Серёга попросил вразнобой. Просто
@@ -9792,7 +9851,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    каждой карточки свой СДВИГ ФАЗЫ — задержка перед первым щелчком, разная
    у соседей и одна и та же при каждом запуске.
 
-   ПЕРЕХОД КОРОЧЕ КАДРА. Кадр живёт 0,5 с, наплыв — 0,26 с (числа в стилях,
+   ДВА РЕЖИМА (11.09.2026, просьба Серёги).
+   • НА КОМПЬЮТЕРЕ (есть настоящий курсор и окно от 768 px) кадры меняются
+     ТОЛЬКО пока курсор на карточке. Увёл курсор — карточка замирает на том
+     кадре, который показывала; к первому не отматывается, это выглядело бы
+     как рывок. Разброс фаз тут не нужен: под курсором всегда одна карточка.
+   • НА ТЕЛЕФОНЕ всё как было — карточка мелькает сама, пока видна, — только
+     кадр держится дольше: 0,65 с вместо 0,5 («чуть чуть медленнее»).
+
+   ПЕРЕХОД КОРОЧЕ КАДРА. Кадр живёт 0,5-0,65 с, наплыв — 0,26 с (числа в стилях,
    `.pg-win img.on`). Растянешь переход до длины кадра — следующий перебьёт
    предыдущий на полпути, и окно навсегда останется мыльным.
 
@@ -9804,7 +9871,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    4. Карточка начинает мелькать, когда ВСЕ её кадры уже в памяти: иначе
       на медленном интернете в окне вместо фотографии вспыхивает заглушка. */
 (function(){
-  var STEP = 500;                                    /* сколько держится кадр, мс */
+  var FAST = 500, SLOW = 650;      /* сколько держится кадр: под курсором и сам по себе */
+  var LEAD = 120;                  /* пауза перед первым кадром под курсором, мс */
+  var STEP = 500;                  /* шаг, от которого считается разброс фаз */
+  /* Тот же порог, что у подсветки карточки в стилях (@media (hover:hover) and
+     (min-width:768px)). Обязан совпадать: иначе на планшете карточка будет
+     подниматься под курсором, но не мелькать, или наоборот. */
+  var hov  = window.matchMedia('(hover:hover) and (min-width:768px)');
   var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
   var cards = [];
 
@@ -9817,7 +9890,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var extra = srcs.filter(function(src){ return !first || !first.src.endsWith(src) });
     if (!extra.length) return;                       /* один кадр — мелькать нечем */
 
-    var c = { seen:false, ready:false, shots:[first], cur:0, loaded:false,
+    var c = { seen:false, ready:false, hot:false, shots:[first], cur:0, loaded:false,
               timer:null, wait:null,
               /* сдвиг фазы. Шаг 137 — «золотой угол» в миллисекундах: остатки
                  от деления ложатся по кругу далеко друг от друга, поэтому даже
@@ -9837,10 +9910,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     };
     c.start = function(){
       if (c.timer || c.wait || !c.seen || !c.ready || document.hidden || calm.matches) return;
+      var byHand = hov.matches;                      /* компьютер: ждём курсор */
+      if (byHand && !c.hot) return;
+      var step = byHand ? FAST : SLOW;
       c.wait = setTimeout(function(){
         c.wait = null; c.step();
-        c.timer = setInterval(c.step, STEP);
-      }, c.phase);
+        c.timer = setInterval(c.step, step);
+      }, byHand ? LEAD : c.phase);
     };
     c.stop = function(){
       if (c.wait){ clearTimeout(c.wait); c.wait = null }
@@ -9864,6 +9940,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       });
     };
 
+    /* Слушатели вешаем всегда, а работают они только на компьютере: на телефоне
+       mouseenter приходит и от касания, и c.stop() в mouseleave погасил бы
+       карточку, которая по правилам телефона обязана мелькать сама.
+       Кадры при этом грузятся по-прежнему при подъезде карточки к окну,
+       а не по наведению: иначе первое наведение упиралось бы в загрузку
+       и карточка секунду стояла бы мёртвой. */
+    el.addEventListener('mouseenter', function(){
+      if (!hov.matches) return; c.hot = true; c.load(); c.start();
+    });
+    el.addEventListener('mouseleave', function(){
+      if (!hov.matches) return; c.hot = false; c.stop();
+    });
+
     cards.push(c);
     if ('IntersectionObserver' in window){
       new IntersectionObserver(function(es){
@@ -9879,6 +9968,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       if (document.hidden) cards[i].stop(); else cards[i].start();
     }
   });
+
+  /* Окно перетащили через порог 768 px (или подключили мышь к планшету) —
+     режим меняется на лету. Без этого страница осталась бы в том режиме,
+     в котором её открыли: на узком окне карточки замерли бы навсегда. */
+  var swap = function(){
+    for (var i = 0; i < cards.length; i++){ cards[i].hot = false; cards[i].stop(); cards[i].start(); }
+  };
+  if (hov.addEventListener) hov.addEventListener('change', swap);
+  else if (hov.addListener) hov.addListener(swap);
 })();
 </script>
 
