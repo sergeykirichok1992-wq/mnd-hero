@@ -3896,12 +3896,36 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   border:2px dotted rgba(255,255,255,.92);
   border-radius:calc(clamp(18px,1.4vw,24px) - 7px);
 }
-.pr-card--spec{--pr-bg:#C3F3B6}
-.pr-card--std{--pr-bg:#C9EAFF}
-.pr-card--prem{--pr-bg:#FFD3D3}
+.pr-card--spec{--pr-bg:#C3F3B6; --pr-halo:rgba(88,196,58,.5);  --pr-line:rgba(38,110,20,.30)}
+.pr-card--std {--pr-bg:#C9EAFF; --pr-halo:rgba(56,151,226,.5); --pr-line:rgba(18,90,150,.28)}
+.pr-card--prem{--pr-bg:#FFD3D3; --pr-halo:rgba(236,104,120,.5);--pr-line:rgba(150,40,50,.26)}
 /* Золото у VIP на старом сайте не плоское, а с высветлением к середине:
    замер по картинке - край #FFCC5D, центр #FFE890. */
-.pr-card--vip{--pr-bg:radial-gradient(120% 100% at 50% 42%, #FFE890 0%, #FFD673 46%, #FFCC5D 100%)}
+.pr-card--vip{--pr-bg:radial-gradient(120% 100% at 50% 42%, #FFE890 0%, #FFD673 46%, #FFCC5D 100%);
+  --pr-halo:rgba(245,158,11,.58); --pr-line:rgba(150,95,10,.30)}
+
+/* ПОД КУРСОРОМ карточка приподнимается и подсвечивается сзади своим же цветом
+   (просьба Серёги 10.09.2026). Свечение сделано ТЕНЬЮ, а не отдельным слоем
+   под карточкой: `transform` на наведении создаёт свой контекст наложения,
+   и слой с `z-index:-1` перестал бы уходить за фон - подсветка вылезла бы
+   поверх карточки ровно в тот момент, когда включается увеличение.
+   `z-index:2` обязателен: увеличенная карточка залезает на соседнюю, и без
+   него сосед накрыл бы ей край. Только там, где есть настоящий курсор:
+   на телефоне :hover прилипает после касания и карточка остаётся поднятой. */
+@media (hover:hover) and (min-width:768px){
+  .pr-card{transition:transform .3s cubic-bezier(.2,.7,.3,1),
+                      box-shadow .3s cubic-bezier(.2,.7,.3,1)}
+  .pr-card:hover{
+    z-index:2; transform:translateY(-8px) scale(1.022);
+    box-shadow:0 34px 58px -26px rgba(0,27,113,.45),
+               0 8px 20px -10px rgba(0,27,113,.22),
+               0 0 46px 6px var(--pr-halo);
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  .pr-card{transition:none}
+  .pr-card:hover{transform:none}
+}
 
 .pr-name{margin:0 0 clamp(14px,1.2vw,20px); text-align:center;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
@@ -3932,21 +3956,50 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    margin-top:auto прижимает цену к низу карточки. Ради этого карточка и сделана
    колонкой-флексом: дат в категориях разное число (6, 10, 12 и 14), и без этого
    строки с ценой встали бы на четырёх разных высотах. */
-.pr-price{margin-top:auto; padding-top:clamp(18px,1.7vw,26px)}
-.pr-now{margin:0; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px;
-  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14px,1.05vw,15.6px);
-  line-height:1.2; color:#14213D}
-.pr-now b{font-weight:700; font-size:clamp(19px,1.5vw,24px); color:#C81420}
-.pr-was{text-decoration:line-through; color:rgba(20,33,61,.5)}
+.pr-price{margin-top:auto; padding-top:clamp(22px,2vw,32px)}
+/* Цена лежит белой табличкой, а не строчкой текста на цвете (просьба Серёги
+   10.09.2026 «оформи эту часть блока покрасивее»). Материал у таблички тот же,
+   что у плиток с датами - белое поле, та же тень, тот же радиус: в карточке
+   ровно два вида предметов, а не пять. Цена - главное, что человек ищет
+   на этом экране глазами, и отдельный предмет она заслуживает. */
+.pr-plate{
+  border-radius:clamp(12px,1vw,16px); background:#fff;
+  padding:clamp(12px,1.05vw,17px) clamp(13px,1.1vw,18px) clamp(11px,.95vw,15px);
+  box-shadow:0 3px 8px -3px rgba(20,33,61,.3), inset 0 0 0 1px rgba(20,33,61,.07);
+}
+.pr-lab{margin:0 0 clamp(3px,.3vw,5px);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(10px,.72vw,11px);
+  font-weight:600; letter-spacing:.17em; text-transform:uppercase;
+  line-height:1; color:rgba(20,33,61,.5)}
+.pr-now{margin:0; display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 9px;
+  font-family:"Golos Text",Arial,sans-serif; line-height:1}
+.pr-now b{font-weight:700; font-size:clamp(23px,1.85vw,30px); letter-spacing:-.01em;
+  color:#C81420}
+.pr-was{font-size:clamp(13px,1vw,15px); text-decoration:line-through;
+  color:rgba(20,33,61,.42)}
 /* Зачёркнутое голосом не читается: диктор произнёс бы «Сейчас 1590 ₽ 1490 ₽»
    и второе число повисло бы без объяснения. Слово «было» стоит в разметке,
    но спрятано от глаза - видно его только на слух. */
 .pr-sr{position:absolute; width:1px; height:1px; margin:0; padding:0;
   overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0}
-.pr-next{margin:clamp(8px,.7vw,12px) 0 0;
-  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.5px,.95vw,14px);
-  line-height:1.3; color:rgba(20,33,61,.75)}
-.pr-next b{font-weight:700; color:#14213D}
+/* Следующее повышение отделено пунктиром: это уже не сегодняшняя цена и
+   слипаться с ней она не должна. Цвет пунктира берётся от карточки
+   (--pr-line), поэтому на всех четырёх он свой и не выглядит чужой чертой. */
+.pr-next{margin:clamp(9px,.8vw,13px) 0 0; padding-top:clamp(9px,.8vw,13px);
+  display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+  border-top:1px dashed var(--pr-line, rgba(20,33,61,.2));
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12px,.92vw,13.6px);
+  line-height:1.25; color:rgba(20,33,61,.7)}
+.pr-next b{flex:none; font-weight:700; font-size:clamp(13.5px,1.04vw,15.4px);
+  color:#14213D}
+/* ЭТА СТРОКА ОБЯЗАТЕЛЬНА. С 1 декабря повышений больше нет, и скрипт прячет
+   строку через атрибут `hidden`. Но `hidden` - это всего лишь `display:none`
+   в стилях браузера, а своё `display:flex` выше его перебивает: без правила
+   ниже карточка в декабре продолжала бы обещать «С 1 октября: 1590 ₽», хотя
+   цена уже 1790. Поймано замером 10.09.2026 подменой часов на 15 декабря.
+   Правило нужно КАЖДОМУ элементу, которому задан свой display и который
+   когда-либо прячут через `hidden`. */
+.pr-next[hidden]{display:none}
 
 /* ---------- пояснения под карточками ---------- */
 .pr-notes{margin-top:clamp(28px,3vw,48px)}
@@ -3972,17 +4025,71 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pr-fine{margin:clamp(14px,1.4vw,22px) 0 0; text-align:center;
   font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.5px,.92vw,13.6px);
   line-height:1.4; color:rgba(63,79,118,.75)}
-/* Кнопка обычная, золотая (выбор Серёги 10.09.2026). Ширину не задаём -
-   по стандарту она по длине надписи → sayt-nn/standart-knopok.md */
+/* Кнопка обычная, золотая (выбор Серёги 10.09.2026). На компьютере ширина
+   по длине надписи, как велит стандарт; на телефоне - во всю ширину бланка,
+   как у кнопок седьмого и восьмого экранов (просьба Серёги 10.09.2026
+   «как обычно в формах»). Меняешь одну - меняй и те две, иначе кнопки
+   на телефоне перестанут быть одной кнопкой → sayt-nn/standart-knopok.md */
 .pr-send{margin-top:clamp(24px,2.6vw,40px); display:flex; justify-content:center}
+.pr-send .zs-btn{width:min(100%,480px)}
+@media (min-width:768px){ .pr-send .zs-btn{width:auto} }
+
+/* ---------- СТЫК С ЭКРАНОМ ВИДЕО ----------
+   Высота картинки снега считается от ШИРИНЫ ОКНА и растёт без потолка, а воздух
+   под роликами - нет. Замер 10.09.2026 при подъёме 30 %: гребни не доходили до
+   подписей роликов всего 13-25 px, а на 2560 заходили на них на 20 px.
+   Правок две сразу: подъём снижен до 22 % и под последним рядом роликов добавлен
+   воздух. Правило про .vd живёт ЗДЕСЬ, а не в стилях четырнадцатого экрана:
+   оно про стык, а не про сам экран, и потерять его при правке роликов нельзя.
+
+   СЧИТАЕТСЯ ТАК: зазор = воздух_под_роликами − (подъём − 13 %) × высота снимка.
+   Верхние 13 % снимка прозрачны, гребни начинаются под ними, поэтому подъём
+   меньше 13 % оставил бы вместо сугробов ровную белую черту. */
+.vd{padding-bottom:clamp(110px,10.5vw,190px)}
+.pr .cr-snow{transform:translateY(max(-22%,-260px))}
 
 @media (max-width:767px){
   /* Общий контейнер ниже 768 идёт без полей - карточкам они нужны */
   .pr .cr-cont{width:100%; padding-inline:20px}
-  .pr{padding:44px 0 48px}
-  .pr-t{font-size:clamp(21px,6.2vw,30px)}
-  .pr-lead{font-size:14.5px; margin-bottom:26px}
-  .pr-grid{gap:14px}
+  .pr{padding:44px 0 52px}
+  .vd{padding-bottom:96px}          /* тот же стык, телефонное значение */
+
+  /* Крупнее и просторнее - просьба Серёги 10.09.2026. На телефоне карточка одна
+     в ряду и место есть; экран от этого длиннее, но читается он с расстояния
+     вытянутой руки, а не с монитора. */
+  .pr-t{font-size:clamp(23px,6.9vw,33px)}
+  .pr-lead{font-size:14.5px; margin-bottom:28px}
+  .pr-grid{gap:16px}
+
+  .pr-card{padding:26px 20px 24px}   /* было 20/14: плитки почти упирались в пунктир */
+  .pr-card::before{inset:9px; border-radius:15px}
+  .pr-name{font-size:19.5px; margin-bottom:22px}
+  .pr-mon{margin:18px 0 9px; font-size:13px}
+  .pr-days{gap:8px}
+  /* Плитка была наполовину пустой: текст жался влево, справа оставалось поле
+     шире самой надписи. Содержимое поставлено по центру, поля ужаты, кегль
+     поднят - плитка стала полной, а не полупустой. */
+  .pr-d{justify-content:center; padding:7px 8px; gap:7px; font-size:14.5px}
+  .pr-d i{width:16px; height:16px}
+  .pr-d i::before{height:5px}
+
+  .pr-price{padding-top:26px}
+  .pr-plate{padding:15px 16px 13px; border-radius:14px}
+  .pr-lab{font-size:11px; margin-bottom:4px}
+  .pr-now b{font-size:27px}
+  .pr-was{font-size:14.5px}
+  .pr-next{margin-top:12px; padding-top:12px; font-size:13px}
+  .pr-next b{font-size:14.5px}
+}
+/* Самые узкие телефоны (320-359 px). Двум плиткам в ряд с новым кеглем тут
+   уже тесно: колонка выходит 116 px, а «10 янв (сб)» на 14,5 px просит 115.
+   Поэтому на них поля карточки и кегль возвращаются к прежним. */
+@media (max-width:359px){
+  .pr-card{padding:22px 14px 20px}
+  .pr-card::before{inset:7px; border-radius:13px}
+  .pr-d{padding:7px 7px; gap:6px; font-size:13.5px}
+  .pr-d i{width:15px; height:15px}
+  .pr-days{gap:7px}
 }
 /* Одну плитку в ряд на телефоне НЕ ставить, хотя соблазн есть: замер на 320 px
    (самый узкий телефон в ходу) даёт колонку в 123 px, а самой длинной плитке
@@ -5285,8 +5392,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <li class="pr-d"><i aria-hidden="true"></i>4&nbsp;дек <span>(пт)</span></li>
         </ul>
         <div class="pr-price">
-          <p class="pr-now">Сейчас: <b class="pr-cur">1490&nbsp;₽</b><s class="pr-was" hidden></s></p>
-          <p class="pr-next">С 1 октября: <b>1590&nbsp;₽</b></p>
+          <div class="pr-plate">
+            <p class="pr-lab">Сейчас</p>
+            <p class="pr-now"><b class="pr-cur">1490&nbsp;₽</b><s class="pr-was" hidden></s></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1590&nbsp;₽</b></p>
+          </div>
         </div>
       </article>
       <article class="pr-card pr-card--std" data-base="1590">
@@ -5311,8 +5421,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <li class="pr-d"><i aria-hidden="true"></i>8&nbsp;янв <span>(пт)</span></li>
         </ul>
         <div class="pr-price">
-          <p class="pr-now">Сейчас: <b class="pr-cur">1590&nbsp;₽</b><s class="pr-was" hidden></s></p>
-          <p class="pr-next">С 1 октября: <b>1690&nbsp;₽</b></p>
+          <div class="pr-plate">
+            <p class="pr-lab">Сейчас</p>
+            <p class="pr-now"><b class="pr-cur">1590&nbsp;₽</b><s class="pr-was" hidden></s></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1690&nbsp;₽</b></p>
+          </div>
         </div>
       </article>
       <article class="pr-card pr-card--prem" data-base="1690">
@@ -5336,8 +5449,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <li class="pr-d"><i aria-hidden="true"></i>10&nbsp;янв <span>(вс)</span></li>
         </ul>
         <div class="pr-price">
-          <p class="pr-now">Сейчас: <b class="pr-cur">1690&nbsp;₽</b><s class="pr-was" hidden></s></p>
-          <p class="pr-next">С 1 октября: <b>1790&nbsp;₽</b></p>
+          <div class="pr-plate">
+            <p class="pr-lab">Сейчас</p>
+            <p class="pr-now"><b class="pr-cur">1690&nbsp;₽</b><s class="pr-was" hidden></s></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1790&nbsp;₽</b></p>
+          </div>
         </div>
       </article>
       <article class="pr-card pr-card--vip" data-base="1890">
@@ -5363,8 +5479,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <li class="pr-d"><i aria-hidden="true"></i>5&nbsp;янв <span>(вт)</span></li>
         </ul>
         <div class="pr-price">
-          <p class="pr-now">Сейчас: <b class="pr-cur">1890&nbsp;₽</b><s class="pr-was" hidden></s></p>
-          <p class="pr-next">С 1 октября: <b>1990&nbsp;₽</b></p>
+          <div class="pr-plate">
+            <p class="pr-lab">Сейчас</p>
+            <p class="pr-now"><b class="pr-cur">1890&nbsp;₽</b><s class="pr-was" hidden></s></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1990&nbsp;₽</b></p>
+          </div>
         </div>
       </article>
     </div>
@@ -5391,10 +5510,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
 
     <div class="pr-send">
-      <button class="zs-btn" type="button" data-zs="экран цен"
-              data-zs-title="Забронируйте дату"
+      <button class="zs-btn" type="button" data-zs="экран цен - предложение в МАХ"
+              data-zs-title="Пришлём предложение в МАХ"
               data-zs-sub="Оставьте заявку - мы перезвоним в течение 30 минут, подберём дату и назовём точную цену для вашей группы.">
-        <span class="zs-t">Оставить заявку</span></button>
+        <span class="zs-t">Получить предложение в МАХ</span></button>
     </div>
   </div>
 </section>
@@ -9000,7 +9119,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     if(elNext){
       if(next){
-        elNext.innerHTML = 'С 1 ' + next.from + ': <b>' + money(base + next.add) + '</b>';
+        elNext.innerHTML = '<span>С 1 ' + next.from + '</span><b>' + money(base + next.add) + '</b>';
         elNext.hidden = false;
       } else {
         elNext.hidden = true;
