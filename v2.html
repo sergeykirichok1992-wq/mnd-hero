@@ -3762,20 +3762,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-size:max(14px, clamp(15px,1.15vw,19px)); line-height:1.35; color:#D8E2FF;
 }
 
-/* ---------- фильм ---------- */
-/* Отдельный блок под сеткой: ролик на двадцать минут — это уже не «короткое
-   видео», у него своя подводка и окно вдвое шире карточки. */
-.vd-film{margin:clamp(40px,4.6vw,78px) auto 0; width:min(100%, 900px); text-align:center}
-.vd-film-t{
-  margin:0 auto clamp(8px,.8vw,14px);
-  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
-  font-size:clamp(19px,2.1vw,33px); line-height:1.15; text-wrap:balance; color:#FFE7B4;
-}
-.vd-film-p{
-  margin:0 auto clamp(18px,2vw,32px); max-width:640px;
-  font-family:"CR Blogger",Arial,sans-serif; font-size:max(14px, clamp(15px,1.15vw,19px));
-  line-height:1.45; text-wrap:balance; color:#B9C8F5;
-}
 /* Подсказка про VPN. На старом сайте она стоит под каждым роликом; здесь
    одна на весь экран и мелко: у кого всё открылось, тому она не нужна. */
 .vd-note{
@@ -3784,21 +3770,23 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   color:rgba(185,200,245,.62);
 }
 
-.vd-nw{white-space:nowrap}
-.vd-br2{display:none}
-
 @media (max-width:767px){
-  /* Общий контейнер ниже 768 px идёт без полей — карточкам они нужны. */
-  .vd .cr-cont{width:100%; padding-inline:16px}
+  /* Общий контейнер ниже 768 px идёт без полей — карточкам они нужны.
+     10.09.2026 поля увеличены с 16 до 20 px, а заголовок с подзаголовком
+     получили сверх того ещё по 10: они набраны крупно и почти упирались
+     в края экрана. Просьба Серёги. */
+  .vd .cr-cont{width:100%; padding-inline:20px}
+  .vd-t, .vd-lead{padding-inline:10px}
+  /* Зазор между роликами на телефоне свой: общий clamp даёт тут 16 px,
+     и карточки читались одной слипшейся полосой. */
+  .vd-grid{gap:26px}
   .vd{padding:38px 0 44px}
   .vd-t{font-size:clamp(21px,6.2vw,30px)}
   /* Свои переносы на телефоне не нужны: строка и так короткая, а вместе
      с ними заголовок ломался на четыре строки вместо трёх. */
   .vd-br{display:none}
-  .vd-br2{display:block}
   .vd-lead{font-size:14px; margin-bottom:22px}
   .vd-cap{font-size:14px}
-  .vd-film{margin-top:34px}
 }
 /* Дыхание отблесков — как на пятом экране: движение не должно ловиться
    боковым зрением, а при «меньше движения» его нет совсем. */
@@ -4973,7 +4961,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                   data-rt="01db694af6a781db78ca88a9ba5fd2dd"
                   data-ti="Как выглядит наша локация"
                   aria-label="Смотреть видео: как выглядит наша локация, 46 секунд">
-            <img src="video/lokaciya.webp?v=1" width="1000" height="562" alt="Деревянная изба с кирпичным камином, ёлкой и гирляндами" loading="lazy" decoding="async">
+            <img src="video/lokaciya.webp?v=2" width="640" height="360" alt="Деревянная изба с кирпичным камином, ёлкой и гирляндами" loading="lazy" decoding="async">
             <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
             <span class="vd-time" aria-hidden="true">0:46</span>
           </button>
@@ -4987,7 +4975,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                   data-rt="c3aac8bdc6e601f602fdb7438cb2c0d2"
                   data-ti="Какой у нас шикарный Дед Мороз"
                   aria-label="Смотреть видео: какой у нас шикарный Дед Мороз, 36 секунд">
-            <img src="video/ded.webp?v=1" width="1000" height="562" alt="Дед Мороз в расшитой шубе у пульта управления новогодними делами" loading="lazy" decoding="async">
+            <img src="video/ded.webp?v=2" width="640" height="360" alt="Дед Мороз в расшитой шубе у пульта управления новогодними делами" loading="lazy" decoding="async">
             <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
             <span class="vd-time" aria-hidden="true">0:36</span>
           </button>
@@ -5001,7 +4989,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                   data-rt="7dc568d06964706bdb9172e5f19de57d"
                   data-ti="Про карамельный мастер-класс"
                   aria-label="Смотреть видео: про карамельный мастер-класс, 37 секунд">
-            <img src="video/karamel.webp?v=1" width="1000" height="562" alt="Дети показывают готовые красно-белые леденцы в упаковке" loading="lazy" decoding="async">
+            <img src="video/karamel.webp?v=2" width="640" height="360" alt="Дети показывают готовые красно-белые леденцы в упаковке" loading="lazy" decoding="async">
             <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
             <span class="vd-time" aria-hidden="true">0:37</span>
           </button>
@@ -5015,7 +5003,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                   data-rt="9e325eef4e760e97690b80e66b69ac51"
                   data-ti="Шоу рисования светом"
                   aria-label="Смотреть видео: шоу рисования светом, 50 секунд">
-            <img src="video/svet.webp?v=1" width="1000" height="562" alt="Светящийся зелёный рисунок в темноте на шоу рисования светом" loading="lazy" decoding="async">
+            <img src="video/svet.webp?v=2" width="640" height="360" alt="Светящийся зелёный рисунок в темноте на шоу рисования светом" loading="lazy" decoding="async">
             <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
             <span class="vd-time" aria-hidden="true">0:50</span>
           </button>
@@ -5029,7 +5017,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                   data-rt="a9043e2da960e702764475101888c6d6"
                   data-ti="Про сервис на наших площадках"
                   aria-label="Смотреть видео: про сервис на наших площадках, 42 секунды">
-            <img src="video/servis.webp?v=1" width="1000" height="562" alt="Гостиная площадки: диваны, гирлянды и экран с заставкой" loading="lazy" decoding="async">
+            <img src="video/servis.webp?v=2" width="640" height="360" alt="Гостиная площадки: диваны, гирлянды и экран с заставкой" loading="lazy" decoding="async">
             <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
             <span class="vd-time" aria-hidden="true">0:42</span>
           </button>
@@ -5043,7 +5031,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                   data-rt="a8e2f72ae47a500019bb8ae918bace27"
                   data-ti="Фееричная актёрская игра"
                   aria-label="Смотреть видео: фееричная актёрская игра, 12 минут 35 секунд">
-            <img src="video/aktery.webp?v=1" width="1000" height="562" alt="Дед Мороз и ведущий у пульта, вокруг дети и родители" loading="lazy" decoding="async">
+            <img src="video/aktery.webp?v=2" width="640" height="360" alt="Дед Мороз и ведущий у пульта, вокруг дети и родители" loading="lazy" decoding="async">
             <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
             <span class="vd-time" aria-hidden="true">12:35</span>
           </button>
@@ -5052,20 +5040,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       </figure>
     </div>
 
-    <div class="vd-film">
-      <p class="vd-film-t">Хотите полностью погрузиться в наш мир?<br class="vd-br2"> Посмотрите <span class="vd-nw">20-минутный</span> фильм о нас!</p>
-      <p class="vd-film-p">У вас сложится полная картина о том, в какую сказку попадут ваши детки.</p>
-      <div class="vd-box">
-        <button class="vd-open" type="button"
-                data-rt="838ecf64473337f103fc545669103258"
-                data-ti="Документальный фильм о Министерстве Новогодних Дел"
-                aria-label="Смотреть документальный фильм о Министерстве Новогодних Дел, 20 минут 19 секунд">
-          <img src="video/film.webp?v=1" width="1280" height="720" alt="Пульт управления делами Деда Мороза со светящимися экранами" loading="lazy" decoding="async">
-          <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-          <span class="vd-time" aria-hidden="true">20:19</span>
-        </button>
-      </div>
-    </div>
+    <!-- Блок с двадцатиминутным фильмом (ролик 838ecf64473337f103fc545669103258,
+         обложка video/film.webp) убран 10.09.2026 по просьбе Серёги: на старом
+         сайте он стоит не здесь, а ниже отдельным экраном, и сюда его добавил
+         я сам. Вернётся позже — разметка и стили лежат в коммите 5f94e0c. -->
 
     <p class="vd-note">Если видео не открылось, выключите VPN и обновите страницу.</p>
   </div>
