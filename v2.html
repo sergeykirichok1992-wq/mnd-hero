@@ -2112,6 +2112,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .kr{
   --kr-gap:clamp(8px,1.1vw,20px);
 
+  /* СТРЕЛКИ ВЫНЕСЕНЫ ЗА КАДРЫ (просьба Серёги 11.09.2026): раньше они лежали
+     поверх крайних снимков и на светлых кадрах терялись. Теперь они стоят
+     в полях по бокам карусели, а поля под них резервирует сама ширина:
+     `--kr-w` на компьютере вычитает по стрелке с воздухом с каждой стороны.
+     Ширину карусели и полосы миниатюр берём ТОЛЬКО отсюда — иначе полоса
+     разъедется с кадрами. */
+  --kr-arrow:clamp(38px,3.4vw,50px);      /* диаметр кружка стрелки */
+  --kr-arrow-gap:clamp(6px,.8vw,16px);    /* воздух между кадром и стрелкой */
+  --kr-w:min(100%, 124vh, 1240px);        /* телефон: стрелки остаются на кадрах */
+
   /* ШАРЫ. Всё, что у них регулируется, объявлено здесь — размер, размах
      качания и СКОРОСТЬ. Больше секунд = плывёт медленнее. Два разных срока
      нужны, чтобы шары не качались строем: глаз сразу замечает синхрон. */
@@ -2127,13 +2137,40 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   --kr-ball-pull:46px;                    /* насколько шар тянется за курсором */
 
   position:relative; overflow:hidden;     /* краями экрана шары и обрезает */
-  color:#333; padding:calc(60 * var(--u)) 0 calc(70 * var(--u));
+  /* низ на 10 % меньше верха-исходника: было 70, Серёга попросил
+     поджать воздух под кнопкой (11.09.2026) */
+  color:#333; padding:calc(60 * var(--u)) 0 calc(63 * var(--u));
   background-color:#E4EFF9;
   background-image:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.100'/></svg>"),
     radial-gradient(125% 95% at 50% 40%,#F3F8FD 0%,#E3EFF9 46%,#CDE1F1 100%);
   background-size:120px 120px, auto;
   background-blend-mode:overlay, normal;
 }
+
+/* ЗАГОЛОВОК В ОДНУ СТРОКУ (11.09.2026). Новый заголовок промахивается мимо
+   строки на 0,6 % — «ДЕТИ!» уезжало вниз одиноким словом. Общие 300 % кегля
+   (то есть 48 «пикселей старого сайта») заменены на 47: разницы глазом
+   не видно, а строка встаёт целиком. Только компьютер: на телефоне заголовок
+   всё равно в четыре строки и живёт своим правилом ниже.
+   Если менять текст заголовка — проверить, что он всё ещё влезает:
+   строка этим шрифтом занимает 22,84 своих кегля, а места ровно 1090 `--u`. */
+@media (min-width:768px){
+  .kr .cr-h2 span{font-size:calc(47 * var(--u))}
+}
+
+/* ПОДЗАГОЛОВОК ЭКРАНА МЕЛЬЧЕ ОБЩЕГО (11.09.2026). Общий `.cr-lead` — 28 «пикселей
+   старого сайта»; здесь строка длинная и на 28 ломалась надвое. Серёга попросил
+   одну строку, поэтому кегль опущен до 25 — это те же -11 %, что дала бы ручная
+   подгонка, но записанные через `--u`, а значит одинаковые на всех ширинах.
+
+   ВТОРОЕ ЧИСЛО (2,55 % ширины окна) — страховка для узкого компьютера. Ниже
+   1170 px множитель `--u` упирается в 1 px и перестаёт уменьшаться, а контейнер
+   продолжает сужаться — и в полосе 768-980 px строка снова ломалась надвое.
+   Берём меньшее из двух: выше 980 px работает первое число и ничего не меняется,
+   у самого края включается второе. Само число не на глаз: строка этим шрифтом
+   занимает 32,4 своих кегля, а контейнеру достаётся 94 % окна минус поля —
+   отсюда предельные 2,68 %, и взято с запасом. */
+.kr .cr-lead{font-size:min(calc(25 * var(--u)), 2.55vw)}
 
 /* ТЕНЬ ОТ КРОМОК ЭКРАНА. Не отдельная картинка, а внутренняя тень на всю
    секцию: сверху и снизу сильная, по бокам едва заметная. Лежит НАД фоном
@@ -2198,6 +2235,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   to{transform:translateY(var(--kr-ball-sw))}
 }
 
+/* ПОДСКАЗКА «Листайте до конца!». До 11.09.2026 стояла хвостом подзаголовка,
+   и подзаголовок из-за неё ломался на две строки. Серёга попросил опустить её
+   к самому слайдеру и уменьшить: это подсказка, а не часть обещания, поэтому
+   кегль мельче подзаголовка. На телефоне она ещё и красная (просьба того же
+   дня) — на компьютере цвет обычный. */
+.kr-swipe{
+  margin:0 0 calc(8 * var(--u)); text-align:center;
+  font-family:"CR Blogger",Arial,sans-serif;
+  font-size:calc(20 * var(--u)); line-height:1.4; color:#3a3a46;
+}
+@media (max-width:767px){
+  .kr-swipe{font-size:15px; margin-bottom:8px; color:rgb(157,10,15)}
+}
+
 /* Строчка под слайдером. Ширина ограничена 46 знаками в строке: это абзац,
    а не заголовок, и во всю ширину карусели он читался бы полосой текста.
    Кегль между подписью экрана и обычным текстом. */
@@ -2206,7 +2257,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"CR Blogger",Arial,sans-serif;
   font-size:calc(22 * var(--u)); line-height:1.45; color:#3a3a46;
 }
-@media (max-width:767px){ .kr-note{font-size:16px; margin-top:1cm} }
+/* 11.09.2026 кегль на телефоне поднят с 16 до 18 px (просьба Серёги) */
+@media (max-width:767px){ .kr-note{font-size:18px; margin-top:1cm} }
 
 /* Кнопка под слайдером: 2,5 см воздуха от полосы миниатюр (просьба Серёги
    07.09.2026). Вид обычный, золотой — по стандарту кнопок сайта.
@@ -2214,12 +2266,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    экрана (её снимок Серёга и прислал). На компьютере 480 px оказались велики,
    и там кнопка вернулась к стандарту сайта: ширину не задаём, её держит
    длина надписи. */
-.kr-send{margin:2.5cm 0 0; text-align:center}
+/* 11.09.2026: воздух над кнопкой ужат на 30 % — было 2,5 см, стало 1,75. */
+.kr-send{margin:1.75cm 0 0; text-align:center}
 .kr-send .zs-btn{width:min(100%, 480px)}
 @media (min-width:768px){ .kr-send .zs-btn{width:auto} }
 
-/* ОКНО КАРУСЕЛИ. Ширину ограничивают три вещи, и меньшая побеждает: ширина
-   контейнера, высота окна браузера и потолок 1240 px.
+/* КОРОБКА КАРУСЕЛИ — обёртка, в которой окно с кадрами и стрелки лежат рядом.
+   Появилась 11.09.2026 ровно ради стрелок: у окна `overflow:hidden` (иначе
+   видны были бы все слайды сразу), а значит вынести из него что-либо за край
+   нельзя — обрежется. Поэтому стрелки переехали на уровень выше, к окну
+   в соседи, и встают в поля по бокам отрицательным отступом.
+
+   ШИРИНА ОБЩАЯ (`--kr-w`) у коробки и у полосы миниатюр: они должны стоять
+   ровно друг под другом. На компьютере из неё уже вычтены поля под стрелки,
+   поэтому кадры на узком мониторе становятся чуть уже — это плата за то,
+   чтобы стрелки всегда были видны, а не только там, где место осталось. */
+.kr-stage{position:relative; width:var(--kr-w); margin-inline:auto}
+@media (min-width:768px){
+  .kr{--kr-w:min(100% - 2 * (var(--kr-arrow) + var(--kr-arrow-gap)), 124vh, 1240px)}
+}
+
+/* ОКНО КАРУСЕЛИ. Ширину держит коробка выше, окно занимает её целиком.
 
    ВЫСОТУ СТАВИТ СКРИПТ в `--kr-h` — по фактической высоте открытого слайда,
    и она переезжает тем же движением, что и сама лента. Поэтому у ленты
@@ -2232,7 +2299,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   position:relative; isolation:isolate; overflow:hidden;
   container-type:inline-size;                  /* даёт cqw для расчётов внутри */
   box-sizing:content-box;
-  width:min(100%, 124vh, 1240px); margin-inline:auto;
+  width:100%;
   height:var(--kr-h, auto);
   padding-bottom:clamp(6px,.9vw,14px);
   transition:height .45s cubic-bezier(.22,.61,.36,1);
@@ -2344,15 +2411,25 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    которой некуда вести. */
 .kr-nav{
   position:absolute; z-index:3; top:50%; transform:translateY(-50%);
-  width:clamp(38px,3.4vw,50px); aspect-ratio:1; border:0; border-radius:999px;
+  width:var(--kr-arrow); aspect-ratio:1; border:0; border-radius:999px;
   background:#fff; color:#1b1630; opacity:.78; cursor:pointer; padding:0;
   display:flex; align-items:center; justify-content:center;
   box-shadow:0 6px 18px rgba(20,16,40,.28);
   transition:opacity .2s ease, transform .2s ease;
 }
 .kr-nav svg{width:52%; height:52%; display:block}
+/* Телефон: места по бокам нет, стрелки остаются на кадрах, как и были. */
 .kr-prev{left:clamp(8px,.9vw,16px)}
 .kr-next{right:clamp(8px,.9vw,16px)}
+/* Компьютер: стрелки стоят В ПОЛЯХ, за кадрами. Отрицательный отступ ровно
+   на свою ширину плюс воздух — то самое, что вычтено из `--kr-w` выше.
+   Непрозрачность поднята: на светло-голубом поле белый кружок в 78 %
+   почти сливался с фоном, а на снимке он был контрастным. */
+@media (min-width:768px){
+  .kr-prev{left:calc(-1 * (var(--kr-arrow) + var(--kr-arrow-gap)))}
+  .kr-next{right:calc(-1 * (var(--kr-arrow) + var(--kr-arrow-gap)))}
+  .kr-nav{opacity:.95}
+}
 @media (hover:hover){ .kr-nav:not(:disabled):hover{opacity:1; transform:translateY(-50%) scale(1.1)} }
 .kr-nav:disabled{opacity:.3; cursor:default}
 .kr-nav:focus-visible{outline:3px solid rgb(47,49,146); outline-offset:3px}
@@ -2374,7 +2451,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    горизонтальная — 1,5 высоты (тот же кадр 3:2), свёрнутые — 26 % высоты. */
 .kr-thumbs{
   --th-h:clamp(56px,5.2vw,92px);
-  width:min(100%, 124vh, 1240px); margin:clamp(10px,1vw,16px) auto 0;
+  width:var(--kr-w); margin:clamp(10px,1vw,16px) auto 0;
   display:flex; gap:3px; overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
   scroll-behavior:smooth; padding-bottom:2px;
   /* Края полосы растворяются — по обрезанной миниатюре у кромки видно,
@@ -2433,8 +2510,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .kr .cr-h2{font-size:13.05px}
   /* подпись уменьшена вслед за заголовком: 28 px оригинала оказались БОЛЬШЕ
      нового заголовка, и подпись начинала спорить с ним за главное место.
-     Держим то же отношение, что на втором экране (заголовок / подпись = 1,4). */
-  .kr .cr-lead{font-size:18px}
+     Держим то же отношение, что на втором экране (заголовок / подпись = 1,4).
+     11.09.2026 Серёга попросил «чуть-чуть больше»: 18 -> 19 px. */
+  .kr .cr-lead{font-size:19px}
   /* ШАРОВ НА ТЕЛЕФОНЕ НЕТ (решение Серёги 07.09.2026). Пробовали и общий
      слой секции, и отдельный у кромок слайдера — на узком экране шар либо
      наезжает на подпись, либо закрывает кадры. Оставили только на компьютере. */
@@ -2448,7 +2526,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    не видно, экран восьмой поднят ровно на столько же. Трогать только
    вместе с margin-top у .km. */
 @media (min-width:1024px){
-  .kr{padding-bottom:calc(70 * var(--u) + 100vw * 0.022)}
+  .kr{padding-bottom:calc(63 * var(--u) + 100vw * 0.022)}
 }
 
 /* «Меньше движения»: слайды, высота и миниатюры меняются мгновенно. */
@@ -5527,16 +5605,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <span class="kr-ball kr-ball--gold"><img src="shar-gold.webp" width="520" height="701" alt="" loading="lazy" decoding="async" draggable="false"></span>
   </div>
   <div class="cr-cont">
+    <!-- ПРОБЕЛ МЕЖДУ ЦВЕТАМИ ЛЕЖИТ ВНУТРИ СИНЕГО span, а не между ними:
+         у `.cr-h2` сам заголовок мелкий, а 300 % кегля висят на span. Пробел,
+         оставленный СНАРУЖИ, набирается мелким кеглем и слова слипаются
+         («ПОСМОТРИТЕВ КАКУЮ»). Проверено 11.09.2026. -->
     <div class="cr-n">
-      <h2 class="cr-t cr-h2" id="krT"><span class="cr-red"><strong>НАША ЛОКАЦИЯ КАК ПРОИЗВЕДЕНИЕ НОВОГОДНЕГО ИСКУССТВА&nbsp;-&nbsp;</strong></span><span class="cr-blue"><strong>СОСТОИТ ИЗ МЕЛЬЧАЙШИХ ДЕТАЛЕЙ</strong></span></h2>
+      <h2 class="cr-t cr-h2" id="krT"><span class="cr-red"><strong>ПОСМОТРИТЕ</strong></span><span class="cr-blue"><strong> В КАКУЮ КРАСОТУ ПОПАДУТ ВАШИ ДЕТИ!</strong></span></h2>
     </div>
 
     <div style="height:calc(26 * var(--u))"></div>
 
-    <div class="cr-n"><p class="cr-t cr-lead">Оцените уровень и масштаб застройки, украшений и детализации площадки! Листайте до конца!</p></div>
+    <div class="cr-n"><p class="cr-t cr-lead">Оцените уровень и масштаб застройки, украшений и детализации площадки!</p></div>
 
     <div style="height:calc(30 * var(--u))"></div>
 
+    <!-- Подсказка стоит вплотную к слайдеру, а не хвостом подзаголовка
+         (Серёга, 11.09.2026): её задача — объяснить кадры под ней. -->
+    <p class="kr-swipe">Листайте до конца!</p>
+
+    <!-- Коробка `.kr-stage`: окно с кадрами и стрелки рядом. Стрелки лежат
+         ВНЕ окна намеренно — у окна `overflow:hidden`, оно бы их обрезало. -->
+    <div class="kr-stage">
     <div class="kr-view" id="krView" role="group" aria-roledescription="карусель" aria-label="Фотографии площадки">
       <div class="kr-strip" id="krStrip">
         <div class="kr-slide kr-slide--hor">
@@ -5637,14 +5726,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
       </div>
 
+      <p class="kr-count" aria-hidden="true"><span id="krNum">1</span> / <span id="krAll">12</span></p>
+    </div>
+
       <button class="kr-nav kr-prev" id="krPrev" type="button" aria-label="Предыдущие снимки">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg>
       </button>
       <button class="kr-nav kr-next" id="krNext" type="button" aria-label="Следующие снимки">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
       </button>
-
-      <p class="kr-count" aria-hidden="true"><span id="krNum">1</span> / <span id="krAll">12</span></p>
     </div>
 
     <div class="kr-thumbs" id="krThumbs" aria-label="Кадры площадки">
@@ -9612,7 +9702,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var t = e.target.closest ? e.target.closest('.kr-th') : null;
     if (t) show(+t.getAttribute('data-i'));
   });
-  view.addEventListener('keydown', function(e){
+  /* Клавиши слушаем на коробке `.kr-stage`, а не на окне: с 11.09.2026
+     стрелки лежат ВНЕ окна (вынесены за кадры), и события с них всплывают
+     уже в коробку. На окне слушатель ловил бы только пустоту. */
+  (view.parentNode || view).addEventListener('keydown', function(e){
     if (e.key === 'ArrowLeft'){ e.preventDefault(); show(i - 1); }
     if (e.key === 'ArrowRight'){ e.preventDefault(); show(i + 1); }
   });
