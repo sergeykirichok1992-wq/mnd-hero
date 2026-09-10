@@ -4634,6 +4634,106 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (max-width:767px){
   .dm .cr-cont{width:100%; padding-inline:20px}
 }
+/* ==================== ЭКРАН 18: ГАЗЕТКА НА ПАМЯТЬ ====================
+   Пространство имён `gz-`. Синее поле с переливом, на нём коллаж из трёх
+   газеток, за коллажем — золотая пунктирная рамка. Сделан 10.09.2026
+   по макету Серёги (`~/Desktop/новый сайт/экран газетка.png`, холст 1724x1442).
+
+   КОЛЛАЖ - ОДНА КАРТИНКА С ПРОЗРАЧНЫМ ФОНОМ (`v2-gaz.webp` 2000x1019 и
+   `v2-gaz-1100.webp` для телефона). Резать её на отдельные снимки нельзя:
+   у газеток свои повороты, тени и еловые ветки поверх краёв - это собрано
+   в фотошопе и кодом не повторяется. Прозрачные поля по краям срезаны,
+   поэтому картинка совпадает со своей видимой частью пиксель в пиксель.
+
+   РАМКА СТОИТ ЗА КОЛЛАЖЕМ и нарисована SVG-прямоугольником, а не `border`:
+   в макете штрих 4 px и зазор 12 px, а CSS-пунктир (`dotted`) даёт зазор
+   в размер точки - линия вышла бы вчетверо гуще. Все доли рамки сняты
+   с макета и заданы процентами от коллажа, поэтому отношение сторон у неё
+   постоянное на любой ширине и `preserveAspectRatio="none"` ничего не тянет.
+
+   ПОЛЕ СВЕТЛЕЕ, ЧЕМ У СОСЕДНЕГО ЭКРАНА С ДЕДОМ МОРОЗОМ: в макете это
+   насыщенный синий с фиолетовыми пятнами (пипеткой: #012A8B, #200276,
+   #004494), а не ночное небо. Шов между двумя тёмными экранами держит
+   золотой блик - тот же `v2-sm-blik.webp`, что на швах пятого, шестого,
+   четырнадцатого и семнадцатого экранов.
+
+   z-index:30 - следующая ступень за экраном о Деде Морозе (29).
+   Секции на странице идут лестницей → lessons/element-na-shve-sekciy-z-index.md */
+.gz-hold{position:relative; z-index:30}
+/* Блик на шве стоит СНАРУЖИ секции: у неё `overflow:hidden`, и изнутри
+   верхнюю половину блика срезало бы. */
+.gz-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.gz{
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(58px,7vw,116px) 0 clamp(44px,5vw,88px);
+  background:
+    radial-gradient(72vw 46% at 4% 2%,  rgba(0,74,178,.72), rgba(0,74,178,0) 72%),
+    radial-gradient(66vw 44% at 99% 54%, rgba(0,86,196,.62), rgba(0,86,196,0) 72%),
+    radial-gradient(58vw 40% at 16% 99%, rgba(0,70,168,.5),  rgba(0,70,168,0) 72%),
+    linear-gradient(168deg,#1B0A79 0%,#210278 34%,#1B1080 70%,#171B8A 100%);
+}
+.gz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.gz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.gz-glow i:nth-child(1){left:-16vw; top:-8%; width:66vw; height:56%;
+  background:radial-gradient(closest-side, rgba(0,92,205,.45) 0%, rgba(0,92,205,.3) 32%, rgba(0,92,205,.1) 64%, rgba(0,92,205,0) 100%);
+  animation:bkDrift1 40s ease-in-out infinite alternate}
+.gz-glow i:nth-child(2){right:-18vw; top:24%; width:70vw; height:60%;
+  background:radial-gradient(closest-side, rgba(0,84,196,.4) 0%, rgba(0,84,196,.26) 32%, rgba(0,84,196,.09) 64%, rgba(0,84,196,0) 100%);
+  animation:bkDrift2 47s ease-in-out infinite alternate}
+.gz-glow i:nth-child(3){left:50%; top:-12%; width:74vw; height:52%; margin-left:-37vw;
+  background:radial-gradient(closest-side, rgba(108,26,214,.34) 0%, rgba(108,26,214,.22) 32%, rgba(108,26,214,.07) 64%, rgba(108,26,214,0) 100%);
+  animation:bkDrift3 35s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){ .gz-glow i{animation:none} }
+/* зерно: без него градиент полосит на большой синей плоскости */
+.gz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Заголовок и подзаголовок - как на соседних тёмных экранах: Blogger Sans Bold
+   прописными, по центру. ЗОЛОТОМ ВЫДЕЛЕН ЗАЧИН «Каждая группа получит», а не
+   «газетку» - так в макете: золото ведёт глаз в строку, а главное слово стоит
+   белым на его фоне. Подзаголовок в макете тоже белый, а не светло-синий,
+   как на экранах с видео и Дедом Морозом. */
+.gz-t{
+  position:relative; z-index:2;
+  margin:0 auto clamp(16px,1.9vw,33px); text-align:center;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.16; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.gz-y{color:#FFD189}
+.gz-lead{
+  position:relative; z-index:2;
+  max-width:calc(760 * var(--u)); margin:0 auto;
+  text-align:center; text-wrap:balance;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(15px, clamp(16px,1.5vw,24px)); line-height:1.4; color:#fff;
+}
+
+/* ---------- КОЛЛАЖ И РАМКА ----------
+   Коллаж идёт во всю ширину контейнера: в макете он занимает 91 % холста,
+   а контейнер сайта на широком мониторе - ровно столько же.
+   Доли рамки с макета: слева 5,2 % ширины коллажа, справа 4,2 %, сверху
+   5,6 % высоты, снизу вровень с нижним краем коллажа. */
+.gz-art{position:relative; margin:clamp(24px,3vw,52px) auto 0}
+.gz-art img{position:relative; z-index:1; display:block; width:100%; height:auto}
+.gz-ramka{
+  position:absolute; z-index:0; left:5.2%; top:5.6%; width:90.6%; height:94.4%;
+  pointer-events:none; overflow:visible;
+}
+/* На телефоне общий контейнер отдаёт поля целиком
+   (`@media (max-width:767px){ .cr-cont{width:100%; padding:0} }`), и заголовок
+   упёрся бы в кромку экрана. Возвращаем их тексту, а коллаж оставляем во всю
+   ширину окна: мельче его делать некуда, газетки и так небольшие. */
+/* Перенос строки заголовка на телефоне снимаем: с ним последняя строка
+   вырождается в одно слово. Без него `text-wrap:balance` делит сам. */
+@media (max-width:767px){
+  .gz-t, .gz-lead{padding-inline:20px}
+  .gz-br{display:none}
+}
 </style>
 
 </head>
@@ -6292,6 +6392,45 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <figure class="dm-card"><img src="ded/f10.webp" width="857" height="860"
            loading="lazy" decoding="async" draggable="false"
            alt="Дети окружили Деда Мороза под вывеской «Министерство Новогодних Дел»"></figure>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ==================== ЭКРАН 18: ГАЗЕТКА НА ПАМЯТЬ ====================
+     Синее поле с переливом, коллаж из трёх газеток и золотая пунктирная
+     рамка за ним. Сделан 10.09.2026 по макету Серёги
+     (`~/Desktop/новый сайт/экран газетка.png`). Устройство, доли рамки
+     и почему коллаж одной картинкой → блок «ЭКРАН 18» в стилях выше
+     и sayt-nn/ustroystvo.md.
+
+     РАМКА ЛЕЖИТ ПОД КАРТИНКОЙ: коллаж накрывает её газетками, а сквозь
+     прозрачные места пунктир видно. Менять её размер - процентами
+     в `.gz-ramka`, а не числами внутри `viewBox`: viewBox держит толщину
+     штриха и скругление углов. -->
+<div class="gz-hold">
+<div class="gz-blik" aria-hidden="true"></div>
+<section class="cr gz" id="press" aria-labelledby="gzT">
+  <div class="gz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="gz-grain" aria-hidden="true"></div>
+
+  <div class="cr-cont">
+    <h2 class="gz-t" id="gzT"><span class="gz-y">Каждая группа получит</span> газетку<br class="gz-br">
+      со своим фото и статьей на память!</h2>
+    <p class="gz-lead">В этом году новый космический шаблон!</p>
+
+    <div class="gz-art">
+      <svg class="gz-ramka" viewBox="0 0 1884 1000" preserveAspectRatio="none"
+           aria-hidden="true" focusable="false">
+        <rect x="3" y="3" width="1878" height="994" rx="60" ry="60" fill="none"
+              stroke="#FFE09C" stroke-width="5" stroke-dasharray="5 16"></rect>
+      </svg>
+      <img src="v2-gaz.webp" srcset="v2-gaz-1100.webp 1100w, v2-gaz.webp 2000w"
+           sizes="(max-width:767px) 100vw, min(94vw,1462px)"
+           width="2000" height="1019" loading="lazy" decoding="async"
+           alt="Три новогодние газетки «Новогодняя пресса» с общими фотографиями групп
+                и статьёй про поход в Министерство Новогодних Дел, рядом старинный
+                фотоаппарат, еловые ветки, шишки и леденец">
     </div>
   </div>
 </section>
