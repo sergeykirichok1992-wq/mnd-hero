@@ -3170,7 +3170,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    всём экране один и тот же знак фокуса: тёмно-золотая обводка.
    У полей она стоит на :focus-visible, а не на :focus: щелчок мышью не должен
    обводить поле рамкой в три пикселя, там хватает мягкого кольца ниже. */
-.sv .zs-btn:focus-visible{outline-color:rgba(180,83,9,.9)}
+.sv .zs-btn:focus-visible,.pr .zs-btn:focus-visible,.gb .zs-btn:focus-visible{outline-color:rgba(180,83,9,.9)}
 .sv .zs-inp:focus-visible{outline:3px solid rgba(180,83,9,.9); outline-offset:2px}
 .sv .zs-opt:has(input:focus-visible){outline-color:rgba(180,83,9,.9)}
 
@@ -5789,25 +5789,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <p class="gb-lead">Мы всегда можем предложить альтернативные условия под ваш бюджет:
           по количеству детей и не только. Всё обсуждаемо&nbsp;- звоните!</p>
 
-        <ul class="gb-list">
+        <!-- role="list" не лишний: Safari у списка со снятыми маркерами
+             отбирает роль списка, и голос перестаёт объявлять «список, 5 пунктов». -->
+        <ul class="gb-list" role="list">
           <li class="gb-i">
-            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#gbGift"/></svg></span>
             <span class="gb-tx"><b>1 детский билет</b> организатору группы в подарок</span>
           </li>
           <li class="gb-i">
-            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#gbGift"/></svg></span>
             <span class="gb-tx"><b>1 взрослый билет</b> организатору группы в подарок</span>
           </li>
           <li class="gb-i">
-            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#gbGift"/></svg></span>
             <span class="gb-tx"><b>4 сопровождающих</b> взрослых бесплатно</span>
           </li>
           <li class="gb-i">
-            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#gbGift"/></svg></span>
             <span class="gb-tx">Родителей развлекаем по полной, угощаем игристым или чаем</span>
           </li>
           <li class="gb-i">
-            <span class="gb-ic" aria-hidden="true"><svg><use href="#gbGift"/></svg></span>
+            <span class="gb-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#gbGift"/></svg></span>
             <span class="gb-tx"><b>Скидка 5%</b> детям участников СВО, инвалидам и многодетным</span>
           </li>
         </ul>
