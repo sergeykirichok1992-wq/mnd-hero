@@ -261,6 +261,13 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 
 .city{
   font-family:"Prata",Georgia,serif; line-height:1.14;
+  /* У «Й» краткая стоит ВЫШЕ строки, а буквы залиты градиентом через
+     background-clip:text — фон красит только коробку элемента, и краткая
+     в неё не помещалась: город читался «НИЖНИИ» (на компьютере — с ровной
+     чёрточкой вместо дужки). Поднимаем верх коробки на .22em и тем же
+     числом возвращаем блок на место: текст не сдвинулся, дужка появилась.
+     Трогать line-height нельзя — разъедутся две строки на компьютере. */
+  padding-top:.22em; margin-top:-.22em;
   font-size:clamp(19px,2.15vw,32.3px);
   text-transform:uppercase; letter-spacing:.045em;
   background:
@@ -287,32 +294,28 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .facts li + li{color:rgba(196,210,234,.72)}
 
 @media (max-aspect-ratio:1/1), (max-width:820px){
-  /* Оба блока стартуют с одной линии: слева сезон, справа город.
-     Правый растянут на всю ширину, чтобы даты и возраст встали по центру экрана,
-     а город с адресом остались прижаты вправо. */
+  /* ОДИН СТОЛБЕЦ ПО ЦЕНТРУ, ПОД ЛОГОТИПОМ (просьба Серёги 11.09.2026):
+     город, адрес, даты, возраст — друг под другом.
+     Блок про сезон («СЕЗОН 2026/2027, экскурсия-шоу») с телефона убран совсем:
+     он делил узкий кадр надвое, а логотип в ролике и так говорит и про сезон,
+     и про экскурсию-шоу. На компьютере блок остаётся, тут только прячем. */
   /* ниже дюз (на 63vh текст лежал на сосульках) и ещё на полтора сантиметра вниз.
      Второе значение — предохранитель: на коротком экране блок иначе уезжает за нижний край. */
   .side{ top:min(calc(72vh + 1.5cm), calc(100vh - 170px)); bottom:auto; transform:none; }
-  .side.left { left:0; right:auto; width:auto; text-align:left;  padding:0 18px; }
-  .side.right{ left:0; right:0;   width:100%;  text-align:right; padding:0 18px; }
+  .side.left { display:none }
+  .side.right{ left:0; right:0; width:100%; text-align:center; padding:0 18px; }
 
-  .season{ display:block; margin:0 0 5px; font-size:12px; letter-spacing:.30em }
-  .years { display:block; font-size:31px; line-height:1 }
-  .years .fill, .years .outline{ display:inline }
-  .years .outline{ -webkit-text-stroke-width:1px }
-  .kicker{ margin-top:8px; font-size:10px; letter-spacing:.26em }
-
-  .city{ display:block; font-size:20px; letter-spacing:.04em; line-height:1.12 }
+  .city{ display:block; font-size:22px; letter-spacing:.04em; line-height:1.12 }
+  .city br{ display:none }                                          /* «Нижний Новгород» — одной строкой */
   .rule{ display:none }
-  .facts li{ display:block; font-size:13px; line-height:1.5 }
-  .facts li:nth-child(1){ text-align:right; margin-top:7px }        /* адрес — под городом */
-  .facts li:nth-child(2){ text-align:center; margin-top:26px }      /* даты — по центру */
-  .facts li:nth-child(3){ text-align:center; margin-top:4px }       /* возраст — ещё ниже */
+  .facts li{ display:block; text-align:center; font-size:13px; line-height:1.5 }
+  .facts li:nth-child(1){ margin-top:10px }                         /* адрес */
+  .facts li:nth-child(2){ margin-top:6px }                          /* даты */
+  .facts li:nth-child(3){ margin-top:4px }                          /* возраст */
   .facts li + li::before{ content:none }
 }
 @media (prefers-reduced-motion:reduce){ .years .fill,.city,.season{animation:none} }
 @media (max-width:819px){
-  .curtain{display:none}                    /* на телефоне кулис нет — и файл бархата не грузится */
   /* низ кадра занят огнями набережной, и белый текст на них терялся — кладём мягкую подложку */
   .vig::after{
     content:''; position:absolute; left:0; right:0; bottom:0; height:34vh; pointer-events:none;
@@ -329,6 +332,16 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 #curtainL{left:0;  background-position:left top;  transform-origin:0% 0%}
 #curtainR{right:0; background-position:right top; transform-origin:100% 0%}
 @media (max-aspect-ratio:1/1){ .curtain{width:62%} }
+/* КУЛИСЫ НА ТЕЛЕФОНЕ — СТАТИКОЙ, БЕЗ ВЫЕЗДА (просьба Серёги 11.09.2026).
+   На тач-устройстве ролик «запечённый»: прокрутка его не ведёт, разъезжаться
+   кулисам не по чему — поэтому они просто висят сверху кадра. Класс .touch вешает
+   скрипт первого экрана, он же там их больше не трогает (см. ветку BAKED).
+   ШИРИНА. У картинки бархат занимает только внешние 40 % своей половины, поэтому
+   две кулисы по 100 % ширины НЕ смыкаются, а оставляют просвет посередине.
+   Потолок 46vh — предохранитель для альбомной ориентации: высота кулисы это
+   0,565 её ширины, и без потолка она заняла бы там пол-экрана. */
+html.touch .curtain{opacity:1}
+@media (max-width:819px){ html.touch .curtain{width:min(100%, 46vh)} }
 #vstatus{
   position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); z-index:40;
   background:rgba(5,8,15,.9); border:1px solid var(--line); border-radius:5px;
@@ -420,9 +433,13 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-snow{
   position:absolute; left:0; right:0; top:0; z-index:2; pointer-events:none;
   aspect-ratio:3400/1050;
-  /* насколько снег заезжает на первый экран: 30 % своей высоты, из них верхние 13 %
-     прозрачны — над стыком остаются одни гребни, «немножечко» нижнего края сцены */
-  transform:translateY(-30%);
+  /* насколько снег заезжает на первый экран: 22 % своей высоты, из них верхние 13 %
+     прозрачны — над стыком остаются одни гребни, «немножечко» нижнего края сцены.
+     БЫЛО 30 % — при прокрутке сугробы доезжали до самых сосулек летающего острова
+     с логотипом, зазор между ними держался всего в палец на любой ширине окна
+     (просьба Серёги 11.09.2026 опустить их). Ниже 20 % уводить нельзя: над стыком
+     останется белая полоска и он прочитается ровной линией, а не сугробами. */
+  transform:translateY(-22%);
   background:url(snow-1500.webp) center bottom/100% 100% no-repeat;
 }
 @media (min-width:900px){ .cr-snow{background-image:url(snow-2400.webp)} }
@@ -5303,295 +5320,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .rd-dot{transition:none}
 }
 </style>
-<!-- Стили квиза лежат в ОТДЕЛЬНОМ <style> намеренно, как у экранов 9, 11, 15
-     и фильма: файл правит вторая сессия, и незакрытая скобка в чужом блоке
-     не должна ронять этот экран (и наоборот). -->
-<style>
-/* ==================== ЭКРАН 21: КВИЗ «расчёт стоимости для класса» ====================
-   Классы `.kv-*` (квиз). Копия шестого экрана боевого ministrynn.ru: те же
-   вопросы, те же варианты, тот же порядок и те же надписи на кнопках. Дизайн
-   свой - «в стиле основной формы» (просьба Серёги 11.09.2026): то же ночное
-   небо и то же окно, что у экрана 5 (бронь) и экрана 11 (заявка на светлом),
-   поля и кнопки из единого блока заявки (`.zs-*`), отправка - общая
-   `window.zsBind`. Своей валидации телефона и своего приёмника у экрана нет.
-
-   САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - выбор Серёги 11.09.2026. Раньше последним был
-   фильм; теперь шов у них общий и его держит золотой блик `.kv-blik` (тот же
-   снимок `v2-sm-blik.webp`, что на швах пятого, шестого, четырнадцатого,
-   семнадцатого и восемнадцатого экранов). Снизу шва нет вовсе - там конец
-   документа, поэтому низ секции просто уходит в тот же почти чёрный,
-   с которого фильм начинал.
-
-   ВСЕ ШАГИ ЛЕЖАТ В РАЗМЕТКЕ СРАЗУ, скрипт только переставляет `hidden`:
-   без JS и для поисковика виден весь текст квиза, а не пустая коробка.
-
-   Размеры не в множителе --u: это не копия старого сайта, всё через clamp()
-   от ширины окна - один в один с экраном 5. */
-.kv-hold{position:relative; z-index:29}
-/* Блик на шве с фильмом. Стоит СНАРУЖИ секции: у неё `overflow:hidden`,
-   и изнутри верхнюю половину блика срезало бы. */
-.kv-blik{
-  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
-  aspect-ratio:2000/381; transform:translateY(-48.5%);
-  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
-}
-.kv{
-  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
-  padding:clamp(72px,7.6vw,127.5px) 0 clamp(72px,7.6vw,127.5px);
-  /* Верх ровно в цвет низа фильма (#04071A) - шов гасится цветом, а не полосой.
-     Дальше поле поднимается в ночную синь, чтобы окно не стояло на плоском
-     чёрном, и к низу снова темнеет: страница на этом кончается. */
-  background:
-    radial-gradient(62vw 16vw at 50% 2%, rgba(28,36,116,.55), rgba(28,36,116,0) 100%),
-    linear-gradient(180deg,#04071A 0%,#070C30 16%,#0A1140 42%,#070C2E 74%,#04071A 100%);
-}
-/* отблески и зерно - тот же рецепт, что у экрана 5. Движение по общим
-   keyframes bkDrift1-3 (объявлены в блоке экрана 5), своих не заводим.
-   БЕЗ filter:blur - мягкость даёт сам радиальный градиент. */
-.kv-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
-.kv-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
-.kv-glow i:nth-child(1){left:-20vw; top:-6%; width:70vw; height:60%;
-  background:radial-gradient(closest-side, rgba(47,49,146,.46) 0%, rgba(47,49,146,.3) 32%, rgba(47,49,146,.1) 64%, rgba(47,49,146,0) 100%);
-  animation:bkDrift1 38s ease-in-out infinite alternate}
-.kv-glow i:nth-child(2){right:-22vw; top:-8%; width:72vw; height:64%;
-  background:radial-gradient(closest-side, rgba(108,43,217,.34) 0%, rgba(108,43,217,.22) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
-  animation:bkDrift2 45s ease-in-out infinite alternate}
-.kv-glow i:nth-child(3){left:6vw; bottom:2%; width:60vw; height:56%;
-  background:radial-gradient(closest-side, rgba(176,106,224,.22) 0%, rgba(176,106,224,.14) 32%, rgba(176,106,224,.05) 64%, rgba(176,106,224,0) 100%);
-  animation:bkDrift3 33s ease-in-out infinite alternate}
-.kv-glow i:nth-child(4){left:50%; bottom:-14%; width:76vw; height:52%; margin-left:-38vw;
-  background:radial-gradient(closest-side, rgba(227,179,78,.18) 0%, rgba(227,179,78,.12) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
-  animation:bkDrift2 41s ease-in-out infinite alternate-reverse}
-.kv-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
-/* звёзды общего блока «Живое небо»: выше фона и отблесков, ниже окна */
-.kv-sky{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none}
-
-/* ---------- окно квиза ---------- */
-/* Числа один в один с `.bk-card` пятого экрана: два окна заявки на одной
-   странице обязаны быть одним бланком. Меняешь тут - меняй и там. */
-.kv-card{
-  position:relative; z-index:2; isolation:isolate; overflow:hidden;
-  width:min(100%,1400px); margin:0 auto; text-align:center;
-  padding:clamp(51px,5.1vw,76.5px) clamp(18px,3.8vw,61.2px) clamp(45px,4.6vw,68.85px);
-  border-radius:clamp(22px,2.1vw,30.6px);
-  background:linear-gradient(180deg, rgba(9,16,50,.9) 0%, rgba(7,11,36,.95) 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(227,179,78,.34),
-    inset 0 1px 0 rgba(255,238,190,.22),
-    0 50px 110px -40px rgba(0,0,0,.9),
-    0 0 180px -50px rgba(108,43,217,.5);
-}
-.kv-card-sky{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
-.kv-card-sky i{position:absolute; display:block; border-radius:50%}
-.kv-card-sky i:nth-child(1){left:-28%; top:-36%; width:80%; height:92%;
-  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.3) 36%, rgba(47,49,146,.08) 70%, rgba(47,49,146,0) 100%)}
-.kv-card-sky i:nth-child(2){right:-22%; top:-16%; width:68%; height:86%;
-  background:radial-gradient(closest-side, rgba(108,43,217,.3) 0%, rgba(108,43,217,.18) 36%, rgba(108,43,217,.05) 70%, rgba(108,43,217,0) 100%)}
-.kv-card-sky i:nth-child(3){left:16%; bottom:-46%; width:68%; height:80%;
-  background:radial-gradient(closest-side, rgba(227,179,78,.13) 0%, rgba(227,179,78,.08) 36%, rgba(227,179,78,.02) 70%, rgba(227,179,78,0) 100%)}
-.kv-card > *:not(.kv-card-sky){position:relative; z-index:1}
-
-/* Высоту окна на переходах между шагами держит скрипт: без этого страница
-   прыгала бы на пол-экрана каждый раз, когда короткий шаг сменяет длинный.
-   `--kv-h` ставит скрипт, до его появления высота своя. */
-.kv-body{transition:height .32s cubic-bezier(.2,.7,.2,1)}
-.kv-body.fix{height:var(--kv-h)}
-.kv-step[hidden]{display:none}
-/* шаг въезжает: короткое проявление со сдвигом, чтобы смена читалась как
-   переход, а не как подмена текста */
-.kv-step.in{animation:kvIn .38s cubic-bezier(.2,.7,.2,1) both}
-@keyframes kvIn{from{opacity:0; transform:translateY(14px)} to{opacity:1; transform:none}}
-
-/* ---------- шапка с полосой шагов ---------- */
-/* Кнопка «назад» стоит СВОЕЙ строкой слева, а не рядом с полосой: так центр
-   полосы совпадает с центром окна на всех ширинах, и на телефоне ничего
-   ни на что не налезает. На обложке и на «принято» шапки нет вовсе. */
-.kv-head[hidden]{display:none}
-.kv-head{margin:0 0 clamp(26px,2.8vw,38.25px)}
-.kv-nav{display:flex; align-items:center; justify-content:space-between; gap:12px;
-  margin:0 0 clamp(12px,1.3vw,17px); min-height:24px}
-.kv-back{
-  display:inline-flex; align-items:center; gap:7px; padding:0; border:0; background:none;
-  font-family:"Golos Text",Arial,sans-serif; font-size:12.5px; font-weight:600;
-  letter-spacing:.1em; text-transform:uppercase; color:#7F91B4; cursor:pointer;
-  transition:color .2s ease;
-}
-.kv-back[hidden]{display:none}
-.kv-back:hover{color:#EBD3A0}
-.kv-back:focus-visible{outline:2px solid rgba(227,179,78,.8); outline-offset:3px; border-radius:4px}
-.kv-back svg{width:14px; height:14px}
-.kv-stepn{margin:0; font-family:"Golos Text",Arial,sans-serif; font-size:11.5px; font-weight:600;
-  letter-spacing:.16em; text-transform:uppercase; color:#7F91B4}
-.kv-bar{display:flex; gap:8px; width:100%; margin:0; padding:0; list-style:none}
-.kv-bar li{flex:1; height:4px; border-radius:999px; background:rgba(146,167,214,.2);
-  transition:background .35s ease, box-shadow .35s ease}
-.kv-bar li.on{background:linear-gradient(90deg,#FDE68A,#E3B34E);
-  box-shadow:0 0 14px -2px rgba(227,179,78,.7)}
-
-/* ---------- обложка (шаг 0) ---------- */
-/* Порядок и расположение как на боевом сайте: надзаголовок, крупный заголовок
-   в две краски, обещание подарка, мелкая строка, кнопка - всё по центру. */
-.kv-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); font-family:"Golos Text",Arial,sans-serif;
-  font-size:clamp(9.68px,.86vw,11.05px); font-weight:600; letter-spacing:.24em;
-  text-transform:uppercase; color:#8FA3C8}
-/* Ширину НЕ ограничивать в ch: пока Blogger Sans не загрузился, строку рисует
-   запасной Golos - он шире на 21 % и в свои же ch не влезает (та же ловушка,
-   что у `.bk-t`, см. блок экрана 5). Ширину держат поля окна. */
-.kv-t{margin:0 auto;
-  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(26px,3.7vw,57.8px); line-height:1.06; letter-spacing:.005em;
-  text-transform:uppercase; text-wrap:balance; color:#fff}
-.kv-t b{font-weight:700; color:#E3B34E}
-@supports ((-webkit-background-clip:text) or (background-clip:text)){
-  .kv-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F1D695 38%,#E3B34E 62%,#C9922F 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
-}
-.kv-lede{margin:clamp(23px,2.6vw,33.15px) auto 0; max-width:92ch; text-wrap:balance;
-  font-family:"Golos Text",Arial,sans-serif;
-  font-size:clamp(14.5px,1.12vw,16.57px); line-height:1.5; color:#B7C6E2}
-.kv-lede b{font-weight:600; color:#EBD3A0}
-/* «Подарок лишним не будет ;)» - та же мелкая строка, что в источнике */
-.kv-small{margin:clamp(12px,1.3vw,17px) auto 0; max-width:60ch;
-  font-family:"Golos Text",Arial,sans-serif; font-size:12.5px; line-height:1.45; color:#7F91B4}
-
-/* ---------- вопрос ---------- */
-.kv-q{margin:0 auto; max-width:26ch;
-  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(22px,2.4vw,35.7px); line-height:1.1; letter-spacing:.005em;
-  text-transform:uppercase; color:#fff; text-wrap:balance}
-.kv-note{margin:clamp(12px,1.3vw,15.3px) auto 0; max-width:70ch;
-  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.5px,1vw,14px);
-  line-height:1.45; color:#8FA3C8; text-wrap:pretty}
-
-/* ---------- варианты ответа ---------- */
-/* Плитки те же, что у вопроса «как планируете прийти» в основной форме
-   (`.zs-opt`), но в строку и с галочкой: тут ответов может быть несколько,
-   и человек должен видеть, что выбрано, а не догадываться по подсветке.
-   Две колонки, на телефоне одна - как в лабораторном квизе. */
-.kv-opts{display:grid; grid-template-columns:1fr 1fr; gap:clamp(10px,1.1vw,14px);
-  width:min(100%,880px); margin:clamp(28px,3vw,42.5px) auto 0; text-align:left}
-.kv-opt{flex-direction:row; align-items:center; justify-content:flex-start;
-  gap:13px; min-height:64px; padding:14px 18px; text-align:left; font-size:15.5px}
-.kv-tick{
-  position:relative; flex:0 0 auto; width:23px; height:23px; border-radius:8px;
-  border:1px solid rgba(146,167,214,.45); background:rgba(255,255,255,.06);
-  transition:background .2s ease, border-color .2s ease;
-}
-/* галка нарисована двумя гранями повёрнутого прямоугольника: одна картинка
-   на двенадцать плиток - это дешевле, чем двенадцать одинаковых SVG */
-.kv-tick::after{
-  content:''; position:absolute; left:8px; top:4px; width:5px; height:10px;
-  border:solid #3A2603; border-width:0 2.4px 2.4px 0; border-radius:1px;
-  transform:rotate(42deg) scale(.4); opacity:0;
-  transition:opacity .18s ease, transform .22s cubic-bezier(.2,.8,.2,1);
-}
-.kv-opt.on .kv-tick{background:linear-gradient(180deg,#FDE68A,#F0BC4B); border-color:rgba(251,191,36,.9)}
-.kv-opt.on .kv-tick::after{opacity:1; transform:rotate(42deg) scale(1)}
-
-/* ---------- счётчики детей и взрослых ---------- */
-.kv-cnts{display:grid; grid-template-columns:1fr 1fr; gap:clamp(12px,1.4vw,20.4px);
-  width:min(100%,720px); margin:clamp(28px,3vw,42.5px) auto 0}
-.kv-cnt{padding:clamp(16px,1.7vw,22px) clamp(12px,1.4vw,18px); border-radius:18px;
-  border:1px solid rgba(146,167,214,.24); background:rgba(255,255,255,.04)}
-.kv-cnt-lab{display:block; margin:0 0 12px; font-family:"Golos Text",Arial,sans-serif;
-  font-size:11.5px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:#7F91B4}
-.kv-cnt-row{display:flex; align-items:center; justify-content:center; gap:clamp(8px,1vw,14px)}
-.kv-pm{
-  flex:0 0 auto; width:44px; height:44px; border-radius:50%; cursor:pointer;
-  border:1px solid rgba(146,167,214,.3); background:rgba(255,255,255,.05); color:#EBD3A0;
-  font-family:"Golos Text",Arial,sans-serif; font-size:21px; line-height:1;
-  display:flex; align-items:center; justify-content:center;
-  transition:border-color .2s ease, background .2s ease, color .2s ease;
-}
-.kv-pm:hover{border-color:rgba(227,179,78,.55); background:rgba(255,255,255,.09); color:#fff}
-.kv-pm:active{transform:translateY(1px)}
-.kv-pm:focus-visible{outline:2px solid rgba(227,179,78,.8); outline-offset:2px}
-.kv-pm[disabled]{opacity:.35; cursor:default}
-/* Кегль числа не опускаем ниже 16 px по той же причине, что и у полей:
-   на iOS мелкий шрифт в поле заставляет Safari зумить всю страницу */
-.kv-num{
-  width:clamp(74px,7vw,104px); padding:6px 2px; border:0; background:transparent; text-align:center;
-  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:max(16px, clamp(24px,2.2vw,30px)); line-height:1.1; color:#fff;
-  -moz-appearance:textfield;
-}
-.kv-num::-webkit-outer-spin-button,.kv-num::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
-.kv-num:focus{outline:0; color:#FFE9B5}
-.kv-cnt.bad{border-color:rgba(255,120,120,.55)}
-
-/* ---------- поля последнего шага ---------- */
-/* Три поля в ряд - имя, телефон, город. Ровно как в основной форме: сетка
-   уже окна (880 против 1256), кнопка под ней 480. Город спрашиваем, хотя
-   в источнике его нет: от него зависит воронка в CRM. */
-.kv-form{margin-top:clamp(30px,3.2vw,45px); text-align:left}
-.kv-grid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:clamp(14px,1.5vw,20.4px);
-  align-items:start; width:min(100%,880px); margin:0 auto}
-.kv-f{min-width:0}
-.kv-send{margin-top:clamp(30px,3.2vw,45px); display:flex; flex-direction:column; align-items:center}
-.kv-send .zs-btn{width:min(100%,480px)}
-.kv .zs-fine{max-width:72ch}
-/* мелкая строка про согласие на обработку данных нужна только там, где
-   отправляют, - на промежуточных шагах её нет */
-.kv-step[data-step="0"] .kv-send{margin-top:clamp(34px,3.6vw,48px)}
-
-/* ---------- «заявка принята» ---------- */
-.kv-seal{
-  width:clamp(73.92px,7vw,95.2px); height:clamp(73.92px,7vw,95.2px);
-  margin:0 auto clamp(16px,1.7vw,20.4px); border-radius:50%;
-  display:flex; align-items:center; justify-content:center; color:#E3B34E;
-  border:1px solid rgba(227,179,78,.5);
-  background:radial-gradient(closest-side, rgba(227,179,78,.22), rgba(227,179,78,0) 78%);
-  box-shadow:inset 0 0 24px rgba(227,179,78,.28), 0 0 44px -8px rgba(227,179,78,.7);
-}
-.kv-seal svg{width:52%; height:52%; display:block}
-/* keyframes bkSeal объявлены в блоке экрана 5 - своих не заводим */
-.kv-step[data-step="5"]:not([hidden]) .kv-seal{animation:bkSeal .7s cubic-bezier(.2,.8,.2,1) both}
-.kv-done-h{margin:0 auto; max-width:24ch;
-  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(22px,2.4vw,35.7px); line-height:1.1; text-transform:uppercase; color:#fff; text-wrap:balance}
-
-/* появление окна: всплывает снизу. Прятать умеет только класс .rv, его вешает
-   скрипт - без скрипта всё видно сразу */
-.kv.rv .kv-card{opacity:0; transform:translateY(28px)}
-.kv.rv.on .kv-card{opacity:1; transform:none; transition:opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
-
-/* ---------- планшет и телефон ---------- */
-@media (max-width:1279px){
-  .kv{padding-top:clamp(70px,12.8vw,108.8px)}
-  /* Окно не должно упираться в края экрана: до 1023 px контейнер `.cr-cont`
-     идёт без полей, поэтому поля задаёт себе само окно. Без width:auto
-     margin вытолкнул бы окно за экран. Числа те же, что у `.bk-card`. */
-  .kv-card{
-    width:auto; margin:0 clamp(12px,4.2vw,18.7px);
-    padding:clamp(32px,9.5vw,40.8px) clamp(16px,4.4vw,25.5px);
-    border-radius:22px;
-  }
-  .kv-t{font-size:clamp(28px,8.2vw,37.4px)}
-  .kv-eyebrow{margin-bottom:clamp(20px,6.4vw,25.5px)}
-  .kv-lede{margin-top:clamp(20px,7vw,28.9px); font-size:clamp(13.2px,4vw,15.3px)}
-  .kv-q{font-size:clamp(22px,6.4vw,30px); max-width:22ch}
-  .kv-form{margin-top:clamp(28px,8vw,38px)}
-  .kv-send{margin-top:clamp(34px,10vw,46px)}
-}
-@media (max-width:860px){
-  .kv-opts{grid-template-columns:1fr}
-  .kv-grid{grid-template-columns:1fr 1fr}
-}
-@media (max-width:640px){
-  .kv-grid{grid-template-columns:1fr}
-  .kv-cnts{grid-template-columns:1fr}
-  .kv-opt{min-height:58px; padding:12px 14px; font-size:15px}
-}
-@media (prefers-reduced-motion:reduce){
-  .kv-glow i{animation:none}
-  .kv.rv .kv-card{opacity:1; transform:none; transition:none}
-  .kv-step.in{animation:none}
-  .kv-body{transition:none}
-  .kv-step[data-step="5"]:not([hidden]) .kv-seal{animation:none}
-}
-</style>
-
 
 </head>
 <body>
@@ -5627,7 +5355,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <div class="kicker">Экскурсия-шоу</div>
     </div>
     <div class="side right" id="sideR">
-      <div class="city">Нижний<br>Новгород</div>
+      <div class="city">Нижний<br> Новгород</div>
       <div class="rule"></div>
       <ul class="facts">
         <li>Ольгино, 62</li>
@@ -7411,212 +7139,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </div>
 
 
-
-<!-- ==================== ЭКРАН 21: КВИЗ «расчёт стоимости для класса» ====================
-     САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - выбор Серёги 11.09.2026. Копия шестого
-     экрана боевого ministrynn.ru: те же четыре шага, те же варианты ответов
-     и те же надписи на кнопках («Начать!», «Ответить», «Рассчитать стоимость
-     и получить подарок»). Дизайн свой - в стиле основной формы заявки:
-     то же ночное небо и то же окно, что у экранов 5 и 11.
-
-     ВСЕ ШАГИ ЛЕЖАТ В РАЗМЕТКЕ СРАЗУ, скрипт только переставляет `hidden`:
-     без JS человек и поисковик видят весь текст квиза, а не пустую коробку.
-
-     КНОПКАМ КВИЗА НЕЛЬЗЯ ДАВАТЬ `data-zs`: этот атрибут открывает общее окно
-     заявки поверх страницы, и вместо следующего шага человек получил бы
-     вторую форму. Заявку отсюда отправляет своя форма через window.zsBind.
-
-     Устройство и почему шов держит блик → блок «ЭКРАН 21» в стилях выше
-     и sayt-nn/ustroystvo.md. -->
-<div class="kv-hold">
-<!-- Блик на шве с фильмом. Стоит СНАРУЖИ секции: у неё `overflow:hidden`,
-     и изнутри верхнюю половину блика срезало бы. -->
-<div class="kv-blik" aria-hidden="true"></div>
-<section class="cr kv" id="calc" aria-labelledby="kvT">
-  <canvas class="kv-sky" id="kvSky" aria-hidden="true"></canvas>
-  <div class="kv-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <div class="kv-grain" aria-hidden="true"></div>
-
-  <div class="cr-cont">
-    <div class="kv-card">
-      <div class="kv-card-sky" aria-hidden="true"><i></i><i></i><i></i></div>
-
-      <!-- шапка с полосой шагов: появляется только на вопросах -->
-      <div class="kv-head" id="kvHead" hidden>
-        <div class="kv-nav">
-          <button class="kv-back" id="kvBack" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg>
-            Назад</button>
-          <p class="kv-stepn" id="kvStepN">Шаг 1 из 4</p>
-        </div>
-        <ul class="kv-bar" id="kvBar" aria-hidden="true"><li></li><li></li><li></li><li></li></ul>
-      </div>
-
-      <div class="kv-body" id="kvBody">
-
-        <!-- ---------- шаг 0: обложка ---------- -->
-        <div class="kv-step" data-step="0">
-          <p class="kv-eyebrow">Только для орг. групп от 20 детей</p>
-          <h2 class="kv-t" id="kvT">Получите расчёт стоимости для вашего класса<br class="kv-br"> <b>+ подарок!</b></h2>
-          <p class="kv-lede">Получите индивидуальное предложение <b>+ 1 взрослый билет
-            для себя в подарок</b>, ответив всего на 3 простых вопроса!</p>
-          <p class="kv-small">Подарок лишним не будет ;)</p>
-          <div class="kv-send">
-            <button class="zs-btn" type="button" id="kvGo"><span class="zs-t">Начать!</span></button>
-          </div>
-        </div>
-
-        <!-- ---------- шаг 1: были или не были ---------- -->
-        <div class="kv-step" data-step="1" hidden>
-          <h3 class="kv-q">Бывали ли вы уже на нашей программе?</h3>
-          <p class="kv-note">Также мы были организаторами Карамельной фабрики в Ольгино в 2023 году.
-            Можно выбрать несколько вариантов.</p>
-          <div class="kv-opts" id="kvQ1" role="group" aria-label="Бывали ли вы уже на нашей программе">
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Были в прошлом году">
-              <span class="kv-tick" aria-hidden="true"></span>Были в прошлом году</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Никогда не были и вас не знаем">
-              <span class="kv-tick" aria-hidden="true"></span>Никогда не были и вас не знаем</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Были в 2023 году в Ольгино">
-              <span class="kv-tick" aria-hidden="true"></span>Были в 2023 году в Ольгино</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Хотели к вам попасть, но не успели забронировать">
-              <span class="kv-tick" aria-hidden="true"></span>Хотели к вам попасть, но не успели забронировать</label>
-          </div>
-          <p class="zs-err kv-err" id="kvErr1" hidden>Выберите хотя бы один вариант</p>
-          <div class="kv-send">
-            <button class="zs-btn" type="button" data-kv-next="1"><span class="zs-t">Ответить</span></button>
-          </div>
-        </div>
-
-        <!-- ---------- шаг 2: даты ---------- -->
-        <!-- В источнике шаг необязательный: не выбрали ничего - всё равно
-             пускает дальше. Так и оставлено. -->
-        <div class="kv-step" data-step="2" hidden>
-          <h3 class="kv-q">Какие даты вы бы рассмотрели?</h3>
-          <p class="kv-note">Можно выбрать несколько вариантов или пропустить шаг.</p>
-          <div class="kv-opts" id="kvQ2" role="group" aria-label="Какие даты вы бы рассмотрели">
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Начало декабря">
-              <span class="kv-tick" aria-hidden="true"></span>Начало декабря</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Середина декабря">
-              <span class="kv-tick" aria-hidden="true"></span>Середина декабря</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Конец декабря">
-              <span class="kv-tick" aria-hidden="true"></span>Конец декабря</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Январь">
-              <span class="kv-tick" aria-hidden="true"></span>Январь</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Главное, чтобы это были выходные">
-              <span class="kv-tick" aria-hidden="true"></span>Главное, чтобы это были выходные</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Главное, чтобы это были будние дни">
-              <span class="kv-tick" aria-hidden="true"></span>Главное, чтобы это были будние дни</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Мы готовы рассмотреть максимально низкие по цене даты">
-              <span class="kv-tick" aria-hidden="true"></span>Мы готовы рассмотреть максимально низкие по цене даты</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Нам важнее удобная дата, чем низкая цена">
-              <span class="kv-tick" aria-hidden="true"></span>Нам важнее удобная дата, чем низкая цена</label>
-          </div>
-          <div class="kv-send">
-            <button class="zs-btn" type="button" data-kv-next="2"><span class="zs-t">Ответить</span></button>
-          </div>
-        </div>
-
-        <!-- ---------- шаг 3: сколько детей и взрослых ---------- -->
-        <!-- Стартовые числа не с потолка: 20 детей - нижняя граница групповой
-             заявки («от 20 детей» в надзаголовке), 2 взрослых - обычные
-             учитель и родитель. Человеку чаще остаётся поправить, а не набрать
-             с нуля. Число можно и ввести руками: поле открыто. -->
-        <div class="kv-step" data-step="3" hidden>
-          <h3 class="kv-q">Сколько примерно будет детей и взрослых?</h3>
-          <p class="kv-note">Точное число потом уточним - сейчас нужно только для расчёта.</p>
-          <div class="kv-cnts">
-            <div class="kv-cnt" id="kvCntKids">
-              <span class="kv-cnt-lab" id="kvKidsLab">Дети</span>
-              <div class="kv-cnt-row">
-                <button class="kv-pm" type="button" data-kv-step="-1" data-kv-for="kvKids" aria-label="Убрать одного ребёнка">−</button>
-                <input class="kv-num" id="kvKids" type="text" inputmode="numeric" autocomplete="off"
-                       value="20" maxlength="3" aria-labelledby="kvKidsLab">
-                <button class="kv-pm" type="button" data-kv-step="1" data-kv-for="kvKids" aria-label="Добавить одного ребёнка">+</button>
-              </div>
-            </div>
-            <div class="kv-cnt">
-              <span class="kv-cnt-lab" id="kvAdLab">Взрослые</span>
-              <div class="kv-cnt-row">
-                <button class="kv-pm" type="button" data-kv-step="-1" data-kv-for="kvAdults" aria-label="Убрать одного взрослого">−</button>
-                <input class="kv-num" id="kvAdults" type="text" inputmode="numeric" autocomplete="off"
-                       value="2" maxlength="3" aria-labelledby="kvAdLab">
-                <button class="kv-pm" type="button" data-kv-step="1" data-kv-for="kvAdults" aria-label="Добавить одного взрослого">+</button>
-              </div>
-            </div>
-          </div>
-          <p class="zs-err kv-err" id="kvErr3" hidden>Укажите, сколько будет детей</p>
-          <div class="kv-send">
-            <button class="zs-btn" type="button" data-kv-next="3"><span class="zs-t">Ответить</span></button>
-          </div>
-        </div>
-
-        <!-- ---------- шаг 4: контакты ---------- -->
-        <!-- Поля и кнопка из единого блока заявки (.zs-*), логику отправки
-             даёт window.zsBind - своей у экрана нет. Ответы на три вопроса
-             уезжают вместе с заявкой (opts.extra в скрипте экрана). -->
-        <div class="kv-step" data-step="4" hidden>
-          <h3 class="kv-q">Последний шаг</h3>
-          <p class="kv-note">Оставьте номер - перезвоним в течение <b>30 минут</b> (в рабочее время),
-            предложим самые подходящие даты и цены, пришлём программу в мессенджер
-            и закрепим за вашим номером <b>1 взрослый билет в подарок</b>
-            (при групповом бронировании).</p>
-
-          <form class="kv-form" id="kvForm" novalidate>
-            <div class="kv-grid">
-              <div class="kv-f">
-                <label class="zs-lab" for="kvName">Ваше имя</label>
-                <input class="zs-inp" id="kvName" name="name" type="text" autocomplete="given-name"
-                       placeholder="Как к вам обращаться" maxlength="60">
-              </div>
-              <div class="kv-f">
-                <label class="zs-lab" for="kvPhone">Ваш телефон <span class="zs-req" aria-hidden="true">*</span></label>
-                <input class="zs-inp" id="kvPhone" name="phone" type="tel" inputmode="tel"
-                       autocomplete="tel" placeholder="+7 (___) ___-__-__"
-                       aria-describedby="kvErrPhone" required>
-                <p class="zs-err" id="kvErrPhone" data-for="phone" hidden>Проверьте номер: нужно 11 цифр</p>
-              </div>
-              <!-- город обязателен: от него зависит воронка в CRM. Ярославля и
-                   Екатеринбурга нет намеренно - они у партнёра по франшизе -->
-              <div class="kv-f">
-                <label class="zs-lab" for="kvCity">Город <span class="zs-req" aria-hidden="true">*</span></label>
-                <select class="zs-inp zs-sel" id="kvCity" name="city" aria-describedby="kvErrCity" required>
-                  <option value="" disabled selected>Выберите город</option>
-                  <option>Нижний Новгород</option>
-                  <option>Казань</option>
-                  <option>Крым</option>
-                  <option>Ставрополь</option>
-                  <option>Тюмень</option>
-                </select>
-                <p class="zs-err" id="kvErrCity" data-for="city" hidden>Выберите город</p>
-              </div>
-            </div>
-            <div class="kv-send">
-              <button class="zs-btn" type="submit"><span class="zs-t">Рассчитать стоимость и получить подарок</span></button>
-              <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на обработку персональных данных
-                и на звонок от менеджера. Телефон нужен только для связи по заявке.</p>
-            </div>
-          </form>
-        </div>
-
-        <!-- ---------- шаг 5: заявка принята ---------- -->
-        <div class="kv-step" data-step="5" hidden tabindex="-1">
-          <div class="kv-seal" aria-hidden="true">
-            <svg viewBox="0 0 32 32"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z" fill="currentColor"/></svg>
-          </div>
-          <h3 class="kv-done-h">Заявка принята!</h3>
-          <p class="kv-lede">Мы посчитаем стоимость для вашей группы и перезвоним
-            в течение <b>30&nbsp;минут</b>. Взрослый билет в подарок уже закреплён
-            за вашим номером.</p>
-        </div>
-
-      </div>
-    </div>
-  </div>
-</section>
-</div>
-
-
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
 
@@ -8224,7 +7746,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }
 
   if (BAKED){
-    var off = [logo, glow, curL, curR, cvLL, cvFX, cvSB, cvSF];   // лучи оставляем, они светят на остров
+    // кулисы тут НЕ гасим: на телефоне они висят статикой, их показывает CSS по классу .touch
+    var off = [logo, glow, cvLL, cvFX, cvSB, cvSF];   // лучи оставляем, они светят на остров
     for (var oi=0; oi<off.length; oi++) if(off[oi]) off[oi].style.display='none';
   }
 
@@ -9358,15 +8881,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     first: 3, gap: 5, gapSpread: 7
   });
 
-  /* двадцать первый экран, квиз: то же небо, что у формы заявки пятого
-     экрана - это её же окно, только с вопросами. Звёзды идут почти до низа
-     секции и гаснут у самой кромки: ниже конец страницы. */
-  add('calc', 'kvSky', {
-    div: 6200, cap: 300, bias: 1.7, knotTop: 0.04, knotLen: 0.40,
-    fadeFrom: 0.74, fadeLen: 0.26, alpha: 0.9, shift: 46,
-    first: 9, gap: 15, gapSpread: 22
-  });
-
   if (!list.length) return;
 
   window.addEventListener('scroll', function(){
@@ -9971,15 +9485,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         sentAt: new Date().toISOString()
       };
       if (nameI && nameI.value.trim()) lead.name = nameI.value.trim();
-      /* Свои поля формы (ответы квиза) - их отдаёт сама форма через opts.extra.
-         zsBind знает только про имя, телефон, город и формат; всё остальное,
-         что нужно конкретному экрану, приходит отсюда. */
-      if (opts.extra){
-        var ex = typeof opts.extra === 'function' ? opts.extra() : opts.extra;
-        for (var k in ex){
-          if (Object.prototype.hasOwnProperty.call(ex, k) && ex[k] !== '' && ex[k] != null) lead[k] = ex[k];
-        }
-      }
       window.__zsLead = lead;
       remember(lead);
 
@@ -11669,215 +11174,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.addEventListener('resize', function(){ pokazat(i); });
 
   pokazat(0);
-})();
-</script>
-
-
-<!-- Скрипт квиза вынесен в ОТДЕЛЬНЫЙ <script> намеренно: файл правят две
-     сессии сразу, и ошибка в чужом блоке не должна ронять этот экран. -->
-<script>
-/* ==================== ЭКРАН 21: КВИЗ ====================
-   Четыре шага в одном окне: три вопроса и контакты. Скрипт делает ровно три
-   вещи - переставляет `hidden` между шагами, проверяет ответ перед переходом
-   и держит высоту окна, чтобы страница не прыгала на переходах.
-
-   ОТПРАВКУ ДЕЛАЕТ ОБЩАЯ window.zsBind, как на экранах 5 и 11: маска телефона,
-   проверка города, блокировка двойного нажатия и сам POST - всё оттуда.
-   Ответы на вопросы уезжают вместе с заявкой через opts.extra.
-
-   БЕЗ СКРИПТА виден весь текст квиза сразу - это не запасной вариант,
-   а требование к разметке: поисковик читает страницу без JS. */
-(function(){
-  'use strict';
-  var sec = document.getElementById('calc');
-  if (!sec) return;
-
-  var body  = document.getElementById('kvBody');
-  var head  = document.getElementById('kvHead');
-  var bar   = document.getElementById('kvBar');
-  var stepN = document.getElementById('kvStepN');
-  var back  = document.getElementById('kvBack');
-  var form  = document.getElementById('kvForm');
-  var steps = [];
-  var all = body.querySelectorAll('.kv-step');
-  for (var i = 0; i < all.length; i++) steps[+all[i].getAttribute('data-step')] = all[i];
-
-  var LAST = 4;                       /* последний шаг с вопросом (дальше «принято») */
-  var cur  = 0;
-  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---------- появление окна ---------- */
-  if (window.IntersectionObserver && !reduce){
-    sec.classList.add('rv');
-    var io = new IntersectionObserver(function(es){
-      if (es[0].isIntersecting){ sec.classList.add('on'); io.disconnect(); }
-    }, {threshold:.12});
-    io.observe(sec);
-  }
-
-  /* ---------- плитки с галочками ---------- */
-  /* Клик по плитке ловим через change на самом чекбоксе, а не через click
-     по label: у label клик срабатывает дважды (сам label и вложенный input),
-     и плитка мигала бы туда-обратно. */
-  function paintOpts(box){
-    var labs = box.querySelectorAll('.kv-opt');
-    for (var i = 0; i < labs.length; i++){
-      labs[i].classList.toggle('on', labs[i].querySelector('input').checked);
-    }
-  }
-  var boxes = sec.querySelectorAll('.kv-opts');
-  for (var b = 0; b < boxes.length; b++){
-    (function(box){
-      box.addEventListener('change', function(e){
-        if (!e.target || e.target.type !== 'checkbox') return;
-        paintOpts(box);
-        var err = box.parentNode.querySelector('.kv-err');
-        if (err) err.hidden = true;
-      });
-      paintOpts(box);                 /* браузер мог вернуть галочки после «назад» */
-    })(boxes[b]);
-  }
-  function picked(id){
-    var out = [], ins = document.getElementById(id).querySelectorAll('input:checked');
-    for (var i = 0; i < ins.length; i++) out.push(ins[i].value);
-    return out;
-  }
-
-  /* ---------- счётчики ---------- */
-  var MAXN = 999;
-  function num(el){ var n = parseInt(String(el.value).replace(/\D/g,''), 10); return isNaN(n) ? 0 : n; }
-  function setNum(el, n){
-    el.value = Math.max(0, Math.min(MAXN, n));
-    var cnt = el.closest ? el.closest('.kv-cnt') : null;
-    if (cnt) cnt.classList.remove('bad');
-    var err = document.getElementById('kvErr3');
-    if (err && el.id === 'kvKids' && num(el) > 0) err.hidden = true;
-  }
-  var pms = sec.querySelectorAll('.kv-pm');
-  for (var p = 0; p < pms.length; p++){
-    pms[p].addEventListener('click', function(){
-      var el = document.getElementById(this.getAttribute('data-kv-for'));
-      setNum(el, num(el) + (+this.getAttribute('data-kv-step')));
-    });
-  }
-  var nums = sec.querySelectorAll('.kv-num');
-  for (var n = 0; n < nums.length; n++){
-    /* в поле пускаем только цифры: буквы в «количестве детей» ничего не значат,
-       а очистка на blur убирает пустую строку, оставшуюся после стирания */
-    nums[n].addEventListener('input', function(){
-      var v = String(this.value).replace(/\D/g,'').slice(0,3);
-      this.value = v;
-      if (v !== '' && +v > 0){
-        var err = document.getElementById('kvErr3');
-        if (err && this.id === 'kvKids') err.hidden = true;
-        var cnt = this.closest ? this.closest('.kv-cnt') : null;
-        if (cnt) cnt.classList.remove('bad');
-      }
-    });
-    nums[n].addEventListener('blur', function(){ if (this.value === '') this.value = '0'; });
-  }
-
-  /* ---------- переход между шагами ---------- */
-  /* Высоту окна на переходе держим руками: короткий шаг вслед за длинным
-     схлопывал бы окно рывком и утаскивал страницу под курсором. Меряем «до»,
-     ставим новый шаг, меряем «после», едем от одного к другому. */
-  var tmr = 0;
-  function show(n){
-    if (n === cur) return;
-    var from = body.offsetHeight;
-
-    steps[cur].hidden = true;
-    steps[cur].classList.remove('in');
-    cur = n;
-    steps[cur].hidden = false;
-
-    var quiz = (cur >= 1 && cur <= LAST);
-    head.hidden = !quiz;
-    if (quiz){
-      stepN.textContent = 'Шаг ' + cur + ' из ' + LAST;
-      var li = bar.children;
-      for (var i = 0; i < li.length; i++) li[i].classList.toggle('on', i < cur);
-      back.hidden = false;
-    }
-
-    if (!reduce){
-      steps[cur].classList.add('in');
-      var to = body.offsetHeight;
-      body.style.setProperty('--kv-h', from + 'px');
-      body.classList.add('fix');
-      /* два кадра: в первом браузер принимает высоту «до», во втором едет к «после».
-         В один rAF он схлопнул бы оба значения в одно и перехода не вышло бы. */
-      requestAnimationFrame(function(){
-        requestAnimationFrame(function(){ body.style.setProperty('--kv-h', to + 'px'); });
-      });
-      clearTimeout(tmr);
-      tmr = setTimeout(function(){ body.classList.remove('fix'); }, 420);
-    }
-
-    /* если верх окна уехал за экран (длинный шаг сменился коротким или
-       наоборот), подтягиваем окно обратно - иначе человек смотрит в пустоту */
-    var box = sec.querySelector('.kv-card').getBoundingClientRect();
-    if (box.top < 0 || box.top > window.innerHeight * 0.6){
-      window.scrollTo({top: window.scrollY + box.top - 90, behavior: reduce ? 'auto' : 'smooth'});
-    }
-    /* фокус уводим в сам шаг: человек с клавиатуры должен оказаться в новом
-       вопросе, а не в конце страницы */
-    var f = steps[cur].querySelector('input, select, button');
-    if (f && cur !== 0 && cur !== 5 && !('ontouchstart' in window)) f.focus({preventScroll:true});
-  }
-
-  document.getElementById('kvGo').addEventListener('click', function(){ show(1); });
-  back.addEventListener('click', function(){ if (cur > 1) show(cur - 1); else show(0); });
-
-  var nexts = sec.querySelectorAll('[data-kv-next]');
-  for (var k = 0; k < nexts.length; k++){
-    nexts[k].addEventListener('click', function(){
-      var from = +this.getAttribute('data-kv-next');
-      /* Первый вопрос обязательный, второй - нет: так на боевом ministrynn.ru.
-         Третий пускает дальше, только если детей больше нуля. */
-      if (from === 1 && !picked('kvQ1').length){
-        document.getElementById('kvErr1').hidden = false;
-        return;
-      }
-      if (from === 3 && num(document.getElementById('kvKids')) < 1){
-        document.getElementById('kvErr3').hidden = false;
-        document.getElementById('kvCntKids').classList.add('bad');
-        document.getElementById('kvKids').focus();
-        return;
-      }
-      show(from + 1);
-    });
-  }
-
-  /* ---------- отправка ---------- */
-  /* zsBind объявлен ниже по файлу в общем блоке формы заявки, поэтому ждём
-     полной загрузки страницы, как это делают экраны 5 и 11. */
-  var bound = false;
-  function bind(){
-    if (bound || typeof window.zsBind !== 'function') return;
-    bound = true;
-    window.zsBind(form, {
-      source: 'квиз, 21-й экран',
-      /* Ответы на три вопроса. Приёмник заявок их пока не сохраняет - он
-         читает имя, телефон, город и формат. Поле уезжает в теле запроса
-         заранее: появится место в CRM - на сайте менять будет нечего. */
-      extra: function(){
-        var kids = num(document.getElementById('kvKids'));
-        var ad   = num(document.getElementById('kvAdults'));
-        return {
-          visit: 'Групповое',              /* квиз - только для групп от 20 детей */
-          quiz: [
-            'были у нас: ' + (picked('kvQ1').join('; ') || 'не ответили'),
-            'даты: ' + (picked('kvQ2').join('; ') || 'не выбрали'),
-            'детей: ' + kids + ', взрослых: ' + ad
-          ].join(' | ')
-        };
-      },
-      onDone: function(){ show(5); }
-    });
-  }
-  if (document.readyState === 'complete') bind();
-  else window.addEventListener('load', bind);
 })();
 </script>
 
