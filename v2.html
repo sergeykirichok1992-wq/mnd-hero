@@ -3858,6 +3858,119 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 </style>
 
+<!-- Экран с фильмом тоже держит свой <style>, по той же причине
+     → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ==================== ЭКРАН 14Б: ФИЛЬМ О ПРОЕКТЕ ====================
+   Пространство имён `fl-`. Тот же экран, что на боевом ministrynn.ru: заголовок,
+   подводка, одна большая обложка с кнопкой пуска, красная строка про VPN
+   и кнопка заявки. Ролик тот же — 838ecf64473337f103fc545669103258, 20:19.
+   Стоит там, где на старом сайте: сразу за короткими роликами, перед ценами.
+
+   ЧЕМ ОТЛИЧАЕТСЯ ОТ СТАРОГО САЙТА. Там поле белое, у нас ночное небо —
+   выбор Серёги 10.09.2026. Выше уже стоит тёмный экран с короткими роликами,
+   а ниже подряд идут светлые (цены, бонусы); белый фильм между ними склеил бы
+   три светлых экрана в одну простыню. И кино вообще смотрят в темноте: тёмное
+   поле работает на саму обложку.
+
+   ПОЧЕМУ ДВА ТЁМНЫХ ЭКРАНА ПОДРЯД НЕ СЛИПАЮТСЯ. Шов держит золотой блик — тот
+   же снимок `v2-sm-blik.webp`, что на швах пятого, шестого и семнадцатого
+   экранов. Плюс обложка тут одна и во всю колонку, а не три в ряд: крупность
+   сама говорит, что экран другой.
+
+   ПЛЕЕР ОБЩИЙ С ЭКРАНОМ РОЛИКОВ. Классы окна (`vd-box`, `vd-open`, `vd-play`,
+   `vd-time`, `vd-vpn`) взяты оттуда специально, а не переписаны под своими
+   именами: тогда обложка, золотой кружок и подсказка про VPN правятся у всех
+   семи роликов в одном месте. Скрипт запуска тоже один на оба экрана —
+   поэтому короткий ролик и фильм не могут играть одновременно.
+
+   ОБЛОЖКА ФИРМЕННАЯ, с боевого сайта (`video/film-big.webp`, исходник 1726x972):
+   кадр с надписью «Фильм о Министерстве Новогодних Дел». Превью самого ролика
+   на Rutube — человек у ёлки, по нему не понять, что это фильм. Тот же урок,
+   что с обложками роликов: когда просят «как на том сайте», обложки тоже
+   часть «как». */
+.fl-hold{position:relative; z-index:27}   /* ради блика на шве: он вылезает вверх, на экран роликов */
+.fl{
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(58px,6.6vw,110px) 0 clamp(62px,7vw,118px);
+  /* Верх и низ ровно #04071A — тем же цветом кончается экран роликов сверху
+     и на нём же стоит сугроб экрана цен снизу. Стыки без швов. */
+  background:
+    radial-gradient(52vw 34vw at 50% 48%, rgba(227,179,78,.09), rgba(227,179,78,0) 100%),
+    radial-gradient(64vw 42vw at 50% 44%, rgba(52,42,116,.5), rgba(52,42,116,0) 100%),
+    linear-gradient(180deg,#04071A 0%,#070C28 26%,#060A22 62%,#04071A 100%);
+}
+/* блик на шве с экраном роликов — тот же снимок, что на швах 5-6 и 16-17 */
+.fl-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.fl-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.fl-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.fl-glow i:nth-child(1){left:-18vw; top:-8%; width:66vw; height:58%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.42) 0%, rgba(47,49,146,.28) 32%, rgba(47,49,146,.1) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift1 41s ease-in-out infinite alternate}
+.fl-glow i:nth-child(2){right:-20vw; bottom:-12%; width:68vw; height:60%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.3) 0%, rgba(108,43,217,.19) 32%, rgba(108,43,217,.06) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift2 47s ease-in-out infinite alternate}
+.fl-glow i:nth-child(3){left:50%; top:14%; width:58vw; height:64%; margin-left:-29vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.16) 0%, rgba(227,179,78,.1) 32%, rgba(227,179,78,.035) 64%, rgba(227,179,78,0) 100%);
+  animation:bkDrift3 34s ease-in-out infinite alternate-reverse}
+.fl-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Заголовок и подводка — теми же числами, что на экране роликов: два соседних
+   экрана про видео должны читаться одной семьёй. Золотом выделено «20-минутный
+   фильм»: это и есть новость экрана, ради неё сюда доскроллили. */
+.fl-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(24px,3.3vw,51px); line-height:1.08; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.fl-t b{font-weight:inherit; color:#FCD34D}
+/* Неразрывно только само число со словом: если запретить перенос всей золотой
+   фразе, на телефоне она забирает целую строку и «о нас!» уезжает в сироты. */
+.fl-nw{white-space:nowrap}
+.fl-lead{
+  max-width:min(100%,720px); margin:0 auto clamp(26px,3vw,48px);
+  text-align:center; text-wrap:balance;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(14px, clamp(15px,1.25vw,20px)); line-height:1.45; color:#B9C8F5;
+}
+
+/* Кадр фильма. Потолок ширины свой: во всю колонку (около 1370 px на большом
+   мониторе) обложка перестаёт быть кадром и становится фоном экрана. */
+.fl-frame{width:min(100%,1040px); margin:0 auto}
+/* Кино светит в зал: тёплый ореол вокруг кадра поверх обычной тени окна. */
+.fl-frame .vd-box{
+  border-radius:clamp(14px,1.3vw,24px);
+  box-shadow:0 0 0 1px rgba(251,191,36,.26), 0 26px 70px rgba(2,5,20,.62), 0 0 130px 10px rgba(245,158,11,.11);
+}
+/* Кружок пуска и время растут вместе с кадром: числа экрана роликов сняты под
+   карточку в треть ширины, на кадре втрое крупнее они выглядят потерянными. */
+.fl-frame .vd-play{width:clamp(66px,7.4vw,104px); height:clamp(66px,7.4vw,104px)}
+.fl-frame .vd-time{font-size:max(12px,.92vw)}
+.fl-frame .vd-vpn{margin-top:clamp(8px,.8vw,14px); font-size:max(12.5px, clamp(13px,.98vw,16px))}
+/* Кнопка прозрачная (вид 2 стандарта → sayt-nn/standart-knopok.md), выбор
+   Серёги 10.09.2026: главное действие этого экрана — посмотреть фильм,
+   и золотая заливка перетянула бы внимание с обложки. */
+.fl-cta{margin:clamp(28px,3vw,50px) auto 0; text-align:center}
+
+@media (max-width:767px){
+  /* Поля те же, что на экране роликов: 20 px у экрана и ещё 10 у текста. */
+  .fl .cr-cont{width:100%; padding-inline:20px}
+  .fl-t, .fl-lead{padding-inline:10px}
+  .fl{padding:40px 0 46px}
+  .fl-t{font-size:clamp(21px,6.2vw,30px)}
+  /* Перенос между фразами оставлен и на телефоне. Без него балансировщик
+     ставил «МИР? ПОСМОТРИТЕ» одной строкой — вопрос и ответ слипались. */
+  .fl-lead{font-size:14px; margin-bottom:22px}
+}
+@media (prefers-reduced-motion:reduce){ .fl-glow i{animation:none} }
+</style>
+
 <!-- Экран цен держит свой <style>: незакрытая скобка в чужом блоке не уронит
      ни его, ни соседей → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
 <style>
@@ -5783,14 +5896,62 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <span class="zs-t">Получить видео в МАХ</span></button>
     </div>
 
-    <!-- Блок с двадцатиминутным фильмом (ролик 838ecf64473337f103fc545669103258,
-         обложка video/film.webp) убран 10.09.2026 по просьбе Серёги: на старом
-         сайте он стоит не здесь, а ниже отдельным экраном, и сюда его добавил
-         я сам. Вернётся позже — разметка и стили лежат в коммите 5f94e0c. -->
+    <!-- Двадцатиминутного фильма тут нет намеренно: на старом сайте он стоит
+         не в этой сетке, а следующим экраном. У нас так же — см. «ЭКРАН 14Б:
+         ФИЛЬМ О ПРОЕКТЕ» сразу под этой секцией. -->
   </div>
 </section>
 </div>
 
+
+
+<!-- ==================== ЭКРАН 14Б: ФИЛЬМ О ПРОЕКТЕ ====================
+     Один ролик на двадцать минут — экран с боевого ministrynn.ru, где он стоит
+     ровно тут же: за короткими роликами, перед таблицей цен. Устройство, почему
+     поле тёмное и почему классы окна взяты у соседнего экрана → блок
+     «ЭКРАН 14Б: ФИЛЬМ О ПРОЕКТЕ» в стилях и sayt-nn/ustroystvo.md.
+
+     Меняешь ролик — меняешь `data-rt`, `data-ti`, время в `.vd-time` и обложку.
+     Плеер поднимает общий скрипт «ЭКРАН 14: ЗАПУСК РОЛИКОВ» в конце страницы. -->
+<div class="fl-hold">
+<section class="fl" id="film" aria-labelledby="flT">
+  <span class="fl-blik" aria-hidden="true"></span>
+  <div class="fl-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="fl-grain" aria-hidden="true"></div>
+
+  <div class="cr-cont">
+    <h2 class="fl-t" id="flT">Хотите полностью погрузиться в наш мир?<br class="fl-br"> Посмотрите <b><span class="fl-nw">20-минутный</span> фильм</b> о нас!</h2>
+    <p class="fl-lead">У вас сложится полная картина о том, в какую сказку попадут ваши детки.</p>
+
+    <div class="fl-frame">
+      <div class="vd-box">
+        <button class="vd-open" type="button"
+                data-rt="838ecf64473337f103fc545669103258"
+                data-ti="Документальный фильм о Министерстве Новогодних Дел"
+                aria-label="Смотреть документальный фильм о Министерстве Новогодних Дел, 20 минут 19 секунд">
+          <img src="video/film-big.webp?v=1"
+               srcset="video/film-big-900.webp?v=1 900w, video/film-big.webp?v=1 1600w"
+               sizes="(max-width:1200px) 92vw, 1040px"
+               width="1600" height="901"
+               alt="Ведущий с фонарём во дворе площадки, надпись «Фильм о Министерстве Новогодних Дел, новогодняя документалка»"
+               loading="lazy" decoding="async">
+          <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+          <span class="vd-time" aria-hidden="true">20:19</span>
+        </button>
+      </div>
+      <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
+    </div>
+
+    <!-- Кнопка прозрачная (вид 2) — выбор Серёги 10.09.2026. Надпись взята
+         с той же кнопки старого сайта. -->
+    <div class="fl-cta">
+      <button class="zs-btn zs-btn--ghost" type="button"
+              data-zs="экран с фильмом">
+        <span class="zs-t">Вау, хочу к вам!</span></button>
+    </div>
+  </div>
+</section>
+</div>
 
 
 <!-- ==================== ЭКРАН 15: ТАБЛИЦА ЦЕН ====================
@@ -9636,9 +9797,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    а удалённый iframe умолкает гарантированно.
 
    Кнопка не удаляется, а прячется через `hidden` — из неё же берётся
-   обложка обратно, когда ролик сворачивают. */
+   обложка обратно, когда ролик сворачивают.
+
+   СКРИПТ ОДИН НА ДВА ЭКРАНА — сетку роликов (#video) и фильм (#film). Так
+   правило «играет только один» работает и между экранами: открыл фильм —
+   короткий ролик выше умолк сам. */
 (function(){
-  var boxes = [].slice.call(document.querySelectorAll('#video .vd-box'));
+  var boxes = [].slice.call(document.querySelectorAll('#video .vd-box, #film .vd-box'));
   if(!boxes.length) return;
   var open = null;                       /* окно, в котором сейчас играет ролик */
 
