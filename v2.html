@@ -3480,6 +3480,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .mk-gap1{height:calc(24 * var(--u))}
 .mk-gap2{height:calc(52 * var(--u))}
 
+/* Мелкая подсказка над слайдером: карусель на этом экране одна фотография
+   в рамке, и без неё не видно, что кадров ещё восемнадцать. */
+.mk-hint{
+  text-align:center; font-family:"CR Blogger",Arial,sans-serif;
+  font-size:calc(14 * var(--u)); line-height:1.3; color:#8B6C76;
+  margin:0 0 calc(16 * var(--u));
+}
+
 .mk-slider{position:relative; width:var(--mk-w); margin-inline:auto}
 .mk-box{position:relative; aspect-ratio:2099 / 1098}
 .mk-view{
@@ -3612,6 +3620,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk-ceh-list{gap:14px}
   .mk-li{font-size:16.5px; grid-template-columns:26px 1fr; gap:10px}
   .mk-cta{margin-top:39px}
+  .mk-hint{font-size:12.5px; margin-bottom:10px}
   .mk-dots{gap:7px; margin-top:16px}
   .mk-dot{width:8px; height:8px}
   .mk-dot.is-on{width:26px}
@@ -5369,6 +5378,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <div class="cr-n"><p class="cr-t cr-lead">Ниже фото с нашего МК. 100% у всех детей любого возраста получаются<br class="mk-br"> красивые аккуратные леденцы, как на фотографиях:</p></div>
 
     <div class="mk-gap2"></div>
+
+    <p class="mk-hint">Листайте слайдер</p>
 
     <div class="mk-slider" id="mkSlider">
       <div class="mk-box">
