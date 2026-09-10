@@ -3556,6 +3556,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-weight:700;
   color:#17171B; font-size:calc(32 * var(--u)); line-height:1.2;
   max-width:calc(1000 * var(--u)); margin:0 auto;
+  /* Капслок рисует CSS, а не разметка (просьба Серёги 10.09.2026): в тексте
+     страницы заголовок остаётся в обычном регистре — так его читают
+     поисковик и голосовая читалка, которая капс произносит по буквам. */
+  text-transform:uppercase;
 }
 /* Раскладка с макета: слева сетка снимков цеха, справа четыре пункта,
    выровненные по её середине. Обе сетки нарисованы Серёгой одной картинкой
@@ -3585,7 +3589,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk .cr-cont{padding-inline:16px}
   /* На телефоне холст остаётся во всю ширину: там 70 % дали бы рамку
      в 260 px, на которой фотографию уже не разглядеть. */
-  .mk{padding:36px 0 42px; --mk-arw:36px; --mk-w:100%}
+  .mk{padding:36px 0 63px; --mk-arw:36px; --mk-w:100%}
   /* Заголовок на телефоне мельче общих 13 px: строка «ВОТ КАКИЕ КРАСИВЫЕ
      ЛЕДЕНЦЫ» при 39 px готовой строки ломается на три и вместе со второй
      половиной съедает пол-экрана — на фотографию, ради которой экран
@@ -3595,15 +3599,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk-gap1{height:12px}
   .mk-gap2{height:24px}
   .mk-br{display:none}
-  .mk .cr-cont{padding-inline:8px}
+  /* Полей по краям вдвое больше (8 -> 16), а тексту блока про цех - ещё
+     по 10 px сверх того: на телефоне строки упирались в кромку экрана.
+     Просьба Серёги 10.09.2026. */
+  .mk .cr-cont{padding-inline:16px}
+  .mk-ceh-t, .mk-ceh-list{padding-inline:10px}
   .mk-arw--prev{left:1.4%}
   .mk-arw--next{right:1.4%}
-  .mk-ceh{margin-top:34px}
+  .mk-ceh{margin-top:51px}
   .mk-ceh-t{font-size:21px}
   .mk-ceh-grid{grid-template-columns:1fr; gap:20px; margin-top:22px}
   .mk-ceh-list{gap:14px}
-  .mk-li{font-size:15px; grid-template-columns:26px 1fr; gap:10px}
-  .mk-cta{margin-top:26px}
+  .mk-li{font-size:16.5px; grid-template-columns:26px 1fr; gap:10px}
+  .mk-cta{margin-top:39px}
   .mk-dots{gap:7px; margin-top:16px}
   .mk-dot{width:8px; height:8px}
   .mk-dot.is-on{width:26px}
