@@ -5321,13 +5321,176 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 </style>
 
+<!-- Экран отзывов держит свой <style> намеренно: файл правит ещё одна сессия,
+     и своя коробка не даёт чужой незакрытой скобке уронить его
+     → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ==================== ЭКРАН 19Б: СТЕНА ОТЗЫВОВ ====================
+   Пространство имён `oz-`. Бегущая лента скриншотов отзывов на ночном небе
+   и кнопка на страницу, где лежат все.
+
+   ГДЕ СТОИТ: между экраном про родителей и фильмом о проекте. Так же и на
+   боевом ministrynn.ru: там стена отзывов идёт сразу за последним «взрослым»
+   аргументом.
+
+   ЩЕЛЧОК ПО КАДРУ УВОДИТ НА otzyvy.html#oN, и там этот отзыв сразу открыт
+   крупно. Поэтому карточка — ссылка, а не кнопка, и на главной нет второго
+   экземпляра окна просмотра: одно окно живёт на странице отзывов. Скрин
+   мелким не читается ни при какой высоте кадра (текст набран кеглем 15 px
+   при ширине 900 px), поэтому «прочитать» тут — это всегда перейти.
+
+   ЛЕНТА — ТОТ ЖЕ ПРИЁМ И ТЕ ЖЕ ЧИСЛА, ЧТО У ЭКРАНА 17 (Дед Морозы) и у ленты
+   второго экрана: 26 px/с базовой скорости на телефонной высоте кадра, потолок
+   разгона 2400, затухание броска 0,75 с. Язык на странице один. Выбор ленты
+   (а не слайдера и не плитки) — решение Серёги 11.09.2026.
+
+   КАДР ОДНОЙ ВЫСОТЫ И ОДНОЙ ШИРИНЫ, показывает ВЕРХ скрина, низ срезан
+   `overflow:hidden` у карточки. У экрана 17 иначе — там ширина кадра своя
+   у каждого снимка, — и разница не случайна: там фотографии, их надо видеть
+   целиком, а тут скриншоты текста, у которых важен верх (кто написал и первые
+   строки), и лента из них должна идти ровной чередой, а не рваным частоколом
+   разной ширины.
+
+   ПОЛЕ ТЁМНОЕ, ПОТОМУ ЧТО СКРИНЫ БЕЛЫЕ: на ночном небе они читаются как
+   светящиеся листы, на белом их пришлось бы обводить рамками. Небо — тот же
+   рецепт, что у экранов 14, 17 и 20.
+
+   z-index:29 — тот же слой, что у экранов 17-20. Выше нельзя: на 30 стоит
+   шапка сайта. При равном слое побеждает тот, кто ниже в разметке
+   → lessons/element-na-shve-sekciy-z-index.md
+
+   Картинки и разметку делает `sayt-nn/instrumenty/otzyvy.py`. */
+.oz-hold{position:relative; z-index:29}
+/* Блик на шве с белым экраном про родителей — тот же снимок, что на швах
+   пятого, шестого, семнадцатого и двадцатого экранов. Стоит СНАРУЖИ секции:
+   у неё `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. */
+.oz-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.oz{
+  /* Высота кадра. 700*--u — это 869 px на 1600 и 700 px до 1250 px, где
+     множитель упирается в свой пол 1 px. Меньше делать нельзя: кадр 470 px
+     даёт ширину 366 px, то есть 0,4 от исходных 900 px, и от текста остаётся
+     серая рябь — стена перестаёт читаться как стена отзывов. На телефоне
+     высоту ограничивает 88vw. */
+  --oh: min(88vw, calc(700 * var(--u)));
+  --ow: calc(var(--oh) * .78);             /* ширина кадра: чуть уже высоты */
+  --og: calc(var(--oh) * .036);            /* зазор между кадрами */
+  --or: calc(var(--oh) * .022);            /* скругление углов кадра */
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(52px,6vw,102px) 0 clamp(56px,6.4vw,108px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.oz-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:58%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift1 38s ease-in-out infinite alternate}
+.oz-glow i:nth-child(2){right:-20vw; top:-6%; width:70vw; height:62%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift2 45s ease-in-out infinite alternate}
+.oz-glow i:nth-child(3){left:50%; bottom:-16%; width:78vw; height:54%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:bkDrift3 33s ease-in-out infinite alternate}
+.oz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Заголовок как на других тёмных экранах: Blogger Sans Bold прописными,
+   белый, вторая половина — золотом. Золотом выделено «только с прошлого
+   сезона»: тысяча отзывов за один сезон и есть мысль экрана. */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.oz-q{color:#F0C97A}
+.oz-lead{
+  max-width:calc(760 * var(--u)); margin:0 auto;
+  text-align:center; text-wrap:balance;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(14px, clamp(15px,1.25vw,20px)); line-height:1.45; color:#B9C8F5;
+}
+
+/* ---------- ЛЕНТА ----------
+   Стоит СНАРУЖИ `.cr-cont`: идёт во всю ширину окна и обрывается ровно
+   по его краю, как лента экрана 17. */
+.oz-wrap{
+  margin-top:clamp(26px,3.1vw,54px);
+  overflow:hidden;
+  padding:calc(var(--oh) * .022) 0;            /* запас, чтобы не срезало тень */
+  touch-action:pan-y;                          /* вертикаль отдаём странице */
+  user-select:none; -webkit-user-select:none;  /* палец тянет ленту, а не выделяет */
+}
+.oz-band{display:flex; align-items:flex-start; width:max-content; will-change:transform}
+/* Скругление задано И карточке, И картинке: в Safari скруглённый блок
+   с overflow:hidden внутри едущего слоя оставляет по углам прямоугольные хвосты
+   → lessons/skruglenie-uglov-v-dvizhushchemsya-sloe.md */
+.oz-card{
+  position:relative; flex:0 0 auto; display:block;
+  margin:0 var(--og) 0 0;
+  width:var(--ow); height:var(--oh);
+  border-radius:var(--or); overflow:hidden;
+  background:#fff;                             /* скрин белый: пока грузится, место белое */
+  box-shadow:0 calc(var(--oh) * .02) calc(var(--oh) * .05) rgba(2,5,22,.55);
+  transition:box-shadow .3s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.oz-card img{
+  display:block; width:100%; height:auto; max-width:none;
+  border-radius:inherit; -webkit-user-drag:none;
+}
+/* Низ кадра уходит в темноту, поверх — «Читать целиком». Тут это не украшение,
+   а честная подпись: низ скрина действительно срезан, и щелчок открывает его
+   целиком на странице отзывов. */
+.oz-card::after{
+  content:''; position:absolute; z-index:1; inset:auto 0 0 0; height:24%; pointer-events:none;
+  background:linear-gradient(180deg, rgba(4,7,26,0) 0%, rgba(4,7,26,.74) 74%, rgba(4,7,26,.94) 100%);
+}
+.oz-card::before{
+  content:'Читать целиком'; position:absolute; z-index:2; left:0; right:0;
+  bottom:calc(var(--oh) * .022); text-align:center; pointer-events:none;
+  font-family:"Golos Text",Arial,sans-serif; font-weight:600;
+  font-size:max(12px, calc(var(--oh) * .021)); letter-spacing:.02em; color:#F0C97A;
+  text-shadow:0 1px 8px rgba(0,0,0,.75);
+}
+@media (hover:hover) and (pointer:fine){
+  .oz-wrap{cursor:grab}
+  .oz-wrap.drag, .oz-wrap.drag *{cursor:grabbing}
+  .oz-card:hover{box-shadow:0 calc(var(--oh) * .03) calc(var(--oh) * .07) rgba(2,5,22,.7),
+                            0 0 0 2px rgba(240,201,122,.6)}
+}
+.oz-card:focus-visible{outline:3px solid rgba(255,238,190,.9); outline-offset:3px}
+/* «Меньше движения»: лента не едет сама, её листают пальцем или колесом */
+@media (prefers-reduced-motion:reduce){
+  .oz-wrap{overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch}
+}
+/* ---------- кнопка на страницу всех отзывов ----------
+   Обычная, золотая (выбор Серёги 11.09.2026): на этом экране она и есть
+   главное действие. Ширина как у кнопок под формами: 480 px на телефоне,
+   по надписи от 768 px → sayt-nn/standart-knopok.md */
+.oz-send{margin-top:clamp(28px,3.2vw,52px); text-align:center}
+.oz-send .zs-btn{width:min(100%,480px)}
+@media (min-width:768px){ .oz-send .zs-btn{width:auto} }
+/* На телефоне общий контейнер отдаёт поля целиком, и заголовок упёрся бы
+   в кромку экрана. Возвращаем их тексту — как на экранах 14 и 17. Ленты это
+   не касается: она снаружи контейнера и обязана обрываться по краю окна. */
+@media (max-width:767px){
+  .oz .cr-cont{width:100%; padding-inline:20px}
+}
+</style>
+
 </head>
 <body>
 
 <header class="nav" id="nav">
   <div class="brand">МНД<span>·</span>Звёздная смена</div>
   <span class="demoflag">демо первого экрана</span>
-  <nav class="navlinks"><a href="#next">Программа</a><a href="#next">Города</a><a href="#next">Отзывы</a></nav>
+  <nav class="navlinks"><a href="#next">Программа</a><a href="#next">Города</a><a href="#otzyvy">Отзывы</a></nav>
   <button class="navbtn" type="button">Выбрать город</button>
 </header>
 
@@ -7080,6 +7243,81 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </div>
 </section>
 
+
+<!-- ==================== ЭКРАН 19Б: СТЕНА ОТЗЫВОВ ====================
+     Бегущая лента скриншотов отзывов на ночном небе и кнопка на страницу,
+     где лежат все. Стоит между экраном про родителей и фильмом - так же,
+     как на боевом ministrynn.ru. Устройство, скорость и почему поле тёмное
+     → блок «ЭКРАН 19Б» в стилях выше и sayt-nn/ustroystvo.md.
+
+     КАЖДЫЙ КАДР - ССЫЛКА НА otzyvy.html#oN: там этот отзыв сразу открывается
+     крупно. Мелким скрин не читается ни при какой высоте кадра, поэтому
+     «прочитать» на главной - это всегда перейти. Номер в адресе - номер
+     карточки на странице отзывов, поэтому порядок кадров тут и порядок
+     кладки там обязаны совпадать: и то и другое печатает otzyvy.py.
+
+     В ЛЕНТЕ ВОСЕМЬ КАДРОВ ИЗ ТРИНАДЦАТИ (LENTA в otzyvy.py). Восемь - это
+     килобайт на 900, и их хватает, чтобы лента не выглядела короткой петлёй;
+     остальные ждут на своей странице, за кнопкой. -->
+<div class="oz-hold">
+<div class="oz-blik" aria-hidden="true"></div>
+<section class="cr oz" id="otzyvy" aria-labelledby="ozT">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="oz-grain" aria-hidden="true"></div>
+
+  <div class="cr-cont">
+    <h2 class="oz-t" id="ozT">Более 1000 реальных текстовых отзывов<br>
+      <span class="oz-q">только с прошлого сезона!</span></h2>
+    <p class="oz-lead">Вот несколько случайных из них. Это скриншоты как есть:
+      посты и комментарии из ВКонтакте, благодарности в переписке. Нажмите
+      на любой, чтобы прочитать целиком.</p>
+  </div>
+
+  <!-- Лента стоит снаружи `.cr-cont`: она идёт во всю ширину окна. -->
+  <div class="oz-wrap" id="ozWrap">
+    <div class="oz-band" id="ozBand">
+      <a class="oz-card" href="otzyvy.html#o1" draggable="false">
+        <img src="otz/o01.webp" width="900" height="643"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Отзыв ВКонтакте: «всё продумано до мелочей, актёры — мастера своего дела, даже родители поверили что Дед Мороз настоящий»"></a>
+      <a class="oz-card" href="otzyvy.html#o2" draggable="false">
+        <img src="otz/o02.webp" width="900" height="1566"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Отзыв ВКонтакте с фотографиями: «волшебная сказка для детей и детей постарше»"></a>
+      <a class="oz-card" href="otzyvy.html#o3" draggable="false">
+        <img src="otz/o03.webp" width="900" height="1548"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Длинный отзыв родителя-организатора: разбор по пунктам — организация, программа, актёры, Дед Мороз, атмосфера, безопасность"></a>
+      <a class="oz-card" href="otzyvy.html#o4" draggable="false">
+        <img src="otz/o04.webp" width="900" height="1950"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Благодарность в переписке: «дети были в восторге, отдельный респект Министру новогодних дел и Дед Морозу»"></a>
+      <a class="oz-card" href="otzyvy.html#o5" draggable="false">
+        <img src="otz/o05.webp" width="900" height="1526"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Отзыв мамы: «мы вывезли второклашек, и пока 35 детей катали карамельные леденцы, сопровождающие мамы водили хоровод с Дедом Морозом»"></a>
+      <a class="oz-card" href="otzyvy.html#o6" draggable="false">
+        <img src="otz/o06.webp" width="900" height="1533"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Отзыв ВКонтакте с фотографиями встречи с Дедом Морозом и Снегурочкой"></a>
+      <a class="oz-card" href="otzyvy.html#o7" draggable="false">
+        <img src="otz/o07.webp" width="900" height="1950"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Комментарии ВКонтакте от нескольких мам: «чудесная атмосфера, программа для детей, карамель очень вкусная»"></a>
+      <a class="oz-card" href="otzyvy.html#o8" draggable="false">
+        <img src="otz/o08.webp" width="900" height="1492"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Отзыв с фотографией Деда Мороза: «водила хоровод, пела песню про ёлочку — он существует, и не вздумайте теперь спорить со мной»"></a>
+    </div>
+  </div>
+
+  <div class="cr-cont">
+    <div class="oz-send">
+      <a class="zs-btn" href="otzyvy.html"><span class="zs-t">Читать все отзывы</span></a>
+    </div>
+  </div>
+</section>
+</div>
 
 <!-- ==================== ЭКРАН 20: ФИЛЬМ О ПРОЕКТЕ ====================
      Один ролик на двадцать минут. САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ — просьба
@@ -11174,6 +11412,191 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.addEventListener('resize', function(){ pokazat(i); });
 
   pokazat(0);
+})();
+</script>
+
+<!-- Скрипт экрана отзывов вынесен в ОТДЕЛЬНЫЙ <script> намеренно: файл правит
+     ещё одна сессия, и своя коробка не даёт чужой правке уронить его. -->
+<script>
+/* ==================== ЭКРАН 19Б: ЛЕНТА ОТЗЫВОВ ====================
+   Лента едет справа налево сама и разгоняется пальцем или мышью. Приём и числа
+   те же, что у ленты Деда Морозов (экран 17) и у ленты второго экрана —
+   язык на странице один.
+
+   ПЕТЛЯ БЕЗ ШВА. Кадры повторены дважды, лента сдвигается на остаток от ширины
+   одного повтора, и в момент, когда первая восьмёрка уезжает за левый край,
+   вторая стоит ровно на её месте. Вторая восьмёрка — копии разметки, а не
+   второй набор файлов: браузер берёт картинки из кеша. Копии помечены
+   `aria-hidden`, с пустым `alt` и вынуты из обхода по Tab (`tabindex="-1"`):
+   иначе читалка прочитала бы все отзывы дважды, а Tab обошёл бы шестнадцать
+   ссылок вместо восьми.
+
+   СЕРЕДИНЫ У ЭТОЙ ЛЕНТЫ НЕТ. У экрана 17 один кадр стоит по центру окна
+   на старте (просьба Серёги про Деда Мороза, развёдшего руки). Тут все кадры
+   равноправны, поэтому лента просто начинает с нуля — и кода на пересчёт
+   середины при каждом замере не нужно.
+
+   ЩЕЛЧОК И ПЕРЕТАСКИВАНИЕ РАЗВЕДЕНЫ ПО ПРОЙДЕННОМУ ПУТИ. Кадры — ссылки,
+   и без этого любое перетаскивание ленты мышью заканчивалось бы уходом
+   на страницу отзывов. Порог тот же, что у ленты 17: 8 px. Меньше — это
+   щелчок, больше — бросок.
+
+   ЛЕНТА ЖИВЁТ, ПОКА ОНА НА ЭКРАНЕ: за кадром кадры не считаем.
+
+   При «меньше движения» лента не собирается вовсе: прокрутку отдаём браузеру
+   (`overflow-x:auto` в стилях), кадры листаются пальцем. */
+(function(){
+  'use strict';
+  var wrap = document.getElementById('ozWrap');
+  var band = document.getElementById('ozBand');
+  if (!wrap || !band) return;
+
+  var calm  = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var cards = Array.prototype.slice.call(band.children);   /* настоящие, без копий */
+  var N = cards.length;
+  if (!N) return;
+
+  function slushat(mq, fn){
+    if (mq.addEventListener) mq.addEventListener('change', fn);
+    else if (mq.addListener) mq.addListener(fn);
+  }
+
+  /* Ленивая загрузка снимается ЗАРАНЕЕ, за пол-экрана до подъезда: иначе кадр
+     въезжает в окно пустым — браузер берётся за файл, только когда картинка
+     пересекла край окна, а лента к этому моменту её уже показывает. */
+  var razleneno = false;
+  function razlenit(){
+    razleneno = true;
+    var im = band.querySelectorAll('img[loading="lazy"]');
+    for (var i = 0; i < im.length; i++) im[i].loading = 'eager';
+  }
+  if (!('IntersectionObserver' in window)) razlenit();
+  else new IntersectionObserver(function(en, ob){
+    if (en[0].isIntersecting){ razlenit(); ob.disconnect(); }
+  }, {rootMargin:'60% 0px'}).observe(wrap);
+
+  var BASE = 26, LH0 = 240, MAXV = 2400, TAU = 0.75;   /* числа ленты второго экрана */
+  var sobrano = false, shag = 0, pos = 0, v = BASE, raf = 0, last = 0;
+  var tyanut = false, pid = null, x0 = 0, t0 = 0, vx = 0, proshel = 0;
+  var glaz = null;
+
+  function sobrat(){
+    if (sobrano) return;
+    for (var i = 0; i < N; i++){
+      var k = cards[i].cloneNode(true);
+      k.className += ' oz-clone';
+      k.setAttribute('aria-hidden', 'true');
+      k.setAttribute('tabindex', '-1');   /* копию Tab обходить не должен */
+      var im = k.querySelector('img');
+      if (im) im.alt = '';
+      band.appendChild(k);
+    }
+    sobrano = true;
+    /* Копии унаследовали loading="lazy". Снимаем её только если экран уже
+       подъехал: иначе лента, собранная при загрузке страницы, утащила бы
+       все файлы с самого верха. */
+    if (razleneno) razlenit();
+    izmerit();
+  }
+  function razobrat(){
+    var k = band.querySelectorAll('.oz-clone');
+    for (var i = 0; i < k.length; i++) k[i].parentNode.removeChild(k[i]);
+    sobrano = false; pos = 0; v = BASE; shag = 0;
+    band.style.transform = '';
+  }
+  /* МЕРЯЕМ ПРЯМОУГОЛЬНИКАМИ, А НЕ offsetLeft: тот округлён до целых пикселей,
+     а ширина кадра дробная (считается от высоты), и на восьми кадрах округление
+     копится — шаг петли промахнулся бы, и лента дёргалась на каждом обороте. */
+  function izmerit(){
+    if (!sobrano) return;
+    var a = band.children[0], b = band.children[N];
+    if (!a || !b){ shag = 0; return; }
+    var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    shag = rb.left - ra.left;
+    /* крупнее кадр — быстрее лента: глаз мерит движение долями кадра,
+       а не пикселями. Ниже телефонной высоты не замедляемся. */
+    BASE = 26 * Math.max(1, (ra.height || LH0) / LH0);
+    polozhit();
+  }
+  function polozhit(){
+    var x = shag ? -(((pos % shag) + shag) % shag) : 0;
+    band.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+  }
+  function kadr(now){
+    raf = requestAnimationFrame(kadr);
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+    last = now;
+    if (!tyanut){
+      v += (BASE - v) * (1 - Math.exp(-dt / TAU));   /* бросок затухает к базовой */
+      pos += v * dt;
+    }
+    polozhit();
+  }
+  function pusk(){ if (!raf && sobrano){ last = 0; raf = requestAnimationFrame(kadr); } }
+  function stop(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+
+  wrap.addEventListener('pointerdown', function(e){
+    if (!sobrano) return;
+    tyanut = true;
+    pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; proshel = 0;
+    wrap.classList.add('drag');                      /* курсор «схваченная рука» */
+    try{ wrap.setPointerCapture(pid); }catch(err){}
+  });
+  wrap.addEventListener('pointermove', function(e){
+    if (!tyanut || e.pointerId !== pid) return;
+    var dx = e.clientX - x0, dt = (e.timeStamp - t0) / 1000;
+    pos -= dx;                                       /* лента идёт за пальцем */
+    proshel += Math.abs(dx);
+    if (dt > 0.004) vx = 0.7 * vx + 0.3 * (dx / dt); /* сглаженная скорость пальца */
+    x0 = e.clientX; t0 = e.timeStamp;
+    polozhit();
+  });
+  function otpustit(){
+    if (!tyanut) return;
+    tyanut = false;
+    wrap.classList.remove('drag');
+    if (pid !== null){ try{ wrap.releasePointerCapture(pid); }catch(err){} pid = null; }
+    if (proshel < 8) return;                         /* это был щелчок, не бросок */
+    v = Math.max(-MAXV, Math.min(MAXV, -vx));
+  }
+  wrap.addEventListener('pointerup', otpustit);
+  wrap.addEventListener('pointercancel', otpustit);
+  wrap.addEventListener('lostpointercapture', otpustit);
+
+  /* Перетащили ленту — переход не нужен. Ловим на всплытии от ссылки:
+     `proshel` к этому моменту уже посчитан в pointermove. */
+  wrap.addEventListener('click', function(e){
+    if (proshel >= 8){ e.preventDefault(); e.stopPropagation(); }
+  });
+  /* Родное перетаскивание картинки браузером мешает нашему: гасим. */
+  wrap.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+  function smotret(){
+    if (glaz || !('IntersectionObserver' in window)){ pusk(); return; }
+    glaz = new IntersectionObserver(function(en){
+      if (en[0].isIntersecting) pusk(); else stop();
+    }, {rootMargin:'100px'});
+    glaz.observe(wrap);
+  }
+
+  function svet(){
+    if (!calm.matches){ sobrat(); smotret(); }
+    else { stop(); razobrat(); }
+  }
+  svet();
+  slushat(calm, svet);
+
+  /* Замер повторяем после полной загрузки: шрифт заголовка и картинки могли
+     поменять высоту секции, а вместе с ней и ширину кадров. */
+  window.addEventListener('load', function(){ if (sobrano) izmerit(); });
+
+  var tmr = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 150);
+  });
+  window.addEventListener('orientationchange', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 300);
+  });
 })();
 </script>
 
