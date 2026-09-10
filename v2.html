@@ -2768,7 +2768,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
   position:relative; box-sizing:border-box;
   width:min(var(--w), 100%);
-  padding:0 0 calc(100 * var(--u2));
+  padding:0 0 calc(120 * var(--u2));   /* 10.09.2026: воздуха под текстом больше, было 100 */
   border-radius:calc(76 * var(--u2));
   /* Поле карточки: сверху светлее, книзу чуть темнее (в макете — Gradient
      Overlay). Тон свой у каждой, насыщенность и светлота — общие. */
@@ -2816,9 +2816,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    в пустоту. Наплыв — выбор Серёги 08.09.2026 из четырёх вариантов. */
 .pg-win img.prev{opacity:1; z-index:1;
   transform:rotate(calc(-1 * var(--tilt))) scale(1.025)}
+/* Переход обязан быть КОРОЧЕ кадра. Кадр живёт 0,5 с (STEP в скрипте внизу),
+   наплыв — 0,26 с. Прежние 0,52 с были подобраны под кадр в секунду; если их
+   оставить, следующий кадр будет перебивать предыдущий на полпути и окно
+   навсегда останется мыльным — картинка просто не дойдёт до резкости. */
 .pg-win img.on{opacity:1; z-index:2;
   transform:rotate(calc(-1 * var(--tilt))) scale(1.025);
-  transition:opacity .52s linear, transform .58s cubic-bezier(.2,.7,.3,1)}
+  transition:opacity .26s linear, transform .29s cubic-bezier(.2,.7,.3,1)}
 .pg-win img:not(.on):not(.prev){transform:rotate(calc(-1 * var(--tilt))) scale(1.08)}
 @media (prefers-reduced-motion:reduce){ .pg-win img{transition:none} }
 
@@ -4323,10 +4327,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .gb-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
 }
 
-/* ---------- планшет: фотография под текстом, во всю ширину окна ---------- */
+/* ---------- планшет и телефон: фотография НАД текстом, во всю ширину окна ----------
+   Просьба Серёги 10.09.2026: когда экран складывается в одну колонку,
+   фотография идёт первой, а текст под ней. В разметке порядок обратный
+   (текст, потом фотография) - и трогать его нельзя: он правильный для
+   компьютера и для чтения голосом, где сначала должен идти заголовок.
+   Переставляет их `order`, то есть только на вид и только здесь.
+
+   Появление тоже меняется местами: наверху теперь фотография, ей и ехать
+   первой. Оставь задержку у фотографии - на телефоне сперва всплывал бы
+   текст снизу, а верх экрана стоял бы пустым. */
 @media (max-width:1023px){
   .gb-grid{grid-template-columns:1fr; gap:clamp(22px,3.2vw,34px)}
-  .gb-photo{margin:0 calc(-1 * var(--gb-bleed))}
+  .gb-photo{order:-1; margin:0 calc(-1 * var(--gb-bleed))}
+  .gb.rv.on .gb-photo{transition-delay:0s}
+  .gb.rv.on .gb-text{transition-delay:.1s}
   /* Кадр 1373x960 (пустое белое поле сверху и снизу у файла обрезано), а
      поперёк экрана нужен широкий: режем до 16:10. Точка 62 % держит в кадре
      детей - режется только снежная крыша автобуса. На телефоне при 4:3 кадр
@@ -8779,45 +8794,31 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Под каждой карточкой лежит несколько снимков, они меняются по STEP
    миллисекунд, пока карточка видна. Список файлов — в data-shots.
 
-   ТАКТ ОДИН НА ВСЕХ. Часы тут единственные: все карточки экрана щёлкают кадр
-   в один и тот же момент. Если дать каждой свой таймер, они разъедутся
-   (каждая заводится, когда доехала до экрана) и ряд начнёт дёргаться вразнобой.
+   КАЖДАЯ КАРТОЧКА ЩЁЛКАЕТ САМА ПО СЕБЕ. Сначала часы были одни на весь экран
+   и все окна менялись разом; 10.09.2026 Серёга попросил вразнобой. Просто
+   раздать каждой свой таймер мало: после возврата на вкладку или прокрутки
+   назад они снова заводятся в один момент и опять идут строем. Поэтому у
+   каждой карточки свой СДВИГ ФАЗЫ — задержка перед первым щелчком, разная
+   у соседей и одна и та же при каждом запуске.
 
-   ПЕРЕХОД КОРОЧЕ КАДРА. Кадр живёт 1 с, наплыв — 0,52 с (числа в стилях,
+   ПЕРЕХОД КОРОЧЕ КАДРА. Кадр живёт 0,5 с, наплыв — 0,26 с (числа в стилях,
    `.pg-win img.on`). Растянешь переход до длины кадра — следующий перебьёт
    предыдущий на полпути, и окно навсегда останется мыльным.
 
    Четыре вещи, без которых это вредно:
    1. Кадры грузятся, только когда карточка подъезжает к окну браузера.
-      Всего их 66 на экран, разом это почти три мегабайта.
-   2. Нет ни одной видимой карточки или вкладка спрятана — часы стоят.
+      Всего их больше сотни на экран, разом это четыре мегабайта.
+   2. Карточка ушла из виду или вкладка спрятана — её таймер стоит.
    3. Если в системе включено «меньше движения», мелькания нет вовсе.
-   4. Карточка входит в общий такт, когда ВСЕ её кадры уже в памяти: иначе
+   4. Карточка начинает мелькать, когда ВСЕ её кадры уже в памяти: иначе
       на медленном интернете в окне вместо фотографии вспыхивает заглушка. */
 (function(){
-  var STEP = 1000;                                   /* сколько держится кадр, мс */
+  var STEP = 500;                                    /* сколько держится кадр, мс */
   var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
-  var cards = [], timer = null;
-
-  function tick(){
-    for (var i = 0; i < cards.length; i++){
-      var c = cards[i];
-      if (c.seen && c.ready) c.step();
-    }
-  }
-  /* часы идут, только пока есть кому щёлкать */
-  function clock(){
-    var live = false;
-    for (var i = 0; i < cards.length; i++) if (cards[i].seen && cards[i].ready) live = true;
-    if (live && !document.hidden && !calm.matches){
-      if (!timer) timer = setInterval(tick, STEP);
-    } else if (timer){
-      clearInterval(timer); timer = null;
-    }
-  }
+  var cards = [];
 
   var list = document.querySelectorAll('#whatawaits .pg[data-shots]');
-  for (var k = 0; k < list.length; k++) (function(el){
+  for (var k = 0; k < list.length; k++) (function(el, idx){
     var win  = el.querySelector('.pg-win');
     var srcs = (el.getAttribute('data-shots') || '').split(',')
                  .map(function(x){ return x.trim() }).filter(Boolean);
@@ -8825,7 +8826,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var extra = srcs.filter(function(src){ return !first || !first.src.endsWith(src) });
     if (!extra.length) return;                       /* один кадр — мелькать нечем */
 
-    var c = { seen:false, ready:false, shots:[first], cur:0, loaded:false };
+    var c = { seen:false, ready:false, shots:[first], cur:0, loaded:false,
+              timer:null, wait:null,
+              /* сдвиг фазы. Шаг 137 — «золотой угол» в миллисекундах: остатки
+                 от деления ложатся по кругу далеко друг от друга, поэтому даже
+                 у соседних карточек моменты щелчка заведомо разные */
+              phase: (idx * 137) % STEP };
 
     c.step = function(){
       var was = c.shots[c.cur];
@@ -8837,6 +8843,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     c.reset = function(){
       for (var i = 0; i < c.shots.length; i++) c.shots[i].classList.remove('on', 'prev');
       c.cur = 0; c.shots[0].classList.add('on');
+    };
+    c.start = function(){
+      if (c.timer || c.wait || !c.seen || !c.ready || document.hidden || calm.matches) return;
+      c.wait = setTimeout(function(){
+        c.wait = null; c.step();
+        c.timer = setInterval(c.step, STEP);
+      }, c.phase);
+    };
+    c.stop = function(){
+      if (c.wait){ clearTimeout(c.wait); c.wait = null }
+      if (c.timer){ clearInterval(c.timer); c.timer = null }
     };
     c.load = function(){
       if (c.loaded) return; c.loaded = true;
@@ -8852,7 +8869,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
            окно вспыхивает заглушкой */
         c.shots = c.shots.filter(function(im){ return im.naturalWidth > 0 });
         if (c.shots.length < 2) return;
-        c.reset(); c.ready = true; clock();
+        c.reset(); c.ready = true; c.start();
       });
     };
 
@@ -8860,13 +8877,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     if ('IntersectionObserver' in window){
       new IntersectionObserver(function(es){
         c.seen = es[0].isIntersecting;
-        if (c.seen) c.load(); else if (c.ready) c.reset();
-        clock();
+        if (c.seen){ c.load(); c.start() }
+        else { c.stop(); if (c.ready) c.reset() }
       }, {threshold:.25}).observe(el);
     } else { c.seen = true; c.load() }
-  })(list[k]);
+  })(list[k], k);
 
-  document.addEventListener('visibilitychange', clock);
+  document.addEventListener('visibilitychange', function(){
+    for (var i = 0; i < cards.length; i++){
+      if (document.hidden) cards[i].stop(); else cards[i].start();
+    }
+  });
 })();
 </script>
 
