@@ -1753,7 +1753,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    тонкое золото на нём почти не видно, поэтому там обводка и надпись темнее.
    Заводишь новый светлый экран - добавляй его сюда, иначе кнопка на нём
    выйдет бледной обводкой, которую не видно ни на солнце, ни на проекторе. */
-.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost,.sv .zs-btn--ghost,.pr .zs-btn--ghost,.gb .zs-btn--ghost{
+.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost,.sv .zs-btn--ghost,.pr .zs-btn--ghost,.gb .zs-btn--ghost,.rd .zs-btn--ghost{
   color:#8A6111; box-shadow:inset 0 0 0 2px rgba(160,116,32,.75);
 }
 .cr-s2 .zs-btn--ghost:hover,.cr-s3 .zs-btn--ghost:hover,.sv .zs-btn--ghost:hover,.pr .zs-btn--ghost:hover,.gb .zs-btn--ghost:hover{
@@ -3668,9 +3668,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk-dot.is-on{width:26px}
 }
 /* ==================== ЭКРАН 14: КОРОТКИЕ ВИДЕО ====================
-   Пространство имён `vd-`. Семь роликов Rutube, сняты с боевого сайта
-   ministrynn.ru: шесть коротких сеткой и двадцатиминутный фильм отдельным
-   блоком под ними. Ссылки на ролики — те же, что на старом сайте.
+   Пространство имён `vd-`. Шесть коротких роликов Rutube сеткой, сняты
+   с боевого сайта ministrynn.ru; ссылки на ролики — те же, что на старом
+   сайте. Двадцатиминутный фильм жил тут отдельным блоком под сеткой один
+   день и 10.09.2026 уехал на свой экран — см. «ЭКРАН 16Б: ФИЛЬМ О ПРОЕКТЕ»,
+   он стоит ниже, за экраном условий и бонусов.
 
    ПОДПИСИ ИСПРАВЛЕНЫ ОТНОСИТЕЛЬНО СТАРОГО САЙТА. Там подписи со второй
    по четвёртую съехали на соседний ролик: под «Про карамельный мастер-класс»
@@ -3861,22 +3863,29 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <!-- Экран с фильмом тоже держит свой <style>, по той же причине
      → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
 <style>
-/* ==================== ЭКРАН 14Б: ФИЛЬМ О ПРОЕКТЕ ====================
+/* ==================== ЭКРАН 16Б: ФИЛЬМ О ПРОЕКТЕ ====================
    Пространство имён `fl-`. Тот же экран, что на боевом ministrynn.ru: заголовок,
    подводка, одна большая обложка с кнопкой пуска, красная строка про VPN
    и кнопка заявки. Ролик тот же — 838ecf64473337f103fc545669103258, 20:19.
-   Стоит там, где на старом сайте: сразу за короткими роликами, перед ценами.
+
+   ГДЕ СТОИТ: за экраном условий и бонусов для групп, перед экраном о Деде
+   Морозе. Просьба Серёги 10.09.2026. На старом сайте этот экран стоит выше,
+   сразу за короткими роликами, — там его собрали в первый заход, и в тот же
+   день Серёга попросил перенести вниз. Разметка живёт рядом с экраном 17,
+   а этот блок стилей остался выше, между блоками экранов 14 и 15. Свой
+   отдельный <style> у него не случайно: незакрытая скобка в чужом блоке
+   не уронит ни его, ни соседей. Вклиниться на «своё» место он не может -
+   экраны 16-19 держат один общий <style> на четверых.
 
    ЧЕМ ОТЛИЧАЕТСЯ ОТ СТАРОГО САЙТА. Там поле белое, у нас ночное небо —
-   выбор Серёги 10.09.2026. Выше уже стоит тёмный экран с короткими роликами,
-   а ниже подряд идут светлые (цены, бонусы); белый фильм между ними склеил бы
-   три светлых экрана в одну простыню. И кино вообще смотрят в темноте: тёмное
-   поле работает на саму обложку.
+   выбор Серёги. Выше стоят два белых экрана подряд (цены и бонусы), белый
+   фильм стал бы третьим и склеил бы их в одну простыню. И кино вообще
+   смотрят в темноте: тёмное поле работает на саму обложку.
 
-   ПОЧЕМУ ДВА ТЁМНЫХ ЭКРАНА ПОДРЯД НЕ СЛИПАЮТСЯ. Шов держит золотой блик — тот
-   же снимок `v2-sm-blik.webp`, что на швах пятого, шестого и семнадцатого
-   экранов. Плюс обложка тут одна и во всю колонку, а не три в ряд: крупность
-   сама говорит, что экран другой.
+   ДВА ШВА, И ОБА ДЕРЖИТ ЗОЛОТОЙ БЛИК `v2-sm-blik.webp`. Сверху свой,
+   `.fl-blik`, на границе с белым экраном бонусов. Снизу — чужой, `.dm-blik`
+   экрана о Деде Морозе: там сходятся два тёмных поля, и без блика они
+   читались бы одним длинным экраном.
 
    ПЛЕЕР ОБЩИЙ С ЭКРАНОМ РОЛИКОВ. Классы окна (`vd-box`, `vd-open`, `vd-play`,
    `vd-time`, `vd-vpn`) взяты оттуда специально, а не переписаны под своими
@@ -3889,18 +3898,30 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    на Rutube — человек у ёлки, по нему не понять, что это фильм. Тот же урок,
    что с обложками роликов: когда просят «как на том сайте», обложки тоже
    часть «как». */
-.fl-hold{position:relative; z-index:27}   /* ради блика на шве: он вылезает вверх, на экран роликов */
+/* z-index:29 - на одной ступени с экраном о Деде Морозе и газеткой, и это
+   намеренно. Выше бонусов (28) - иначе свой блик фильма срезало бы белым
+   экраном сверху. Не выше - при равном слое побеждает тот, кто ниже
+   в разметке, поэтому блик Деда Мороза ложится на фильм, а не наоборот,
+   а 30 занято шапкой → lessons/element-na-shve-sekciy-z-index.md */
+.fl-hold{position:relative; z-index:29}
 .fl{
   position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
   padding:clamp(58px,6.6vw,110px) 0 clamp(62px,7vw,118px);
-  /* Верх и низ ровно #04071A — тем же цветом кончается экран роликов сверху
-     и на нём же стоит сугроб экрана цен снизу. Стыки без швов. */
+  /* Ночное небо по общему рецепту тёмных экранов (ролики, Дед Мороз):
+     синее зарево у верхней кромки и вертикаль до почти чёрного низа. Зарево
+     сверху обязательно - над экраном стоит белый экран бонусов, и без него
+     шов выходит резкой чёрной чертой. Свой у фильма только тёплый отсвет
+     посередине: он поднимает обложку из поля. */
   background:
-    radial-gradient(52vw 34vw at 50% 48%, rgba(227,179,78,.09), rgba(227,179,78,0) 100%),
-    radial-gradient(64vw 42vw at 50% 44%, rgba(52,42,116,.5), rgba(52,42,116,0) 100%),
-    linear-gradient(180deg,#04071A 0%,#070C28 26%,#060A22 62%,#04071A 100%);
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    radial-gradient(52vw 34vw at 50% 52%, rgba(227,179,78,.09), rgba(227,179,78,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
 }
-/* блик на шве с экраном роликов — тот же снимок, что на швах 5-6 и 16-17 */
+/* Блик на шве с белым экраном бонусов - тот же снимок, что на швах пятого,
+   шестого, четырнадцатого и семнадцатого экранов. В разметке он стоит
+   СНАРУЖИ секции: у неё `overflow:hidden`, и изнутри верхнюю половину
+   срезало бы. Пока фильм стоял между двумя тёмными экранами, срез был
+   не виден - там обрезанный край совпадал по цвету с полем. */
 .fl-blik{
   position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
   aspect-ratio:2000/381; transform:translateY(-48.5%);
@@ -4526,7 +4547,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
    ПОЛЕ - НОЧНОЕ НЕБО по рецепту экрана с видео: синяя ночь, размытые пурпурные
    и лиловые пятна, зерно. Фотографии тёплые, на тёмном они светятся; на белом
-   (а выше стоят три белых экрана подряд) слились бы в серую полосу.
+   слились бы в серую полосу. (Когда экран делали, выше стояли три белых
+   подряд; 10.09.2026 между ними и этим экраном встал тёмный экран с фильмом,
+   и `.dm-blik` теперь лежит на шве двух тёмных полей, а не на белом.)
 
    ВЫСОТА КАДРА - ОДНА ФОРМУЛА НА ВСЕ ШИРИНЫ: `min(58vw, 340*--u)`. До 1250 px
    множитель --u упирается в свой пол 1px, поэтому там высота ровно 340 px,
@@ -4539,8 +4562,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Картинки делает `sayt-nn/instrumenty/ded_moroz.py`: приводит снимки из папки
    Серёги к высоте 860 px и печатает готовую разметку с шириной каждого кадра. */
 .dm-hold{position:relative; z-index:29}
-/* Блик на шве с белым экраном бонусов - тот же снимок, что на швах пятого,
-   шестого и четырнадцатого экранов. Стоит СНАРУЖИ секции: у неё
+/* Блик на шве с экраном фильма - тот же снимок, что на швах пятого,
+   шестого, четырнадцатого и самого фильма. До 10.09.2026 под ним был белый
+   экран бонусов; теперь между ними встал тёмный экран с фильмом, и блик
+   держит шов двух тёмных полей. Стоит СНАРУЖИ секции: у неё
    `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. */
 .dm-blik{
   position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
@@ -4736,6 +4761,145 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (max-width:767px){
   .gz-t, .gz-lead{padding-inline:20px}
   .gz-br{display:none}
+}
+
+/* ==================== ЭКРАН 19: РАЗВЛЕКАЕМ И УГОЩАЕМ РОДИТЕЛЕЙ ====================
+   Пространство имён `rd-`. Белое снежное поле, заголовок в два цвета, строка
+   про игристое и хороводы, карусель из пяти снимков и кнопка заявки.
+   Копия последнего «взрослого» блока боевого ministrynn.ru: там тот же текст
+   и те же пять картинок. Сделан 10.09.2026, стоит последним на странице.
+
+   ПОЛЕ ОБЯЗАНО БЫТЬ ЧИСТО БЕЛЫМ - на верхней кромке стоит сугроб (`.cr-snow`),
+   низ у него сплошные 255,255,255. Дай фону хоть оттенок, и по нижнему краю
+   картинки ляжет черта во всю ширину окна. Воздух экрану дают круглые
+   отблески: у них края прозрачные, черте взяться неоткуда. Тот же приём,
+   что на одиннадцатом и пятнадцатом экранах.
+
+   z-index:29 - тот же слой, что у экранов о Деде Морозе и газетке. Выше
+   поднимать нельзя (на 30 стоит шапка сайта) и незачем: при равном слое
+   побеждает тот, кто ниже в разметке, а этот экран последний - сугроб
+   спокойно вылезает на синее поле газетки
+   → lessons/element-na-shve-sekciy-z-index.md.
+
+   КАРТОЧКИ РАЗНОЙ ШИРИНЫ, И ЭТО ИЗ ИСТОЧНИКА: четыре снимка из пяти - отзывы
+   мам поверх фотографии, у каждого своя пропорция, а поворот и тень вшиты
+   в саму картинку. Поэтому карточка - коробка одной высоты (`--rd-h`),
+   а снимок вписан в неё по меньшей стороне: узкие не растягиваются, широкие
+   не вылезают за колонку. Картинки собирает `sayt-nn/instrumenty/roditeli.py`. */
+.rd{
+  position:relative; z-index:29;
+  background:#fff; color:#333;
+  padding:clamp(64px,6.6vw,128px) 0 clamp(52px,5.4vw,100px);
+}
+/* Страховка от наезда снега на заголовок на очень широких мониторах - ровно
+   та же, что на одиннадцатом и пятнадцатом экранах. */
+.rd .cr-snow{transform:translateY(max(-30%,-240px))}
+/* Отблески гаснут внутри своей секции (`bottom:0` + `closest-side`): экран
+   последний на странице, но правило общее - свесил декорацию ниже кромки,
+   получи черту на шве, как только под ней кто-нибудь появится. */
+.rd-glow{position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden}
+.rd-glow i{position:absolute; display:block; border-radius:50%}
+.rd-glow i:nth-child(1){left:-18vw; bottom:0; width:64vw; height:56%;
+  background:radial-gradient(closest-side, rgba(255,226,236,.62) 0%, rgba(255,226,236,.3) 40%, rgba(255,226,236,0) 100%)}
+.rd-glow i:nth-child(2){right:-16vw; bottom:0; width:60vw; height:50%;
+  background:radial-gradient(closest-side, rgba(255,232,186,.5) 0%, rgba(255,232,186,.24) 40%, rgba(255,232,186,0) 100%)}
+
+.rd .cr-lead{font-size:calc(24 * var(--u))}
+.rd-lead{max-width:calc(860 * var(--u)); margin-inline:auto; text-wrap:balance}
+
+/* ---------- КАРУСЕЛЬ ----------
+   Одно состояние - номер страницы; всё остальное из него следует. Сколько
+   карточек в кадре, задаёт CSS (`--rd-n`), а не скрипт: раскладка - дело
+   стилей, скрипт лишь читает число и считает по нему страницы. Меняешь
+   раскладку - меняешь только медиазапрос ниже.
+
+   ВЫСОТА КОРОБКИ `--rd-h` подобрана так, чтобы самый широкий снимок (0,673
+   ширины к высоте) влезал в колонку целиком. Возьмёшь больше - широкие
+   упрутся в ширину колонки и станут ниже соседей; ничего не сломается,
+   но ряд пойдёт вразнобой. */
+.rd-view{
+  --rd-n:3;
+  --rd-h:min(41vw, 640px);
+  --rd-gap:clamp(10px,1.3vw,24px);
+  position:relative; overflow:hidden;
+  margin-top:clamp(22px,2.6vw,46px);
+  touch-action:pan-y;                 /* вертикальную прокрутку отдаём странице */
+}
+/* Лента двигается `transform`-ом, а не `left`: только он не заставляет браузер
+   пересчитывать раскладку каждый кадр. `--i` - сдвиг В КАРТОЧКАХ, поэтому
+   у последней страницы он может быть дробным от страничного: лента
+   останавливается на конце ряда, а не уезжает в пустоту. */
+.rd-strip{
+  display:flex; align-items:center; will-change:transform;
+  transform:translate3d(calc(var(--i,0) * -100% / var(--rd-n)),0,0);
+  transition:transform .45s cubic-bezier(.22,.61,.36,1);
+}
+.rd-strip.is-drag{transition:none}
+@media (hover:hover) and (pointer:fine){
+  .rd-view{cursor:grab}
+  .rd-view:active{cursor:grabbing}
+}
+/* Воздух между карточками - поля внутри самой карточки, а не `gap` у ленты:
+   с `gap` сдвиг в процентах перестал бы совпадать с шириной карточки. */
+.rd-card{
+  flex:0 0 calc(100% / var(--rd-n)); box-sizing:border-box;
+  margin:0; padding:0 calc(var(--rd-gap) / 2); height:var(--rd-h);
+  display:flex; align-items:center; justify-content:center;
+}
+/* Тень под снимком нарисована в самой картинке (прозрачные поля срезаны),
+   своей тени карточка не рисует - вышла бы двойная. */
+.rd-card img{
+  display:block; max-width:100%; max-height:100%; width:auto; height:auto;
+  -webkit-user-drag:none; user-select:none;
+}
+
+/* Стрелки - органы управления, а не кнопки действия: стандарт `zs-btn` тут
+   ни при чём, как и у каруселей площадки и мастер-класса. Белый кружок
+   с тенью, стоят поверх крайних карточек. */
+.rd-nav{
+  position:absolute; z-index:3; top:50%; transform:translateY(-50%);
+  width:clamp(38px,3.4vw,50px); aspect-ratio:1; border:0; border-radius:999px;
+  background:#fff; color:#1b1630; opacity:.82; cursor:pointer; padding:0;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 18px rgba(20,16,40,.24);
+  transition:opacity .2s ease, transform .2s ease;
+}
+.rd-nav svg{width:52%; height:52%; display:block}
+.rd-prev{left:clamp(4px,.6vw,14px)}
+.rd-next{right:clamp(4px,.6vw,14px)}
+@media (hover:hover){ .rd-nav:not(:disabled):hover{opacity:1; transform:translateY(-50%) scale(1.1)} }
+.rd-nav:disabled{opacity:.28; cursor:default}
+.rd-nav:focus-visible{outline:3px solid rgb(47,49,146); outline-offset:3px}
+
+.rd-dots{display:flex; flex-wrap:wrap; gap:clamp(7px,.7vw,12px); justify-content:center; margin-top:clamp(16px,1.8vw,30px)}
+.rd-dot{
+  width:clamp(8px,.75vw,12px); height:clamp(8px,.75vw,12px); border:0; padding:0; border-radius:999px;
+  background:#C4CCE4; cursor:pointer; transition:width .25s ease, background .25s ease;
+}
+.rd-dot.is-on{width:clamp(26px,2.4vw,38px); background:rgb(47,49,146)}
+.rd-dot:focus-visible{outline:2px solid rgb(47,49,146); outline-offset:3px}
+
+/* Кнопка обычная, золотая - выбор Серёги 10.09.2026 и то же, что на боевом
+   сайте. Ширина как у кнопок соседних экранов: на телефоне во всю ширину,
+   на компьютере по длине надписи. */
+.rd-send{margin:clamp(30px,3.2vw,58px) 0 0; text-align:center}
+.rd-send .zs-btn{width:min(100%, 480px)}
+@media (min-width:768px){ .rd-send .zs-btn{width:auto} }
+
+/* Планшет: две карточки в кадре. */
+@media (max-width:1023px){
+  .rd-view{--rd-n:2; --rd-h:min(56vw, 620px)}
+}
+/* Телефон: одна карточка в кадре и поля тексту - общий контейнер их отдаёт. */
+@media (max-width:767px){
+  .rd-view{--rd-n:1; --rd-h:clamp(380px, 118vw, 620px)}
+  .rd .cr-lead{font-size:16px}
+  .rd .cr-h2, .rd-lead{padding-inline:20px}
+  .rd-send{padding-inline:20px}
+}
+@media (prefers-reduced-motion:reduce){
+  .rd-strip{transition:none}
+  .rd-dot{transition:none}
 }
 </style>
 
@@ -6000,61 +6164,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
 
     <!-- Двадцатиминутного фильма тут нет намеренно: на старом сайте он стоит
-         не в этой сетке, а следующим экраном. У нас так же — см. «ЭКРАН 14Б:
-         ФИЛЬМ О ПРОЕКТЕ» сразу под этой секцией. -->
+         не в этой сетке, а отдельным экраном. У нас он ещё ниже — за экраном
+         условий и бонусов, см. «ЭКРАН 16Б: ФИЛЬМ О ПРОЕКТЕ». -->
   </div>
 </section>
 </div>
 
-
-
-<!-- ==================== ЭКРАН 14Б: ФИЛЬМ О ПРОЕКТЕ ====================
-     Один ролик на двадцать минут — экран с боевого ministrynn.ru, где он стоит
-     ровно тут же: за короткими роликами, перед таблицей цен. Устройство, почему
-     поле тёмное и почему классы окна взяты у соседнего экрана → блок
-     «ЭКРАН 14Б: ФИЛЬМ О ПРОЕКТЕ» в стилях и sayt-nn/ustroystvo.md.
-
-     Меняешь ролик — меняешь `data-rt`, `data-ti`, время в `.vd-time` и обложку.
-     Плеер поднимает общий скрипт «ЭКРАН 14: ЗАПУСК РОЛИКОВ» в конце страницы. -->
-<div class="fl-hold">
-<section class="fl" id="film" aria-labelledby="flT">
-  <span class="fl-blik" aria-hidden="true"></span>
-  <div class="fl-glow" aria-hidden="true"><i></i><i></i><i></i></div>
-  <div class="fl-grain" aria-hidden="true"></div>
-
-  <div class="cr-cont">
-    <h2 class="fl-t" id="flT">Хотите полностью погрузиться в наш мир?<br class="fl-br"> Посмотрите <b><span class="fl-nw">20-минутный</span> фильм</b> о нас!</h2>
-    <p class="fl-lead">У вас сложится полная картина о том, в какую сказку попадут ваши детки.</p>
-
-    <div class="fl-frame">
-      <div class="vd-box">
-        <button class="vd-open" type="button"
-                data-rt="838ecf64473337f103fc545669103258"
-                data-ti="Документальный фильм о Министерстве Новогодних Дел"
-                aria-label="Смотреть документальный фильм о Министерстве Новогодних Дел, 20 минут 19 секунд">
-          <img src="video/film-big.webp?v=1"
-               srcset="video/film-big-900.webp?v=1 900w, video/film-big.webp?v=1 1600w"
-               sizes="(max-width:1200px) 92vw, 1040px"
-               width="1600" height="901"
-               alt="Ведущий с фонарём во дворе площадки, надпись «Фильм о Министерстве Новогодних Дел, новогодняя документалка»"
-               loading="lazy" decoding="async">
-          <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
-          <span class="vd-time" aria-hidden="true">20:19</span>
-        </button>
-      </div>
-      <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
-    </div>
-
-    <!-- Кнопка прозрачная (вид 2) — выбор Серёги 10.09.2026. Надпись взята
-         с той же кнопки старого сайта. -->
-    <div class="fl-cta">
-      <button class="zs-btn zs-btn--ghost" type="button"
-              data-zs="экран с фильмом">
-        <span class="zs-t">Вау, хочу к вам!</span></button>
-    </div>
-  </div>
-</section>
-</div>
 
 
 <!-- ==================== ЭКРАН 15: ТАБЛИЦА ЦЕН ====================
@@ -6331,6 +6446,63 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </section>
 
 
+<!-- ==================== ЭКРАН 16Б: ФИЛЬМ О ПРОЕКТЕ ====================
+     Один ролик на двадцать минут. Стоит за экраном условий и бонусов для групп
+     и перед экраном о Деде Морозе — просьба Серёги 10.09.2026 (на боевом
+     ministrynn.ru этот экран стоит выше, сразу за короткими роликами).
+     Устройство, почему поле тёмное и почему классы окна взяты у экрана
+     роликов → блок «ЭКРАН 16Б: ФИЛЬМ О ПРОЕКТЕ» в стилях и
+     sayt-nn/ustroystvo.md.
+
+     СТИЛИ ЛЕЖАТ НЕ РЯДОМ, а выше по файлу, между блоками экранов 14 и 15:
+     у фильма свой отдельный <style>, а экраны 16-19 держат один общий
+     на четверых, и вклиниться в него отдельным блоком нельзя.
+
+     Меняешь ролик — меняешь `data-rt`, `data-ti`, время в `.vd-time` и обложку.
+     Плеер поднимает общий скрипт «ЭКРАН 14: ЗАПУСК РОЛИКОВ» в конце страницы. -->
+<div class="fl-hold">
+<!-- Блик на шве с белым экраном бонусов. Стоит СНАРУЖИ секции: у неё
+     `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. -->
+<div class="fl-blik" aria-hidden="true"></div>
+<section class="fl" id="film" aria-labelledby="flT">
+  <div class="fl-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="fl-grain" aria-hidden="true"></div>
+
+  <div class="cr-cont">
+    <h2 class="fl-t" id="flT">Хотите полностью погрузиться в наш мир?<br class="fl-br"> Посмотрите <b><span class="fl-nw">20-минутный</span> фильм</b> о нас!</h2>
+    <p class="fl-lead">У вас сложится полная картина о том, в какую сказку попадут ваши детки.</p>
+
+    <div class="fl-frame">
+      <div class="vd-box">
+        <button class="vd-open" type="button"
+                data-rt="838ecf64473337f103fc545669103258"
+                data-ti="Документальный фильм о Министерстве Новогодних Дел"
+                aria-label="Смотреть документальный фильм о Министерстве Новогодних Дел, 20 минут 19 секунд">
+          <img src="video/film-big.webp?v=1"
+               srcset="video/film-big-900.webp?v=1 900w, video/film-big.webp?v=1 1600w"
+               sizes="(max-width:1200px) 92vw, 1040px"
+               width="1600" height="901"
+               alt="Ведущий с фонарём во дворе площадки, надпись «Фильм о Министерстве Новогодних Дел, новогодняя документалка»"
+               loading="lazy" decoding="async">
+          <span class="vd-play" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span>
+          <span class="vd-time" aria-hidden="true">20:19</span>
+        </button>
+      </div>
+      <p class="vd-vpn">Выключите VPN и обновите страницу, если видео не отобразилось!</p>
+    </div>
+
+    <!-- Кнопка прозрачная (вид 2) — выбор Серёги 10.09.2026. Надпись взята
+         с той же кнопки старого сайта. -->
+    <div class="fl-cta">
+      <button class="zs-btn zs-btn--ghost" type="button"
+              data-zs="экран с фильмом">
+        <span class="zs-t">Вау, хочу к вам!</span></button>
+    </div>
+  </div>
+</section>
+</div>
+
+
 <!-- ==================== ЭКРАН 17: О НАШЕМ ДЕДЕ МОРОЗЕ ====================
      Последний экран страницы. Десять фотографий Деда Мороза одной бегущей
      лентой во всю ширину окна, на ночном небе. Устройство, скорость и почему
@@ -6436,6 +6608,72 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </div>
 </section>
 </div>
+
+<!-- ==================== ЭКРАН 19: РАЗВЛЕКАЕМ И УГОЩАЕМ РОДИТЕЛЕЙ ====================
+     Последний экран страницы. Белое снежное поле, карусель из пяти снимков
+     и кнопка заявки. Копия последнего «взрослого» блока боевого ministrynn.ru:
+     текст и картинки оттуда. Устройство → блок «ЭКРАН 19» в стилях выше
+     и sayt-nn/ustroystvo.md.
+
+     ПЕРВЫЙ СНИМОК - КОЛЛАЖ ИЗ ТРЁХ ЖИВЫХ КАДРОВ (чокаются, хоровод, поднос
+     с игристым), остальные четыре - отзывы мам поверх фотографии. Порядок
+     такой намеренно: сначала само угощение, потом слова тех, кого угощали.
+     Меняешь порядок - правь список KARTOCHKI в `sayt-nn/instrumenty/roditeli.py`
+     и гоняй его, а не переставляй файлы руками: ширина и высота в атрибутах
+     должны совпадать с картинкой, иначе лента прыгнет, пока снимки грузятся.
+
+     ПЕРВЫЕ ТРИ БЕЗ `loading="lazy"` - они видны сразу на компьютере. Дальше
+     соседей греет скрипт: внутри ленты с `overflow:hidden` ленивая загрузка
+     срабатывает уже после переезда. -->
+<section class="cr rd" id="parents" aria-labelledby="rdT">
+  <div class="cr-snow" aria-hidden="true"></div>
+  <div class="rd-glow" aria-hidden="true"><i></i><i></i></div>
+
+  <div class="cr-cont">
+    <div class="cr-n">
+      <h2 class="cr-t cr-h2" id="rdT"><span class="cr-red"><strong>РАЗВЛЕКАЕМ И УГОЩАЕМ</strong></span> <span class="cr-blue"><strong>РОДИТЕЛЕЙ!</strong></span></h2>
+    </div>
+
+    <div class="cr-n"><p class="cr-t cr-lead rd-lead">Праздничное игристое, вкусный чай, хороводы,
+      стишки на стульчике, игры, обнимашки и фото с Дедом Морозом&nbsp;- обязательно для каждой группы!</p></div>
+
+    <div class="rd-view" id="rdView" role="group" aria-roledescription="карусель"
+         aria-label="Фотографии родителей на программе и их отзывы">
+      <div class="rd-strip" id="rdStrip">
+        <figure class="rd-card"><img src="rod/r1.webp" width="900" height="1524"
+             decoding="async" draggable="false"
+             alt="Три кадра стопкой: мамы в колпаках чокаются стаканчиками, хоровод у стены с надписью «Карамельная фабрика Деда Мороза», поднос с игристым и чаем"></figure>
+        <figure class="rd-card"><img src="rod/r2.webp" width="638" height="971"
+             decoding="async" draggable="false"
+             alt="Мама держит Деда Мороза за руки, поверх снимка отзыв: «И дети, и взрослые получили массу положительных эмоций»"></figure>
+        <figure class="rd-card"><img src="rod/r3.webp" width="610" height="908"
+             decoding="async" draggable="false"
+             alt="Мама с Дедом Морозом у наряженной ёлки, поверх снимка отзыв: «Не знаю как детям - а мамам очень понравилось»"></figure>
+        <figure class="rd-card"><img src="rod/r4.webp" width="614" height="929" loading="lazy"
+             decoding="async" draggable="false"
+             alt="Мама в розовом пиджаке под руку с Дедом Морозом, поверх снимка отзыв: «Это было просто шикарно, мамочкам больше понравилось»"></figure>
+        <figure class="rd-card"><img src="rod/r5.webp" width="900" height="1406" loading="lazy"
+             decoding="async" draggable="false"
+             alt="Мама отдыхает в кресле у ёлки, под снимком её рассказ о том, как сопровождающие мамы водили хоровод с Дедом Морозом и пели"></figure>
+      </div>
+      <button class="rd-nav rd-prev" id="rdPrev" type="button" aria-label="Предыдущие снимки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <button class="rd-nav rd-next" id="rdNext" type="button" aria-label="Следующие снимки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <div class="rd-dots" id="rdDots" aria-label="Страницы карусели"></div>
+
+    <div class="rd-send">
+      <button class="zs-btn" type="button" data-zs="экран про родителей - оставить заявку"
+              data-zs-sub="Перезвоним в течение 30 минут, подберём дату и расскажем, как проходит программа у детей и у взрослых.">
+        <span class="zs-t">Оставить заявку</span></button>
+    </div>
+  </div>
+</section>
+
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
@@ -10293,6 +10531,142 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.addEventListener('orientationchange', function(){
     clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 300);
   });
+})();
+</script>
+
+<!-- Скрипт девятнадцатого экрана вынесен в ОТДЕЛЬНЫЙ <script> намеренно: файл
+     правит ещё одна сессия, и своя коробка не даёт чужой правке уронить его. -->
+<script>
+/* ==================== ЭКРАН 19: КАРУСЕЛЬ «РОДИТЕЛИ» ====================
+   Состояние одно - номер страницы; всё остальное из него следует:
+     - лента сдвигается переменной --i (плавность делает CSS);
+     - точек ровно столько, сколько страниц;
+     - стрелка гаснет там, где дальше страниц нет.
+   Листается стрелками, точками, клавишами и пальцем.
+
+   СКОЛЬКО КАРТОЧЕК В КАДРЕ, РЕШАЕТ CSS, а не скрипт: число лежит в `--rd-n`
+   у окна карусели и меняется медиазапросами (3 / 2 / 1). Скрипт его читает
+   и считает по нему страницы, поэтому раскладка правится в одном месте.
+
+   СДВИГ СЧИТАЕТСЯ В КАРТОЧКАХ, а не в страницах. Снимков пять, в кадре три:
+   у второй страницы страничный сдвиг увёл бы ленту на карточку в пустоту.
+   `Math.min(p * n, N - n)` останавливает её на конце ряда - последняя
+   страница показывает три последних снимка.
+
+   ЛЕНИВАЯ ЗАГРУЗКА В ЛЕНТЕ САМА НЕ РАБОТАЕТ: карточки лежат по горизонтали
+   внутри `overflow:hidden`, браузер не считает их видимыми и берётся
+   за картинку уже после переезда - снимок успевает мигнуть пустотой.
+   Поэтому `pokazat()` заранее переводит соседей на `eager`, как на экране
+   мастер-класса. */
+(function(){
+  var view = document.getElementById('rdView');
+  if (!view) return;
+  var strip = document.getElementById('rdStrip'),
+      dots  = document.getElementById('rdDots'),
+      prev  = document.getElementById('rdPrev'),
+      next  = document.getElementById('rdNext');
+  if (!strip || !dots || !prev || !next) return;
+
+  var kartochki = strip.children, N = kartochki.length, i = 0, bylo = 0;
+
+  function vKadre(){
+    var n = parseInt(getComputedStyle(view).getPropertyValue('--rd-n'), 10);
+    if (!(n > 0)) n = 1;
+    return Math.min(n, N);
+  }
+  function stranic(){ return Math.max(1, Math.ceil(N / vKadre())); }
+
+  /* Соседей греем заранее: `lazy` внутри ленты срабатывает слишком поздно. */
+  function sogret(ot, skolko){
+    for (var k = ot; k < Math.min(N, ot + skolko); k++){
+      var im = kartochki[k].querySelector('img');
+      if (im && im.getAttribute('loading') === 'lazy') im.setAttribute('loading', 'eager');
+    }
+  }
+
+  function tochki(){
+    var vsego = stranic();
+    if (dots.children.length === vsego) return;
+    dots.textContent = '';
+    for (var k = 0; k < vsego; k++){
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'rd-dot';
+      b.setAttribute('data-p', k);
+      b.setAttribute('aria-label', 'Показать снимки ' + (k + 1) + ' из ' + vsego);
+      dots.appendChild(b);
+    }
+  }
+
+  function pokazat(p){
+    var n = vKadre(), posledn = stranic() - 1;
+    p = Math.max(0, Math.min(posledn, p));
+    i = p;
+    var sdvig = Math.min(p * n, Math.max(0, N - n));
+    strip.style.setProperty('--i', sdvig);
+    prev.disabled = (p === 0);
+    next.disabled = (p === posledn);
+    tochki();
+    for (var k = 0; k < dots.children.length; k++){
+      var on = (k === p);
+      dots.children[k].classList.toggle('is-on', on);
+      dots.children[k].setAttribute('aria-current', on ? 'true' : 'false');
+    }
+    sogret(sdvig, n * 2);
+  }
+
+  prev.addEventListener('click', function(){ pokazat(i - 1); });
+  next.addEventListener('click', function(){ pokazat(i + 1); });
+  dots.addEventListener('click', function(e){
+    var t = e.target.closest ? e.target.closest('.rd-dot') : null;
+    if (t) pokazat(+t.getAttribute('data-p'));
+  });
+  view.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); pokazat(i - 1); }
+    if (e.key === 'ArrowRight'){ e.preventDefault(); pokazat(i + 1); }
+  });
+
+  /* ПАЛЕЦ И МЫШЬ - тот же порог, что у карусели площадки: треть кадра или
+     быстрый бросок. Вертикальные движения не перехватываем, за это отвечает
+     `touch-action:pan-y` в стилях. */
+  var x0 = 0, t0 = 0, dx = 0, tyanem = false, id = null;
+  view.addEventListener('pointerdown', function(e){
+    if (e.button) return;
+    tyanem = true; id = e.pointerId; x0 = e.clientX; t0 = Date.now(); dx = 0;
+    bylo = Math.min(i * vKadre(), Math.max(0, N - vKadre()));
+    strip.classList.add('is-drag');
+  });
+  view.addEventListener('pointermove', function(e){
+    if (!tyanem || e.pointerId !== id) return;
+    dx = e.clientX - x0;
+    var n = vKadre(), shirinaKarty = (view.clientWidth || 1) / n;
+    /* у краёв лента тянется вдвое неохотнее - так видно, что дальше нечего листать */
+    if ((i === 0 && dx > 0) || (i === stranic() - 1 && dx < 0)) dx *= .35;
+    strip.style.setProperty('--i', bylo - dx / shirinaKarty);
+    if (Math.abs(dx) > 6 && view.setPointerCapture){ try{ view.setPointerCapture(id); }catch(err){} }
+  });
+  function konec(){
+    if (!tyanem) return;
+    tyanem = false; id = null;
+    strip.classList.remove('is-drag');
+    var w = view.clientWidth || 1;
+    var skorost = Math.abs(dx) / Math.max(1, Date.now() - t0) * 1000;   /* px/с */
+    var shag = 0;
+    if (skorost > 500 && Math.abs(dx) > 24) shag = dx > 0 ? -1 : 1;
+    else if (Math.abs(dx) > w * .3)         shag = dx > 0 ? -1 : 1;
+    pokazat(i + shag);
+    dx = 0;
+  }
+  view.addEventListener('pointerup', konec);
+  view.addEventListener('pointercancel', konec);
+  view.addEventListener('pointerleave', konec);
+  view.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+  /* На resize показываем ту же страницу заново: карточек в кадре могло стать
+     больше или меньше, и сдвиг надо пересчитать. Показ не сбрасываем на первую
+     страницу - человек листает, а не смотрит, как рамку окна двигают. */
+  window.addEventListener('resize', function(){ pokazat(i); });
+
+  pokazat(0);
 })();
 </script>
 
