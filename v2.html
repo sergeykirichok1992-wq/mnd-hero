@@ -1749,14 +1749,14 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   transform:translateY(1px); background:rgba(227,179,78,.16);
   box-shadow:inset 0 0 0 2px rgba(227,179,78,.9);
 }
-/* На светлых экранах (2, 3 и одиннадцатый) прозрачная кнопка стоит на белом:
+/* На светлых экранах (2, 3, одиннадцатый и пятнадцатый) прозрачная кнопка стоит на белом:
    тонкое золото на нём почти не видно, поэтому там обводка и надпись темнее.
    Заводишь новый светлый экран - добавляй его сюда, иначе кнопка на нём
    выйдет бледной обводкой, которую не видно ни на солнце, ни на проекторе. */
-.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost,.sv .zs-btn--ghost{
+.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost,.sv .zs-btn--ghost,.pr .zs-btn--ghost{
   color:#8A6111; box-shadow:inset 0 0 0 2px rgba(160,116,32,.75);
 }
-.cr-s2 .zs-btn--ghost:hover,.cr-s3 .zs-btn--ghost:hover,.sv .zs-btn--ghost:hover{
+.cr-s2 .zs-btn--ghost:hover,.cr-s3 .zs-btn--ghost:hover,.sv .zs-btn--ghost:hover,.pr .zs-btn--ghost:hover{
   color:#3A2705; background:rgba(227,179,78,.16);
   box-shadow:inset 0 0 0 2px rgba(160,116,32,1), 0 16px 34px -18px rgba(160,116,32,.5);
 }
@@ -3795,6 +3795,188 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 </style>
 
+<!-- Экран цен держит свой <style>: незакрытая скобка в чужом блоке не уронит
+     ни его, ни соседей → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ==================== ЭКРАН 15: ТАБЛИЦА ЦЕН ====================
+   Тот же экран, что на боевом ministrynn.ru: четыре пастельные карточки по
+   категориям дат, внутри плитки с датами, внизу цена сейчас и цена со
+   следующего повышения. Цвета карточек сняты пипеткой с картинок старого
+   сайта (#C3F3B6, #C9EAFF, #FFD3D3, золото радиальным градиентом), белый
+   пунктир по кромке - оттуда же.
+
+   ОТЛИЧИЙ ОТ СТАРОГО САЙТА ТРИ, все сознательные:
+   1. Там это была КАРТИНКА (1795x792 px) - её нельзя ни выделить, ни прочитать
+      голосом, ни поправить без фотошопа. Здесь всё живой текст.
+   2. Карточки идут от дешёвых к дорогим. На старом сайте на компьютере было
+      наоборот, а на телефоне - как здесь; выбрана телефонная раскладка: она
+      читается лестницей «сезон открывается дёшево, к Новому году дороже».
+   3. Цена не вписана намертво, а считается скриптом от 1 числа месяца
+      → блок «ЭКРАН 15: ЦЕНЫ ПО КАЛЕНДАРЮ» в конце страницы.
+
+   Даты, категории и цены - из business/cities/nizhny/pricing.md и
+   business/core/pricing-logic.md. ГОРОД ТОЛЬКО НИЖНИЙ НОВГОРОД: у Казани,
+   Крыма, Ставрополя и Тюмени календарь тот же, а цены свои, и живут они
+   на своих страницах.
+
+   ПОЛЕ СЕКЦИИ ОБЯЗАНО БЫТЬ ЧИСТО БЕЛЫМ - на верхней кромке стоит сугроб
+   (.cr-snow), его низ это сплошные 255,255,255. Дай фону хоть оттенок - и по
+   нижнему краю картинки ляжет черта во всю ширину окна. Воздух экрану дают
+   круглые отблески внизу: у них края прозрачные, черте взяться неоткуда.
+   Тот же приём, что на одиннадцатом экране.
+
+   z-index:27 ОБЯЗАТЕЛЕН. Экран с видео стоит на 26 и рисует своё ночное небо;
+   сугроб, которому надо вылезти на него вверх, обязан быть выше
+   → lessons/element-na-shve-sekciy-z-index.md. */
+.pr{
+  position:relative; z-index:27;
+  background:#fff;
+  padding:clamp(64px,6.6vw,128px) 0 clamp(64px,6.8vw,116px);
+}
+/* Страховка от наезда снега на карточки на очень широких мониторах - ровно
+   та же, что на одиннадцатом экране: высота сугроба считается от ширины окна
+   и растёт без потолка, а воздух под ним - нет. */
+.pr .cr-snow{transform:translateY(max(-30%,-240px))}
+.pr-glow{position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden}
+.pr-glow i{position:absolute; display:block; border-radius:50%}
+.pr-glow i:nth-child(1){left:-16vw; bottom:-14%; width:66vw; height:58%;
+  background:radial-gradient(closest-side, rgba(198,219,255,.5) 0%, rgba(198,219,255,.26) 40%, rgba(198,219,255,0) 100%)}
+.pr-glow i:nth-child(2){right:-18vw; bottom:-8%; width:62vw; height:52%;
+  background:radial-gradient(closest-side, rgba(255,232,186,.4) 0%, rgba(255,232,186,.2) 40%, rgba(255,232,186,0) 100%)}
+
+/* ---------- шапка экрана ---------- */
+.pr-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); text-align:center;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#4E5D82}
+.pr-t{margin:0 auto clamp(14px,1.4vw,22px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(24px,3.3vw,51px); line-height:1.08; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance}
+/* Синий и красный светлых экранов - те же числа, что на экране с леденцами.
+   Тёмные .cr-blue/.cr-red брать нельзя: они сняты со старого сайта под его
+   заголовки и на этом кегле выглядят грязными. */
+.pr-blue{color:#083182}
+.pr-red{color:#8C1B12}
+.pr-lead{margin:0 auto clamp(30px,3.4vw,56px); max-width:78ch;
+  text-align:center; text-wrap:balance;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.12vw,16.57px);
+  line-height:1.5; color:#3F4F76}
+.pr-lead b{font-weight:600; color:#1B2C57}
+
+/* ---------- сетка карточек ----------
+   Четыре в ряд, ниже 1280 - две, на телефоне одна. Порог 1280 выбран замером,
+   а не на глаз: на нём в карточке остаётся 114 px под плитку, а самая длинная
+   («10 янв (сб)») занимает 104. Опустишь порог - плитка полезет из карточки. */
+.pr-grid{display:grid; grid-template-columns:repeat(4,1fr);
+  gap:clamp(14px,1.5vw,24px); align-items:stretch}
+@media (max-width:1279px){ .pr-grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:659px){ .pr-grid{grid-template-columns:1fr} }
+
+/* ---------- карточка ---------- */
+.pr-card{
+  position:relative; display:flex; flex-direction:column;
+  padding:clamp(20px,1.7vw,28px) clamp(14px,1.2vw,20px);
+  border-radius:clamp(18px,1.4vw,24px);
+  background:var(--pr-bg);
+  box-shadow:0 22px 40px -30px rgba(0,27,113,.5), 0 3px 10px -6px rgba(0,27,113,.2);
+}
+/* Белый пунктир внутри кромки - примета карточек старого сайта. Сделан
+   псевдоэлементом, а не border у самой карточки: border съел бы 2 px её
+   ширины, и четыре карточки в ряду разъехались бы с сеткой. */
+.pr-card::before{
+  content:""; position:absolute; inset:7px; pointer-events:none;
+  border:2px dotted rgba(255,255,255,.92);
+  border-radius:calc(clamp(18px,1.4vw,24px) - 7px);
+}
+.pr-card--spec{--pr-bg:#C3F3B6}
+.pr-card--std{--pr-bg:#C9EAFF}
+.pr-card--prem{--pr-bg:#FFD3D3}
+/* Золото у VIP на старом сайте не плоское, а с высветлением к середине:
+   замер по картинке - край #FFCC5D, центр #FFE890. */
+.pr-card--vip{--pr-bg:radial-gradient(120% 100% at 50% 42%, #FFE890 0%, #FFD673 46%, #FFCC5D 100%)}
+
+.pr-name{margin:0 0 clamp(14px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(17px,1.35vw,22px); line-height:1.15; color:#14213D}
+.pr-mon{margin:clamp(11px,.95vw,15px) 0 clamp(6px,.5vw,9px); padding-left:2px;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12px,.92vw,13.6px);
+  font-weight:500; color:rgba(20,33,61,.62)}
+.pr-mon:first-of-type{margin-top:0}
+.pr-days{display:grid; grid-template-columns:repeat(2,1fr);
+  gap:clamp(6px,.5vw,9px); margin:0; padding:0; list-style:none}
+.pr-d{display:flex; align-items:center; gap:7px;
+  padding:clamp(7px,.6vw,10px) clamp(8px,.7vw,12px);
+  border-radius:10px; background:#fff;
+  box-shadow:0 2px 5px -2px rgba(20,33,61,.28), inset 0 0 0 1px rgba(20,33,61,.06);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.5px,.98vw,14.5px);
+  line-height:1.1; color:#1B2C57; white-space:nowrap}
+.pr-d span{color:rgba(27,44,87,.6)}
+/* Календарик нарисован, а не взят эмодзи. На старом сайте тут стоит 📅, но
+   эмодзи рисует система: на Windows он синий и плоский, на Android свой,
+   а в вёрстке ещё и прыгает по базовой линии. Значок из двух прямоугольников
+   везде одинаковый и весит ноль. */
+.pr-d i{flex:none; position:relative; width:14px; height:14px; border-radius:3px;
+  background:#fff; box-shadow:inset 0 0 0 1px #C3CCDD}
+.pr-d i::before{content:""; position:absolute; left:0; right:0; top:0; height:4.5px;
+  background:#E11D2E; border-radius:2px 2px 0 0}
+
+/* ---------- цена ----------
+   margin-top:auto прижимает цену к низу карточки. Ради этого карточка и сделана
+   колонкой-флексом: дат в категориях разное число (6, 10, 12 и 14), и без этого
+   строки с ценой встали бы на четырёх разных высотах. */
+.pr-price{margin-top:auto; padding-top:clamp(18px,1.7vw,26px)}
+.pr-now{margin:0; display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 8px;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14px,1.05vw,15.6px);
+  line-height:1.2; color:#14213D}
+.pr-now b{font-weight:700; font-size:clamp(19px,1.5vw,24px); color:#C81420}
+.pr-was{text-decoration:line-through; color:rgba(20,33,61,.5)}
+.pr-next{margin:clamp(8px,.7vw,12px) 0 0;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.5px,.95vw,14px);
+  line-height:1.3; color:rgba(20,33,61,.75)}
+.pr-next b{font-weight:700; color:#14213D}
+
+/* ---------- пояснения под карточками ---------- */
+.pr-notes{margin-top:clamp(28px,3vw,48px)}
+.pr-grow{margin:0 auto clamp(18px,1.8vw,28px); max-width:74ch; text-align:center;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14px,1.05vw,16px);
+  line-height:1.5; color:#3F4F76}
+.pr-grow b{font-weight:700; color:#C81420}
+.pr-two{display:grid; grid-template-columns:repeat(2,1fr); gap:clamp(14px,1.5vw,24px)}
+@media (max-width:759px){ .pr-two{grid-template-columns:1fr} }
+/* Голубой лист - тот же, что у бланка заявки на одиннадцатом экране: две
+   справки лежат на снегу отдельными предметами, а не пятнами на нём. */
+.pr-box{padding:clamp(18px,1.6vw,26px) clamp(16px,1.5vw,24px);
+  border-radius:clamp(16px,1.3vw,22px);
+  background:linear-gradient(180deg,#ECF2FE 0%,#DCE7F9 100%);
+  box-shadow:inset 0 0 0 1px rgba(0,27,113,.14), inset 0 1px 0 rgba(255,255,255,.85),
+             0 20px 40px -32px rgba(0,27,113,.42)}
+.pr-box-t{margin:0 0 8px;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(15px,1.15vw,18px); line-height:1.2; color:#001B71}
+.pr-box p{margin:0; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(13.5px,1.02vw,15.4px); line-height:1.5; color:#3F4F76}
+.pr-box b{font-weight:700; color:#C81420}
+.pr-fine{margin:clamp(14px,1.4vw,22px) 0 0; text-align:center;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.5px,.92vw,13.6px);
+  line-height:1.4; color:rgba(63,79,118,.75)}
+/* Кнопка обычная, золотая (выбор Серёги 10.09.2026). Ширину не задаём -
+   по стандарту она по длине надписи → sayt-nn/standart-knopok.md */
+.pr-send{margin-top:clamp(24px,2.6vw,40px); display:flex; justify-content:center}
+
+@media (max-width:767px){
+  /* Общий контейнер ниже 768 идёт без полей - карточкам они нужны */
+  .pr .cr-cont{width:100%; padding-inline:20px}
+  .pr{padding:44px 0 48px}
+  .pr-t{font-size:clamp(21px,6.2vw,30px)}
+  .pr-lead{font-size:14.5px; margin-bottom:26px}
+  .pr-grid{gap:14px}
+}
+/* Одну плитку в ряд на телефоне НЕ ставить, хотя соблазн есть: замер на 320 px
+   (самый узкий телефон в ходу) даёт колонку в 123 px, а самой длинной плитке
+   «10 янв (сб)» нужно 99. Зато в одну колонку карточки становятся вдвое выше,
+   и до цены надо листать через все четырнадцать дат VIP. */
+</style>
+
 </head>
 <body>
 
@@ -5047,6 +5229,162 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </div>
 </section>
 </div>
+
+
+
+<!-- ==================== ЭКРАН 15: ТАБЛИЦА ЦЕН ====================
+     Копия ценового экрана боевого ministrynn.ru, только живым текстом и с
+     ценами сезона 2026/27 по Нижнему Новгороду. Устройство, замеры и три
+     сознательных отличия от старого сайта → блок «ЭКРАН 15: ТАБЛИЦА ЦЕН»
+     в стилях; цифры → business/cities/nizhny/pricing.md.
+
+     ЦЕНА В РАЗМЕТКЕ - СЕНТЯБРЬСКАЯ, и это не заглушка: без JS человек и
+     поисковик видят настоящую цену, а не пустое место. Скрипт в конце
+     страницы переписывает её на текущую ступень (+100 ₽ каждого 1 числа).
+
+     МЕНЯЕШЬ ЦЕНЫ - правь data-base у карточки (это цена СЕНТЯБРЯ, от неё
+     скрипт считает все остальные) и заодно сентябрьские числа в разметке.
+     Меняешь даты - правь плитки тут и календарь в business/core/pricing-logic.md,
+     он общий на все шесть городов. -->
+<section class="cr pr" id="prices" aria-labelledby="prT">
+  <div class="cr-snow" aria-hidden="true"></div>
+  <div class="pr-glow" aria-hidden="true"><i></i><i></i></div>
+
+  <div class="cr-cont">
+    <p class="pr-eyebrow">Нижний Новгород · сезон 2026/27</p>
+    <h2 class="pr-t" id="prT"><span class="pr-blue">Таблица цен на сезон 2026-2027</span><br><span class="pr-red">в Нижнем Новгороде</span></h2>
+    <p class="pr-lead">Цены указаны для <b>организованных групп</b> (класс, школа, детский сад&nbsp;- от 20 детей).
+      Цена зависит только от привлекательности даты и от того, когда вы бронируете: программа на всех датах одна и та же.</p>
+
+    <div class="pr-grid">
+      <article class="pr-card pr-card--spec" data-base="1490">
+        <h3 class="pr-name">Даты «Специальные»</h3>
+        <p class="pr-mon">Ноябрь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>27&nbsp;ноя <span>(пт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>30&nbsp;ноя <span>(пн)</span></li>
+        </ul>
+        <p class="pr-mon">Декабрь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>1&nbsp;дек <span>(вт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>2&nbsp;дек <span>(ср)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>3&nbsp;дек <span>(чт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>4&nbsp;дек <span>(пт)</span></li>
+        </ul>
+        <div class="pr-price">
+          <p class="pr-now">Сейчас: <b class="pr-cur">1490&nbsp;₽</b><s class="pr-was" hidden></s></p>
+          <p class="pr-next">С 1 октября: <b>1590&nbsp;₽</b></p>
+        </div>
+      </article>
+      <article class="pr-card pr-card--std" data-base="1590">
+        <h3 class="pr-name">Даты «Стандарт»</h3>
+        <p class="pr-mon">Ноябрь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>28&nbsp;ноя <span>(сб)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>29&nbsp;ноя <span>(вс)</span></li>
+        </ul>
+        <p class="pr-mon">Декабрь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>7&nbsp;дек <span>(пн)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>8&nbsp;дек <span>(вт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>9&nbsp;дек <span>(ср)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>10&nbsp;дек <span>(чт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>14&nbsp;дек <span>(пн)</span></li>
+        </ul>
+        <p class="pr-mon">Январь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>6&nbsp;янв <span>(ср)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>7&nbsp;янв <span>(чт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>8&nbsp;янв <span>(пт)</span></li>
+        </ul>
+        <div class="pr-price">
+          <p class="pr-now">Сейчас: <b class="pr-cur">1590&nbsp;₽</b><s class="pr-was" hidden></s></p>
+          <p class="pr-next">С 1 октября: <b>1690&nbsp;₽</b></p>
+        </div>
+      </article>
+      <article class="pr-card pr-card--prem" data-base="1690">
+        <h3 class="pr-name">Даты «Премиум»</h3>
+        <p class="pr-mon">Декабрь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>5&nbsp;дек <span>(сб)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>6&nbsp;дек <span>(вс)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>11&nbsp;дек <span>(пт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>15&nbsp;дек <span>(вт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>16&nbsp;дек <span>(ср)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>17&nbsp;дек <span>(чт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>21&nbsp;дек <span>(пн)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>22&nbsp;дек <span>(вт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>23&nbsp;дек <span>(ср)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>30&nbsp;дек <span>(ср)</span></li>
+        </ul>
+        <p class="pr-mon">Январь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>9&nbsp;янв <span>(сб)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>10&nbsp;янв <span>(вс)</span></li>
+        </ul>
+        <div class="pr-price">
+          <p class="pr-now">Сейчас: <b class="pr-cur">1690&nbsp;₽</b><s class="pr-was" hidden></s></p>
+          <p class="pr-next">С 1 октября: <b>1790&nbsp;₽</b></p>
+        </div>
+      </article>
+      <article class="pr-card pr-card--vip" data-base="1890">
+        <h3 class="pr-name">Даты «VIP»</h3>
+        <p class="pr-mon">Декабрь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>12&nbsp;дек <span>(сб)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>13&nbsp;дек <span>(вс)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>18&nbsp;дек <span>(пт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>19&nbsp;дек <span>(сб)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>20&nbsp;дек <span>(вс)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>24&nbsp;дек <span>(чт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>25&nbsp;дек <span>(пт)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>26&nbsp;дек <span>(сб)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>27&nbsp;дек <span>(вс)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>28&nbsp;дек <span>(пн)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>29&nbsp;дек <span>(вт)</span></li>
+        </ul>
+        <p class="pr-mon">Январь:</p>
+        <ul class="pr-days">
+          <li class="pr-d"><i aria-hidden="true"></i>3&nbsp;янв <span>(вс)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>4&nbsp;янв <span>(пн)</span></li>
+          <li class="pr-d"><i aria-hidden="true"></i>5&nbsp;янв <span>(вт)</span></li>
+        </ul>
+        <div class="pr-price">
+          <p class="pr-now">Сейчас: <b class="pr-cur">1890&nbsp;₽</b><s class="pr-was" hidden></s></p>
+          <p class="pr-next">С 1 октября: <b>1990&nbsp;₽</b></p>
+        </div>
+      </article>
+    </div>
+
+    <div class="pr-notes">
+      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b> каждого 1 числа месяца: 1 октября, 1 ноября, 1 декабря.
+        Чем раньше забронируете, тем дешевле&nbsp;- дата за вами закрепляется по той цене, которая была в день брони.</p>
+
+      <div class="pr-two">
+        <div class="pr-box">
+          <h3 class="pr-box-t">Если детей меньше 20</h3>
+          <p>Вы можете прийти в <b>сборной группе</b>: мы соберём её из нескольких семей на ту же дату.
+            Детский билет в сборной группе стоит <b>на 300&nbsp;₽ дороже</b> цены из таблицы, категория даты та же.</p>
+        </div>
+        <div class="pr-box">
+          <h3 class="pr-box-t">Взрослые участвуют по желанию</h3>
+          <p>Взрослые могут пойти вместе с детьми&nbsp;- сопровождать, помогать, снимать и фотографировать.
+            Взрослый билет&nbsp;- <b class="pr-adult" data-base="700">от 700&nbsp;₽</b>, одинаково для организованных и для сборных групп,
+            и растёт по тому же правилу.</p>
+        </div>
+      </div>
+
+      <p class="pr-fine">31 декабря, 1 и 2 января мы не работаем. В других городах календарь дат тот же, а цены свои&nbsp;- они на страницах этих городов.</p>
+    </div>
+
+    <div class="pr-send">
+      <button class="zs-btn" type="button" data-zs="экран цен"
+              data-zs-title="Забронируйте дату"
+              data-zs-sub="Оставьте заявку - мы перезвоним в течение 30 минут, подберём дату и назовём точную цену для вашей группы.">
+        <span class="zs-t">Оставить заявку</span></button>
+    </div>
+  </div>
+</section>
 
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
@@ -8577,6 +8915,107 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     if(!btn) return;
     btn.addEventListener('click', function(){ play(box, btn); });
   });
+})();
+</script>
+
+<script>
+/* ==================== ЭКРАН 15: ЦЕНЫ ПО КАЛЕНДАРЮ ====================
+   Цена билета растёт на 100 ₽ каждого 1 числа месяца - это правило сезона,
+   а не выдумка скрипта (business/core/pricing-logic.md). Значит цену можно
+   не переписывать руками каждый месяц: скрипт сам находит нынешнюю ступень
+   и подставляет три числа в каждую карточку - сколько стоит сейчас, сколько
+   стоило до последнего повышения (зачёркнутым) и сколько будет со следующего.
+
+   ЧТО СЧИТАЕТСЯ ОТ ЧЕГО. В разметке у карточки лежит data-base - цена
+   СЕНТЯБРЯ. Все остальные это она же плюс надбавка ступени. Правишь цены -
+   правишь data-base, ступени трогать не надо.
+
+   ПОЧЕМУ ЦЕНА ЕСТЬ И БЕЗ СКРИПТА. В разметке уже написана сентябрьская цена.
+   Скрипт её только переписывает; выключен JS или он упал - человек видит
+   настоящее число, а не пустое место и не «загрузка».
+
+   ЧАСЫ БЕРУТСЯ У ПОСЕТИТЕЛЯ, и сбитая дата на его компьютере покажет чужую
+   ступень. Проверить на сервере мы не можем - страница лежит на GitHub Pages
+   и своего сервера у неё нет. Поэтому подстраховка простая: пока сегодняшний
+   день раньше первой ступени, показывается первая, а не отрицательная. Цена
+   всё равно называется менеджером по телефону, экран её только показывает.
+
+   ПОСЛЕ 1 ДЕКАБРЯ повышений больше нет: строка «С 1 …» у карточек прячется,
+   а объяснение под таблицей меняется на «это финальные цены сезона». */
+(function(){
+  var sec = document.getElementById('prices');
+  if(!sec) return;
+
+  /* Ступени сезона: с какого дня действует и сколько прибавлено к сентябрьской
+     цене. Названия месяцев в родительном падеже - они идут в строку «С 1 …». */
+  var STEPS = [
+    { t: Date.UTC(2026, 8, 1), add:   0, from: 'сентября' },
+    { t: Date.UTC(2026, 9, 1), add: 100, from: 'октября'  },
+    { t: Date.UTC(2026,10, 1), add: 200, from: 'ноября'   },
+    { t: Date.UTC(2026,11, 1), add: 300, from: 'декабря'  }
+  ];
+
+  var n = new Date();
+  var today = Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
+  var i = 0;
+  for(var k = 0; k < STEPS.length; k++){ if(today >= STEPS[k].t) i = k; }
+
+  var cur  = STEPS[i];
+  var prev = i > 0 ? STEPS[i - 1] : null;
+  var next = STEPS[i + 1] || null;
+
+  /* Пробел перед рублём неразрывный: иначе «₽» уезжает на следующую строку
+     и цена читается как голое число. */
+  function money(v){ return v + ' ₽'; }
+
+  [].forEach.call(sec.querySelectorAll('.pr-card'), function(card){
+    var base = parseInt(card.getAttribute('data-base'), 10);
+    if(!base) return;
+
+    var elCur  = card.querySelector('.pr-cur');
+    var elWas  = card.querySelector('.pr-was');
+    var elNext = card.querySelector('.pr-next');
+
+    if(elCur) elCur.textContent = money(base + cur.add);
+
+    /* Зачёркнутая цена - та, что была до последнего повышения. В сентябре
+       зачёркивать нечего, сезон только открылся: строка прячется. */
+    if(elWas){
+      if(prev){ elWas.textContent = money(base + prev.add); elWas.hidden = false; }
+      else     { elWas.textContent = ''; elWas.hidden = true; }
+    }
+
+    if(elNext){
+      if(next){
+        elNext.innerHTML = 'С 1 ' + next.from + ': <b>' + money(base + next.add) + '</b>';
+        elNext.hidden = false;
+      } else {
+        elNext.hidden = true;
+      }
+    }
+  });
+
+  /* Взрослый билет живёт по тому же правилу, но категории дат у него нет:
+     одна цена на весь сезон, растёт теми же ступенями. */
+  var ad = sec.querySelector('.pr-adult');
+  if(ad){
+    var adBase = parseInt(ad.getAttribute('data-base'), 10);
+    if(adBase) ad.textContent = 'от ' + money(adBase + cur.add);
+  }
+
+  /* Объяснение под таблицей перечисляет только ТЕ повышения, которые ещё
+     впереди. Оставь его написанным намертво - в декабре экран обещал бы
+     повышение 1 октября, которое давно прошло. */
+  var grow = sec.querySelector('.pr-grow');
+  if(grow){
+    var rest = STEPS.slice(i + 1).map(function(s){ return '1 ' + s.from; });
+    grow.innerHTML = rest.length
+      ? 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца: ' + rest.join(', ') +
+        '. Чем раньше забронируете, тем дешевле - дата за вами закрепляется по той цене, ' +
+        'которая была в день брони.'
+      : 'Это финальные цены сезона: последнее повышение было 1 декабря. ' +
+        'Дата за вами закрепляется по той цене, которая была в день брони.';
+  }
 })();
 </script>
 
