@@ -4565,8 +4565,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    а на телефоне её ограничивает 58vw. Отдельного телефонного правила и стыка,
    на котором кадр мог бы прыгнуть, тут нет.
 
-   z-index:29 - следующая ступень за экраном бонусов (28). Секции на странице
-   идут лестницей → lessons/element-na-shve-sekciy-z-index.md
+   z-index:29 - тот же слой, что у экрана с фильмом (он стоит выше в разметке)
+   и у газетки (ниже). Лестница тут кончилась: на 30 стоит шапка сайта, выше
+   подниматься некуда. Порядок между тремя секциями на 29 решает не число,
+   а место в разметке - при равном слое побеждает тот, кто ниже. Поэтому блик
+   этого экрана ложится на фильм, а блик газетки - на этот экран
+   → lessons/element-na-shve-sekciy-z-index.md
 
    Картинки делает `sayt-nn/instrumenty/ded_moroz.py`: приводит снимки из папки
    Серёги к высоте 860 px и печатает готовую разметку с шириной каждого кадра. */
@@ -6059,8 +6063,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      Идентификатор ролика лежит в `data-rt`, подпись для плеера — в `data-ti`.
      Меняешь ролик — меняешь только эти два поля и картинку. -->
 <div class="vd-hold">
+<!-- Блик на шве с розовым экраном леденцов. Стоит СНАРУЖИ секции: у неё
+     `overflow:hidden`, и изнутри верхнюю половину блика срезало бы - на
+     розовом это видно сразу. Поправлено 10.09.2026, до этого блик лежал
+     внутри секции и половины свечения не было. -->
+<div class="vd-blik" aria-hidden="true"></div>
 <section class="vd" id="video" aria-labelledby="vdT">
-  <span class="vd-blik" aria-hidden="true"></span>
   <div class="vd-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <div class="vd-grain" aria-hidden="true"></div>
 
@@ -6478,7 +6486,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="fl-grain" aria-hidden="true"></div>
 
   <div class="cr-cont">
-    <h2 class="fl-t" id="flT">Хотите полностью погрузиться в наш мир?<br class="fl-br"> Посмотрите <b><span class="fl-nw">20-минутный</span> фильм</b> о нас!</h2>
+    <h2 class="fl-t" id="flT">Хотите полностью погрузиться в наш мир?<br class="fl-br"> Посмотрите <b><span class="fl-nw">20-минутный</span> фильм</b>&nbsp;о&nbsp;нас!</h2>
     <p class="fl-lead">У вас сложится полная картина о том, в какую сказку попадут ваши детки.</p>
 
     <div class="fl-frame">
