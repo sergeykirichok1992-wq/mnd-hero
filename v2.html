@@ -4276,8 +4276,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (max-width:1023px){
   .gb-grid{grid-template-columns:1fr; gap:clamp(22px,3.2vw,34px)}
   .gb-photo{margin:0 calc(-1 * var(--gb-bleed))}
-  /* Кадр высокий (1373x1146), а поперёк экрана нужен широкий: режем его до
-     16:10 и держим в кадре детей - они в нижней половине снимка. */
+  /* Кадр 1373x960 (пустое белое поле сверху и снизу у файла обрезано), а
+     поперёк экрана нужен широкий: режем до 16:10. Точка 62 % держит в кадре
+     детей - режется только снежная крыша автобуса. На телефоне при 4:3 кадр
+     помещается по высоте целиком и подрезается уже по бокам. */
   .gb-photo img{aspect-ratio:16/10; object-fit:cover; object-position:50% 62%;
     -webkit-mask-image:none; mask-image:none}
 }
