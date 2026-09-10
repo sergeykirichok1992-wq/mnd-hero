@@ -4095,6 +4095,55 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    (самый узкий телефон в ходу) даёт колонку в 123 px, а самой длинной плитке
    «10 янв (сб)» нужно 99. Зато в одну колонку карточки становятся вдвое выше,
    и до цены надо листать через все четырнадцать дат VIP. */
+
+/* ---------- СНЕГОПАД ИЗ ПРОЦЕНТИКОВ ----------
+   Просьба Серёги 10.09.2026: «редкий снегопад из маленьких полупрозрачных
+   белых процентиков». Восемнадцать значков падают сверху вниз, покачиваясь.
+
+   СЛОЙ ЛЕЖИТ ПОВЕРХ ВСЕГО (z-index:8, начинка экрана - 7). Иначе смысла нет:
+   поле экрана белое, и белый значок на нём не виден вовсе - виден он только
+   там, где под ним цветная карточка. Уведи слой под карточки - и снегопада
+   не будет нигде. pointer-events:none обязателен: слой накрывает и кнопку,
+   и карточки, и без него по ним нельзя было бы попасть мышью.
+
+   ПАДЕНИЕ СЧИТАЕТСЯ В ДОЛЯХ ВЫСОТЫ (top: -5% → 105%), а не в пикселях:
+   высота экрана цен от ширины окна гуляет втрое (1578 px на 1600, 3113 px
+   на телефоне). Задай пиксели - на телефоне значки исчезали бы на середине.
+   Из-за этого же на телефоне падение замедлено: путь длиннее, а время то же,
+   и без поправки снег летел бы вдвое быстрее.
+
+   Покачивание - вторая анимация: первая занимает `top`, вторая `transform`.
+   Одним правилом их не сделать, две анимации на один и тот же `transform`
+   не складываются - последняя перебьёт первую.
+
+   Полупрозрачная тень нужна, чтобы значок хоть немного читался и на белом:
+   чисто белый на белом пропадает совсем. */
+.pr-perc{position:absolute; inset:0; z-index:8; overflow:hidden; pointer-events:none}
+.pr-perc i{
+  position:absolute; top:-5%; left:var(--x); display:block;
+  font-family:"Golos Text",Arial,sans-serif; font-weight:700; font-style:normal;
+  font-size:var(--s); line-height:1; color:#fff; opacity:var(--o);
+  /* Тень - единственное, чем белый значок держится на белом поле: сам по себе
+     он там пропадает целиком. Две тени: короткая тёмная даёт кромку, длинная
+     мягкая - лёгкое облачко под ней. Над цветной карточкой обе почти не видны,
+     и значок читается просто белым снегом, как и просил Серёга. */
+  text-shadow:0 1px 1px rgba(0,27,113,.34), 0 0 7px rgba(0,27,113,.12);
+  animation:prPercFall var(--dur) linear var(--t) infinite,
+            prPercSway calc(var(--dur) / 4) ease-in-out var(--t) infinite alternate;
+}
+.pr-perc i::before{content:"%"}
+@keyframes prPercFall{ from{top:-5%} to{top:105%} }
+@keyframes prPercSway{
+  from{transform:translateX(-7px) rotate(-10deg)}
+  to  {transform:translateX(7px) rotate(10deg)}
+}
+@media (max-width:767px){
+  .pr-perc i{animation-duration:calc(var(--dur) * 1.8), calc(var(--dur) / 2.2)}
+  /* на телефоне значков вдвое меньше: экран длинный, и восемнадцать штук
+     на нём читались бы уже не редким снегом, а рябью */
+  .pr-perc i:nth-child(2n){display:none}
+}
+@media (prefers-reduced-motion:reduce){ .pr-perc{display:none} }
 </style>
 
 <!-- Экран бонусов держит свой <style>: незакрытая скобка в чужом блоке не уронит
@@ -5208,7 +5257,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
-<article class="pg" data-shots="karta/k12/01.webp,karta/k12/02.webp,karta/k12/03.webp,karta/k12/04.webp" style="--tint:295">
+<article class="pg" data-shots="karta/k12/01.webp,karta/k12/02.webp,karta/k12/03.webp,karta/k12/04.webp,karta/k12/05.webp" style="--tint:295">
         <div class="pg-shot">
           <div class="pg-win"><img class="on" src="karta/k12/01.webp" width="640" height="640" alt="" loading="lazy" decoding="async"></div>
         <svg class="pg-frame" viewBox="0 0 899 899" aria-hidden="true" focusable="false">
@@ -5553,6 +5602,32 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <section class="cr pr" id="prices" aria-labelledby="prT">
   <div class="cr-snow" aria-hidden="true"></div>
   <div class="pr-glow" aria-hidden="true"><i></i><i></i></div>
+
+  <!-- Снегопад из процентиков (просьба Серёги 10.09.2026). Каждый значок -
+       свои четыре числа: --x место по ширине, --s кегль, --o прозрачность,
+       --dur сколько летит, --t отрицательная задержка (значок уже в пути,
+       иначе первые полминуты небо пустое). Устройство → блок «СНЕГОПАД
+       ИЗ ПРОЦЕНТИКОВ» в стилях экрана цен. -->
+  <div class="pr-perc" aria-hidden="true">
+    <i style="--x:3%;--s:12px;--o:0.87;--dur:26s;--t:-3s"></i>
+    <i style="--x:9%;--s:16px;--o:0.82;--dur:31s;--t:-17s"></i>
+    <i style="--x:15%;--s:11px;--o:0.92;--dur:23s;--t:-9s"></i>
+    <i style="--x:21%;--s:19px;--o:0.77;--dur:35s;--t:-28s"></i>
+    <i style="--x:27%;--s:14px;--o:0.87;--dur:28s;--t:-21s"></i>
+    <i style="--x:33%;--s:11px;--o:0.82;--dur:24s;--t:-5s"></i>
+    <i style="--x:39%;--s:18px;--o:0.77;--dur:33s;--t:-14s"></i>
+    <i style="--x:45%;--s:12px;--o:0.92;--dur:27s;--t:-31s"></i>
+    <i style="--x:51%;--s:15px;--o:0.82;--dur:30s;--t:-8s"></i>
+    <i style="--x:57%;--s:11px;--o:0.87;--dur:22s;--t:-19s"></i>
+    <i style="--x:63%;--s:19px;--o:0.74;--dur:36s;--t:-26s"></i>
+    <i style="--x:69%;--s:14px;--o:0.87;--dur:29s;--t:-11s"></i>
+    <i style="--x:74%;--s:12px;--o:0.82;--dur:25s;--t:-34s"></i>
+    <i style="--x:79%;--s:16px;--o:0.8;--dur:32s;--t:-2s"></i>
+    <i style="--x:84%;--s:11px;--o:0.9;--dur:24s;--t:-23s"></i>
+    <i style="--x:89%;--s:15px;--o:0.82;--dur:30s;--t:-15s"></i>
+    <i style="--x:93%;--s:12px;--o:0.87;--dur:27s;--t:-29s"></i>
+    <i style="--x:97%;--s:18px;--o:0.76;--dur:34s;--t:-6s"></i>
+  </div>
 
   <div class="cr-cont">
     <p class="pr-eyebrow">Нижний Новгород · сезон 2026/27</p>
