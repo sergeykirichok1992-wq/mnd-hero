@@ -451,6 +451,38 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-lead{text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(28 * var(--u)); line-height:1.4}
 @media (max-width:767px){ .cr-h2{font-size:13px} }
 
+/* ---- ЗАГОЛОВОК ВТОРОГО ЭКРАНА: свой кегль и настоящий Bold (Серёга, 11.09.2026) ----
+   Всё через .cr-s2: теми же классами .cr-h2 набраны ещё четыре заголовка
+   (локация, персонажи, леденцы, родители), их правка не касается.
+
+   1) КЕГЛЬ НА 15 % МЕНЬШЕ: 16 -> 13,6 (строка-span берёт 300 % от него, 48 -> 40,8).
+      Это не только «покрасивее». Настоящий Bold шире дорисованного на 8,5 %:
+      на прежнем кегле вторая строка «ДЛЯ ШКОЛЬНИКОВ, АНАЛОГОВ КОТОРОМУ НЕТ
+      В РОССИИ!» перестаёт помещаться в контейнер и заголовок распадается
+      на три строки. На 13,6 она занимает 96 % ширины — две строки держатся
+      на любой ширине от 1250 px, где множитель --u ещё растёт.
+   2) НАЧЕРТАНИЕ — настоящий "CR Blogger Bold" (файл blogger-sans-bold.woff уже
+      лежит в репозитории, им набраны подписи городов на карте). Сознательное
+      отличие от старого сайта: там жирный дорисовывал браузер сам, и буквы
+      выходили тоньше и рыхлее.
+   3) ПЕРЕНОС ТОЛЬКО ПО ПРОБЕЛАМ. У .cr-t стоит word-break:break-word — он рвёт
+      слово посередине, даже когда оно целиком помещается в следующую строку.
+      На телефоне из-за этого «АНАЛОГОВ» разваливалось на «АНАЛОГ / ОВ».
+      overflow-wrap:break-word оставлен страховкой: слово шире экрана всё-таки
+      разорвётся, а не вылезет за край. */
+.cr-s2 .cr-h2{
+  font-family:"CR Blogger Bold","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:calc(13.6 * var(--u));
+  word-break:normal; word-wrap:normal; overflow-wrap:break-word;
+}
+/* Телефон: кегль ровно как у заголовка светлого окна заявки «Успейте забрать
+   лучшие даты по цене сентября!» (.sv-t). У того clamp(28px,8.2vw,37.4px),
+   у нас строка-span множит базу на 300 % — значит база втрое меньше.
+   Было 13 px (то есть 39 px строкой), стало 32 px на экране 390. */
+@media (max-width:767px){
+  .cr-s2 .cr-h2{font-size:clamp(9.333px,2.7333vw,12.4667px)}
+}
+
 /* ---- ГОДА НА ФОНЕ ВТОРОГО ЭКРАНА ----
    За лентой снимков вспыхивают и сразу гаснут года прошлых сезонов: 2018 ... 2026.
    Смысл — «мы делаем это давно», без единой лишней строки текста.
@@ -552,16 +584,49 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .cr-grid{margin-left:calc(-10 * var(--u)); margin-right:calc(-10 * var(--u))}
 .cr-gridwrap{display:table; table-layout:fixed; width:100%}
 .cr-col{display:table-cell; padding:0 calc(10 * var(--u)); vertical-align:top; width:25%}
+/* Кегль цифры и подписи с 11.09.2026 на 15 % меньше оригинальных (64 -> 54,4
+   и 20 -> 17) — просьба Серёги, только для компьютера и планшета. На телефоне
+   размеры прежние: там цифра давно живёт своим числом (51 px), а подписи
+   оставлены как были, про них разговора не было. */
 .cr-num{
   margin:0; text-align:center; font-family:"CR Yeseva",Georgia,serif; font-weight:500;
-  font-size:calc(64 * var(--u)); line-height:1.1; color:rgb(251,176,90);
+  font-size:calc(54.4 * var(--u)); line-height:1.1; color:rgb(251,176,90);
 }
-.cr-cap{margin:0; text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(20 * var(--u)); line-height:1.4}
+.cr-cap{margin:0; text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-size:calc(17 * var(--u)); line-height:1.4}
+
+/* ---- ВОЛОСЯНЫЕ РАЗДЕЛИТЕЛИ МЕЖДУ ЦИФРАМИ (Серёга, 11.09.2026) ----
+   Линия рисуется псевдоэлементом, а не border-left у ячейки. У border высота
+   всегда равна высоте строки таблицы, а в неё входит нижняя распорка 20*--u —
+   линия висела бы заметно ниже подписей. У псевдоэлемента концы ставятся точно.
+
+   left:0 у ячейки — это стык двух соседних колонок. Поле у каждой 10*--u,
+   значит линия оказывается ровно посередине зазора, без подгонки.
+
+   Концы растворяются в белом: волосяная линия с жёстким обрезом читается
+   на светлом поле как обрубок, а не как разделитель. */
+.cr-col{position:relative}
+.cr-col + .cr-col::before{
+  content:''; position:absolute; left:0; top:calc(4 * var(--u)); bottom:calc(24 * var(--u));
+  width:1px; pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(51,51,51,0) 0%, rgba(51,51,51,.17) 13%,
+    rgba(51,51,51,.17) 87%, rgba(51,51,51,0) 100%);
+}
 @media (max-width:767px){
   .cr-grid{margin-left:0; margin-right:0}
   .cr-gridwrap{display:block}
   .cr-col{display:block; width:100% !important; padding-left:0; padding-right:0}
   .cr-num{font-size:51px}
+  .cr-cap{font-size:20px}
+  /* Колонки встали в столбик — разделитель ложится поперёк. Воздух над линией
+     даёт распорка 20*--u предыдущей колонки, под линией — это поле. */
+  .cr-col + .cr-col{padding-top:calc(20 * var(--u))}
+  .cr-col + .cr-col::before{
+    left:0; right:0; top:0; bottom:auto; width:auto; height:1px;
+    background:linear-gradient(90deg,
+      rgba(51,51,51,0) 0%, rgba(51,51,51,.17) 11%,
+      rgba(51,51,51,.17) 89%, rgba(51,51,51,0) 100%);
+  }
 }
 
 /* ---------- ЭКРАН 3: карта городов ----------
