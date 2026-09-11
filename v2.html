@@ -6204,8 +6204,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     <!-- Коробка `.kr-stage`: окно с кадрами и стрелки рядом. Стрелки лежат
          ВНЕ окна намеренно — у окна `overflow:hidden`, оно бы их обрезало. -->
-    <div class="kr-stage">
-    <div class="kr-view" id="krView" role="group" aria-roledescription="карусель" aria-label="Фотографии площадки">
+    <!-- Роль карусели держит КОРОБКА, а не окно: стрелки лежат вне окна,
+         и на окне группа не включала бы собственные органы управления. -->
+    <div class="kr-stage" role="group" aria-roledescription="карусель" aria-label="Фотографии площадки">
+    <div class="kr-view" id="krView">
       <div class="kr-strip" id="krStrip">
         <div class="kr-slide kr-slide--hor">
           <figure class="kr-shot kr-shot--hor" data-th="karus_v/hm00.webp?v=17"><img src="karus_v/h00.webp?v=17" width="1400" height="933" alt="Изба Министерства вечером: гости идут по снегу" loading="eager" decoding="async" sizes="(max-width:767px) 100vw, min(50vw, 620px)" draggable="false"></figure>
