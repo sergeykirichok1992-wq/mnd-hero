@@ -4523,6 +4523,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .mk-view:active{cursor:grabbing}
 .mk-track{display:flex; height:100%; transition:transform .5s cubic-bezier(.22,.61,.36,1); will-change:transform}
 .mk-track.is-drag{transition:none}
+/* Перескок с клона-хвоста на первый кадр: тот же кадр, без перехода. */
+.mk-track.is-jump{transition:none}
 .mk-slide{flex:0 0 100%; height:100%}
 .mk-slide img{width:100%; height:100%; object-fit:cover; display:block; -webkit-user-drag:none; user-select:none}
 .mk-frame{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2}
@@ -13355,7 +13357,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var b = document.createElement('button');
     b.type = 'button'; b.className = 'mk-dot'; b.setAttribute('role','tab');
     b.setAttribute('aria-label', 'Фото ' + (k+1) + ' из ' + n);
-    b.addEventListener('click', function(){ show(k); });
+    b.addEventListener('click', function(){ byHand(); show(k); });
     dotbox.appendChild(b);
     return b;
   });
@@ -13379,20 +13381,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     });
   }
 
+  /* Стрелки и точки подсвечиваем отдельно от переезда: во время бесшовного
+     возврата в начало лента стоит на клоне последнего экрана, а показывать
+     человеку надо уже первую точку. */
+  function mark(k){
+    prev.disabled = (k === 0);
+    next.disabled = (k === n - 1);
+    dots.forEach(function(d, j){
+      d.classList.toggle('is-on', j === k);
+      d.setAttribute('aria-selected', j === k ? 'true' : 'false');
+    });
+  }
+
   function show(k){
     i = Math.max(0, Math.min(n - 1, k));
     warm(i);
     track.style.transform = 'translateX(' + (-i * 100) + '%)';
-    prev.disabled = (i === 0);
-    next.disabled = (i === n - 1);
-    dots.forEach(function(d, j){
-      d.classList.toggle('is-on', j === i);
-      d.setAttribute('aria-selected', j === i ? 'true' : 'false');
-    });
+    mark(i);
   }
 
-  prev.addEventListener('click', function(){ show(i - 1); });
-  next.addEventListener('click', function(){ show(i + 1); });
+  prev.addEventListener('click', function(){ byHand(); show(i - 1); });
+  next.addEventListener('click', function(){ byHand(); show(i + 1); });
 
   /* Листание пальцем и мышью. Пока палец на экране, у ленты снят переход
      (класс is-drag) — иначе кадр тянулся бы за пальцем с задержкой в полсекунды.
@@ -13404,6 +13413,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
   view.addEventListener('pointerdown', function(e){
     if(e.pointerType === 'mouse' && e.button !== 0) return;
+    byHand();
     x0 = e.clientX; dx = 0; w = view.clientWidth || 1; id = e.pointerId;
     track.classList.add('is-drag');
     try{ view.setPointerCapture(id); }catch(err){}
@@ -13435,11 +13445,88 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }, true);
 
   box.addEventListener('keydown', function(e){
-    if(e.key === 'ArrowLeft'){ show(i - 1); }
-    else if(e.key === 'ArrowRight'){ show(i + 1); }
+    if(e.key === 'ArrowLeft'){ byHand(); show(i - 1); }
+    else if(e.key === 'ArrowRight'){ byHand(); show(i + 1); }
     else return;
     e.preventDefault();
   });
+
+  /* ---------- Само листается, пока экран на виду ----------
+     Человек докрутил до слайдера — фотографии пошли сами, раз в 4 секунды.
+     Уехал экран из окна — таймер встаёт: иначе он крутил бы ленту вхолостую
+     и, вернувшись, человек застал бы её промотанной к концу.
+
+     Любое РУЧНОЕ действие (стрелка, точка, свайп, стрелки на клавиатуре)
+     выключает автолистание НАСОВСЕМ: раз человек листает сам, выдёргивать
+     кадр у него из-под руки нельзя. Наведение мыши на слайдер и уход
+     на другую вкладку только ставят на паузу — вернулся, и лента поехала.
+     При включённом в системе «уменьшить движение» автолистания нет вовсе. */
+  var AUTO_MS = 4000;
+  var timer = null, live = false, manual = false, hold = 0, jump = false, clone = null;
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  function beat(){
+    clearTimeout(timer);
+    timer = (live && !manual && !hold) ? setTimeout(step, AUTO_MS) : null;
+  }
+
+  function step(){
+    if(!live || manual || hold) return;
+    if(i < n - 1){ show(i + 1); beat(); return; }
+    /* С последнего кадра возвращаемся в начало без рывка: в хвост ленты один
+       раз подставлен клон первого кадра, лента доезжает до него обычным
+       переездом, а дальше мы мгновенно (без перехода) переставляем её в самое
+       начало. Кадр в этот момент один и тот же, поэтому шва не видно. */
+    if(!clone){
+      clone = slides[0].cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      clone.removeAttribute('role');
+      track.appendChild(clone);
+    }
+    var im = clone.querySelector('img'); if(im) im.loading = 'eager';
+    warm(0);
+    jump = true;
+    mark(0);
+    track.style.transform = 'translateX(' + (-n * 100) + '%)';
+  }
+
+  /* Доводит перескок до конца прямо сейчас — по окончании переезда или если
+     человек тронул слайдер, пока лента ехала на клон. */
+  function settle(){
+    if(!jump) return;
+    jump = false;
+    track.classList.add('is-jump');
+    show(0);
+    void track.offsetWidth;          /* заставляем браузер применить сдвиг до снятия класса */
+    track.classList.remove('is-jump');
+  }
+
+  function byHand(){
+    manual = true;
+    clearTimeout(timer); timer = null;
+    settle();
+  }
+
+  track.addEventListener('transitionend', function(e){
+    if(!jump || e.target !== track || e.propertyName !== 'transform') return;
+    settle();
+    beat();
+  });
+
+  /* Пауза: 1 — мышь на слайдере, 2 — вкладка не на экране. Держим битами,
+     чтобы уход мыши не снимал паузу, поставленную скрытой вкладкой. */
+  function pause(bit, on){ hold = on ? (hold | bit) : (hold & ~bit); beat(); }
+
+  box.addEventListener('pointerenter', function(e){ if(e.pointerType === 'mouse') pause(1, true); });
+  box.addEventListener('pointerleave', function(e){ if(e.pointerType === 'mouse') pause(1, false); });
+  document.addEventListener('visibilitychange', function(){ pause(2, document.hidden); });
+
+  if(!calm && 'IntersectionObserver' in window){
+    new IntersectionObserver(function(list){
+      list.forEach(function(e){ live = e.isIntersecting; });
+      beat();
+    }, {threshold:0.35}).observe(box);
+  }
 
   show(0);
 })();
