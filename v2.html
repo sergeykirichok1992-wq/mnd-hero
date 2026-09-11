@@ -3061,7 +3061,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
   position:relative; overflow:hidden;   /* страховка от горизонтальной прокрутки */
   z-index:26;                           /* как у .cf-hold — экран стоит над формой */
-  background:#001061;                   /* поле макета, на нём Серёга рисовал карточки */
+  /* ПОЛЕ. Раньше тут была плоская заливка #001061 — цвет макета, на нём Серёга
+     рисовал карточки. 11.09.2026 он попросил фон «поинтереснее, не просто
+     однородный». #001061 остался главным тоном (на 20 % высоты, там где стоит
+     заголовок), а вокруг него собрана ночь: сверху и снизу темнее, в середине
+     чуть светлее и с фиолетовым уклоном. Сверху добавлено широкое свечение
+     под заголовок — чтобы белые буквы не висели в пустоте.
+     Снизу самый тёмный край намеренно: туда заезжает белый сугроб следующего
+     экрана, и на тёмном его гребни читаются, а на светлом слились бы. */
+  background:
+    radial-gradient(72% 16% at 50% 0%, rgba(30,52,158,.55), rgba(30,52,158,0) 100%),
+    linear-gradient(180deg,
+      #000A3D 0%, #001061 20%, #041A6E 46%, #02114F 74%, #000B36 100%);
   /* Снизу воздуха вдвое больше обычного (было 80) — просьба Серёги 09.09.2026.
      Под этим экраном начинается заявка на светлом, и её сугроб вылезает сюда
      вверх на 5,25 % ширины окна. Этот отступ — то расстояние, на которое
@@ -3116,7 +3127,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    и карточка получалась уже, чем нужно. Тут поля свои — на телефоне узкие
    (просьба Серёги 09.09.2026 «на мобиле карточки шире»), от 560 px обычные,
    как у остальных экранов. */
+/* `position:relative; z-index:7` — ряд обязан лежать НАД отблесками и зерном
+   (у них 0 и 1). Тот же слой, что у `.cr-cont` с заголовком. Без него карточки
+   спорили бы за порядок рисования с фоном по одному только порядку в разметке. */
 .pgs-row{display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start;
+  position:relative; z-index:7;
   gap:var(--gap); padding:0 14px}
 @media (min-width:560px){
   .pgs-row{width:min(94vw,1462px); margin:0 auto; padding:0 16px}
@@ -3139,6 +3154,55 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .pgs-t{font-size:52px}                    /* вдвое крупнее прежних 26 */
   .pgs-lead{font-size:17.85px}              /* на 30 % меньше прежних 25,5 */
 }
+/* ---------- ОТБЛЕСКИ И ЗЕРНО ----------
+   Тот же приём и те же цвета, что на экранах видео (.vd-glow) и фильма
+   (.fl-glow): синий #2F3192, пурпурный #6C2BD9, лиловый #B06AE0 и один тёплый
+   акцент #E3B34E контрапунктом. Кадры анимации (bkDrift1-3) общие на весь
+   сайт, лежат в блоке пятого экрана — новых заводить не надо.
+
+   РАЗМЕРЫ В ПРОЦЕНТАХ, А НЕ В vw. На соседних экранах пятна заданы в vw,
+   и там это работает: экран примерно в высоту окна. Тут экран ОЧЕНЬ длинный —
+   2700 px на компьютере и почти 8000 на телефоне. Пятно в 60vw на телефоне
+   было бы size 230 px на восьми тысячах: шесть еле заметных точек по краям
+   и плоское поле между ними. Проценты считаются от самой секции, поэтому
+   пятна растягиваются вместе с ней и на любой ширине покрывают всю длину.
+
+   Размытия (`filter:blur`) тут нет намеренно: у радиального градиента края
+   и так мягкие, а blur считает видеокарта каждый кадр
+   → schedule-app/lessons/cdp-disable-gpu-vret-pro-fps.md */
+.pgs-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+/* `will-change` тут НЕТ намеренно, хотя на соседних тёмных экранах он стоит.
+   Там секция высотой примерно в окно и пятна небольшие; здесь секция 2700 px
+   на компьютере и под 8000 на телефоне, а пятен шесть, и каждое — почти во всю
+   ширину. `will-change` держал бы шесть таких слоёв в памяти всё время, пока
+   открыта страница, а не только пока экран виден. Анимация и без него
+   поднимет слой, когда он понадобится. */
+.pgs-glow i{position:absolute; display:block; border-radius:50%}
+.pgs-glow i:nth-child(1){left:-18%; top:-1%; width:72%; height:13%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.50) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift1 38s ease-in-out infinite alternate}
+.pgs-glow i:nth-child(2){right:-20%; top:14%; width:70%; height:12%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.21) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift2 45s ease-in-out infinite alternate}
+.pgs-glow i:nth-child(3){left:-8%; top:33%; width:66%; height:12%;
+  background:radial-gradient(closest-side, rgba(176,106,224,.24) 0%, rgba(176,106,224,.16) 32%, rgba(176,106,224,.05) 64%, rgba(176,106,224,0) 100%);
+  animation:bkDrift3 33s ease-in-out infinite alternate}
+.pgs-glow i:nth-child(4){right:-16%; top:51%; width:72%; height:13%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.42) 0%, rgba(47,49,146,.28) 32%, rgba(47,49,146,.10) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift2 41s ease-in-out infinite alternate-reverse}
+.pgs-glow i:nth-child(5){left:-12%; top:69%; width:68%; height:12%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.26) 0%, rgba(108,43,217,.17) 32%, rgba(108,43,217,.06) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift1 49s ease-in-out infinite alternate-reverse}
+.pgs-glow i:nth-child(6){left:50%; margin-left:-38%; bottom:-3%; width:76%; height:12%;
+  background:radial-gradient(closest-side, rgba(227,179,78,.15) 0%, rgba(227,179,78,.10) 32%, rgba(227,179,78,.03) 64%, rgba(227,179,78,0) 100%);
+  animation:bkDrift3 44s ease-in-out infinite alternate}
+/* зерно: без него градиент полосит на большой тёмной плоскости */
+.pgs-grain{position:absolute; inset:0; z-index:1; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+/* Дыхание отблесков не должно ловиться боковым зрением при чтении карточек,
+   а при «меньше движения» его нет совсем — как на остальных тёмных экранах. */
+@media (prefers-reduced-motion:reduce){ .pgs-glow i{animation:none} }
+
 .pgs-defs{position:absolute; width:0; height:0; overflow:hidden}
 
 .pg{
@@ -3225,26 +3289,43 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pg-win img{
   position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
   /* Обратный разворот: окно косое, а фотография в нём стоит ровно, как в макете.
-     1.025 — ровно столько, чтобы косое окно нигде не осталось без картинки.
-     Больше не надо: углы у окна скруглены, и его дальняя точка ближе, чем
-     у острого квадрата. */
-  transform:rotate(calc(-1 * var(--tilt))) scale(1.025);
+
+     МАСШТАБ 1,05 СЧИТАЕТСЯ, А НЕ ПОДБИРАЕТСЯ НА ГЛАЗ. Фотография развёрнута
+     относительно окна на угол наклона, и чтобы её квадрат накрыл окно целиком,
+     нужен масштаб
+
+         k = (c * (cos θ + sin θ) + r) / h,
+
+     где h — половина стороны окна, r — радиус скругления, c = h - r,
+     θ — угол наклона. При θ=2,83° и r/h = 0,087 это ровно 1,0442; берём 1,05
+     с запасом на округление до целого пикселя.
+
+     Раньше тут стояло 1,025 с комментарием «больше не надо, углы скруглены».
+     Скругление действительно помогает, но только в самой вершине угла, а
+     максимум приходится на место, где скругление переходит в прямую сторону,
+     и там оно не помогает почти совсем. Не хватало 2,9 px на окне 303 px —
+     по краю фотографии стояла тёмная полоска заглушки, её и было видно
+     (замер 11.09.2026: 20 879 пикселей заглушки вылезло наружу). */
+  transform:rotate(calc(-1 * var(--tilt))) scale(1.05);
   opacity:0; z-index:0;
 }
 /* Два слоя, а не один: виден и новый кадр, и предыдущий — он держит картинку,
    пока новый проявляется. Без него в середине перехода окно проваливалось бы
    в пустоту. Наплыв — выбор Серёги 08.09.2026 из четырёх вариантов. */
 .pg-win img.prev{opacity:1; z-index:1;
-  transform:rotate(calc(-1 * var(--tilt))) scale(1.025)}
+  transform:rotate(calc(-1 * var(--tilt))) scale(1.05)}
 /* Переход обязан быть КОРОЧЕ кадра. Кадр живёт 0,5 с под курсором и 0,65 с
    на телефоне (FAST и SLOW в скрипте внизу), наплыв — 0,26 с. Прежние 0,52 с
    были подобраны под кадр в секунду; если их оставить, следующий кадр будет
    перебивать предыдущий на полпути и окно навсегда останется мыльным —
    картинка просто не дойдёт до резкости. */
 .pg-win img.on{opacity:1; z-index:2;
-  transform:rotate(calc(-1 * var(--tilt))) scale(1.025);
+  transform:rotate(calc(-1 * var(--tilt))) scale(1.05);
   transition:opacity .26s linear, transform .29s cubic-bezier(.2,.7,.3,1)}
-.pg-win img:not(.on):not(.prev){transform:rotate(calc(-1 * var(--tilt))) scale(1.08)}
+/* Кадр «на подлёте» обязан быть КРУПНЕЕ рабочего, иначе в начале наплыва
+   по краю мелькнёт заглушка. 1,11 к рабочим 1,05 — та же разница, что была
+   у прежней пары 1,08 / 1,025. */
+.pg-win img:not(.on):not(.prev){transform:rotate(calc(-1 * var(--tilt))) scale(1.11)}
 @media (prefers-reduced-motion:reduce){ .pg-win img{transition:none} }
 
 /* ---------- карамельная рамка ----------
@@ -7059,6 +7140,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
      Наклон рамки у чётных карточек зеркалится сам, правилом :nth-child(even). -->
 <section class="cr pgs" id="whatawaits" aria-labelledby="pgsT">
+  <!-- ночь под карточками: шесть размытых пятен и зерно поверх.
+       Оба слоя чисто декоративные и спрятаны от голосового чтения. -->
+  <div class="pgs-glow" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="pgs-grain" aria-hidden="true"></div>
   <div class="cr-cont">
     <h2 class="pgs-t" id="pgsT">Что же ждёт детей?</h2>
     <p class="pgs-lead"><b>Продолжительность программы 1 час 20 минут</b> — самое оптимальное
