@@ -5313,9 +5313,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .dm-glow i:nth-child(2){right:-20vw; top:-6%; width:70vw; height:62%;
   background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
   animation:bkDrift2 45s ease-in-out infinite alternate}
-.dm-glow i:nth-child(3){left:50%; bottom:-16%; width:78vw; height:54%; margin-left:-39vw;
-  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
-  animation:bkDrift3 33s ease-in-out infinite alternate}
+/* ЗОЛОТОГО ПЯТНА ВНИЗУ ЗДЕСЬ НЕТ, в отличие от экрана с видео, откуда взят
+   рецепт неба. Причина в устройстве именно этого экрана: под лентой остаётся
+   узкая полоса пустого поля (101 px), сверху её режет ровный край фотографий,
+   снизу - шов. Пятно попадало ровно в неё и читалось не свечением, а плоской
+   серо-коричневой плашкой с прямой верхней кромкой. Серёга 11.09.2026:
+   «видно от блика желтизну, которая резко обрезается».
+   Тепло на шве даёт сам блик - у него falloff нарисован в картинке и сходит
+   на нет раньше, чем доходит до фотографий. Вернёшь пятно - вернётся плашка.
+   Правило: свечение не ставить в полосу, которую с одной стороны обрезает
+   непрозрачный край. */
 .dm-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
 
@@ -5370,9 +5377,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .dm-wrap{cursor:grab}
   .dm-wrap.drag, .dm-wrap.drag *{cursor:grabbing}
 }
-/* «Меньше движения»: лента не едет сама, её листают пальцем или колесом */
+/* «Меньше движения»: лента не едет сама, её листают пальцем или колесом,
+   и пятна на фоне замирают - как на всех остальных тёмных экранах сайта
+   (`.bk-glow`, `.vd-glow`, `.fl-glow`, `.gz-glow`, `.kv-glow`). */
 @media (prefers-reduced-motion:reduce){
   .dm-wrap{overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch}
+  .dm-glow i{animation:none}
 }
 /* На телефоне общий контейнер отдаёт поля целиком
    (`@media (max-width:767px){ .cr-cont{width:100%; padding:0} }`), и заголовок
@@ -8271,7 +8281,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <div class="dm-hold">
 <div class="dm-blik" aria-hidden="true"></div>
 <section class="cr dm" id="ded" aria-labelledby="dmT">
-  <div class="dm-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="dm-glow" aria-hidden="true"><i></i><i></i></div>
   <div class="dm-grain" aria-hidden="true"></div>
 
   <div class="cr-cont">
