@@ -5280,16 +5280,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    z-index:29 - тот же слой, что у газетки, родителей и фильма (все они ниже
    в разметке). Лестница тут кончилась: на 30 стоит шапка сайта, выше
    подниматься некуда. Порядок между секциями на 29 решает не число, а место
-   в разметке - при равном слое побеждает тот, кто ниже. Этому экрану хватает
-   28 у бонусов сверху: его блик спокойно ложится на них
+   в разметке - при равном слое побеждает тот, кто ниже. С 11.09.2026 сверху
+   стоит квиз, и у него тот же 29-й слой - но этот экран ниже в разметке,
+   поэтому его блик спокойно ложится на нижний край квиза
    → lessons/element-na-shve-sekciy-z-index.md
 
    Картинки делает `sayt-nn/instrumenty/ded_moroz.py`: приводит снимки из папки
    Серёги к высоте 860 px и печатает готовую разметку с шириной каждого кадра. */
 .dm-hold{position:relative; z-index:29}
-/* Блик на шве с белым экраном бонусов - тот же снимок, что на швах пятого,
-   шестого, четырнадцатого и двадцатого экранов. Стоит СНАРУЖИ секции: у неё
-   `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. */
+/* Блик на шве с тёмным экраном квиза (до 11.09.2026 сверху стоял белый экран
+   бонусов) - тот же снимок, что на швах пятого, шестого, четырнадцатого
+   и двадцатого экранов. Стоит СНАРУЖИ секции: у неё `overflow:hidden`,
+   и изнутри верхнюю половину блика срезало бы. */
 .dm-blik{
   position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
   aspect-ratio:2000/381; transform:translateY(-48.5%);
@@ -5872,12 +5874,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    поля и кнопки из единого блока заявки (`.zs-*`), отправка - общая
    `window.zsBind`. Своей валидации телефона и своего приёмника у экрана нет.
 
-   САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - выбор Серёги 11.09.2026. Раньше последним был
-   фильм; теперь шов у них общий и его держит золотой блик `.kv-blik` (тот же
-   снимок `v2-sm-blik.webp`, что на швах пятого, шестого, четырнадцатого,
-   семнадцатого и восемнадцатого экранов). Снизу шва нет вовсе - там конец
-   документа, поэтому низ секции просто уходит в тот же почти чёрный,
-   с которого фильм начинал.
+   СТОИТ СРАЗУ ЗА ЭКРАНОМ УСЛОВИЙ ДЛЯ ГРУПП (экран 16) - перенесён туда
+   11.09.2026 по просьбе Серёги, до этого был самым нижним экраном страницы.
+   Сверху теперь БЕЛОЕ поле бонусов, поэтому фон взят по общему рецепту тёмного
+   экрана под светлым (как у фильма, отзывов и Деда Мороза): зарево у верхней
+   кромки и старт с #0A1046. Шов держит золотой блик `.kv-blik` - тот же снимок
+   `v2-sm-blik.webp`, что на швах пятого, шестого, четырнадцатого, семнадцатого
+   и восемнадцатого экранов. Снизу идёт тёмный экран Деда Мороза, и тот шов
+   держит уже его блик `.dm-blik`.
 
    ВСЕ ШАГИ ЛЕЖАТ В РАЗМЕТКЕ СРАЗУ, скрипт только переставляет `hidden`:
    без JS и для поисковика виден весь текст квиза, а не пустая коробка.
@@ -5885,8 +5889,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Размеры не в множителе --u: это не копия старого сайта, всё через clamp()
    от ширины окна - один в один с экраном 5. */
 .kv-hold{position:relative; z-index:29}
-/* Блик на шве с фильмом. Стоит СНАРУЖИ секции: у неё `overflow:hidden`,
-   и изнутри верхнюю половину блика срезало бы. */
+/* Блик на шве с белым экраном бонусов. Стоит СНАРУЖИ секции: у неё
+   `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. */
 .kv-blik{
   position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
   aspect-ratio:2000/381; transform:translateY(-48.5%);
@@ -5895,12 +5899,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .kv{
   position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
   padding:clamp(72px,7.6vw,127.5px) 0 clamp(72px,7.6vw,127.5px);
-  /* Верх ровно в цвет низа фильма (#04071A) - шов гасится цветом, а не полосой.
-     Дальше поле поднимается в ночную синь, чтобы окно не стояло на плоском
-     чёрном, и к низу снова темнеет: страница на этом кончается. */
+  /* Сверху стоит БЕЛЫЙ экран бонусов, поэтому верх собран по общему рецепту
+     тёмных экранов под светлыми (фильм, отзывы, Дед Мороз): синее зарево
+     у кромки и старт с #0A1046. Без зарева шов выходит резкой чёрной чертой.
+     В середине поле поднимается в ночную синь, чтобы окно не стояло на плоском
+     чёрном; низ снова уходит в почти чёрный - его закрывает блик `.dm-blik`
+     следующего экрана. */
   background:
-    radial-gradient(62vw 16vw at 50% 2%, rgba(28,36,116,.55), rgba(28,36,116,0) 100%),
-    linear-gradient(180deg,#04071A 0%,#070C30 16%,#0A1140 42%,#070C2E 74%,#04071A 100%);
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#0A1140 42%,#070C2E 74%,#04071A 100%);
 }
 /* отблески и зерно - тот же рецепт, что у экрана 5. Движение по общим
    keyframes bkDrift1-3 (объявлены в блоке экрана 5), своих не заводим.
@@ -8305,6 +8312,229 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </section>
 
 
+<!-- ==================== ЭКРАН 21: КВИЗ «расчёт стоимости для класса» ====================
+     СТОИТ СРАЗУ ЗА ЭКРАНОМ УСЛОВИЙ ДЛЯ ГРУПП - перенесён туда 11.09.2026
+     по просьбе Серёги (до этого был самым нижним). Копия шестого
+     экрана боевого ministrynn.ru: те же четыре шага, те же варианты ответов
+     и те же надписи на кнопках («Начать!», «Ответить», «Рассчитать стоимость
+     и получить подарок»). Дизайн свой - в стиле основной формы заявки:
+     то же ночное небо и то же окно, что у экранов 5 и 11.
+
+     ВСЕ ШАГИ ЛЕЖАТ В РАЗМЕТКЕ СРАЗУ, скрипт только переставляет `hidden`:
+     без JS человек и поисковик видят весь текст квиза, а не пустую коробку.
+
+     КНОПКАМ КВИЗА НЕЛЬЗЯ ДАВАТЬ `data-zs`: этот атрибут открывает общее окно
+     заявки поверх страницы, и вместо следующего шага человек получил бы
+     вторую форму. Заявку отсюда отправляет своя форма через window.zsBind.
+
+     Устройство и почему шов держит блик → блок «ЭКРАН 21» в стилях выше
+     и sayt-nn/ustroystvo.md. -->
+<div class="kv-hold">
+<!-- Блик на шве с белым экраном бонусов. Стоит СНАРУЖИ секции: у неё
+     `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. -->
+<div class="kv-blik" aria-hidden="true"></div>
+<section class="cr kv" id="calc" aria-labelledby="kvT">
+  <canvas class="kv-sky" id="kvSky" aria-hidden="true"></canvas>
+  <div class="kv-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="kv-grain" aria-hidden="true"></div>
+
+  <div class="cr-cont">
+   <div class="kv-box">
+    <div class="kv-card">
+      <div class="kv-card-sky" aria-hidden="true"><i></i><i></i><i></i></div>
+
+      <!-- шапка с полосой шагов: появляется только на вопросах -->
+      <div class="kv-head" id="kvHead" hidden>
+        <div class="kv-nav">
+          <button class="kv-back" id="kvBack" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg>
+            Назад</button>
+          <p class="kv-stepn" id="kvStepN">Шаг 1 из 4</p>
+        </div>
+        <ul class="kv-bar" id="kvBar" aria-hidden="true"><li></li><li></li><li></li><li></li></ul>
+      </div>
+
+      <div class="kv-body" id="kvBody">
+
+        <!-- ---------- шаг 0: обложка ---------- -->
+        <div class="kv-step" data-step="0">
+          <p class="kv-eyebrow">Только для орг. групп от 20 детей</p>
+          <h2 class="kv-t" id="kvT">Получите расчёт стоимости для вашего класса<br class="kv-br"> <b>+ подарок!</b></h2>
+          <!-- числа в разметке - только запас на случай отключённого JS:
+               настоящую цену ставит скрипт «ЦЕНА В ФОРМАХ СЧИТАЕТСЯ ОТ ДАТЫ» -->
+          <p class="zs-price">от <b>1490 руб</b> до <b>1890 руб</b> для групп</p>
+          <p class="kv-lede">Получите индивидуальное предложение <b>+ 1 взрослый билет
+            для себя в подарок</b>, ответив всего на 3 простых вопроса!</p>
+          <p class="kv-small">Подарок лишним не будет ;)</p>
+          <div class="kv-send">
+            <button class="zs-btn" type="button" id="kvGo"><span class="zs-t">Начать!</span></button>
+          </div>
+        </div>
+
+        <!-- ---------- шаг 1: были или не были ---------- -->
+        <div class="kv-step" data-step="1" hidden>
+          <h3 class="kv-q">Бывали ли вы уже на нашей программе?</h3>
+          <p class="kv-note">Также мы были организаторами Карамельной фабрики в Ольгино в 2023 году.
+            Можно выбрать несколько вариантов.</p>
+          <div class="kv-opts" id="kvQ1" role="group" aria-label="Бывали ли вы уже на нашей программе">
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Были в прошлом году">
+              <span class="kv-tick" aria-hidden="true"></span>Были в прошлом году</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Никогда не были и вас не знаем">
+              <span class="kv-tick" aria-hidden="true"></span>Никогда не были и вас не знаем</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Были в 2023 году в Ольгино">
+              <span class="kv-tick" aria-hidden="true"></span>Были в 2023 году в Ольгино</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Хотели к вам попасть, но не успели забронировать">
+              <span class="kv-tick" aria-hidden="true"></span>Хотели к вам попасть, но не успели забронировать</label>
+          </div>
+          <p class="zs-err kv-err" id="kvErr1" hidden>Выберите хотя бы один вариант</p>
+          <div class="kv-send">
+            <button class="zs-btn" type="button" data-kv-next="1"><span class="zs-t">Ответить</span></button>
+          </div>
+        </div>
+
+        <!-- ---------- шаг 2: даты ---------- -->
+        <!-- В источнике шаг необязательный: не выбрали ничего - всё равно
+             пускает дальше. Так и оставлено. -->
+        <div class="kv-step" data-step="2" hidden>
+          <h3 class="kv-q">Какие даты вы бы рассмотрели?</h3>
+          <p class="kv-note">Можно выбрать несколько вариантов или пропустить шаг.</p>
+          <div class="kv-opts" id="kvQ2" role="group" aria-label="Какие даты вы бы рассмотрели">
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Начало декабря">
+              <span class="kv-tick" aria-hidden="true"></span>Начало декабря</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Середина декабря">
+              <span class="kv-tick" aria-hidden="true"></span>Середина декабря</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Конец декабря">
+              <span class="kv-tick" aria-hidden="true"></span>Конец декабря</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Январь">
+              <span class="kv-tick" aria-hidden="true"></span>Январь</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Главное, чтобы это были выходные">
+              <span class="kv-tick" aria-hidden="true"></span>Главное, чтобы это были выходные</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Главное, чтобы это были будние дни">
+              <span class="kv-tick" aria-hidden="true"></span>Главное, чтобы это были будние дни</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Мы готовы рассмотреть максимально низкие по цене даты">
+              <span class="kv-tick" aria-hidden="true"></span>Мы готовы рассмотреть максимально низкие по цене даты</label>
+            <label class="zs-opt kv-opt"><input type="checkbox" value="Нам важнее удобная дата, чем низкая цена">
+              <span class="kv-tick" aria-hidden="true"></span>Нам важнее удобная дата, чем низкая цена</label>
+          </div>
+          <div class="kv-send">
+            <button class="zs-btn" type="button" data-kv-next="2"><span class="zs-t">Ответить</span></button>
+          </div>
+        </div>
+
+        <!-- ---------- шаг 3: сколько детей и взрослых ---------- -->
+        <!-- Стартовые числа не с потолка: 20 детей - нижняя граница групповой
+             заявки («от 20 детей» в надзаголовке), 2 взрослых - обычные
+             учитель и родитель. Человеку чаще остаётся поправить, а не набрать
+             с нуля. Число можно и ввести руками: поле открыто. -->
+        <div class="kv-step" data-step="3" hidden>
+          <h3 class="kv-q">Сколько примерно будет детей и взрослых?</h3>
+          <p class="kv-note">Точное число потом уточним - сейчас нужно только для расчёта.</p>
+          <div class="kv-cnts">
+            <div class="kv-cnt" id="kvCntKids">
+              <span class="kv-cnt-lab" id="kvKidsLab">Дети</span>
+              <div class="kv-cnt-row">
+                <button class="kv-pm" type="button" data-kv-step="-1" data-kv-for="kvKids" aria-label="Убрать одного ребёнка">−</button>
+                <input class="kv-num" id="kvKids" type="text" inputmode="numeric" autocomplete="off"
+                       value="20" maxlength="3" aria-labelledby="kvKidsLab">
+                <button class="kv-pm" type="button" data-kv-step="1" data-kv-for="kvKids" aria-label="Добавить одного ребёнка">+</button>
+              </div>
+            </div>
+            <div class="kv-cnt">
+              <span class="kv-cnt-lab" id="kvAdLab">Взрослые</span>
+              <div class="kv-cnt-row">
+                <button class="kv-pm" type="button" data-kv-step="-1" data-kv-for="kvAdults" aria-label="Убрать одного взрослого">−</button>
+                <input class="kv-num" id="kvAdults" type="text" inputmode="numeric" autocomplete="off"
+                       value="2" maxlength="3" aria-labelledby="kvAdLab">
+                <button class="kv-pm" type="button" data-kv-step="1" data-kv-for="kvAdults" aria-label="Добавить одного взрослого">+</button>
+              </div>
+            </div>
+          </div>
+          <p class="zs-err kv-err" id="kvErr3" hidden>Укажите, сколько будет детей</p>
+          <div class="kv-send">
+            <button class="zs-btn" type="button" data-kv-next="3"><span class="zs-t">Ответить</span></button>
+          </div>
+        </div>
+
+        <!-- ---------- шаг 4: контакты ---------- -->
+        <!-- Поля и кнопка из единого блока заявки (.zs-*), логику отправки
+             даёт window.zsBind - своей у экрана нет. Ответы на три вопроса
+             уезжают вместе с заявкой (opts.extra в скрипте экрана). -->
+        <div class="kv-step" data-step="4" hidden>
+          <h3 class="kv-q">Последний шаг</h3>
+          <p class="kv-note">Оставьте номер - перезвоним в течение <b>30 минут</b> (в рабочее время),
+            предложим самые подходящие даты и цены, пришлём программу в мессенджер
+            и закрепим за вашим номером <b>1 взрослый билет в подарок</b>
+            (при групповом бронировании).</p>
+
+          <form class="kv-form" id="kvForm" novalidate>
+            <div class="kv-grid">
+              <div class="kv-f">
+                <label class="zs-lab" for="kvName">Ваше имя</label>
+                <input class="zs-inp" id="kvName" name="name" type="text" autocomplete="given-name"
+                       placeholder="Как к вам обращаться" maxlength="60">
+              </div>
+              <div class="kv-f">
+                <label class="zs-lab" for="kvPhone">Ваш телефон <span class="zs-req" aria-hidden="true">*</span></label>
+                <input class="zs-inp" id="kvPhone" name="phone" type="tel" inputmode="tel"
+                       autocomplete="tel" placeholder="+7 (___) ___-__-__"
+                       aria-describedby="kvErrPhone" required>
+                <p class="zs-err" id="kvErrPhone" data-for="phone" hidden>Проверьте номер: нужно 11 цифр</p>
+              </div>
+              <!-- город обязателен: от него зависит воронка в CRM. Ярославля и
+                   Екатеринбурга нет намеренно - они у партнёра по франшизе -->
+              <div class="kv-f">
+                <label class="zs-lab" for="kvCity">Город <span class="zs-req" aria-hidden="true">*</span></label>
+                <select class="zs-inp zs-sel" id="kvCity" name="city" aria-describedby="kvErrCity" required>
+                  <option value="" disabled selected>Выберите город</option>
+                  <option>Нижний Новгород</option>
+                  <option>Казань</option>
+                  <option>Крым</option>
+                  <option>Ставрополь</option>
+                  <option>Тюмень</option>
+                </select>
+                <p class="zs-err" id="kvErrCity" data-for="city" hidden>Выберите город</p>
+              </div>
+            </div>
+            <div class="kv-send">
+              <button class="zs-btn" type="submit"><span class="zs-t">Рассчитать стоимость и получить подарок</span></button>
+              <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+                и на звонок от менеджера. Телефон нужен только для связи по заявке.</p>
+            </div>
+          </form>
+        </div>
+
+        <!-- ---------- шаг 5: заявка принята ---------- -->
+        <div class="kv-step" data-step="5" hidden tabindex="-1">
+          <div class="kv-seal" aria-hidden="true">
+            <svg viewBox="0 0 32 32"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z" fill="currentColor"/></svg>
+          </div>
+          <h3 class="kv-done-h">Заявка принята!</h3>
+          <p class="kv-lede">Мы посчитаем стоимость для вашей группы и перезвоним
+            в течение <b>30&nbsp;минут</b>. Взрослый билет в подарок уже закреплён
+            за вашим номером.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Калькулятор и подарок по бокам окна (макет Серёги 11.09.2026).
+         Лежат СНАРУЖИ `.kv-card`: у него overflow:hidden, изнутри их края
+         срезало бы. Обёртку `span` двигает за курсором скрипт, картинка
+         внутри сама качается - два движения не складываются в один transform.
+         Голубое пятно под картинкой рисует `::before` обёртки. -->
+    <div class="kv-deco" aria-hidden="true">
+      <span class="kv-deco-l"><img src="v2-kv-calc.webp" width="491" height="388"
+            loading="lazy" decoding="async" alt="" draggable="false"></span>
+      <span class="kv-deco-r"><img src="v2-kv-gift.webp" width="362" height="406"
+            loading="lazy" decoding="async" alt="" draggable="false"></span>
+    </div>
+   </div>
+  </div>
+</section>
+</div>
+
+
 <!-- ==================== ЭКРАН 17: О НАШЕМ ДЕДЕ МОРОЗЕ ====================
      Последний экран страницы. Десять фотографий Деда Мороза одной бегущей
      лентой во всю ширину окна, на ночном небе. Устройство, скорость и почему
@@ -8662,229 +8892,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </div>
 
 
-
-<!-- ==================== ЭКРАН 21: КВИЗ «расчёт стоимости для класса» ====================
-     САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - выбор Серёги 11.09.2026. Копия шестого
-     экрана боевого ministrynn.ru: те же четыре шага, те же варианты ответов
-     и те же надписи на кнопках («Начать!», «Ответить», «Рассчитать стоимость
-     и получить подарок»). Дизайн свой - в стиле основной формы заявки:
-     то же ночное небо и то же окно, что у экранов 5 и 11.
-
-     ВСЕ ШАГИ ЛЕЖАТ В РАЗМЕТКЕ СРАЗУ, скрипт только переставляет `hidden`:
-     без JS человек и поисковик видят весь текст квиза, а не пустую коробку.
-
-     КНОПКАМ КВИЗА НЕЛЬЗЯ ДАВАТЬ `data-zs`: этот атрибут открывает общее окно
-     заявки поверх страницы, и вместо следующего шага человек получил бы
-     вторую форму. Заявку отсюда отправляет своя форма через window.zsBind.
-
-     Устройство и почему шов держит блик → блок «ЭКРАН 21» в стилях выше
-     и sayt-nn/ustroystvo.md. -->
-<div class="kv-hold">
-<!-- Блик на шве с фильмом. Стоит СНАРУЖИ секции: у неё `overflow:hidden`,
-     и изнутри верхнюю половину блика срезало бы. -->
-<div class="kv-blik" aria-hidden="true"></div>
-<section class="cr kv" id="calc" aria-labelledby="kvT">
-  <canvas class="kv-sky" id="kvSky" aria-hidden="true"></canvas>
-  <div class="kv-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <div class="kv-grain" aria-hidden="true"></div>
-
-  <div class="cr-cont">
-   <div class="kv-box">
-    <div class="kv-card">
-      <div class="kv-card-sky" aria-hidden="true"><i></i><i></i><i></i></div>
-
-      <!-- шапка с полосой шагов: появляется только на вопросах -->
-      <div class="kv-head" id="kvHead" hidden>
-        <div class="kv-nav">
-          <button class="kv-back" id="kvBack" type="button">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 19l-7-7 7-7"/></svg>
-            Назад</button>
-          <p class="kv-stepn" id="kvStepN">Шаг 1 из 4</p>
-        </div>
-        <ul class="kv-bar" id="kvBar" aria-hidden="true"><li></li><li></li><li></li><li></li></ul>
-      </div>
-
-      <div class="kv-body" id="kvBody">
-
-        <!-- ---------- шаг 0: обложка ---------- -->
-        <div class="kv-step" data-step="0">
-          <p class="kv-eyebrow">Только для орг. групп от 20 детей</p>
-          <h2 class="kv-t" id="kvT">Получите расчёт стоимости для вашего класса<br class="kv-br"> <b>+ подарок!</b></h2>
-          <!-- числа в разметке - только запас на случай отключённого JS:
-               настоящую цену ставит скрипт «ЦЕНА В ФОРМАХ СЧИТАЕТСЯ ОТ ДАТЫ» -->
-          <p class="zs-price">от <b>1490 руб</b> до <b>1890 руб</b> для групп</p>
-          <p class="kv-lede">Получите индивидуальное предложение <b>+ 1 взрослый билет
-            для себя в подарок</b>, ответив всего на 3 простых вопроса!</p>
-          <p class="kv-small">Подарок лишним не будет ;)</p>
-          <div class="kv-send">
-            <button class="zs-btn" type="button" id="kvGo"><span class="zs-t">Начать!</span></button>
-          </div>
-        </div>
-
-        <!-- ---------- шаг 1: были или не были ---------- -->
-        <div class="kv-step" data-step="1" hidden>
-          <h3 class="kv-q">Бывали ли вы уже на нашей программе?</h3>
-          <p class="kv-note">Также мы были организаторами Карамельной фабрики в Ольгино в 2023 году.
-            Можно выбрать несколько вариантов.</p>
-          <div class="kv-opts" id="kvQ1" role="group" aria-label="Бывали ли вы уже на нашей программе">
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Были в прошлом году">
-              <span class="kv-tick" aria-hidden="true"></span>Были в прошлом году</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Никогда не были и вас не знаем">
-              <span class="kv-tick" aria-hidden="true"></span>Никогда не были и вас не знаем</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Были в 2023 году в Ольгино">
-              <span class="kv-tick" aria-hidden="true"></span>Были в 2023 году в Ольгино</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Хотели к вам попасть, но не успели забронировать">
-              <span class="kv-tick" aria-hidden="true"></span>Хотели к вам попасть, но не успели забронировать</label>
-          </div>
-          <p class="zs-err kv-err" id="kvErr1" hidden>Выберите хотя бы один вариант</p>
-          <div class="kv-send">
-            <button class="zs-btn" type="button" data-kv-next="1"><span class="zs-t">Ответить</span></button>
-          </div>
-        </div>
-
-        <!-- ---------- шаг 2: даты ---------- -->
-        <!-- В источнике шаг необязательный: не выбрали ничего - всё равно
-             пускает дальше. Так и оставлено. -->
-        <div class="kv-step" data-step="2" hidden>
-          <h3 class="kv-q">Какие даты вы бы рассмотрели?</h3>
-          <p class="kv-note">Можно выбрать несколько вариантов или пропустить шаг.</p>
-          <div class="kv-opts" id="kvQ2" role="group" aria-label="Какие даты вы бы рассмотрели">
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Начало декабря">
-              <span class="kv-tick" aria-hidden="true"></span>Начало декабря</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Середина декабря">
-              <span class="kv-tick" aria-hidden="true"></span>Середина декабря</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Конец декабря">
-              <span class="kv-tick" aria-hidden="true"></span>Конец декабря</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Январь">
-              <span class="kv-tick" aria-hidden="true"></span>Январь</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Главное, чтобы это были выходные">
-              <span class="kv-tick" aria-hidden="true"></span>Главное, чтобы это были выходные</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Главное, чтобы это были будние дни">
-              <span class="kv-tick" aria-hidden="true"></span>Главное, чтобы это были будние дни</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Мы готовы рассмотреть максимально низкие по цене даты">
-              <span class="kv-tick" aria-hidden="true"></span>Мы готовы рассмотреть максимально низкие по цене даты</label>
-            <label class="zs-opt kv-opt"><input type="checkbox" value="Нам важнее удобная дата, чем низкая цена">
-              <span class="kv-tick" aria-hidden="true"></span>Нам важнее удобная дата, чем низкая цена</label>
-          </div>
-          <div class="kv-send">
-            <button class="zs-btn" type="button" data-kv-next="2"><span class="zs-t">Ответить</span></button>
-          </div>
-        </div>
-
-        <!-- ---------- шаг 3: сколько детей и взрослых ---------- -->
-        <!-- Стартовые числа не с потолка: 20 детей - нижняя граница групповой
-             заявки («от 20 детей» в надзаголовке), 2 взрослых - обычные
-             учитель и родитель. Человеку чаще остаётся поправить, а не набрать
-             с нуля. Число можно и ввести руками: поле открыто. -->
-        <div class="kv-step" data-step="3" hidden>
-          <h3 class="kv-q">Сколько примерно будет детей и взрослых?</h3>
-          <p class="kv-note">Точное число потом уточним - сейчас нужно только для расчёта.</p>
-          <div class="kv-cnts">
-            <div class="kv-cnt" id="kvCntKids">
-              <span class="kv-cnt-lab" id="kvKidsLab">Дети</span>
-              <div class="kv-cnt-row">
-                <button class="kv-pm" type="button" data-kv-step="-1" data-kv-for="kvKids" aria-label="Убрать одного ребёнка">−</button>
-                <input class="kv-num" id="kvKids" type="text" inputmode="numeric" autocomplete="off"
-                       value="20" maxlength="3" aria-labelledby="kvKidsLab">
-                <button class="kv-pm" type="button" data-kv-step="1" data-kv-for="kvKids" aria-label="Добавить одного ребёнка">+</button>
-              </div>
-            </div>
-            <div class="kv-cnt">
-              <span class="kv-cnt-lab" id="kvAdLab">Взрослые</span>
-              <div class="kv-cnt-row">
-                <button class="kv-pm" type="button" data-kv-step="-1" data-kv-for="kvAdults" aria-label="Убрать одного взрослого">−</button>
-                <input class="kv-num" id="kvAdults" type="text" inputmode="numeric" autocomplete="off"
-                       value="2" maxlength="3" aria-labelledby="kvAdLab">
-                <button class="kv-pm" type="button" data-kv-step="1" data-kv-for="kvAdults" aria-label="Добавить одного взрослого">+</button>
-              </div>
-            </div>
-          </div>
-          <p class="zs-err kv-err" id="kvErr3" hidden>Укажите, сколько будет детей</p>
-          <div class="kv-send">
-            <button class="zs-btn" type="button" data-kv-next="3"><span class="zs-t">Ответить</span></button>
-          </div>
-        </div>
-
-        <!-- ---------- шаг 4: контакты ---------- -->
-        <!-- Поля и кнопка из единого блока заявки (.zs-*), логику отправки
-             даёт window.zsBind - своей у экрана нет. Ответы на три вопроса
-             уезжают вместе с заявкой (opts.extra в скрипте экрана). -->
-        <div class="kv-step" data-step="4" hidden>
-          <h3 class="kv-q">Последний шаг</h3>
-          <p class="kv-note">Оставьте номер - перезвоним в течение <b>30 минут</b> (в рабочее время),
-            предложим самые подходящие даты и цены, пришлём программу в мессенджер
-            и закрепим за вашим номером <b>1 взрослый билет в подарок</b>
-            (при групповом бронировании).</p>
-
-          <form class="kv-form" id="kvForm" novalidate>
-            <div class="kv-grid">
-              <div class="kv-f">
-                <label class="zs-lab" for="kvName">Ваше имя</label>
-                <input class="zs-inp" id="kvName" name="name" type="text" autocomplete="given-name"
-                       placeholder="Как к вам обращаться" maxlength="60">
-              </div>
-              <div class="kv-f">
-                <label class="zs-lab" for="kvPhone">Ваш телефон <span class="zs-req" aria-hidden="true">*</span></label>
-                <input class="zs-inp" id="kvPhone" name="phone" type="tel" inputmode="tel"
-                       autocomplete="tel" placeholder="+7 (___) ___-__-__"
-                       aria-describedby="kvErrPhone" required>
-                <p class="zs-err" id="kvErrPhone" data-for="phone" hidden>Проверьте номер: нужно 11 цифр</p>
-              </div>
-              <!-- город обязателен: от него зависит воронка в CRM. Ярославля и
-                   Екатеринбурга нет намеренно - они у партнёра по франшизе -->
-              <div class="kv-f">
-                <label class="zs-lab" for="kvCity">Город <span class="zs-req" aria-hidden="true">*</span></label>
-                <select class="zs-inp zs-sel" id="kvCity" name="city" aria-describedby="kvErrCity" required>
-                  <option value="" disabled selected>Выберите город</option>
-                  <option>Нижний Новгород</option>
-                  <option>Казань</option>
-                  <option>Крым</option>
-                  <option>Ставрополь</option>
-                  <option>Тюмень</option>
-                </select>
-                <p class="zs-err" id="kvErrCity" data-for="city" hidden>Выберите город</p>
-              </div>
-            </div>
-            <div class="kv-send">
-              <button class="zs-btn" type="submit"><span class="zs-t">Рассчитать стоимость и получить подарок</span></button>
-              <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на обработку персональных данных
-                и на звонок от менеджера. Телефон нужен только для связи по заявке.</p>
-            </div>
-          </form>
-        </div>
-
-        <!-- ---------- шаг 5: заявка принята ---------- -->
-        <div class="kv-step" data-step="5" hidden tabindex="-1">
-          <div class="kv-seal" aria-hidden="true">
-            <svg viewBox="0 0 32 32"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z" fill="currentColor"/></svg>
-          </div>
-          <h3 class="kv-done-h">Заявка принята!</h3>
-          <p class="kv-lede">Мы посчитаем стоимость для вашей группы и перезвоним
-            в течение <b>30&nbsp;минут</b>. Взрослый билет в подарок уже закреплён
-            за вашим номером.</p>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- Калькулятор и подарок по бокам окна (макет Серёги 11.09.2026).
-         Лежат СНАРУЖИ `.kv-card`: у него overflow:hidden, изнутри их края
-         срезало бы. Обёртку `span` двигает за курсором скрипт, картинка
-         внутри сама качается - два движения не складываются в один transform.
-         Голубое пятно под картинкой рисует `::before` обёртки. -->
-    <div class="kv-deco" aria-hidden="true">
-      <span class="kv-deco-l"><img src="v2-kv-calc.webp" width="491" height="388"
-            loading="lazy" decoding="async" alt="" draggable="false"></span>
-      <span class="kv-deco-r"><img src="v2-kv-gift.webp" width="362" height="406"
-            loading="lazy" decoding="async" alt="" draggable="false"></span>
-    </div>
-   </div>
-  </div>
-</section>
-</div>
-
-
 <!-- ==================== ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ ====================
      САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - просьба Серёги 11.09.2026 («создай ниже
      всех экран с ответами на вопросы»). Наш ответ странице ministrynn.ru/info.
@@ -8902,8 +8909,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
      Скрипт экрана - в конце страницы, блок «ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ». -->
 <section class="cr qa" id="faq" aria-labelledby="qaT">
-  <!-- Сугроб на стыке с тёмным полем квиза. Тот же класс, что на стыках
-       первого, одиннадцатого, пятнадцатого и девятнадцатого экранов. -->
+  <!-- Сугроб на стыке с тёмным полем фильма (до 11.09.2026 тут стоял квиз).
+       Тот же класс, что на стыках первого, одиннадцатого, пятнадцатого
+       и девятнадцатого экранов. -->
   <div class="cr-snow" aria-hidden="true"></div>
   <div class="qa-glow" aria-hidden="true"><i></i><i></i></div>
 
