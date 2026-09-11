@@ -1911,10 +1911,10 @@ html.touch .curtain{opacity:1}
    тонкое золото на нём почти не видно, поэтому там обводка и надпись темнее.
    Заводишь новый светлый экран - добавляй его сюда, иначе кнопка на нём
    выйдет бледной обводкой, которую не видно ни на солнце, ни на проекторе. */
-.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost,.sv .zs-btn--ghost,.pr .zs-btn--ghost,.gb .zs-btn--ghost,.rd .zs-btn--ghost{
+.cr-s2 .zs-btn--ghost,.cr-s3 .zs-btn--ghost,.sv .zs-btn--ghost,.pr .zs-btn--ghost,.gb .zs-btn--ghost,.rd .zs-btn--ghost,.qa .zs-btn--ghost{
   color:#8A6111; box-shadow:inset 0 0 0 2px rgba(160,116,32,.75);
 }
-.cr-s2 .zs-btn--ghost:hover,.cr-s3 .zs-btn--ghost:hover,.sv .zs-btn--ghost:hover,.pr .zs-btn--ghost:hover,.gb .zs-btn--ghost:hover{
+.cr-s2 .zs-btn--ghost:hover,.cr-s3 .zs-btn--ghost:hover,.sv .zs-btn--ghost:hover,.pr .zs-btn--ghost:hover,.gb .zs-btn--ghost:hover,.qa .zs-btn--ghost:hover{
   color:#3A2705; background:rgba(227,179,78,.16);
   box-shadow:inset 0 0 0 2px rgba(160,116,32,1), 0 16px 34px -18px rgba(160,116,32,.5);
 }
@@ -5822,6 +5822,572 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </style>
 
 
+
+<!-- Стили экрана с ответами лежат в ОТДЕЛЬНОМ <style>, как у квиза, фильма
+     и экранов 9, 11, 15: файл правят из двух окон, и незакрытая скобка
+     в чужом блоке не должна ронять этот экран (и наоборот)
+     → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ==================== ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ ====================
+   Пространство имён `qa-` (вопросы-ответы). Наш ответ странице
+   ministrynn.ru/info: там восемнадцать вопросов простыней в Тильде, здесь -
+   белое снежное поле, поиск, четыре темы и складные карточки.
+
+   ГДЕ СТОИТ: САМЫМ НИЖНИМ ЭКРАНОМ СТРАНИЦЫ, под квизом. Просьба Серёги
+   11.09.2026 - «создай ниже всех экран с ответами на вопросы».
+
+   ПОЛЕ БЕЛОЕ - выбор Серёги 11.09.2026 из трёх (белое / ночное небо /
+   светло-сиреневое). Причина простая: тут больше текста, чем на любом другом
+   экране сайта, а длинный текст на тёмном читают хуже. И страница кончается
+   светлой нотой после тёмного квиза.
+
+   ПОЛЕ ОБЯЗАНО БЫТЬ ЧИСТО БЕЛЫМ - на верхней кромке стоит сугроб (`.cr-snow`),
+   низ у него сплошные 255,255,255. Дай фону хоть оттенок, и по нижнему краю
+   картинки ляжет черта во всю ширину окна. Воздух экрану дают круглые
+   отблески, и они прижаты к НИЗУ секции (`bottom:0` + `closest-side`): у самой
+   верхней кромки поле обязано остаться белым. Тот же приём, что на
+   одиннадцатом, пятнадцатом и девятнадцатом экранах.
+
+   СТЫК С КВИЗОМ ДЕРЖИТ СУГРОБ - тот же снимок снега, что на стыках первого,
+   одиннадцатого, пятнадцатого и девятнадцатого экранов. Своего блика у экрана
+   нет и не нужно: блик - это для шва двух тёмных полей, а тут снег.
+
+   z-index:29 - та же ступень, что у экранов о Деде Морозе, газетки, фильма
+   и квиза. Выше нельзя (на 30 стоит шапка) и незачем: при равном слое
+   побеждает тот, кто НИЖЕ в разметке, а этот экран последний - его сугроб
+   спокойно вылезает на тёмное поле квиза → lessons/element-na-shve-sekciy-z-index.md
+
+   ПОЧЕМУ АККОРДЕОН, А НЕ ПРОСТЫНЯ. Восемнадцать ответов подряд - это четыре
+   экрана мелкого текста, по ним не ищут, их пролистывают. Сложенные карточки
+   дают оглавление: видно все вопросы разом, открывается только нужный.
+
+   БЕЗ JS ЭКРАН ОСТАЁТСЯ РАБОЧИМ. В разметке все ответы лежат РАСКРЫТЫМИ,
+   складывает их скрипт при загрузке. Выключен JS или он упал - человек читает
+   восемнадцать вопросов подряд, как на боевом ministrynn.ru. Тот же приём,
+   что у карусели персонажей и у цен.
+
+   ТЕКСТ - НЕ ВЫДУМАННЫЙ. Все восемнадцать ответов сняты с боевого
+   ministrynn.ru/info и отфильтрованы по городу: страница про Нижний Новгород,
+   поэтому максимум детей, адрес и телефоны трансфера - только нижегородские.
+   Цифры бонусов сверены с экраном 16 (`.gb-list`) и с
+   business/core/customer-journey.md, раздел 9. МЕНЯЕШЬ УСЛОВИЯ - правь
+   сначала в business/, а сюда переноси: сайт тут витрина, а не источник.
+
+   ЦЕНА ВЗРОСЛОГО БИЛЕТА НЕ ВПИСАНА НАМЕРТВО. Она живёт тем же классом
+   `.pr-adult`, что и на экране цен, и её каждый месяц пересчитывает скрипт
+   «ЭКРАН 15: ЦЕНЫ ПО КАЛЕНДАРЮ». Правило репо: цифры не хардкодить. */
+.qa{
+  position:relative; z-index:29;
+  background:#fff; color:#33405F;
+  padding:clamp(74px,7.4vw,136px) 0 clamp(58px,6vw,104px);
+}
+/* ПОТОЛОК ПОДЪЁМА 190 px, А НЕ 240, КАК НА ЭКРАНАХ 11 И 15. Считается так:
+   высота снимка снега растёт от ширины окна без предела (0,309 от неё),
+   верхние 12 % картинки прозрачны, значит над кромкой секции торчат гребни
+   высотой «подъём минус 12 % высоты». А воздух под карточкой квиза сверху -
+   clamp(72px,7.6vw,127.5px) - упирается в 127,5 px уже на 1680 px и дальше
+   не растёт. С потолком 240 px гребни на мониторах около 2500 px вырастают
+   до 142 px и садятся прямо на карточку квиза. При 190 px самый высокий
+   возможный гребень - 114 px, и он ниже воздуха при любой ширине окна.
+   Ниже 190 px опускать нельзя по другой причине: подъём должен оставаться
+   больше прозрачных 12 %, иначе на стыке откроется ровная черта. */
+.qa .cr-snow{transform:translateY(max(-30%,-190px))}
+
+/* Отблески гаснут внутри своей секции и прижаты к её низу: наверху поле
+   обязано быть белым (см. шапку блока), а внизу под ними конец страницы. */
+/* ОТБЛЕСКИ НАЧИНАЮТСЯ РОВНО ПОД СУГРОБОМ, а не от верха секции. Причина:
+   высота сугроба считается от ШИРИНЫ окна (30,9vw), а высота секции - от
+   количества карточек, и фильтр по теме укорачивает её втрое. На мониторе
+   3440 px в короткой выдаче отблеск, привязанный к низу секции, поднимался
+   выше нижней кромки снега - а под снегом поле обязано быть чисто белым,
+   иначе по краю картинки ложится черта во всю ширину окна.
+   Число собрано из двух: 30,9vw - высота снимка снега (пропорция 3400/1050),
+   min(9,27vw,190px) - на сколько он поднят (см. правило .qa .cr-snow ниже).
+   Разница и есть низ сугроба. Меняешь подъём снега - меняй и здесь. */
+.qa-glow{
+  position:absolute; left:0; right:0; bottom:0; z-index:1;
+  top:max(0px, calc(30.9vw - min(9.27vw, 190px)));
+  pointer-events:none; overflow:hidden;
+}
+.qa-glow i{position:absolute; display:block; border-radius:50%}
+.qa-glow i:nth-child(1){left:-16vw; bottom:0; width:62vw; height:52%;
+  background:radial-gradient(closest-side, rgba(223,232,255,.9) 0%, rgba(223,232,255,.42) 40%, rgba(223,232,255,0) 100%)}
+.qa-glow i:nth-child(2){right:-18vw; bottom:0; width:58vw; height:46%;
+  background:radial-gradient(closest-side, rgba(255,232,186,.6) 0%, rgba(255,232,186,.28) 40%, rgba(255,232,186,0) 100%)}
+
+/* ---------- шапка экрана ----------
+   Надзаголовок, двухцветный заголовок и лид набраны теми же числами, что
+   на экране цен. Свои классы, а не `.pr-*`, намеренно: тот блок стилей
+   правит соседняя сессия, и экран не должен зависеть от чужих селекторов. */
+.qa-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); text-align:center;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#4E5D82}
+.qa-t{margin:0 auto clamp(14px,1.4vw,22px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(24px,3.3vw,51px); line-height:1.08; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance}
+/* Те же синий и красный, что у заголовков экранов цен и леденцов. Тёмные
+   .cr-blue/.cr-red брать нельзя: они сняты со старого сайта под его кегль. */
+.qa-blue{color:#083182}
+.qa-red{color:#8C1B12}
+.qa-lead{margin:0 auto clamp(24px,2.6vw,42px); max-width:62ch;
+  text-align:center; text-wrap:balance;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.12vw,16.57px);
+  line-height:1.5; color:#3F4F76}
+.qa-lead b{font-weight:600; color:#1B2C57}
+
+/* ---------- поиск ----------
+   Кегль поля не меньше 16 px СПЕЦИАЛЬНО: Safari на айфоне сам приближает
+   страницу, когда встаёшь в поле с мелким шрифтом, и экран уезжает вбок. */
+/* Обёртка поиска и чипов. В разметке она лежит с `hidden`, снимает его
+   скрипт: без него ни поиск, ни темы не работают - см. комментарий в разметке. */
+.qa-tools[hidden]{display:none}
+
+.qa-find{position:relative; display:block; width:min(100%,520px); margin:0 auto clamp(14px,1.5vw,22px)}
+.qa-find > svg{position:absolute; left:clamp(16px,1.4vw,20px); top:50%; transform:translateY(-50%);
+  width:19px; height:19px; color:#8494BC; pointer-events:none;
+  fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.qa-find input{
+  width:100%; height:clamp(50px,4.1vw,58px);
+  padding:0 clamp(44px,3.6vw,52px); margin:0;
+  border:1px solid rgba(27,44,87,.16); border-radius:999px; background:#fff;
+  font-family:"Golos Text",Arial,sans-serif; font-size:max(16px,1.02vw); color:#16264D;
+  box-shadow:0 2px 14px rgba(27,44,87,.05);
+  -webkit-appearance:none; appearance:none; outline:none;
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+/* Подсказка в поле - единственная надпись у него, поэтому она обязана
+   читаться: #93A0C0 давал 2,6:1, этот - 4,7:1. */
+.qa-find input::placeholder{color:#64739A}
+.qa-find input::-webkit-search-decoration,
+.qa-find input::-webkit-search-cancel-button{-webkit-appearance:none; appearance:none}
+/* ФОКУС НА БЕЛОМ ПОЛЕ ТОЛЬКО ТЁМНЫМ ЗОЛОТОМ. Светлое золото сайта
+   (#E3B34E и светлее) даёт на белом около 1,9:1 - рамку фокуса не видно
+   ни с клавиатуры, ни на проекторе. #8A5A08 - то же золото, но тёмное,
+   на белом 5,9:1. Одно число на весь экран: поиск, чипы, вопросы, крестик. */
+.qa{--qa-focus:#8A5A08}
+.qa-find input:focus{border-color:var(--qa-focus); box-shadow:0 0 0 3px rgba(138,90,8,.28), 0 2px 14px rgba(27,44,87,.06)}
+/* С КЛАВИАТУРЫ - НАСТОЯЩИЙ КОНТУР, а не только подкрашенная рамка. Выше у поля
+   стоит `outline:none` (иначе поверх круглой пилюли браузер рисует свой
+   прямоугольник при щелчке мышью), и без этой строки человек, идущий по
+   странице табом, опознаёт поле только по смене цвета рамки. Специфичность
+   (0,2,1) перебивает `outline:none` из (0,1,1). Тот же приём, что у полей
+   формы на одиннадцатом экране. */
+.qa-find input:focus-visible{outline:3px solid var(--qa-focus); outline-offset:2px}
+.qa-clear{
+  position:absolute; right:8px; top:50%; transform:translateY(-50%);
+  width:34px; aspect-ratio:1; border:0; border-radius:999px; padding:0;
+  background:#EFF3FC; color:#4E5D82; cursor:pointer; display:grid; place-items:center;
+  transition:background-color .18s ease, color .18s ease;
+}
+.qa-clear svg{width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round}
+.qa-clear:hover{background:#E2E9F8; color:#16264D}
+.qa-clear:focus-visible{outline:3px solid var(--qa-focus); outline-offset:2px}
+.qa-clear[hidden]{display:none}
+
+/* ---------- чипы тем ----------
+   Чипы ФИЛЬТРУЮТ, а не прокручивают к разделу. С прокруткой человек всё равно
+   получает восемнадцать карточек и ищет глазами; с фильтром - ровно свои пять. */
+.qa-chips{display:flex; flex-wrap:wrap; justify-content:center; gap:clamp(8px,.66vw,12px);
+  margin:0 0 clamp(24px,2.6vw,42px)}
+.qa-chip{
+  display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+  padding:clamp(9px,.8vw,12px) clamp(13px,1.1vw,18px);
+  border:1px solid rgba(27,44,87,.14); border-radius:999px; background:#fff;
+  font-family:"Golos Text",Arial,sans-serif; font-weight:500; line-height:1;
+  font-size:max(13.5px,.92vw); color:#33405F;
+  -webkit-appearance:none; appearance:none;
+  transition:background .2s ease, border-color .2s ease, color .2s ease, box-shadow .25s ease;
+}
+/* Число вопросов набрано мелко (около 12,5 px), поэтому цвет тёмный:
+   прежний #7E8EB8 давал на своей голубой подложке 2,9:1. */
+.qa-chip i{font-style:normal; font-weight:600; font-size:.85em; color:#4E5D82;
+  background:#EFF3FC; border-radius:999px; padding:3px 7px; transition:inherit}
+@media (hover:hover){ .qa-chip:hover{border-color:rgba(227,179,78,.6); color:#16264D} }
+.qa-chip:focus-visible{outline:3px solid var(--qa-focus); outline-offset:2px}
+.qa-chip[aria-pressed="true"]{
+  background:linear-gradient(180deg,#FFF6DF,#FFEDBE); border-color:rgba(227,179,78,.75); color:#5A3B05;
+  box-shadow:0 6px 16px rgba(227,179,78,.24);
+}
+.qa-chip[aria-pressed="true"] i{background:rgba(180,83,9,.15); color:#8A5A08}
+
+/* ---------- список ----------
+   Ширина списка 980 px при контейнере под 1720: вёрстка сайта широкая, но
+   правило про широкую вёрстку само оставляет ограничение тексту. Строка
+   в 1400 px не читается - глаз теряет начало следующей. */
+.qa-list{width:min(100%,980px); margin:0 auto}
+/* Отступ ДО группы, а не «между соседями»: при фильтре по теме соседи
+   спрятаны через hidden, но для селектора `+` они по-прежнему соседи, и над
+   единственной видимой группой оставался отступ, будто над ней что-то есть.
+   Поэтому отступ у всех, а у первой ВИДИМОЙ его снимает класс от скрипта. */
+.qa-group{margin-top:clamp(28px,2.9vw,50px)}
+.qa-group:first-child,.qa-group.is-first{margin-top:0}
+.qa-group[hidden]{display:none}
+.qa-gt{
+  display:flex; align-items:center; gap:clamp(10px,.9vw,14px);
+  margin:0 0 clamp(12px,1.15vw,18px);
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(15px,1.32vw,21px); letter-spacing:.02em; line-height:1.1;
+  text-transform:uppercase; color:#16264D;
+}
+.qa-gic{
+  flex:0 0 auto; width:clamp(32px,2.5vw,40px); aspect-ratio:1; border-radius:clamp(10px,.9vw,13px);
+  display:grid; place-items:center; color:#8A5A08;
+  background:linear-gradient(180deg,#FFF3D6,#FFE6AA);
+  box-shadow:inset 0 0 0 1px rgba(227,179,78,.5);
+}
+.qa-gic svg{width:56%; height:56%; display:block;
+  fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round}
+
+/* ---------- карточка вопроса ---------- */
+.qa-item{
+  background:#fff; border:1px solid rgba(27,44,87,.11);
+  border-radius:clamp(14px,1.15vw,20px);
+  box-shadow:0 1px 2px rgba(27,44,87,.045);
+  transition:border-color .2s ease, box-shadow .25s ease, background .25s ease;
+}
+.qa-item + .qa-item{margin-top:clamp(8px,.7vw,11px)}
+.qa-item[hidden]{display:none}
+@media (hover:hover){
+  .qa-item:hover{border-color:rgba(227,179,78,.58); box-shadow:0 6px 18px rgba(27,44,87,.07)}
+}
+.qa-item.is-open{
+  background:linear-gradient(180deg,#FFFCF3 0%,#FFF8E7 100%);
+  border-color:rgba(227,179,78,.62);
+  box-shadow:0 14px 34px rgba(27,44,87,.09);
+}
+.qa-h{margin:0}
+.qa-q{
+  width:100%; display:flex; align-items:center; gap:clamp(12px,1.1vw,20px);
+  margin:0; border:0; background:none; cursor:pointer; text-align:left;
+  padding:clamp(15px,1.45vw,22px) clamp(16px,1.55vw,26px);
+  font-family:"Golos Text",Arial,sans-serif; font-weight:600;
+  font-size:max(15px, clamp(15.5px,1.17vw,18.5px)); line-height:1.34; color:#16264D;
+  /* Скругление ПОВТОРЕНО числом, а не унаследовано: между кнопкой и карточкой
+     стоит <h4 class="qa-h">, у которого скругления нет, и `inherit` давал ноль.
+     Из-за нуля кольцо фокуса рисовалось прямоугольником и его углы вылезали
+     за круглый край карточки, а на айфоне подсветка касания ложилась квадратом.
+     Меняешь радиус карточки - меняй и здесь. */
+  border-radius:clamp(14px,1.15vw,20px);
+  -webkit-tap-highlight-color:transparent;
+}
+.qa-q:focus-visible{outline:3px solid var(--qa-focus); outline-offset:-3px}
+.qa-qt{flex:1 1 auto}
+/* Знак: плюс превращается в минус. Кружок доворачивает на пол-оборота, а
+   вертикальная палочка ложится на горизонтальную - двух картинок не нужно. */
+.qa-sign{
+  flex:0 0 auto; position:relative; width:clamp(28px,2.2vw,34px); aspect-ratio:1;
+  border-radius:999px; background:#EFF3FC;
+  transition:background .25s ease, transform .32s cubic-bezier(.22,.61,.36,1);
+}
+.qa-sign::before,.qa-sign::after{
+  content:""; position:absolute; left:50%; top:50%;
+  width:42%; height:2px; margin:-1px 0 0 -21%;
+  border-radius:2px; background:#3F5893;
+  transition:transform .32s cubic-bezier(.22,.61,.36,1), background .25s ease;
+}
+.qa-sign::after{transform:rotate(90deg)}
+.qa-item.is-open .qa-sign{background:linear-gradient(180deg,#FDE68A,#F5B324); transform:rotate(180deg)}
+.qa-item.is-open .qa-sign::before,
+.qa-item.is-open .qa-sign::after{background:#4A2C02}
+.qa-item.is-open .qa-sign::after{transform:rotate(0deg)}
+
+/* ---------- ответ ----------
+   Складывается сеткой (`grid-template-rows: 1fr → 0fr`), а не высотой в
+   пикселях: высоту ответа пришлось бы мерить скриптом на каждом переносе
+   строки и пересчитывать при повороте телефона. Сетка считает сама.
+
+   ПО УМОЛЧАНИЮ ОТКРЫТО. Закрывает класс `.is-shut`, его вешает скрипт.
+   Так экран остаётся читаемым без JS.
+
+   Переходы включаются только классом `.is-live` - его скрипт ставит после
+   первого кадра. Иначе восемнадцать ответов складывались бы анимацией прямо
+   на глазах при загрузке страницы. */
+.qa-wrap{display:grid; grid-template-rows:1fr}
+.qa-wrap > div{overflow:hidden}
+.qa-item.is-shut .qa-wrap{grid-template-rows:0fr}
+/* `visibility` убирает свёрнутый ответ и из озвучки голосом, и из поиска
+   по странице. Прячем с задержкой в длину переезда (иначе текст пропадёт
+   раньше, чем схлопнется коробка), а показываем сразу. */
+.qa-item.is-shut .qa-wrap > div{visibility:hidden}
+.qa.is-live .qa-wrap{transition:grid-template-rows .34s cubic-bezier(.22,.61,.36,1)}
+.qa.is-live .qa-wrap > div{transition:visibility 0s}
+.qa.is-live .qa-item.is-shut .qa-wrap > div{transition:visibility 0s .34s}
+
+.qa-a{
+  padding:0 clamp(16px,1.55vw,26px) clamp(18px,1.7vw,26px);
+  font-family:"Golos Text",Arial,sans-serif;
+  font-size:max(14.5px, clamp(15px,1.05vw,16.6px)); line-height:1.6; color:#41507A;
+}
+/* Волосок между вопросом и ответом: концы растворяются, поэтому он не режет
+   карточку на две коробки, а просто отделяет. */
+.qa-a::before{
+  content:""; display:block; height:1px; margin:0 0 clamp(13px,1.3vw,18px);
+  background:linear-gradient(90deg, rgba(227,179,78,0), rgba(227,179,78,.5) 10%, rgba(227,179,78,.5) 90%, rgba(227,179,78,0));
+}
+.qa-a p{margin:0 0 .78em; max-width:74ch}
+.qa-a p:last-child{margin-bottom:0}
+.qa-a b{font-weight:600; color:#16264D}
+.qa-a a{color:#0B57C2; text-decoration:none; border-bottom:1px solid rgba(11,87,194,.32); white-space:nowrap}
+.qa-a a:hover{border-bottom-color:rgba(11,87,194,.8)}
+/* Маркер списка - золотой ромбик, а не системная точка: точки у нас нигде
+   на сайте нет, а ромб рифмуется с плитками дат на экране цен. */
+.qa-a ul{margin:.15em 0 .85em; padding:0; list-style:none}
+.qa-a ul:last-child{margin-bottom:0}
+.qa-a li{position:relative; padding-left:23px; margin:0 0 .42em; max-width:74ch}
+.qa-a li:last-child{margin-bottom:0}
+.qa-a li::before{
+  content:""; position:absolute; left:4px; top:.6em; width:7px; height:7px;
+  border-radius:2px; transform:rotate(45deg); background:#E3B34E;
+}
+
+/* ---------- ничего не нашлось ---------- */
+/* Строка только для голоса: сколько ответов осталось после фильтра.
+   Зрячий это видит сам - список на глазах укорачивается; читалке же без
+   такой области поиск и чипы не говорят ровно ничего. */
+.qa-sr{position:absolute; width:1px; height:1px; margin:0; padding:0;
+  overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0}
+
+.qa-none{
+  margin:0; padding:clamp(26px,2.6vw,40px) 20px; text-align:center;
+  border:1px dashed rgba(27,44,87,.2); border-radius:clamp(14px,1.15vw,20px);
+  font-family:"Golos Text",Arial,sans-serif; font-size:max(14.5px,1.02vw); color:#5A6A93;
+}
+.qa-none[hidden]{display:none}
+
+/* ---------- «не нашли свой вопрос» ---------- */
+.qa-cta{
+  width:min(100%,980px); margin:clamp(30px,3.2vw,56px) auto 0; text-align:center;
+  padding:clamp(26px,2.7vw,44px) clamp(18px,2vw,36px);
+  border-radius:clamp(18px,1.5vw,26px);
+  background:linear-gradient(180deg,#F8FAFF 0%,#EDF2FF 100%);
+  box-shadow:inset 0 0 0 1px rgba(47,49,146,.1);
+}
+.qa-cta-t{
+  margin:0 0 clamp(7px,.6vw,10px);
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(18px,1.75vw,28px); line-height:1.1; letter-spacing:.01em;
+  text-transform:uppercase; color:#16264D;
+}
+.qa-cta-s{
+  margin:0 auto clamp(18px,1.8vw,28px); max-width:58ch;
+  font-family:"Golos Text",Arial,sans-serif; font-size:max(14.5px,1.02vw);
+  line-height:1.5; color:#41507A;
+}
+/* На телефоне кнопка идёт по ширине бланка - как на экранах цен, карусели
+   площадки, комнаты и газетки. От 768 px ширина снова по длине надписи,
+   как велит стандарт → sayt-nn/standart-knopok.md */
+/* Общий контур фокуса кнопки заявки кремовый (rgba(255,238,190,.9)) -
+   он рассчитан на тёмные экраны, а на белом это 1,1:1, то есть ничего.
+   Переопределяем только на своём экране, чужие не трогаем. */
+.qa-cta .zs-btn:focus-visible{outline-color:var(--qa-focus)}
+.qa-cta .zs-btn{width:min(100%,480px)}
+@media (min-width:768px){ .qa-cta .zs-btn{width:auto} }
+
+/* ---------- телефон ---------- */
+@media (max-width:767px){
+  /* На телефоне общий контейнер отдаёт поля тексту (`.cr-cont{padding:0}`),
+     и без своих полей карточки прилипли бы к краям окна. */
+  .qa .cr-cont{width:100%; padding-inline:20px}
+  .qa{padding-top:clamp(56px,15vw,84px)}
+}
+/* Чипы в строку с прокруткой: в три ряда они превращаются в стену кнопок
+   и съедают первый экран раздела. Поля растянуты на ширину окна, чтобы
+   крайние чипы не обрезались на старте. */
+@media (max-width:700px){
+  .qa-chips{
+    flex-wrap:nowrap; justify-content:flex-start;
+    overflow-x:auto; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; -ms-overflow-style:none;
+    /* Поля ленты обязаны вмещать то, что рисуется ЗА краем чипа: снизу
+       золотое свечение выбранного (ему нужно 22 px), сверху кольцо фокуса
+       (4 px). У ленты с overflow-x:auto вторая ось тоже перестаёт быть
+       visible, и всё лишнее срезается ровной линией. Нижний отступ ленты
+       уменьшен на ту же величину, чтобы воздух под ней не вырос. */
+    margin-inline:-20px; padding:6px 20px 22px;
+    /* `scroll-padding` тут обязателен вместе со `scroll-snap`. Прилипание
+       равняет чип по краю ОКНА ПРОКРУТКИ, а не по полю внутри него, и без
+       этой строки первый чип на телефоне садится вплотную к краю экрана,
+       хотя padding у ленты есть. Проверено замером: `left` был 0 вместо 20. */
+    scroll-snap-type:x proximity; scroll-padding-inline:20px;
+    margin-bottom:clamp(10px,1.4vw,22px);
+  }
+  .qa-chips::-webkit-scrollbar{display:none}
+  .qa-chip{flex:0 0 auto; scroll-snap-align:start}
+}
+@media (prefers-reduced-motion:reduce){
+  .qa.is-live .qa-wrap{transition:none}
+  .qa-item,.qa-sign,.qa-sign::before,.qa-sign::after,.qa-chip,.qa-find input{transition:none}
+}
+</style>
+
+<!-- Экран отзывов держит свой <style> намеренно: файл правит ещё одна сессия,
+     и своя коробка не даёт чужой незакрытой скобке уронить его
+     → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ==================== ЭКРАН 19Б: СТЕНА ОТЗЫВОВ ====================
+   Пространство имён `oz-`. Бегущая лента скриншотов отзывов на ночном небе
+   и кнопка на страницу, где лежат все.
+
+   ГДЕ СТОИТ: между экраном про родителей и фильмом о проекте. Так же и на
+   боевом ministrynn.ru: там стена отзывов идёт сразу за последним «взрослым»
+   аргументом.
+
+   ЩЕЛЧОК ПО КАДРУ УВОДИТ НА otzyvy.html#oN, и там этот отзыв сразу открыт
+   крупно. Поэтому карточка — ссылка, а не кнопка, и на главной нет второго
+   экземпляра окна просмотра: одно окно живёт на странице отзывов. Скрин
+   мелким не читается ни при какой высоте кадра (текст набран кеглем 15 px
+   при ширине 900 px), поэтому «прочитать» тут — это всегда перейти.
+
+   ЛЕНТА — ТОТ ЖЕ ПРИЁМ И ТЕ ЖЕ ЧИСЛА, ЧТО У ЭКРАНА 17 (Дед Морозы) и у ленты
+   второго экрана: 26 px/с базовой скорости на телефонной высоте кадра, потолок
+   разгона 2400, затухание броска 0,75 с. Язык на странице один. Выбор ленты
+   (а не слайдера и не плитки) — решение Серёги 11.09.2026.
+
+   КАДР ОДНОЙ ВЫСОТЫ И ОДНОЙ ШИРИНЫ, показывает ВЕРХ скрина, низ срезан
+   `overflow:hidden` у карточки. У экрана 17 иначе — там ширина кадра своя
+   у каждого снимка, — и разница не случайна: там фотографии, их надо видеть
+   целиком, а тут скриншоты текста, у которых важен верх (кто написал и первые
+   строки), и лента из них должна идти ровной чередой, а не рваным частоколом
+   разной ширины.
+
+   ПОЛЕ ТЁМНОЕ, ПОТОМУ ЧТО СКРИНЫ БЕЛЫЕ: на ночном небе они читаются как
+   светящиеся листы, на белом их пришлось бы обводить рамками. Небо — тот же
+   рецепт, что у экранов 14, 17 и 20.
+
+   z-index:29 — тот же слой, что у экранов 17-20. Выше нельзя: на 30 стоит
+   шапка сайта. При равном слое побеждает тот, кто ниже в разметке
+   → lessons/element-na-shve-sekciy-z-index.md
+
+   Картинки и разметку делает `sayt-nn/instrumenty/otzyvy.py`. */
+.oz-hold{position:relative; z-index:29}
+/* Запас под фиксированную шапку: ссылка «Отзывы» в шапке ведёт на этот экран,
+   и без запаса заголовок вставал бы ровно под её кромку (замер на телефоне:
+   заголовок 52 px, низ шапки 51 px — зазор в один пиксель). */
+.oz{scroll-margin-top:24px}
+/* Блик на шве с белым экраном про родителей — тот же снимок, что на швах
+   пятого, шестого, семнадцатого и двадцатого экранов. Стоит СНАРУЖИ секции:
+   у неё `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. */
+.oz-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.oz{
+  /* Высота кадра. 700*--u — это 869 px на 1600 и 700 px до 1250 px, где
+     множитель упирается в свой пол 1 px. Меньше делать нельзя: кадр 470 px
+     даёт ширину 366 px, то есть 0,4 от исходных 900 px, и от текста остаётся
+     серая рябь — стена перестаёт читаться как стена отзывов. На телефоне
+     высоту ограничивает 88vw. */
+  --oh: min(88vw, calc(700 * var(--u)));
+  --ow: calc(var(--oh) * .78);             /* ширина кадра: чуть уже высоты */
+  --og: calc(var(--oh) * .036);            /* зазор между кадрами */
+  --or: calc(var(--oh) * .022);            /* скругление углов кадра */
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(52px,6vw,102px) 0 clamp(56px,6.4vw,108px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.oz-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:58%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift1 38s ease-in-out infinite alternate}
+.oz-glow i:nth-child(2){right:-20vw; top:-6%; width:70vw; height:62%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift2 45s ease-in-out infinite alternate}
+.oz-glow i:nth-child(3){left:50%; bottom:-16%; width:78vw; height:54%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:bkDrift3 33s ease-in-out infinite alternate}
+.oz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Заголовок как на других тёмных экранах: Blogger Sans Bold прописными,
+   белый, вторая половина — золотом. Золотом выделено «только с прошлого
+   сезона»: тысяча отзывов за один сезон и есть мысль экрана. */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.oz-q{color:#F0C97A}
+.oz-lead{
+  max-width:calc(760 * var(--u)); margin:0 auto;
+  text-align:center; text-wrap:balance;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(14px, clamp(15px,1.25vw,20px)); line-height:1.45; color:#B9C8F5;
+}
+
+/* ---------- ЛЕНТА ----------
+   Стоит СНАРУЖИ `.cr-cont`: идёт во всю ширину окна и обрывается ровно
+   по его краю, как лента экрана 17. */
+.oz-wrap{
+  margin-top:clamp(26px,3.1vw,54px);
+  overflow:hidden;
+  padding:calc(var(--oh) * .022) 0;            /* запас, чтобы не срезало тень */
+  touch-action:pan-y;                          /* вертикаль отдаём странице */
+  user-select:none; -webkit-user-select:none;  /* палец тянет ленту, а не выделяет */
+}
+.oz-band{display:flex; align-items:flex-start; width:max-content; will-change:transform}
+/* Скругление задано И карточке, И картинке: в Safari скруглённый блок
+   с overflow:hidden внутри едущего слоя оставляет по углам прямоугольные хвосты
+   → lessons/skruglenie-uglov-v-dvizhushchemsya-sloe.md */
+.oz-card{
+  position:relative; flex:0 0 auto; display:block;
+  margin:0 var(--og) 0 0;
+  width:var(--ow); height:var(--oh);
+  border-radius:var(--or); overflow:hidden;
+  background:#fff;                             /* скрин белый: пока грузится, место белое */
+  box-shadow:0 calc(var(--oh) * .02) calc(var(--oh) * .05) rgba(2,5,22,.55);
+  transition:box-shadow .3s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.oz-card img{
+  display:block; width:100%; height:auto; max-width:none;
+  border-radius:inherit; -webkit-user-drag:none;
+}
+/* Низ кадра уходит в темноту, поверх — «Читать целиком». Тут это не украшение,
+   а честная подпись: низ скрина действительно срезан, и щелчок открывает его
+   целиком на странице отзывов. */
+.oz-card::after{
+  content:''; position:absolute; z-index:1; inset:auto 0 0 0; height:24%; pointer-events:none;
+  background:linear-gradient(180deg, rgba(4,7,26,0) 0%, rgba(4,7,26,.74) 74%, rgba(4,7,26,.94) 100%);
+}
+.oz-card::before{
+  content:'Читать целиком'; position:absolute; z-index:2; left:0; right:0;
+  bottom:calc(var(--oh) * .022); text-align:center; pointer-events:none;
+  font-family:"Golos Text",Arial,sans-serif; font-weight:600;
+  font-size:max(12px, calc(var(--oh) * .021)); letter-spacing:.02em; color:#F0C97A;
+  text-shadow:0 1px 8px rgba(0,0,0,.75);
+}
+@media (hover:hover) and (pointer:fine){
+  .oz-wrap{cursor:grab}
+  .oz-wrap.drag, .oz-wrap.drag *{cursor:grabbing}
+  .oz-card:hover{box-shadow:0 calc(var(--oh) * .03) calc(var(--oh) * .07) rgba(2,5,22,.7),
+                            0 0 0 2px rgba(240,201,122,.6)}
+}
+.oz-card:focus-visible{outline:3px solid rgba(255,238,190,.9); outline-offset:3px}
+/* «Меньше движения»: лента не едет сама, её листают пальцем или колесом */
+@media (prefers-reduced-motion:reduce){
+  .oz-wrap{overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch}
+}
+/* ---------- кнопка на страницу всех отзывов ----------
+   Обычная, золотая (выбор Серёги 11.09.2026): на этом экране она и есть
+   главное действие. Ширина как у кнопок под формами: 480 px на телефоне,
+   по надписи от 768 px → sayt-nn/standart-knopok.md */
+.oz-send{margin-top:clamp(28px,3.2vw,52px); text-align:center}
+.oz-send .zs-btn{width:min(100%,480px)}
+@media (min-width:768px){ .oz-send .zs-btn{width:auto} }
+/* На телефоне общий контейнер отдаёт поля целиком, и заголовок упёрся бы
+   в кромку экрана. Возвращаем их тексту — как на экранах 14 и 17. Ленты это
+   не касается: она снаружи контейнера и обязана обрываться по краю окна. */
+@media (max-width:767px){
+  .oz .cr-cont{width:100%; padding-inline:20px}
+}
+</style>
+
 </head>
 <body>
 
@@ -7928,6 +8494,439 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </section>
 </div>
 
+
+<!-- ==================== ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ ====================
+     САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - просьба Серёги 11.09.2026 («создай ниже
+     всех экран с ответами на вопросы»). Наш ответ странице ministrynn.ru/info.
+     Устройство, почему поле белое и почему ответы в разметке раскрыты →
+     блок «ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ» в стилях и sayt-nn/ustroystvo.md.
+
+     ВСЕ ВОСЕМНАДЦАТЬ ОТВЕТОВ СНЯТЫ С БОЕВОГО ministrynn.ru/info и отфильтрованы
+     по городу: страница нижегородская, поэтому максимум детей, адрес и телефоны
+     трансфера тут только НН. Цифры бонусов сверены с экраном 16 и с
+     business/core/customer-journey.md (раздел 9). Правишь условия - правь
+     сначала в business/.
+
+     СЧЁТЧИКИ В ЧИПАХ написаны и в разметке, и пересчитываются скриптом.
+     В разметке они не для красоты: выключен JS - числа всё равно верные.
+
+     Скрипт экрана - в конце страницы, блок «ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ». -->
+<section class="cr qa" id="faq" aria-labelledby="qaT">
+  <!-- Сугроб на стыке с тёмным полем квиза. Тот же класс, что на стыках
+       первого, одиннадцатого, пятнадцатого и девятнадцатого экранов. -->
+  <div class="cr-snow" aria-hidden="true"></div>
+  <div class="qa-glow" aria-hidden="true"><i></i><i></i></div>
+
+  <!-- Значки тем нарисованы один раз и подставляются через <use>: четыре
+       копии одного <svg> в разметке - четыре шанса, что при правке разъедутся.
+       Тот же приём, что с подарком на экране бонусов. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="qaIcTicket" viewBox="0 0 24 24">
+      <path d="M3.6 9.1V7.4A1.8 1.8 0 0 1 5.4 5.6h13.2a1.8 1.8 0 0 1 1.8 1.8v1.7a2.9 2.9 0 0 0 0 5.8v1.7a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8v-1.7a2.9 2.9 0 0 0 0-5.8Z"/>
+      <path d="M14.2 5.6v2.1M14.2 11v2M14.2 16.3v2.1"/>
+    </symbol>
+    <symbol id="qaIcAdults" viewBox="0 0 24 24">
+      <circle cx="9.2" cy="8" r="3.1"/>
+      <path d="M3.4 19.4a5.8 5.8 0 0 1 11.6 0"/>
+      <path d="M16.1 5.2a3.1 3.1 0 0 1 0 5.9M17.6 14.3a5.8 5.8 0 0 1 3 5.1"/>
+    </symbol>
+    <symbol id="qaIcRub" viewBox="0 0 24 24">
+      <path d="M8.6 20V4.6h4.6a4.4 4.4 0 0 1 0 8.8H8.6"/>
+      <path d="M6.4 16.6h7.4"/>
+    </symbol>
+    <symbol id="qaIcHome" viewBox="0 0 24 24">
+      <path d="M3.8 10.4 12 4l8.2 6.4"/>
+      <path d="M5.7 12v6.6a1.6 1.6 0 0 0 1.6 1.6h9.4a1.6 1.6 0 0 0 1.6-1.6V12"/>
+      <path d="M10 20.2v-4.6h4v4.6"/>
+    </symbol>
+  </svg>
+
+  <div class="cr-cont">
+    <p class="qa-eyebrow">Вопросы и ответы · Нижний Новгород</p>
+    <h2 class="qa-t" id="qaT"><span class="qa-red">Здесь ответ</span><br><span class="qa-blue">на любой вопрос</span></h2>
+    <p class="qa-lead">Быстрее найти ответ здесь, чем писать менеджеру. Собрали всё,
+      о чём спрашивают чаще всего&nbsp;- про группу, деньги, дорогу и сам праздник.</p>
+
+    <!-- ПОИСК И ЧИПЫ СПРЯТАНЫ В РАЗМЕТКЕ, показывает их скрипт. Вся их работа
+         на нём и держится: без JS поле в полную ширину и пять кнопок тем молча
+         ничего не делали бы - человек печатает слово, список не меняется,
+         жмёт тему, ничего не происходит. Это хуже, чем если бы их не было:
+         выглядит как сломанный сайт. А читать экран без JS можно и так - все
+         восемнадцать ответов лежат раскрытыми. -->
+    <div class="qa-tools" id="qaTools" hidden>
+
+    <!-- Поиск ищет и по вопросам, и по тексту ответов: человек чаще помнит
+         слово из ответа («промокод», «Ольгино»), чем формулировку вопроса. -->
+    <!-- Это <div>, а не <label>, хотя внутри поле: в метку нельзя класть
+         интерактивные элементы, а внутри лежит кнопка очистки. С <label>
+         щелчок по крестику считался бы ещё и щелчком по полю. Подписи
+         у поля всё равно нет - её заменяет aria-label. -->
+    <div class="qa-find">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <circle cx="10.8" cy="10.8" r="6.4"/><path d="M15.5 15.5 20 20"/>
+      </svg>
+      <input type="search" id="qaFind" placeholder="Поиск по вопросам" autocomplete="off"
+             aria-label="Поиск по вопросам и ответам">
+      <button class="qa-clear" id="qaClear" type="button" aria-label="Очистить поиск" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+
+    <div class="qa-chips" id="qaChips" role="group" aria-label="Темы вопросов">
+      <button class="qa-chip" type="button" data-tema="all" aria-pressed="true">Все вопросы <i>18</i></button>
+      <button class="qa-chip" type="button" data-tema="bilety" aria-pressed="false">Группа и билеты <i>5</i></button>
+      <button class="qa-chip" type="button" data-tema="vzroslye" aria-pressed="false">Взрослые в группе <i>4</i></button>
+      <button class="qa-chip" type="button" data-tema="oplata" aria-pressed="false">Оплата и скидки <i>5</i></button>
+      <button class="qa-chip" type="button" data-tema="doroga" aria-pressed="false">Дорога и мероприятие <i>4</i></button>
+    </div>
+
+    </div><!-- /.qa-tools -->
+
+    <!-- Область для читалки: скрипт пишет сюда «Нашлось 3 ответа» после
+         каждого нажатия на чип и каждой буквы в поиске. Зрячий видит это сам -
+         список укорачивается на глазах, - а голосу без такой области поиск
+         и чипы не сообщают ничего. role="status" уже подразумевает
+         aria-live="polite", но пишем оба: старые читалки понимают только его. -->
+    <p class="qa-sr" id="qaStatus" role="status" aria-live="polite"></p>
+
+    <div class="qa-list" id="qaList">
+
+      <!-- ---------- тема 1: группа и билеты ---------- -->
+      <section class="qa-group" data-tema="bilety" aria-labelledby="qaG1">
+        <h3 class="qa-gt" id="qaG1">
+          <span class="qa-gic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#qaIcTicket"/></svg></span>
+          Группа и билеты
+        </h3>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA1">
+            <span class="qa-qt">Сколько детей должно быть в группе?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA1"><div><div class="qa-a">
+            <p>Организованной группой считается группа <b>от 20 детей</b>&nbsp;- на неё
+              действуют цены из таблицы выше и все бонусы. Взрослые в это число не входят.</p>
+            <!-- ПРИЧИНУ НЕ ДОПИСЫВАТЬ. Сначала тут стояло «больше в избе становится
+                 тесно, и программа теряет в качестве» - выдумка этого экрана: такого
+                 нет ни в business/, ни на боевом ministrynn.ru/info. Это публичное
+                 заявление, что качество нашей программы зависит от числа детей,
+                 и бизнес его не согласовывал. Захочется объяснить «почему» -
+                 сначала завести формулировку в business/cities/nizhny/venue.md. -->
+            <p>Максимум в Нижнем Новгороде&nbsp;- <b>35-36 детей</b>: столько вмещает изба.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA2">
+            <span class="qa-qt">А если не наберётся 20 детей?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA2"><div><div class="qa-a">
+            <p>Есть два пути, и оба рабочие:</p>
+            <ul>
+              <li>Если детей <b>16-19</b>, вы можете приехать к нам <b>в январе по той же цене</b>&nbsp;-
+                мы добавим в вашу группу около 10 ребят из другой не собравшейся группы.</li>
+              <li>Или <b>выкупить 20 детских билетов</b>, даже если детей меньше, и пойти
+                своей маленькой группой на выбранную дату.</li>
+            </ul>
+            <p>Предоплата <b>5000&nbsp;₽ возвратная</b> в течение 5 дней с момента внесения.
+              Поэтому за эти пять дней лучше окончательно понять, наберётся ли 20 детей.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA3">
+            <span class="qa-qt">Ребёнок заболел. Деньги вернут?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA3"><div><div class="qa-a">
+            <p>Возвратов за непосещение нет: вы покупаете акционный пакет для групп&nbsp;-
+              детский билет дешевле, чем в сборной группе, плюс бесплатные взрослые
+              и детский билет в подарок.</p>
+            <p>Но подстраховаться можно, и мы это предлагаем каждой группе:</p>
+            <ul>
+              <li><b>2-3 резервных билета.</b> При окончательном расчёте платите за 2-3 человек
+                меньше, чем планируете привезти, а остальных оплачиваете позже&nbsp;- но
+                не позднее чем <b>за 3 дня</b> до мероприятия: нам нужно заранее заготовить
+                сырьё для карамельного мастер-класса и много чего ещё.</li>
+              <li><b>Перенос на другую дату.</b> Заболевший ребёнок приедет к нам в январе
+                в составе сборной группы&nbsp;- мы держим для таких случаев 1000 мест.</li>
+            </ul>
+            <p>Так мы делаем каждый год, и проблем не возникало ни у организаторов групп,
+              ни у нас.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA4">
+            <span class="qa-qt">Можно докупить детские билеты позже?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA4"><div><div class="qa-a">
+            <p>Да, но не позднее чем <b>за 3 дня до мероприятия</b>&nbsp;- тогда цена сохраняется.</p>
+            <p>На месте, в день праздника, детские билеты докупить нельзя: заготовки
+              для мастер-класса и угощение готовятся заранее, по числу детей в группе.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA5">
+            <span class="qa-qt">А взрослые билеты можно докупить прямо на мероприятии?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA5"><div><div class="qa-a">
+            <p>В крайнем случае&nbsp;- да, такое бывало. Но при двух условиях: взрослых должно
+              быть не больше допустимого для вашей группы (сколько именно&nbsp;- в вопросе
+              «Сколько родителей можно взять с собой?»), и цена в день мероприятия будет
+              <b>на 200-300&nbsp;₽ выше</b>.</p>
+            <p>Поэтому лучше определиться заранее и купить дешевле. Взрослые билеты
+              невозвратные, и скидки на них не действуют.</p>
+          </div></div></div>
+        </div>
+      </section>
+
+      <!-- ---------- тема 2: взрослые в группе ---------- -->
+      <section class="qa-group" data-tema="vzroslye" aria-labelledby="qaG2">
+        <h3 class="qa-gt" id="qaG2">
+          <span class="qa-gic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#qaIcAdults"/></svg></span>
+          Взрослые в группе
+        </h3>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA6">
+            <span class="qa-qt">Учитель идёт бесплатно? Какие бонусы у группы?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA6"><div><div class="qa-a">
+            <p>Для организованной группы от 20 детей:</p>
+            <ul>
+              <li><b>4 сопровождающих взрослых</b>&nbsp;- бесплатно;</li>
+              <!-- ИТОГОВУЮ ЦИФРУ НЕ ПИСАТЬ. Тут стояло «итого пятеро взрослых
+                   проходят бесплатно» - арифметика по нашим же пунктам, но
+                   такого числа нет ни в business/, ни на боевом сайте, и
+                   менеджер по телефону называет другой состав. Пункты
+                   перечислены ровно как на экране 16 (`.gb-list`); расхождение
+                   с business/ (там 5 сопровождающих) не разведено -
+                   см. business/core/customer-journey.md, раздел 9. -->
+              <li><b>1 взрослый билет в подарок</b> организатору группы;</li>
+              <li><b>1 детский билет в подарок</b> (21-й), обычно его отдают организатору;</li>
+              <li>родителей развлекаем отдельно и угощаем игристым или чаем;</li>
+              <li><b>скидка 5%</b> детям участников СВО, инвалидам и многодетным семьям.</li>
+            </ul>
+            <p>Обычно в число бесплатных взрослых входят классный руководитель
+              и организатор группы.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA7">
+            <span class="qa-qt">Сколько стоит дополнительный взрослый билет?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA7"><div><div class="qa-a">
+            <!-- Цена живёт классом `.pr-adult`: её каждый месяц пересчитывает
+                 скрипт экрана цен. Число в разметке - сентябрьское, оно же
+                 запасное, если JS выключен. -->
+            <p>Взрослый билет&nbsp;- <b class="pr-adult" data-base="700">от 700&nbsp;₽</b>.
+              Цена одинаковая для организованных и для сборных групп.</p>
+            <!-- КЛАСС-КРЮЧОК ОБЯЗАТЕЛЕН. Последнее повышение сезона - 1 декабря,
+                 дальше расти нечему, и обещание роста врало бы весь декабрь
+                 и январь - на самом пике трафика. Скрипт экрана цен переписывает
+                 эту фразу так же, как свою собственную под таблицей. Свой класс,
+                 а не `.pr-grow`: у того есть CSS (по центру, 74ch, красный <b>),
+                 внутри карточки ответа он всё изуродует. Без JS в разметке
+                 остаётся сентябрьский вариант - он верен до 1 декабря. -->
+            <p class="pr-grow-adult">Растёт она по тому же правилу, что и детские билеты&nbsp;- <b>на 100&nbsp;₽
+              каждого 1 числа месяца</b>. Дата закрепляется за вами по той цене, которая
+              была в день брони.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA8">
+            <span class="qa-qt">Сколько родителей можно взять с собой?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA8"><div><div class="qa-a">
+            <p>Чем больше в группе детей, тем меньше в избе места для взрослых.
+              Считаем всех родителей вместе&nbsp;- и бесплатных, и платных:</p>
+            <ul>
+              <li><b>21 ребёнок</b>&nbsp;- до 12 родителей;</li>
+              <li><b>30 детей</b>&nbsp;- до 10 родителей;</li>
+              <li><b>35 детей и больше</b>&nbsp;- 7-8 родителей.</li>
+            </ul>
+            <p>Плюс-минус два человека обсуждаемо. И если у вас позднее время
+              (например, 20:00), взрослых обычно можно взять больше&nbsp;- скажите менеджеру,
+              посмотрим по вашей дате.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA9">
+            <span class="qa-qt">А что делают родители, пока дети на программе?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA9"><div><div class="qa-a">
+            <p>Взрослые часто в шутку пишут, что им понравилось больше, чем детям :)</p>
+            <p>Родители ждут в новогоднем зале с большим камином и детализированными
+              фотозонами&nbsp;- у нас вообще весь дом одна сплошная фотозона. Мы угощаем вас
+              игристым или чаем, и не один раз. К вам спустится наш Дед Мороз&nbsp;- с такой
+              бородой и костюмом, каких вы не видели ни на одном мероприятии. Будут
+              хороводы, стихи, новогодние песни, смех и шутки.</p>
+            <p>А ещё можно подняться в кабинет Деда Мороза, посмотреть на карамельный
+              мастер-класс, полюбоваться авторской выставкой уникальных леденцов
+              и побывать на шоу рисования светом.</p>
+          </div></div></div>
+        </div>
+      </section>
+
+      <!-- ---------- тема 3: оплата и скидки ---------- -->
+      <section class="qa-group" data-tema="oplata" aria-labelledby="qaG3">
+        <h3 class="qa-gt" id="qaG3">
+          <span class="qa-gic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#qaIcRub"/></svg></span>
+          Оплата и скидки
+        </h3>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA10">
+            <span class="qa-qt">Оплата переводом или официальный платёж?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA10"><div><div class="qa-a">
+            <p>Только официально, в белую. <b>Никаких переводов по номеру телефона
+              и никакого СБП на физическое лицо.</b></p>
+            <p>Оплата идёт через интернет-эквайринг на расчётный счёт
+              <b>ИП Киричок С.&nbsp;В., ИНН 910314959705</b>. Мы работаем с сервисом СБП
+              для юридических лиц с эквайрингом от Альфа-банка&nbsp;- не путайте с СБП
+              для физлиц, это другое.</p>
+            <p>После оплаты вы получите фискальный чек. Можете не переживать,
+              на мошенников вы не попали :)</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA11">
+            <span class="qa-qt">Есть ли скидки льготникам и какие нужны документы?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA11"><div><div class="qa-a">
+            <p>Да, <b>скидка 5%</b>&nbsp;- многодетным семьям, инвалидам и детям участников СВО.</p>
+            <p>При окончательном расчёте нужно прислать менеджеру фото подтверждающих
+              документов. Какие именно&nbsp;- родители со льготами обычно знают.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA12">
+            <span class="qa-qt">У меня есть промокод. Как его применить?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA12"><div><div class="qa-a">
+            <p>Промокод нужно назвать менеджеру <b>до бронирования</b>&nbsp;- это условие
+              указано при выдаче промокода тому, кто им с вами поделился. И напомнить
+              о нём при окончательном расчёте: скидка считается там.</p>
+            <p>Применить можно только тот промокод, которым с вами <b>поделились</b>.
+              Тот, что система присвоила лично вам, к своей группе применить нельзя.</p>
+            <!-- ОГОВОРКА ОБЯЗАТЕЛЬНА. Рядом лежат три ответа подряд, и в каждом
+                 по 5%: льгота, чужой промокод, свой промокод на вторую группу.
+                 Без этой строки многодетная семья с чужим промокодом складывает
+                 их в 10% и узнаёт правду на окончательном расчёте, когда деньги
+                 с родителей уже собраны. В голосовом канале оговорка есть
+                 (business/robot/intents/logistika-skidki.md, интент LOG-09),
+                 на сайте её не было. Источник правила -
+                 business/core/customer-journey.md, раздел 8. -->
+            <p>С льготной скидкой промокод <b>не суммируется</b>&nbsp;- действует
+              что-то одно.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA13">
+            <span class="qa-qt">А к своей второй группе промокод применить можно?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA13"><div><div class="qa-a">
+            <p>Да. Ваш собственный промокод даёт <b>скидку 5% на вторую группу</b>, которую
+              вы записываете. На первую он не действует.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA14">
+            <span class="qa-qt">Действует ли Пушкинская карта?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA14"><div><div class="qa-a">
+            <p>Нет. Мы не государственное учреждение, поддержку нам никто не оказывает&nbsp;-
+              это частный коммерческий проект.</p>
+          </div></div></div>
+        </div>
+      </section>
+
+      <!-- ---------- тема 4: дорога и мероприятие ---------- -->
+      <section class="qa-group" data-tema="doroga" aria-labelledby="qaG4">
+        <h3 class="qa-gt" id="qaG4">
+          <span class="qa-gic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#qaIcHome"/></svg></span>
+          Дорога и мероприятие
+        </h3>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA15">
+            <span class="qa-qt">Какой точный адрес площадки?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA15"><div><div class="qa-a">
+            <p>Нижний Новгород, <b>Ольгино, 62</b>. Это в черте города, Приокский район,
+              почти на выезде. Рядом остановка общественного транспорта.</p>
+            <p>От центра ехать <b>20 минут</b> без пробок&nbsp;- не раз засекали. Хорошая дорога,
+              удобный подъезд, большая парковка.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA16">
+            <span class="qa-qt">Вы организуете трансфер?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA16"><div><div class="qa-a">
+            <p>Сами&nbsp;- нет: мы организаторы площадки и мероприятия, детей везут к нам.
+              Но есть партнёры, которые возят к нам группы не первый год и держат
+              для наших клиентов адекватные цены. Сохраните контакты:</p>
+            <ul>
+              <li><a href="tel:+78314157372">+7 (831) 415-73-72</a></li>
+              <li><a href="tel:+79697630667">+7 (969) 763-06-67</a></li>
+            </ul>
+            <p>Скажите, что вы от нас&nbsp;- получите скидку 5%.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA17">
+            <span class="qa-qt">Можно вручить детям свои подарки?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA17"><div><div class="qa-a">
+            <p>Да. Предупредите нас <b>за день</b> до мероприятия и привозите.</p>
+            <p>Каждому лично Дед Мороз вручить не успеет&nbsp;- в программе не хватит времени.
+              А вот поставить подарки под ёлку мы можем: Дед Мороз сам направит
+              к ним деток.</p>
+          </div></div></div>
+        </div>
+
+        <div class="qa-item">
+          <h4 class="qa-h"><button class="qa-q" type="button" aria-expanded="true" aria-controls="qaA18">
+            <span class="qa-qt">Можно принести с собой что-то на чаепитие?</span>
+            <span class="qa-sign" aria-hidden="true"></span></button></h4>
+          <div class="qa-wrap" id="qaA18"><div><div class="qa-a">
+            <p>Нет. Чаепитие у нас символическое&nbsp;- это просто угощение от Деда Мороза,
+              и проходит оно очень быстро, всегда быстрее, чем запланировано: дети
+              выпивают чай, съедают чокопай и бегут фотографироваться и всё
+              рассматривать.</p>
+          </div></div></div>
+        </div>
+      </section>
+
+      <p class="qa-none" id="qaNone" hidden>Ничего не нашлось.
+        Попробуйте другое слово или нажмите «Все вопросы».</p>
+    </div>
+
+    <!-- Кнопка обычная, золотая (вид 1 стандарта) - выбор Серёги 11.09.2026.
+         Это последнее действие последнего экрана страницы, поэтому главное
+         → sayt-nn/standart-knopok.md -->
+    <div class="qa-cta">
+      <p class="qa-cta-t">Не нашли свой вопрос?</p>
+      <p class="qa-cta-s">Оставьте номер&nbsp;- перезвоним в течение 30 минут, ответим
+        на что угодно и подберём дату для вашей группы.</p>
+      <button class="zs-btn" type="button" data-zs="экран с ответами на вопросы"
+              data-zs-title="Спросите нас о чём угодно"
+              data-zs-sub="Перезвоним в течение 30 минут, ответим на любой вопрос и подберём дату для вашей группы.">
+        <span class="zs-t">Оставить заявку</span></button>
+    </div>
+  </div>
+</section>
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
@@ -11610,11 +12609,25 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
   /* Взрослый билет живёт по тому же правилу, но категории дат у него нет:
      одна цена на весь сезон, растёт теми же ступенями. */
-  var ad = sec.querySelector('.pr-adult');
-  if(ad){
+  /* ЦЕНА ВЗРОСЛОГО БИЛЕТА СТОИТ НА ДВУХ ЭКРАНАХ - в справке под таблицей цен
+     и в ответе «Сколько стоит дополнительный взрослый билет?» на экране 22.
+     Поэтому ищем не внутри своей секции, а по всей странице: одно правило
+     сезона - одно место, где оно считается. Заведёшь третье место - просто
+     повесь там тот же класс `.pr-adult` с `data-base`. */
+  [].forEach.call(document.querySelectorAll('.pr-adult'), function(ad){
     var adBase = parseInt(ad.getAttribute('data-base'), 10);
     if(adBase) ad.textContent = 'от ' + money(adBase + cur.add);
-  }
+  });
+
+  /* ОБЕЩАНИЕ РОСТА ТОЖЕ ЖИВЁТ НЕ ТОЛЬКО ПОД ТАБЛИЦЕЙ. Такая же фраза стоит
+     в ответе про взрослый билет на экране 22. После 1 декабря повышений
+     не остаётся, и необновлённая фраза врала бы весь декабрь и январь -
+     ровно то же, от чего страхует `.pr-grow` под таблицей. */
+  [].forEach.call(document.querySelectorAll('.pr-grow-adult'), function(p){
+    p.innerHTML = next
+      ? 'Растёт она по тому же правилу, что и детские билеты&nbsp;- <b>на 100&nbsp;₽ каждого 1 числа месяца</b>. Дата закрепляется за вами по той цене, которая была в день брони.'
+      : 'Это финальная цена сезона: последнее повышение было 1 декабря. Дата закрепляется за вами по той цене, которая была в день брони.';
+  });
 
   /* Объяснение под таблицей БОЛЬШЕ НЕ ПЕРЕЧИСЛЯЕТ даты повышений: Серёга
      попросил 10.09.2026 сказать короче - «растут каждого 1 числа месяца!».
@@ -12387,6 +13400,399 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }
   if (document.readyState === 'complete') bind();
   else window.addEventListener('load', bind);
+})();
+</script>
+
+
+<script>
+/* ==================== ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ ====================
+   Скрипт делает три вещи: складывает карточки, фильтрует их по теме
+   и ищет по слову. Всё состояние экрана - две переменные (`tema` и `zapros`),
+   остальное из них следует. Так не бывает «чип нажат, а список показывает
+   другое»: любое изменение проходит через один пересчёт `pokazat()`.
+
+   РАЗМЕТКА ПРИХОДИТ РАСКРЫТОЙ, складывает её этот скрипт. Выключен JS или
+   он упал - человек читает восемнадцать вопросов подряд, как на боевом
+   ministrynn.ru/info. Тот же приём, что у карусели персонажей и у цен:
+   в разметке всегда лежит рабочее состояние, скрипт его только улучшает.
+
+   ПЕРЕХОДЫ ВКЛЮЧАЮТСЯ ПОСЛЕ ПЕРВОГО КАДРА (класс `is-live`). Без этого
+   восемнадцать ответов складывались бы анимацией прямо на глазах при
+   загрузке страницы.
+
+   ОТКРЫТ ВСЕГДА ОДИН ОТВЕТ. Иначе после пяти открытых карточек список
+   перестаёт быть оглавлением и превращается в ту самую простыню, ради
+   ухода от которой экран и делался.
+
+   ЧИПЫ И ПОИСК РАБОТАЮТ ВМЕСТЕ, а не отменяют друг друга: выбранная тема
+   при вводе слова не сбрасывается. Это предсказуемее, чем «поиск втихую
+   вернул все темы», а на случай пустого пересечения есть строка «ничего
+   не нашлось» с подсказкой нажать «Все вопросы».
+
+   СЧЁТЧИКИ В ЧИПАХ ЖИВЫЕ. Они считаются не один раз при загрузке, а на
+   каждый пересчёт, и учитывают слово из поиска: во время поиска чип
+   «Оплата и скидки» показывает, сколько НАЙДЕНО в этой теме, а не сколько
+   в ней всего. Иначе чип обещает пять ответов, а открывает два. Числа
+   написаны и в разметке - без скрипта они тоже верные.
+
+   ГОЛОСУ ФИЛЬТР СООБЩАЕТСЯ ОТДЕЛЬНО. Зрячий видит, что список укоротился;
+   читалке без живой области (`#qaStatus`) поиск и чипы не говорят ничего -
+   человек нажимает и не понимает, случилось ли что-нибудь. */
+(function(){
+  var sec = document.getElementById('faq');
+  if(!sec) return;
+
+  var items  = [].slice.call(sec.querySelectorAll('.qa-item'));
+  var groups = [].slice.call(sec.querySelectorAll('.qa-group'));
+  var chips  = [].slice.call(sec.querySelectorAll('.qa-chip'));
+  if(!items.length) return;
+
+  var pole  = document.getElementById('qaFind');
+  var sbros = document.getElementById('qaClear');
+  var pusto = document.getElementById('qaNone');
+  var golos = document.getElementById('qaStatus');
+  var pult  = document.getElementById('qaTools');
+
+  var tema = 'all', zapros = '';
+
+  /* ---------- что складывается ---------- */
+  function zakryt(it){
+    it.classList.add('is-shut');
+    it.classList.remove('is-open');
+    var b = it.querySelector('.qa-q');
+    if(b) b.setAttribute('aria-expanded', 'false');
+  }
+  function raskryt(it){
+    items.forEach(function(o){ if(o !== it) zakryt(o); });
+    it.classList.remove('is-shut');
+    it.classList.add('is-open');
+    var b = it.querySelector('.qa-q');
+    if(b) b.setAttribute('aria-expanded', 'true');
+  }
+
+  items.forEach(function(it){
+    zakryt(it);
+    var b = it.querySelector('.qa-q');
+    if(!b) return;
+    b.addEventListener('click', function(){
+      if(it.classList.contains('is-shut')) raskryt(it); else zakryt(it);
+    });
+  });
+  /* Пульт (поиск и чипы) лежит в разметке спрятанным и показывается только
+     теперь, когда есть кому его слушать. */
+  if(pult) pult.hidden = false;
+
+  /* Переходы - только со второго кадра, см. шапку блока. */
+  if(window.requestAnimationFrame) requestAnimationFrame(function(){ sec.classList.add('is-live'); });
+  else sec.classList.add('is-live');
+
+  /* ---------- поиск ----------
+     Текст каждой карточки снимаем ОДИН РАЗ, при загрузке: перечитывать DOM
+     восемнадцать раз на каждый удар по клавише незачем. «ё» приводим к «е» -
+     иначе «ёлка» и «елка» считаются разными словами, а люди пишут и так, и так. */
+  function norm(s){ return (s || '').toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ').trim(); }
+  var korpus = items.map(function(it){ return norm(it.textContent); });
+
+  /* ПОИСК БЕЗ ОКОНЧАНИЙ. По-русски спрашивают «ёлка», а в ответе написано
+     «под ёлку»; точное совпадение не находит ничего, и человек решает, что
+     ответа нет вовсе. Поэтому у слова от четырёх букв отрезаем последнюю,
+     от шести - две: «елка» → «елк», «билеты» → «билет», «Ольгино» → «Ольги».
+     Настоящую морфологию это не заменяет, но закрывает ровно тот случай,
+     ради которого поиск и ставили. Слова запроса ищутся ВСЕ и в любом
+     порядке - «адрес площадки» найдёт и «площадка по адресу». */
+  function slova(q){
+    return norm(q).split(' ').filter(Boolean).map(function(w){
+      return w.length >= 6 ? w.slice(0, -2) : (w.length >= 4 ? w.slice(0, -1) : w);
+    });
+  }
+  var temy   = items.map(function(it){
+    var g = it.parentNode;
+    while(g && !(g.classList && g.classList.contains('qa-group'))) g = g.parentNode;
+    return g ? g.getAttribute('data-tema') : '';
+  });
+
+  /* Русские окончания у числа: «1 ответ», «2 ответа», «5 ответов». Без этого
+     голос читает «нашлось 1 ответов» - мелочь, но по ней сразу слышно, что
+     строку собрали склейкой. */
+  function skolko(n){
+    var a = n % 10, b = n % 100;
+    if(n === 0) return 'Ничего не нашлось';
+    if(a === 1 && b !== 11) return 'Нашёлся ' + n + ' ответ';
+    if(a >= 2 && a <= 4 && (b < 12 || b > 14)) return 'Нашлось ' + n + ' ответа';
+    return 'Нашлось ' + n + ' ответов';
+  }
+
+  function pokazat(){
+    var q = slova(zapros), vidno = 0, pervaya = null;
+    /* Совпадение со словом считаем ОТДЕЛЬНО от темы: по нему же считаются
+       числа в чипах. Иначе чип «Оплата и скидки 5» во время поиска обещает
+       пять ответов, а показывает два. */
+    var poSlovu = items.map(function(it, k){
+      return !q.length || q.every(function(w){ return korpus[k].indexOf(w) !== -1; });
+    });
+
+    items.forEach(function(it, k){
+      var est = (tema === 'all' || temy[k] === tema) && poSlovu[k];
+      it.hidden = !est;
+      /* Спрятанную карточку закрываем: вернётся она сложенной, а не с чужим
+         открытым ответом посреди новой выборки. */
+      if(est) vidno++; else zakryt(it);
+    });
+
+    groups.forEach(function(g){
+      g.hidden = !g.querySelector('.qa-item:not([hidden])');
+      if(!g.hidden && !pervaya) pervaya = g;
+      g.classList.remove('is-first');
+    });
+    if(pervaya) pervaya.classList.add('is-first');
+
+    if(pusto) pusto.hidden = vidno > 0;
+    if(sbros) sbros.hidden = !zapros;
+
+    chips.forEach(function(c){
+      var t = c.getAttribute('data-tema');
+      c.setAttribute('aria-pressed', t === tema ? 'true' : 'false');
+      var i = c.querySelector('i');
+      if(!i) return;
+      var n = 0;
+      for(var k = 0; k < items.length; k++){
+        if(t !== 'all' && temy[k] !== t) continue;
+        if(poSlovu[k]) n++;
+      }
+      i.textContent = n;
+    });
+
+    /* Голосу сообщаем только когда фильтр действительно что-то отсекает:
+       при «все вопросы» и пустом поиске объявлять нечего. */
+    if(golos) golos.textContent = (q.length || tema !== 'all') ? skolko(vidno) : '';
+  }
+
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      var t = c.getAttribute('data-tema') || 'all';
+      /* Повторное нажатие по выбранной теме снимает фильтр. Чип объявлен
+         переключателем (aria-pressed), и нажатый переключатель обязан
+         выключаться - иначе голос говорит «нажато», а нажатие ничего не меняет. */
+      tema = (tema === t && t !== 'all') ? 'all' : t;
+      pokazat();
+    });
+  });
+
+  if(pole){
+    pole.addEventListener('input', function(){ zapros = pole.value; pokazat(); });
+    /* Escape в поле поиска чистит запрос - привычка из любого поиска. */
+    pole.addEventListener('keydown', function(e){
+      if(e.key === 'Escape' && pole.value){ e.preventDefault(); pole.value = ''; zapros = ''; pokazat(); }
+    });
+  }
+  if(sbros){
+    sbros.addEventListener('click', function(){
+      zapros = '';
+      if(pole){ pole.value = ''; pole.focus(); }
+      pokazat();
+    });
+  }
+
+  /* Поле поиска браузер восстанавливает при возврате «назад» - состояние
+     экрана надо привести к тому, что в нём написано, а не к пустому. */
+  if(pole && pole.value){ zapros = pole.value; }
+  pokazat();
+})();
+</script>
+
+<!-- Скрипт экрана отзывов вынесен в ОТДЕЛЬНЫЙ <script> намеренно: файл правит
+     ещё одна сессия, и своя коробка не даёт чужой правке уронить его. -->
+<script>
+/* ==================== ЭКРАН 19Б: ЛЕНТА ОТЗЫВОВ ====================
+   Лента едет справа налево сама и разгоняется пальцем или мышью. Приём и числа
+   те же, что у ленты Деда Морозов (экран 17) и у ленты второго экрана —
+   язык на странице один.
+
+   ПЕТЛЯ БЕЗ ШВА. Кадры повторены дважды, лента сдвигается на остаток от ширины
+   одного повтора, и в момент, когда первая восьмёрка уезжает за левый край,
+   вторая стоит ровно на её месте. Вторая восьмёрка — копии разметки, а не
+   второй набор файлов: браузер берёт картинки из кеша. Копии помечены
+   `aria-hidden`, с пустым `alt` и вынуты из обхода по Tab (`tabindex="-1"`):
+   иначе читалка прочитала бы все отзывы дважды, а Tab обошёл бы шестнадцать
+   ссылок вместо восьми.
+
+   СЕРЕДИНЫ У ЭТОЙ ЛЕНТЫ НЕТ. У экрана 17 один кадр стоит по центру окна
+   на старте (просьба Серёги про Деда Мороза, развёдшего руки). Тут все кадры
+   равноправны, поэтому лента просто начинает с нуля — и кода на пересчёт
+   середины при каждом замере не нужно.
+
+   ЩЕЛЧОК И ПЕРЕТАСКИВАНИЕ РАЗВЕДЕНЫ ПО ПРОЙДЕННОМУ ПУТИ. Кадры — ссылки,
+   и без этого любое перетаскивание ленты мышью заканчивалось бы уходом
+   на страницу отзывов. Порог тот же, что у ленты 17: 8 px. Меньше — это
+   щелчок, больше — бросок.
+
+   ЛЕНТА ЖИВЁТ, ПОКА ОНА НА ЭКРАНЕ: за кадром кадры не считаем.
+
+   При «меньше движения» лента не собирается вовсе: прокрутку отдаём браузеру
+   (`overflow-x:auto` в стилях), кадры листаются пальцем. */
+(function(){
+  'use strict';
+  var wrap = document.getElementById('ozWrap');
+  var band = document.getElementById('ozBand');
+  if (!wrap || !band) return;
+
+  var calm  = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var cards = Array.prototype.slice.call(band.children);   /* настоящие, без копий */
+  var N = cards.length;
+  if (!N) return;
+
+  function slushat(mq, fn){
+    if (mq.addEventListener) mq.addEventListener('change', fn);
+    else if (mq.addListener) mq.addListener(fn);
+  }
+
+  /* Ленивая загрузка снимается ЗАРАНЕЕ, за пол-экрана до подъезда: иначе кадр
+     въезжает в окно пустым — браузер берётся за файл, только когда картинка
+     пересекла край окна, а лента к этому моменту её уже показывает. */
+  var razleneno = false;
+  function razlenit(){
+    razleneno = true;
+    var im = band.querySelectorAll('img[loading="lazy"]');
+    for (var i = 0; i < im.length; i++) im[i].loading = 'eager';
+  }
+  if (!('IntersectionObserver' in window)) razlenit();
+  else new IntersectionObserver(function(en, ob){
+    if (en[0].isIntersecting){ razlenit(); ob.disconnect(); }
+  }, {rootMargin:'60% 0px'}).observe(wrap);
+
+  var BASE = 26, LH0 = 240, MAXV = 2400, TAU = 0.75;   /* числа ленты второго экрана */
+  var sobrano = false, shag = 0, pos = 0, v = BASE, raf = 0, last = 0;
+  var tyanut = false, pid = null, x0 = 0, t0 = 0, vx = 0, proshel = 0;
+  var glaz = null;
+
+  function sobrat(){
+    if (sobrano) return;
+    for (var i = 0; i < N; i++){
+      var k = cards[i].cloneNode(true);
+      k.className += ' oz-clone';
+      k.setAttribute('aria-hidden', 'true');
+      k.setAttribute('tabindex', '-1');   /* копию Tab обходить не должен */
+      var im = k.querySelector('img');
+      if (im) im.alt = '';
+      band.appendChild(k);
+    }
+    sobrano = true;
+    /* Копии унаследовали loading="lazy". Снимаем её только если экран уже
+       подъехал: иначе лента, собранная при загрузке страницы, утащила бы
+       все файлы с самого верха. */
+    if (razleneno) razlenit();
+    izmerit();
+  }
+  function razobrat(){
+    var k = band.querySelectorAll('.oz-clone');
+    for (var i = 0; i < k.length; i++) k[i].parentNode.removeChild(k[i]);
+    sobrano = false; pos = 0; v = BASE; shag = 0;
+    band.style.transform = '';
+  }
+  /* МЕРЯЕМ ПРЯМОУГОЛЬНИКАМИ, А НЕ offsetLeft: тот округлён до целых пикселей,
+     а ширина кадра дробная (считается от высоты), и на восьми кадрах округление
+     копится — шаг петли промахнулся бы, и лента дёргалась на каждом обороте. */
+  function izmerit(){
+    if (!sobrano) return;
+    var a = band.children[0], b = band.children[N];
+    if (!a || !b){ shag = 0; return; }
+    var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    shag = rb.left - ra.left;
+    /* крупнее кадр — быстрее лента: глаз мерит движение долями кадра,
+       а не пикселями. Ниже телефонной высоты не замедляемся. */
+    BASE = 26 * Math.max(1, (ra.height || LH0) / LH0);
+    polozhit();
+  }
+  function polozhit(){
+    var x = shag ? -(((pos % shag) + shag) % shag) : 0;
+    band.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+  }
+  function kadr(now){
+    raf = requestAnimationFrame(kadr);
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+    last = now;
+    if (!tyanut){
+      v += (BASE - v) * (1 - Math.exp(-dt / TAU));   /* бросок затухает к базовой */
+      pos += v * dt;
+    }
+    polozhit();
+  }
+  function pusk(){ if (!raf && sobrano){ last = 0; raf = requestAnimationFrame(kadr); } }
+  function stop(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+
+  wrap.addEventListener('pointerdown', function(e){
+    if (!sobrano) return;
+    tyanut = true;
+    pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; proshel = 0;
+    wrap.classList.add('drag');                      /* курсор «схваченная рука» */
+    try{ wrap.setPointerCapture(pid); }catch(err){}
+  });
+  wrap.addEventListener('pointermove', function(e){
+    if (!tyanut || e.pointerId !== pid) return;
+    var dx = e.clientX - x0, dt = (e.timeStamp - t0) / 1000;
+    pos -= dx;                                       /* лента идёт за пальцем */
+    proshel += Math.abs(dx);
+    if (dt > 0.004) vx = 0.7 * vx + 0.3 * (dx / dt); /* сглаженная скорость пальца */
+    x0 = e.clientX; t0 = e.timeStamp;
+    polozhit();
+  });
+  function otpustit(){
+    if (!tyanut) return;
+    tyanut = false;
+    wrap.classList.remove('drag');
+    if (pid !== null){ try{ wrap.releasePointerCapture(pid); }catch(err){} pid = null; }
+    if (proshel < 8) return;                         /* это был щелчок, не бросок */
+    v = Math.max(-MAXV, Math.min(MAXV, -vx));
+  }
+  wrap.addEventListener('pointerup', otpustit);
+  wrap.addEventListener('pointercancel', otpustit);
+  wrap.addEventListener('lostpointercapture', otpustit);
+
+  /* Перетащили ленту — переход не нужен. Ловим на всплытии от ссылки:
+     `proshel` к этому моменту уже посчитан в pointermove.
+
+     `e.detail !== 0` ОБЯЗАТЕЛЬНО. У щелчка мышью detail — счётчик нажатий
+     (1, 2, 3…), у нажатия Enter на ссылке с клавиатуры — ноль. Без этой
+     проверки человек, который бросил ленту мышью, а потом дошёл до кадра
+     табом и нажал Enter, никуда бы не перешёл: `proshel` остался большим
+     с прошлого броска, а pointerdown, который его обнуляет, с клавиатуры
+     не приходит. Проверено в браузере — сначала именно так и было.
+
+     После разбора щелчка путь обнуляем: один бросок гасит один щелчок,
+     а не все следующие. */
+  wrap.addEventListener('click', function(e){
+    if (e.detail !== 0 && proshel >= 8){ e.preventDefault(); e.stopPropagation(); }
+    proshel = 0;
+  });
+  /* Родное перетаскивание картинки браузером мешает нашему: гасим. */
+  wrap.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+  function smotret(){
+    if (glaz || !('IntersectionObserver' in window)){ pusk(); return; }
+    glaz = new IntersectionObserver(function(en){
+      if (en[0].isIntersecting) pusk(); else stop();
+    }, {rootMargin:'100px'});
+    glaz.observe(wrap);
+  }
+
+  function svet(){
+    if (!calm.matches){ sobrat(); smotret(); }
+    else { stop(); razobrat(); }
+  }
+  svet();
+  slushat(calm, svet);
+
+  /* Замер повторяем после полной загрузки: шрифт заголовка и картинки могли
+     поменять высоту секции, а вместе с ней и ширину кадров. */
+  window.addEventListener('load', function(){ if (sobrano) izmerit(); });
+
+  var tmr = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 150);
+  });
+  window.addEventListener('orientationchange', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 300);
+  });
 })();
 </script>
 
