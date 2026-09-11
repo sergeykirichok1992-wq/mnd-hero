@@ -7,7 +7,7 @@
 <title>Отзывы о «Звёздной смене» — Министерство новогодних дел</title>
 <meta name="theme-color" content="#04070F">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Текстовые отзывы родителей о новогоднем шоу «Звёздная смена» в Нижнем Новгороде: скриншоты постов, комментариев и переписок как есть, без правок.">
+<meta name="description" content="Текстовые отзывы родителей о новогоднем шоу «Звёздная смена» в Нижнем Новгороде: скриншоты отзывов с Яндекс Карт как есть, без правок.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Министерство новогодних дел">
 <meta property="og:title" content="Отзывы о «Звёздной смене»">
@@ -242,6 +242,14 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
 }
 .oz-hint b{color:#EBD3A0; font-weight:600}
 
+/* ---------- баннер с оценкой на Яндексе ----------
+   Ширину держим скромной: это не заголовок экрана, а его подпись. Картинка
+   с прозрачным фоном, никакой подложки под неё не нужно. */
+.oz-ocenka{
+  display:block; width:min(100%, 560px); height:auto;
+  margin:clamp(18px,2.2vw,34px) auto 0;
+}
+
 /* ---------- КЛАДКА КАРТОЧЕК ----------
    Колонками (`columns`), а не сеткой: у скринов разная высота, и в сетке
    ряд равнялся бы по самому высокому - между карточками пошли бы дыры
@@ -291,16 +299,15 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
   transition:transform .2s ease, box-shadow .3s ease;
   -webkit-tap-highlight-color:transparent;
 }
-/* СКРИН СТОИТ ЦЕЛИКОМ, БЕЗ ОБРЕЗКИ.
+/* СКРИН СТОИТ ЦЕЛИКОМ, БЕЗ ОБРЕЗКИ В БРАУЗЕРЕ.
    Первый заход обрезал превью по верху (aspect-ratio 3/4 + object-fit:cover),
    чтобы карточки вышли ровнее, а страница короче. Забраковано на первом же
-   снимке: у половины скринов сверху фотографии, а сам отзыв под ними, - то
-   есть обрезка прятала ровно то, за чем человек пришёл. Пусть страница длинная:
-   это страница ВСЕХ отзывов, длина тут не порок.
+   снимке: у скринов ВКонтакте сверху шли фотографии, а сам отзыв под ними, -
+   то есть обрезка прятала ровно то, за чем человек пришёл.
 
-   Метку `oz-tall` скрипт otzyvy.py по-прежнему ставит высоким скринам -
-   она пригодится, если когда-нибудь понадобится их отличать. Стилей за ней
-   сейчас нет намеренно. */
+   Сейчас это и не нужно: скрины с Яндекс Карт обрезает `instrumenty/otzyvy.py`
+   ещё до выкладки - срезает шапку Карт и кнопку «Добавить отзыв», оставляя
+   только сами отзывы. Поэтому карточки и так близки по пропорции. */
 .oz-card img{display:block; width:100%; height:auto}
 @media (hover:hover) and (pointer:fine){
   .oz-card:hover{transform:translateY(-3px);
@@ -386,50 +393,131 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
   <div class="oz-cont">
     <h1 class="oz-t">Более 1000 реальных текстовых отзывов<br>
       <span class="oz-q">только с прошлого сезона!</span></h1>
-    <p class="oz-lead">Это скриншоты как есть: посты и комментарии из ВКонтакте,
-      благодарности в переписке. Ничего не переписано и не сокращено.</p>
+    <p class="oz-lead">Это скриншоты с Яндекс Карт как есть — с именами, датами
+      и оценками. Ничего не переписано и не сокращено.</p>
     <p class="oz-hint"><b>Нажмите на любой отзыв</b>, чтобы открыть его крупно</p>
 
+    <!-- Баннер с оценкой на Яндексе. Сказан один раз: у всех скринов ниже
+         одна и та же шапка Карт была обрезана, чтобы стена не превратилась
+         в двадцать восемь одинаковых заголовков → instrumenty/otzyvy.py.
+         Картинка с прозрачным фоном, поэтому ложится прямо на небо. -->
+    <img class="oz-ocenka" src="otz/ya-ocenka.webp" width="1200" height="375"
+         decoding="async"
+         alt="Держим планку на Яндексе: 5,0 из 5 по 242 оценкам">
+
     <div class="oz-grid" id="ozGrid">
-    <button class="oz-card" type="button"><img src="otz/o01.webp" width="900" height="643"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв ВКонтакте: «всё продумано до мелочей, актёры — мастера своего дела, даже родители поверили что Дед Мороз настоящий»"></button>   <!-- 52 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o02.webp" width="900" height="1566"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв ВКонтакте с фотографиями: «волшебная сказка для детей и детей постарше»"></button>   <!-- 190 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o03.webp" width="900" height="1548"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Длинный отзыв родителя-организатора: разбор по пунктам — организация, программа, актёры, Дед Мороз, атмосфера, безопасность"></button>   <!-- 191 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o04.webp" width="900" height="1950"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Благодарность в переписке: «дети были в восторге, отдельный респект Министру новогодних дел и Дед Морозу»"></button>   <!-- 69 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o05.webp" width="900" height="1526"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв мамы: «мы вывезли второклашек, и пока 35 детей катали карамельные леденцы, сопровождающие мамы водили хоровод с Дедом Морозом»"></button>   <!-- 146 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o06.webp" width="900" height="1533"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв ВКонтакте с фотографиями встречи с Дедом Морозом и Снегурочкой"></button>   <!-- 117 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o07.webp" width="900" height="1950"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Комментарии ВКонтакте от нескольких мам: «чудесная атмосфера, программа для детей, карамель очень вкусная»"></button>   <!-- 93 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o08.webp" width="900" height="1492"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв с фотографией Деда Мороза: «водила хоровод, пела песню про ёлочку — он существует, и не вздумайте теперь спорить со мной»"></button>   <!-- 119 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o09.webp" width="900" height="1950"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв ВКонтакте: класс лицея на экскурсии, дети сами приготовили карамель на палочке"></button>   <!-- 158 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o10.webp" width="900" height="1555"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв классного руководителя с фотографиями: «там, где живёт детство и вкусно пахнет карамелью»"></button>   <!-- 171 КБ -->
-    <button class="oz-card" type="button"><img src="otz/o11.webp" width="900" height="1106"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв с фотографиями: «все дети с удовольствием делали своими руками карамель и дарили вторую мамам и папам»"></button>   <!-- 125 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o12.webp" width="900" height="1674"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Отзыв с фотографией: «рядом с таким Дедом Морозом веришь, что твои желания обязательно исполнятся»"></button>   <!-- 119 КБ -->
-    <button class="oz-card oz-tall" type="button"><img src="otz/o13.webp" width="900" height="1950"
-         loading="lazy" decoding="async" draggable="false"
-         alt="Раздел отзывов ВКонтакте: средняя оценка 4,9 из 5"></button>   <!-- 96 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya01.webp">
+      <img src="otz/s/ya01.webp" width="560" height="645"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 1)"></button>   <!-- 34 + 58 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya02.webp">
+      <img src="otz/s/ya02.webp" width="560" height="353"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 2)"></button>   <!-- 21 + 34 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya03.webp">
+      <img src="otz/s/ya03.webp" width="560" height="623"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 3)"></button>   <!-- 34 + 58 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya04.webp">
+      <img src="otz/s/ya04.webp" width="560" height="363"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 4)"></button>   <!-- 19 + 32 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya05.webp">
+      <img src="otz/s/ya05.webp" width="560" height="610"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 5)"></button>   <!-- 36 + 63 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya06.webp">
+      <img src="otz/s/ya06.webp" width="560" height="391"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 6)"></button>   <!-- 23 + 40 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya07.webp">
+      <img src="otz/s/ya07.webp" width="560" height="610"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 7)"></button>   <!-- 33 + 58 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya08.webp">
+      <img src="otz/s/ya08.webp" width="560" height="395"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 8)"></button>   <!-- 28 + 45 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya09.webp">
+      <img src="otz/s/ya09.webp" width="560" height="603"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 9)"></button>   <!-- 38 + 63 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya10.webp">
+      <img src="otz/s/ya10.webp" width="560" height="395"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 10)"></button>   <!-- 30 + 51 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya11.webp">
+      <img src="otz/s/ya11.webp" width="560" height="600"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 11)"></button>   <!-- 38 + 65 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya12.webp">
+      <img src="otz/s/ya12.webp" width="560" height="406"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 12)"></button>   <!-- 23 + 39 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya13.webp">
+      <img src="otz/s/ya13.webp" width="560" height="598"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 13)"></button>   <!-- 37 + 67 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya14.webp">
+      <img src="otz/s/ya14.webp" width="560" height="413"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 14)"></button>   <!-- 25 + 42 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya15.webp">
+      <img src="otz/s/ya15.webp" width="560" height="595"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 15)"></button>   <!-- 33 + 56 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya16.webp">
+      <img src="otz/s/ya16.webp" width="560" height="421"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 16)"></button>   <!-- 30 + 49 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya17.webp">
+      <img src="otz/s/ya17.webp" width="560" height="584"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 17)"></button>   <!-- 38 + 69 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya18.webp">
+      <img src="otz/s/ya18.webp" width="560" height="431"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 18)"></button>   <!-- 29 + 49 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya19.webp">
+      <img src="otz/s/ya19.webp" width="560" height="558"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 19)"></button>   <!-- 27 + 46 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya20.webp">
+      <img src="otz/s/ya20.webp" width="560" height="432"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 20)"></button>   <!-- 28 + 46 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya21.webp">
+      <img src="otz/s/ya21.webp" width="560" height="538"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 21)"></button>   <!-- 33 + 56 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya22.webp">
+      <img src="otz/s/ya22.webp" width="560" height="439"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 22)"></button>   <!-- 21 + 36 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya23.webp">
+      <img src="otz/s/ya23.webp" width="560" height="532"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 23)"></button>   <!-- 35 + 58 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya24.webp">
+      <img src="otz/s/ya24.webp" width="560" height="450"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 24)"></button>   <!-- 30 + 50 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya25.webp">
+      <img src="otz/s/ya25.webp" width="560" height="475"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 25)"></button>   <!-- 27 + 50 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya26.webp">
+      <img src="otz/s/ya26.webp" width="560" height="452"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 26)"></button>   <!-- 33 + 55 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya27.webp">
+      <img src="otz/s/ya27.webp" width="560" height="474"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 27)"></button>   <!-- 32 + 57 КБ -->
+    <button class="oz-card" type="button" data-full="otz/ya28.webp">
+      <img src="otz/s/ya28.webp" width="560" height="460"
+           loading="lazy" decoding="async" draggable="false"
+           alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 28)"></button>   <!-- 21 + 39 КБ -->
     </div><!-- /oz-grid -->
 
     <!-- Кнопка обычная, золотая (выбор Серёги 11.09.2026): на странице она
@@ -525,7 +613,12 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
     i = ((k % N) + N) % N;
     var im = kart[i].querySelector('img');
     if (!im) return;
-    img.src = im.currentSrc || im.src;
+    /* КАРТОЧКА ПОКАЗЫВАЕТ МЕЛКУЮ ВЕРСИЮ, ОКНО - КРУПНУЮ (`data-full`).
+       Скрин в карточке виден на 330 px, и мелкой версии 560 px там хватает
+       с запасом; в окне он открывается во всю ширину, и там нужна версия
+       900 px. Если бы обе брались из одного файла, страница тянула бы
+       пять мегабайт крупных версий сразу при открытии. */
+    img.src = kart[i].getAttribute('data-full') || im.currentSrc || im.src;
     img.alt = im.alt || '';
     /* ширину и высоту переносим тоже: без них окно прыгает, пока файл
        достаётся из кеша */

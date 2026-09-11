@@ -5736,22 +5736,28 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
 }
 .oz{
-  /* Высота кадра: 233*--u — это 290 px на 1600 и 233 px до 1250 px, где
-     множитель упирается в свой пол 1 px. На телефоне высоту ограничивает
-     29,3vw (105 px на 390).
+  /* ЗАДАЁМ ШИРИНУ КАДРА, ВЫСОТА У КАЖДОГО СВОЯ. 291*--u — это 362 px на 1600
+     и 291 px до 1250 px, где множитель упирается в свой пол 1 px; на телефоне
+     ширину ограничивает 36,6vw.
+
+     Раньше кадр был фиксированным по обеим сторонам (362x463), и это работало,
+     пока в ленте лежали скриншоты ВКонтакте — все высокие. Скрины с Яндекс Карт
+     после обрезки идут пропорцией от 0,63 до 1,15, то есть половина из них
+     ШИРЕ, чем выше: в фиксированном кадре такая карточка вписывалась по ширине
+     и оставляла снизу пустое поле в половину кадра, а поверх пустоты висела
+     надпись «Читать целиком». Поэтому высота теперь своя у каждого кадра,
+     а лента выровнена по центру — получается стена заметок разной длины.
 
      РАЗМЕР ПОДБИРАЛ САМ СЕРЁГА, В ДВА ЗАХОДА (11.09.2026, оба раза глядя
-     на боевую). Первый заход у меня был крупный — кадр 870 px, чтобы текст
-     скрина читался прямо в ленте. Серёга попросил «в 3 раза меньше»: ему нужна
-     стена, по которой видно, что отзывов много, а читают их по щелчку. Стало
-     290 px — и через несколько минут «увеличь на 60 %». Итог: 700 → 233 → 373,
-     88vw → 29,3vw → 46,9vw, то есть чуть больше половины первоначального.
-     Хочешь другой размер — меняются только эти два числа, остальное
-     считается от них. */
-  --oh: min(46.9vw, calc(373 * var(--u)));
-  --ow: calc(var(--oh) * .78);             /* ширина кадра: чуть уже высоты */
-  --og: calc(var(--oh) * .07);             /* зазор между кадрами */
-  --or: calc(var(--oh) * .038);            /* скругление углов кадра */
+     на боевую). Сперва у меня был крупный кадр 870 px, чтобы текст скрина
+     читался прямо в ленте; Серёга попросил «в 3 раза меньше» — ему нужна стена,
+     по которой видно, что отзывов много. Стало 290 px — и через несколько минут
+     «увеличь на 60 %». Ширина 362 px — это и есть итог обоих заходов; при ней
+     текст скрина (в исходнике кегль около 40 px при ширине 1320) читается
+     на экране как 11 px. Хочешь другой размер — меняется одно это число. */
+  --ow: min(36.6vw, calc(291 * var(--u)));
+  --og: calc(var(--ow) * .09);             /* зазор между кадрами */
+  --or: calc(var(--ow) * .048);            /* скругление углов кадра */
   position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
   padding:clamp(52px,6vw,102px) 0 clamp(56px,6.4vw,108px);
   background:
@@ -5795,21 +5801,23 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .oz-wrap{
   margin-top:clamp(26px,3.1vw,54px);
   overflow:hidden;
-  padding:calc(var(--oh) * .022) 0;            /* запас, чтобы не срезало тень */
+  padding:calc(var(--ow) * .028) 0;            /* запас, чтобы не срезало тень */
   touch-action:pan-y;                          /* вертикаль отдаём странице */
   user-select:none; -webkit-user-select:none;  /* палец тянет ленту, а не выделяет */
 }
-.oz-band{display:flex; align-items:flex-start; width:max-content; will-change:transform}
+/* По ЦЕНТРУ, а не по верху: высота у кадров своя, и при выравнивании по верху
+   лента выглядела бы как частокол с рваным низом. */
+.oz-band{display:flex; align-items:center; width:max-content; will-change:transform}
 /* Скругление задано И карточке, И картинке: в Safari скруглённый блок
    с overflow:hidden внутри едущего слоя оставляет по углам прямоугольные хвосты
    → lessons/skruglenie-uglov-v-dvizhushchemsya-sloe.md */
 .oz-card{
   position:relative; flex:0 0 auto; display:block;
   margin:0 var(--og) 0 0;
-  width:var(--ow); height:var(--oh);
+  width:var(--ow);                             /* высота своя: см. выше */
   border-radius:var(--or); overflow:hidden;
   background:#fff;                             /* скрин белый: пока грузится, место белое */
-  box-shadow:0 calc(var(--oh) * .02) calc(var(--oh) * .05) rgba(2,5,22,.55);
+  box-shadow:0 calc(var(--ow) * .026) calc(var(--ow) * .064) rgba(2,5,22,.55);
   transition:box-shadow .3s ease;
   -webkit-tap-highlight-color:transparent;
 }
@@ -5817,28 +5825,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   display:block; width:100%; height:auto; max-width:none;
   border-radius:inherit; -webkit-user-drag:none;
 }
-/* Низ кадра уходит в темноту, поверх — «Читать целиком». Тут это не украшение,
-   а честная подпись: низ скрина действительно срезан, и щелчок открывает его
-   целиком на странице отзывов. */
-.oz-card::after{
-  content:''; position:absolute; z-index:1; inset:auto 0 0 0; height:30%; pointer-events:none;
-  background:linear-gradient(180deg, rgba(4,7,26,0) 0%, rgba(4,7,26,.74) 74%, rgba(4,7,26,.94) 100%);
-}
-/* «Читать целиком» поверх затемнения. Надпись снималась, пока кадр был
-   226 px - там она занимала половину ширины и лезла на текст отзыва.
-   После увеличения на 60 % кадр 362 px, и надпись (около 110 px) снова
-   встаёт свободно. Уменьшишь кадр - снимать её опять. */
-.oz-card::before{
-  content:'Читать целиком'; position:absolute; z-index:2; left:0; right:0;
-  bottom:calc(var(--oh) * .022); text-align:center; pointer-events:none;
-  font-family:"Golos Text",Arial,sans-serif; font-weight:600;
-  font-size:max(12px, calc(var(--oh) * .027)); letter-spacing:.02em; color:#F0C97A;
-  text-shadow:0 1px 8px rgba(0,0,0,.75);
-}
+/* ЗАТЕМНЕНИЯ И НАДПИСИ «ЧИТАТЬ ЦЕЛИКОМ» НА КАДРЕ НЕТ.
+   Они нужны были, пока кадр срезал скрин по высоте: тогда надпись честно
+   говорила, что текст продолжается. Сейчас каждый скрин виден целиком
+   (свою обрезку - шапку Карт и кнопку - он получил ещё в otzyvy.py),
+   и надпись обещала бы то, чего нет. Приглашение нажать живёт в строке
+   под заголовком экрана. */
 @media (hover:hover) and (pointer:fine){
   .oz-wrap{cursor:grab}
   .oz-wrap.drag, .oz-wrap.drag *{cursor:grabbing}
-  .oz-card:hover{box-shadow:0 calc(var(--oh) * .03) calc(var(--oh) * .07) rgba(2,5,22,.7),
+  .oz-card:hover{box-shadow:0 calc(var(--ow) * .038) calc(var(--ow) * .09) rgba(2,5,22,.7),
                             0 0 0 2px rgba(240,201,122,.6)}
 }
 .oz-card:focus-visible{outline:3px solid rgba(255,238,190,.9); outline-offset:3px}
@@ -8503,11 +8499,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      карточки на странице отзывов, поэтому порядок кадров тут и порядок
      кладки там обязаны совпадать: и то и другое печатает otzyvy.py.
 
-     В ЛЕНТЕ ВСЕ ТРИНАДЦАТЬ КАДРОВ (LENTA в otzyvy.py). Было восемь, пока кадр
-     был крупным; 11.09.2026 кадр уменьшили втрое, и восемь мелких кадров стали
-     укладываться в 1968 px - при окне 1600 петля начинала повторяться почти
-     сразу. Придёт папка Серёги с бо́льшим набором - вернуть в LENTA 14-16,
-     чтобы страница отзывов осталась богаче ленты. -->
+     В ЛЕНТЕ ШЕСТНАДЦАТЬ КАДРОВ ИЗ ДВАДЦАТИ ВОСЬМИ (LENTA в otzyvy.py). Число
+     менялось вслед за размером кадра: восемь при крупном кадре, все тринадцать
+     при мелком (петля из восьми укладывалась в 1968 px и повторялась почти
+     сразу), шестнадцать - когда пришёл набор Серёги с Яндекс Карт. Остальные
+     двенадцать ждут на своей странице, за кнопкой.
+
+     КАДР ПОКАЗЫВАЕТ МЕЛКУЮ ВЕРСИЮ СКРИНА (`otz/s/`, 560 px). Крупная (900 px)
+     нужна только окну просмотра на странице отзывов, и тянуть её в ленту
+     значило бы возить по главной лишние три мегабайта. -->
 <div class="oz-hold">
 <div class="oz-blik" aria-hidden="true"></div>
 <section class="cr oz" id="otzyvy" aria-labelledby="ozT">
@@ -8517,66 +8517,78 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="cr-cont">
     <h2 class="oz-t" id="ozT">Более 1000 реальных текстовых отзывов<br>
       <span class="oz-q">только с прошлого сезона!</span></h2>
-    <p class="oz-lead">Вот несколько случайных из них. Это скриншоты как есть:
-      посты и комментарии из ВКонтакте, благодарности в переписке. Нажмите
-      на любой, чтобы прочитать целиком.</p>
+    <p class="oz-lead">Вот несколько случайных из них. Это скриншоты с Яндекс Карт
+      как есть — с именами, датами и оценками. Нажмите на любой, чтобы открыть
+      все отзывы.</p>
   </div>
 
   <!-- Лента стоит снаружи `.cr-cont`: она идёт во всю ширину окна. -->
   <div class="oz-wrap" id="ozWrap">
     <div class="oz-band" id="ozBand">
       <a class="oz-card" href="otzyvy.html#o1" draggable="false">
-        <img src="otz/o01.webp" width="900" height="643"
+        <img src="otz/s/ya01.webp" width="560" height="645"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв ВКонтакте: «всё продумано до мелочей, актёры — мастера своего дела, даже родители поверили что Дед Мороз настоящий»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 1)"></a>
       <a class="oz-card" href="otzyvy.html#o2" draggable="false">
-        <img src="otz/o02.webp" width="900" height="1566"
+        <img src="otz/s/ya02.webp" width="560" height="353"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв ВКонтакте с фотографиями: «волшебная сказка для детей и детей постарше»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 2)"></a>
       <a class="oz-card" href="otzyvy.html#o3" draggable="false">
-        <img src="otz/o03.webp" width="900" height="1548"
+        <img src="otz/s/ya03.webp" width="560" height="623"
              loading="lazy" decoding="async" draggable="false"
-             alt="Длинный отзыв родителя-организатора: разбор по пунктам — организация, программа, актёры, Дед Мороз, атмосфера, безопасность"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 3)"></a>
       <a class="oz-card" href="otzyvy.html#o4" draggable="false">
-        <img src="otz/o04.webp" width="900" height="1950"
+        <img src="otz/s/ya04.webp" width="560" height="363"
              loading="lazy" decoding="async" draggable="false"
-             alt="Благодарность в переписке: «дети были в восторге, отдельный респект Министру новогодних дел и Дед Морозу»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 4)"></a>
       <a class="oz-card" href="otzyvy.html#o5" draggable="false">
-        <img src="otz/o05.webp" width="900" height="1526"
+        <img src="otz/s/ya05.webp" width="560" height="610"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв мамы: «мы вывезли второклашек, и пока 35 детей катали карамельные леденцы, сопровождающие мамы водили хоровод с Дедом Морозом»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 5)"></a>
       <a class="oz-card" href="otzyvy.html#o6" draggable="false">
-        <img src="otz/o06.webp" width="900" height="1533"
+        <img src="otz/s/ya06.webp" width="560" height="391"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв ВКонтакте с фотографиями встречи с Дедом Морозом и Снегурочкой"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 6)"></a>
       <a class="oz-card" href="otzyvy.html#o7" draggable="false">
-        <img src="otz/o07.webp" width="900" height="1950"
+        <img src="otz/s/ya07.webp" width="560" height="610"
              loading="lazy" decoding="async" draggable="false"
-             alt="Комментарии ВКонтакте от нескольких мам: «чудесная атмосфера, программа для детей, карамель очень вкусная»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 7)"></a>
       <a class="oz-card" href="otzyvy.html#o8" draggable="false">
-        <img src="otz/o08.webp" width="900" height="1492"
+        <img src="otz/s/ya08.webp" width="560" height="395"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв с фотографией Деда Мороза: «водила хоровод, пела песню про ёлочку — он существует, и не вздумайте теперь спорить со мной»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 8)"></a>
       <a class="oz-card" href="otzyvy.html#o9" draggable="false">
-        <img src="otz/o09.webp" width="900" height="1950"
+        <img src="otz/s/ya09.webp" width="560" height="603"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв ВКонтакте: класс лицея на экскурсии, дети сами приготовили карамель на палочке"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 9)"></a>
       <a class="oz-card" href="otzyvy.html#o10" draggable="false">
-        <img src="otz/o10.webp" width="900" height="1555"
+        <img src="otz/s/ya10.webp" width="560" height="395"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв классного руководителя с фотографиями: «там, где живёт детство и вкусно пахнет карамелью»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 10)"></a>
       <a class="oz-card" href="otzyvy.html#o11" draggable="false">
-        <img src="otz/o11.webp" width="900" height="1106"
+        <img src="otz/s/ya11.webp" width="560" height="600"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв с фотографиями: «все дети с удовольствием делали своими руками карамель и дарили вторую мамам и папам»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 11)"></a>
       <a class="oz-card" href="otzyvy.html#o12" draggable="false">
-        <img src="otz/o12.webp" width="900" height="1674"
+        <img src="otz/s/ya12.webp" width="560" height="406"
              loading="lazy" decoding="async" draggable="false"
-             alt="Отзыв с фотографией: «рядом с таким Дедом Морозом веришь, что твои желания обязательно исполнятся»"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 12)"></a>
       <a class="oz-card" href="otzyvy.html#o13" draggable="false">
-        <img src="otz/o13.webp" width="900" height="1950"
+        <img src="otz/s/ya13.webp" width="560" height="598"
              loading="lazy" decoding="async" draggable="false"
-             alt="Раздел отзывов ВКонтакте: средняя оценка 4,9 из 5"></a>
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 13)"></a>
+      <a class="oz-card" href="otzyvy.html#o14" draggable="false">
+        <img src="otz/s/ya14.webp" width="560" height="413"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 14)"></a>
+      <a class="oz-card" href="otzyvy.html#o15" draggable="false">
+        <img src="otz/s/ya15.webp" width="560" height="595"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 15)"></a>
+      <a class="oz-card" href="otzyvy.html#o16" draggable="false">
+        <img src="otz/s/ya16.webp" width="560" height="421"
+             loading="lazy" decoding="async" draggable="false"
+             alt="Отзыв о Министерстве новогодних дел на Яндекс Картах, оценка 5 из 5 (скриншот 16)"></a>
     </div>
   </div>
 
