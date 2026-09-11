@@ -6013,6 +6013,94 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:clamp(22px,2.4vw,35.7px); line-height:1.1; text-transform:uppercase; color:#fff; text-wrap:balance}
 
+/* ---------- калькулятор и подарок по бокам окна ---------- */
+/* Два украшения по макету Серёги 11.09.2026 (`~/Desktop/новый сайт/квиз/`):
+   слева чёрный калькулятор, справа голубой подарок. Обе картинки заходят
+   на окно, поэтому лежат НЕ внутри `.kv-card` (у него overflow:hidden -
+   обрежет), а рядом, в общей обойме `.kv-box`. Обойма повторяет ширину окна,
+   от неё и считаются все проценты.
+
+   ПОЗИЦИЯ ПО ВЕРТИКАЛИ - `margin-top` в процентах, а не `top`: проценты
+   в `top` считаются от ВЫСОТЫ родителя, а она у квиза скачет от шага к шагу
+   (обложка 648 px, шаг с формой под 700). Проценты в `margin-top` считаются
+   от ШИРИНЫ - картинки стоят на одном месте относительно верха окна
+   и растут вместе с ним.
+
+   ДВА ДВИЖЕНИЯ НА ОДНУ КАРТИНКУ, поэтому две вложенные коробки: обёртка
+   `span` съезжает за курсором (её двигает скрипт через `--px/--py`),
+   картинка внутри качается вверх-вниз ключевыми кадрами. В один `transform`
+   их не сложить - анимация переписывала бы сдвиг мыши каждый кадр.
+   Тот же приём, что у ёлочных шаров седьмого экрана (`.kr-ball`).
+
+   НАВСТРЕЧУ ДРУГ ДРУГУ: у подарка `alternate-reverse` - он начинает ход
+   с той стороны, где калькулятор заканчивает. Срок качания у обоих ОДИН
+   (`--kv-dur`), иначе встречное движение разъедется за пару минут. */
+.kv-box{position:relative; width:min(100%,1400px); margin:0 auto}
+.kv{
+  --kv-sw:.5cm;      /* по полсантиметра вверх и вниз - полный ход ровно 1 см */
+  --kv-dur:5.6s;     /* один срок на обе картинки, иначе противоход разъедется */
+  --kv-pull:34px;    /* насколько картинка тянется за курсором */
+}
+.kv-deco{position:absolute; inset:0; z-index:4; pointer-events:none}
+.kv-deco span{
+  position:absolute; display:block; top:0; will-change:transform;
+  transform:translate3d(var(--px,0px), var(--py,0px), 0);
+  transition:transform .55s cubic-bezier(.22,.61,.36,1);
+}
+.kv-deco img{
+  display:block; width:100%; height:auto; will-change:transform;
+  animation:kvFloat var(--kv-dur) ease-in-out infinite alternate;
+}
+@keyframes kvFloat{
+  from{transform:translateY(calc(var(--kv-sw) * -1))}
+  to  {transform:translateY(var(--kv-sw))}
+}
+.kv-deco-r img{animation-direction:alternate-reverse}
+
+/* Голубое свечение под картинкой. Лежит на ОБЁРТКЕ, а не на самой картинке:
+   тогда пятно остаётся на месте, а картинка над ним качается - выходит, что
+   она парит над светом, а не таскает его за собой. Размер - в полтора раза
+   шире картинки, как у эллипса под логотипом первого экрана.
+   БЕЗ filter:blur - мягкость даёт сам радиальный градиент (тот же запрет,
+   что и у отблесков фона: размытие пересчитывается каждый кадр). */
+/* Пятно НЕ равномерный ореол вокруг картинки, а компактный яркий круг под ней,
+   сдвинутый к дальнему нижнему углу, - так нарисовано в макете: свет идёт
+   из одной точки, а не светится сам предмет. Размер и сдвиг у двух картинок
+   разные, потому что и лежат они по-разному: у калькулятора угол правый,
+   у подарка левый. */
+.kv-deco span::before{
+  content:''; position:absolute; z-index:-1; border-radius:50%;
+  /* ядро почти белое: в макете под подарком яркость доходит до 187/227/243,
+     то есть свет там не «подсветка», а лампа. Замер 11.09.2026. */
+  background:radial-gradient(closest-side,
+    rgba(206,242,255,.95) 0%, rgba(132,205,255,.62) 30%,
+    rgba(92,162,248,.22) 60%, rgba(70,130,235,0) 100%);
+}
+/* Пятно должно ВЫСТУПАТЬ из-под картинки, иначе она его закрывает целиком:
+   низ спущен под габарит, дальний бок вынесен за край. */
+.kv-deco-l::before{left:16%; right:-18%; bottom:-22%; height:64%}
+.kv-deco-r::before{left:-24%; right:16%; bottom:-18%; height:62%}
+/* Второе пятно - уже ПОВЕРХ картинки, режимом `screen`: в макете свет не просто
+   лежит за предметом, он падает на его нижний край (у подарка низ коробки
+   светится голубым). Слой мягкий и маленький, стоит на обёртке - значит
+   не качается вместе с картинкой, и предмет ходит сквозь свет, как над лампой. */
+.kv-deco span::after{
+  content:''; position:absolute; z-index:1; pointer-events:none;
+  border-radius:50%; mix-blend-mode:screen;
+  background:radial-gradient(closest-side,
+    rgba(150,215,255,.5) 0%, rgba(110,180,250,.24) 42%, rgba(90,150,240,0) 100%);
+}
+.kv-deco-l::after{left:30%; right:-4%; bottom:2%;  height:38%}
+.kv-deco-r::after{left:-6%; right:30%; bottom:4%;  height:36%}
+/* тень под картинкой и слабый холодный подсвет по её нижнему краю: ореол
+   вокруг всей картинки специально слабый, иначе он съедает само пятно */
+.kv-deco img{filter:drop-shadow(0 16px 20px rgba(0,0,0,.5)) drop-shadow(0 6px 16px rgba(120,200,255,.3))}
+
+/* размеры и места сняты с макета: карточка 1400 px, калькулятор 289 px
+   (20,6 %) вылезает влево на 56 px, подарок 213 px (15,2 %) - вправо на 55 */
+.kv-deco-l{left:-4%;  margin-top:22.1%; width:20.6%}
+.kv-deco-r{right:-3.9%; margin-top:12.1%; width:15.2%}
+
 /* появление окна: всплывает снизу. Прятать умеет только класс .rv, его вешает
    скрипт - без скрипта всё видно сразу */
 .kv.rv .kv-card{opacity:0; transform:translateY(28px)}
@@ -6040,6 +6128,29 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .kv-opts{grid-template-columns:1fr}
   .kv-grid{grid-template-columns:1fr 1fr}
 }
+/* От 1280 до 1600 px окно почти во всю ширину экрана, свободных полей по бокам
+   нет, и картинки в прежнем размере ложились бы на поля формы (замер 11.09.2026:
+   на 1440 калькулятор заходил на поле «Ваше имя» на 17 px). Здесь они мельче
+   и держатся ближе к краю окна: наружу выступают ровно настолько, сколько
+   места осталось до кромки экрана. */
+@media (max-width:1599px){
+  .kv-deco-l{left:-3%; margin-top:23%; width:16.5%}
+  .kv-deco-r{right:-3%; margin-top:13%; width:12.5%}
+}
+/* Ещё одна ступень: на 1366-1440 поля формы занимают почти всю карточку,
+   и картинке остаётся полоса около 200 px. Здесь она самая мелкая -
+   дальше, ниже 1366, её просто нет. */
+@media (max-width:1439px){
+  .kv-deco-l{left:-2%; margin-top:24%; width:14.5%}
+  .kv-deco-r{right:-2%; margin-top:14%; width:11%}
+}
+/* Ниже 1366 px картинкам негде стоять: поля формы занимают 880 px из 1126,
+   и по бокам остаётся полоса в 123 px - картинка в неё не влезает даже самая
+   мелкая (замер 11.09.2026: на 1280 калькулятор заходил на поле «Ваше имя»
+   на 18 px). Прячем целиком - с `loading="lazy"` спрятанное ещё и не качается. */
+@media (max-width:1365px){
+  .kv-deco{display:none}
+}
 @media (max-width:640px){
   .kv-grid{grid-template-columns:1fr}
   .kv-cnts{grid-template-columns:1fr}
@@ -6047,6 +6158,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 @media (prefers-reduced-motion:reduce){
   .kv-glow i{animation:none}
+  .kv-deco img{animation:none}      /* качание */
+  .kv-deco span{transition:none}    /* и тяга за курсором: без неё картинка всё равно уезжала бы */
   .kv.rv .kv-card{opacity:1; transform:none; transition:none}
   .kv-step.in{animation:none}
   .kv-body{transition:none}
@@ -8411,6 +8524,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="kv-grain" aria-hidden="true"></div>
 
   <div class="cr-cont">
+   <div class="kv-box">
     <div class="kv-card">
       <div class="kv-card-sky" aria-hidden="true"><i></i><i></i><i></i></div>
 
@@ -8432,6 +8546,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <div class="kv-step" data-step="0">
           <p class="kv-eyebrow">Только для орг. групп от 20 детей</p>
           <h2 class="kv-t" id="kvT">Получите расчёт стоимости для вашего класса<br class="kv-br"> <b>+ подарок!</b></h2>
+          <!-- числа в разметке - только запас на случай отключённого JS:
+               настоящую цену ставит скрипт «ЦЕНА В ФОРМАХ СЧИТАЕТСЯ ОТ ДАТЫ» -->
+          <p class="zs-price">от <b>1490 руб</b> до <b>1890 руб</b> для групп</p>
           <p class="kv-lede">Получите индивидуальное предложение <b>+ 1 взрослый билет
             для себя в подарок</b>, ответив всего на 3 простых вопроса!</p>
           <p class="kv-small">Подарок лишним не будет ;)</p>
@@ -8585,6 +8702,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
       </div>
     </div>
+
+    <!-- Калькулятор и подарок по бокам окна (макет Серёги 11.09.2026).
+         Лежат СНАРУЖИ `.kv-card`: у него overflow:hidden, изнутри их края
+         срезало бы. Обёртку `span` двигает за курсором скрипт, картинка
+         внутри сама качается - два движения не складываются в один transform.
+         Голубое пятно под картинкой рисует `::before` обёртки. -->
+    <div class="kv-deco" aria-hidden="true">
+      <span class="kv-deco-l"><img src="v2-kv-calc.webp" width="491" height="388"
+            loading="lazy" decoding="async" alt="" draggable="false"></span>
+      <span class="kv-deco-r"><img src="v2-kv-gift.webp" width="362" height="406"
+            loading="lazy" decoding="async" alt="" draggable="false"></span>
+    </div>
+   </div>
   </div>
 </section>
 </div>
@@ -13823,6 +13953,67 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 })();
 </script>
 
+
+
+<!-- Скрипт украшений квиза вынесен в ОТДЕЛЬНЫЙ <script> намеренно: файл правят
+     две сессии, и ошибка в чужом блоке не должна ронять этот экран. -->
+<script>
+/* ==================== КАЛЬКУЛЯТОР И ПОДАРОК СЛЕДЯТ ЗА КУРСОРОМ ====================
+   Просьба Серёги 11.09.2026. Считаем, куда мышь ушла от середины окна, и сдвигаем
+   картинки: калькулятор - за курсором, подарок - в противоположную сторону, тем же
+   жестом, каким они и качаются.
+
+   Сдвиг пишем в переменные `--px/--py` обёртки, плавность даёт CSS-переход
+   (`transition:transform .55s`), поэтому своего цикла анимации скрипту не нужно -
+   только один кадр на событие. Пересчёт прячем в requestAnimationFrame: мышь шлёт
+   события чаще, чем экран успевает рисовать.
+
+   Слушателя ставим на окно, а не на секцию: слой картинок `pointer-events:none`,
+   да и курсор чаще ходит по полям формы, чем по углам окна.
+
+   На тач-экранах и при «меньше движения» скрипт не заводится вовсе.
+   Тот же приём, что у ёлочных шаров седьмого экрана. */
+(function(){
+  'use strict';
+  var sec = document.getElementById('calc');
+  if (!sec || !window.matchMedia) return;
+  if (!matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+
+  var parts = sec.querySelectorAll('.kv-deco span');
+  if (!parts.length) return;
+
+  var px = 0, py = 0, waiting = false;
+
+  function paint(){
+    waiting = false;
+    for (var n = 0; n < parts.length; n++){
+      /* подарок уезжает навстречу калькулятору - множитель -1 */
+      var k = parts[n].classList.contains('kv-deco-r') ? -1 : 1;
+      parts[n].style.setProperty('--px', (px * k).toFixed(1) + 'px');
+      parts[n].style.setProperty('--py', (py * k).toFixed(1) + 'px');
+    }
+  }
+  function ask(){ if (!waiting){ waiting = true; requestAnimationFrame(paint); } }
+
+  function move(e){
+    var r = sec.getBoundingClientRect();
+    /* картинки реагируют, только пока экран на виду: иначе они уезжают в крайнее
+       положение от движения мыши где-то на другом конце страницы */
+    if (r.bottom < 0 || r.top > innerHeight){ px = py = 0; ask(); return; }
+    var pull = parseFloat(getComputedStyle(sec).getPropertyValue('--kv-pull')) || 34;
+    var nx = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+    var ny = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+    px = Math.max(-1, Math.min(1, nx)) * pull;
+    py = Math.max(-1, Math.min(1, ny)) * pull * .6;
+    ask();
+  }
+
+  window.addEventListener('pointermove', move, {passive:true});
+  /* курсор ушёл из окна - картинки возвращаются на место */
+  document.addEventListener('pointerleave', function(){ px = py = 0; ask(); });
+})();
+</script>
 
 </body>
 </html>
