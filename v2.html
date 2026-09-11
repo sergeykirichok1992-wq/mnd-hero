@@ -6098,7 +6098,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 /* размеры и места сняты с макета: карточка 1400 px, калькулятор 289 px
    (20,6 %) вылезает влево на 56 px, подарок 213 px (15,2 %) - вправо на 55 */
-.kv-deco-l{left:-4%;  margin-top:22.1%; width:20.6%}
+.kv-deco-l{left:-4%;  margin-top:22.1%; width:20.4%}
 .kv-deco-r{right:-3.9%; margin-top:12.1%; width:15.2%}
 
 /* появление окна: всплывает снизу. Прятать умеет только класс .rv, его вешает
@@ -6134,14 +6134,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    и держатся ближе к краю окна: наружу выступают ровно настолько, сколько
    места осталось до кромки экрана. */
 @media (max-width:1599px){
-  .kv-deco-l{left:-3%; margin-top:23%; width:16.5%}
+  .kv-deco-l{left:-3%; margin-top:23%; width:16.2%}
   .kv-deco-r{right:-3%; margin-top:13%; width:12.5%}
 }
 /* Ещё одна ступень: на 1366-1440 поля формы занимают почти всю карточку,
    и картинке остаётся полоса около 200 px. Здесь она самая мелкая -
    дальше, ниже 1366, её просто нет. */
 @media (max-width:1439px){
-  .kv-deco-l{left:-2%; margin-top:24%; width:14.5%}
+  .kv-deco-l{left:-2%; margin-top:24%; width:14%}
   .kv-deco-r{right:-2%; margin-top:14%; width:11%}
 }
 /* Ниже 1366 px картинкам негде стоять: поля формы занимают 880 px из 1126,
@@ -13983,15 +13983,31 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   var parts = sec.querySelectorAll('.kv-deco span');
   if (!parts.length) return;
 
+  /* Ниже 1366 px картинки спрятаны (`display:none`), и считать им сдвиг незачем:
+     иначе браузер меряет секцию на каждое движение мыши ради того, чего на экране
+     нет. Слушатель заводится, только когда окно широкое, и снимается обратно,
+     если человек сузил окно. */
+  var wide = matchMedia('(min-width:1366px)');
+
+  /* Насколько картинке позволено заехать НА окно. Наружу она уезжает свободно,
+     внутрь - только на эти пиксели: запас между картинкой и полями формы
+     на узких ширинах всего 11-17 px (замер 11.09.2026), и полная тяга в 34 px
+     клала калькулятор прямо на поле «Ваше имя», едва курсор уходил вправо. */
+  var VNUTR = 6;
+
   var px = 0, py = 0, waiting = false;
+  /* число постоянное - читаем его один раз, а не на каждое движение мыши */
+  var pull = parseFloat(getComputedStyle(sec).getPropertyValue('--kv-pull')) || 34;
 
   function paint(){
     waiting = false;
     for (var n = 0; n < parts.length; n++){
       /* подарок уезжает навстречу калькулятору - множитель -1 */
-      var k = parts[n].classList.contains('kv-deco-r') ? -1 : 1;
-      parts[n].style.setProperty('--px', (px * k).toFixed(1) + 'px');
-      parts[n].style.setProperty('--py', (py * k).toFixed(1) + 'px');
+      var prav = parts[n].classList.contains('kv-deco-r');
+      var x = px * (prav ? -1 : 1);
+      x = prav ? Math.max(-VNUTR, x) : Math.min(VNUTR, x);
+      parts[n].style.setProperty('--px', x.toFixed(1) + 'px');
+      parts[n].style.setProperty('--py', (py * (prav ? -1 : 1)).toFixed(1) + 'px');
     }
   }
   function ask(){ if (!waiting){ waiting = true; requestAnimationFrame(paint); } }
@@ -14001,7 +14017,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     /* картинки реагируют, только пока экран на виду: иначе они уезжают в крайнее
        положение от движения мыши где-то на другом конце страницы */
     if (r.bottom < 0 || r.top > innerHeight){ px = py = 0; ask(); return; }
-    var pull = parseFloat(getComputedStyle(sec).getPropertyValue('--kv-pull')) || 34;
     var nx = (e.clientX - innerWidth / 2) / (innerWidth / 2);
     var ny = (e.clientY - innerHeight / 2) / (innerHeight / 2);
     px = Math.max(-1, Math.min(1, nx)) * pull;
@@ -14009,9 +14024,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     ask();
   }
 
-  window.addEventListener('pointermove', move, {passive:true});
-  /* курсор ушёл из окна - картинки возвращаются на место */
-  document.addEventListener('pointerleave', function(){ px = py = 0; ask(); });
+  function uiti(){ px = py = 0; ask(); }
+
+  function podpisat(){
+    if (wide.matches){
+      window.addEventListener('pointermove', move, {passive:true});
+      document.addEventListener('pointerleave', uiti);   /* курсор ушёл из окна */
+    } else {
+      window.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerleave', uiti);
+      uiti();                                            /* и сдвиг снимаем */
+    }
+  }
+  podpisat();
+  wide.addEventListener ? wide.addEventListener('change', podpisat)
+                        : wide.addListener && wide.addListener(podpisat);
 })();
 </script>
 
