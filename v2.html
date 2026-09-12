@@ -8604,7 +8604,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* Логотип маленький и служебный: он тут не вывеска, а подпись под всем
    сказанным выше. Ширину держим в clamp, у картинки свои width/height -
    без них при медленной загрузке подвал дёргается на высоту логотипа. */
-.pd-logo{display:block; width:clamp(148px,13vw,212px); height:auto; margin:0 0 clamp(14px,1.4vw,22px)}
+/* Знак - надпись «Министерство новогодних дел (Деда Мороза)», её прислал
+   Серёга 12.09.2026. Пропорции у неё лежачие (824x329 после обрезки
+   по краям надписи), поэтому ширина больше, чем была у прежней круглой
+   картинки, а высота выходит вдвое меньше.
+   МЕТКА ВЕРСИИ `?v=2` В АДРЕСЕ ОБЯЗАТЕЛЬНА: файл заменён под тем же именем,
+   и без метки браузер отдаёт прежнюю картинку из кеша
+   → lessons/zamena-kartinki-pod-tem-zhe-imenem.md */
+.pd-logo{display:block; width:clamp(180px,15.5vw,258px); height:auto; margin:0 0 clamp(14px,1.4vw,22px)}
 .pd-slogan{margin:0; max-width:34ch; font-family:"Golos Text",Arial,sans-serif;
   font-size:clamp(13.4px,1.02vw,15.2px); line-height:1.55; color:#A9B8E0}
 .pd-slogan b{font-weight:600; color:#fff}
@@ -11962,7 +11969,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <div class="pd-main">
 
         <div class="pd-col">
-          <img class="pd-logo" src="v2-pd-logo.webp" width="520" height="472"
+          <img class="pd-logo" src="v2-pd-logo.webp?v=2" width="640" height="256"
                loading="lazy" decoding="async"
                alt="Министерство новогодних дел Деда Мороза">
           <p class="pd-slogan">Экскурсия-шоу <b>«Звёздная смена»</b> в Министерство
