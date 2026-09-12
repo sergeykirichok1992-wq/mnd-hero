@@ -5545,7 +5545,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    подводка, одна большая обложка с кнопкой пуска, красная строка про VPN
    и кнопка заявки. Ролик тот же — 838ecf64473337f103fc545669103258, 20:19.
 
-   ГДЕ СТОИТ: САМЫМ НИЖНИМ ЭКРАНОМ СТРАНИЦЫ, за экраном про родителей.
+   ГДЕ СТОИТ: за экраном про родителей и стену отзывов. Самым нижним экраном
+   страницы уже НЕ является: 11.09.2026 под ним встали ответы на вопросы,
+   12.09.2026 - официальная информация.
    Просьба Серёги 10.09.2026. За один день экран переехал дважды: собран
    между короткими роликами и ценами (как на боевом ministrynn.ru), потом
    ушёл за экран условий и бонусов, потом в самый низ. Разметка живёт
@@ -7326,8 +7328,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    ministrynn.ru/info: там восемнадцать вопросов простыней в Тильде, здесь -
    белое снежное поле, поиск, четыре темы и складные карточки.
 
-   ГДЕ СТОИТ: САМЫМ НИЖНИМ ЭКРАНОМ СТРАНИЦЫ, под квизом. Просьба Серёги
-   11.09.2026 - «создай ниже всех экран с ответами на вопросы».
+   ГДЕ СТОИТ: под фильмом о проекте. Просьба Серёги 11.09.2026 - «создай ниже
+   всех экран с ответами на вопросы»; с 12.09.2026 ниже стоит ещё один экран,
+   официальная информация, и снизу к этому полю примыкает уже он.
 
    ПОЛЕ БЕЛОЕ - выбор Серёги 11.09.2026 из трёх (белое / ночное небо /
    светло-сиреневое). Причина простая: тут больше текста, чем на любом другом
@@ -7750,6 +7753,391 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (prefers-reduced-motion:reduce){
   .qa.is-live .qa-wrap{transition:none}
   .qa-item,.qa-sign,.qa-sign::before,.qa-sign::after,.qa-chip,.qa-find input{transition:none}
+}
+</style>
+
+<!-- Стили экрана официальной информации лежат в ОТДЕЛЬНОМ <style>, как у квиза,
+     фильма, цен и ответов на вопросы: файл правит ещё одна сессия, и незакрытая
+     скобка в чужом блоке не должна ронять этот экран. -->
+<style>
+/* ==================== ЭКРАН 23: ОФИЦИАЛЬНАЯ ИНФОРМАЦИЯ ====================
+   Пространство имён `of-` (official). САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - просьба
+   Серёги 12.09.2026: «найди на ministrynn.ru экран с официальной информацией
+   и сделай в самом низу похожий, только красиво, и добавь туда документы,
+   которые там лежат фотографиями».
+
+   ЧТО ВЗЯТО С ИСТОЧНИКА. Шесть условий (предоплата, договор, расчётный счёт,
+   электронная подпись, офис, SMS), два скана из налоговой и блок реквизитов.
+   Тексты условий переписаны короче, смысл тот же; цифры сверены
+   с business/core/customer-journey.md и business/company/founder-info.md.
+
+   ЧЕМ ОТЛИЧАЕТСЯ ОТ ИСТОЧНИКА - четыре вещи, все сознательные:
+   1. У шести условий там ОДИН И ТОТ ЖЕ значок шесть раз подряд. Здесь у каждого
+      свой, нарисованный: календарь, договор, банк, электронная подпись, метка
+      офиса, конверт. Шесть одинаковых значков читаются как маркеры списка,
+      а не как смысл.
+   2. Сканы там лежат двумя картинками в ряд и НЕ ОТКРЫВАЮТСЯ - рассмотреть
+      печать и номер нельзя. Здесь лист щёлкается и открывается крупно
+      (`.of-ov`), стрелками переключается на соседний.
+   3. Реквизиты там четырьмя строчками текста. Здесь - карточка с полями,
+      у каждого кнопка «скопировать»: реквизиты чаще всего переписывает
+      бухгалтерия школы, и переписывать их с картинки руками - лишний риск
+      опечатки в ИНН.
+   4. Поле тёмное. В источнике экран светлый, но у нас сверху стоит светлое
+      поле ответов на вопросы, и два светлых подряд слиплись бы в одно. Плюс
+      белая бумага скана на тёмном читается как лист под музейной подсветкой,
+      а на светлом - как серый прямоугольник.
+
+   ПОЧЕМУ НЕТ КНОПКИ ЗАЯВКИ. Прямо над этим экраном стоит `.qa-cta`
+   с золотой кнопкой «Оставить заявку». Вторая кнопка через полтора экрана -
+   это не второй шанс, а шум; официальная информация закрывает страницу
+   доверием, а не ещё одним призывом → sayt-nn/standart-knopok.md.
+
+   ФОН СОБРАН ПО ОБЩЕМУ РЕЦЕПТУ ТЁМНОГО ЭКРАНА ПОД СВЕТЛЫМ (как у квиза,
+   фильма, отзывов и Деда Мороза): синее зарево у верхней кромки и старт
+   с #0A1046. Без зарева шов со светлым полем ответов выходит резкой чёрной
+   чертой. Шов держит золотой блик `.of-blik` - тот же снимок `v2-sm-blik.webp`,
+   что на швах пятого, шестого, четырнадцатого, семнадцатого, восемнадцатого
+   и двадцать первого экранов.
+
+   z-index:29 - та же ступень, что у экранов о Деде Морозе, газетки, фильма,
+   квиза и ответов. Выше нельзя: на 30 стоит шапка сайта. И не нужно - при
+   равном слое побеждает тот, кто НИЖЕ в разметке, а этот экран последний,
+   поэтому его блик спокойно ложится на светлое поле соседа сверху
+   → lessons/element-na-shve-sekciy-z-index.md
+
+   РАЗМЕРЫ НЕ В МНОЖИТЕЛЕ --u: это не копия старого сайта, всё через clamp()
+   от ширины окна - как у экранов 5, 18 и 21. */
+.of-hold{position:relative; z-index:29}
+/* Блик на шве стоит СНАРУЖИ секции: у неё `overflow:hidden`, и изнутри
+   верхнюю половину блика срезало бы. Те же числа, что у `.kv-blik`. */
+.of-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.of{
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(76px,7.6vw,132px) 0 clamp(66px,6.8vw,118px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#0A1140 42%,#070C2E 74%,#04071A 100%);
+}
+/* Отблески и зерно - тот же рецепт, что у экранов 5, 18 и 21. Движение
+   по общим keyframes bkDrift1-3 (объявлены в блоке пятого экрана), своих
+   не заводим. БЕЗ filter:blur - мягкость даёт сам радиальный градиент. */
+.of-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.of-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.of-glow i:nth-child(1){left:-20vw; top:-6%; width:70vw; height:58%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.46) 0%, rgba(47,49,146,.3) 32%, rgba(47,49,146,.1) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift1 42s ease-in-out infinite alternate}
+.of-glow i:nth-child(2){right:-22vw; top:6%; width:72vw; height:62%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.21) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift2 49s ease-in-out infinite alternate}
+.of-glow i:nth-child(3){left:4vw; bottom:-4%; width:62vw; height:54%;
+  background:radial-gradient(closest-side, rgba(176,106,224,.2) 0%, rgba(176,106,224,.13) 32%, rgba(176,106,224,.05) 64%, rgba(176,106,224,0) 100%);
+  animation:bkDrift3 36s ease-in-out infinite alternate}
+.of-glow i:nth-child(4){left:50%; bottom:-16%; width:76vw; height:50%; margin-left:-38vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.17) 0%, rgba(227,179,78,.11) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:bkDrift2 44s ease-in-out infinite alternate-reverse}
+@media (prefers-reduced-motion:reduce){ .of-glow i{animation:none} }
+/* зерно: без него градиент полосит на большой синей плоскости */
+.of-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+/* звёзды общего блока «Живое небо»: выше фона и отблесков, ниже начинки */
+.of-sky{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none}
+
+/* ---------- шапка экрана ----------
+   Надзаголовок и лид набраны теми же числами, что на экране ответов, заголовок -
+   что на газетке: страница кончается тем же голосом, каким шла. */
+.of-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); text-align:center;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#93A6DA}
+.of-t{
+  position:relative; z-index:2;
+  margin:0 auto clamp(14px,1.5vw,24px); text-align:center;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.12; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.of-y{color:#FFD189}
+.of-lead{
+  position:relative; z-index:2;
+  max-width:min(100%,64ch); margin:0 auto; text-align:center; text-wrap:balance;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.12vw,16.57px);
+  line-height:1.55; color:#C2CEEF;
+}
+.of-lead b{font-weight:600; color:#fff}
+
+/* ---------- шесть условий ----------
+   Три колонки на компьютере, две на планшете, одна на телефоне. Сетка
+   задана ЯВНО, а не через auto-fit: при auto-fit на широком мониторе
+   выходит четыре колонки и во втором ряду остаются две карточки посреди
+   пустоты. Шесть карточек красиво делятся только на 3 и на 2. */
+.of-grid{
+  position:relative; z-index:2;
+  display:grid; grid-template-columns:1fr; gap:clamp(12px,1.25vw,20px);
+  margin:clamp(32px,3.6vw,60px) 0 0;
+}
+@media (min-width:680px){ .of-grid{grid-template-columns:repeat(2,1fr)} }
+@media (min-width:1100px){ .of-grid{grid-template-columns:repeat(3,1fr)} }
+.of-card{
+  position:relative; display:flex; flex-direction:column; align-items:flex-start;
+  padding:clamp(20px,1.85vw,30px);
+  border-radius:clamp(16px,1.3vw,22px);
+  background:linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.028));
+  box-shadow:inset 0 0 0 1px rgba(158,180,255,.15), inset 0 1px 0 rgba(255,255,255,.09);
+  transition:transform .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s ease, background .45s ease;
+}
+@media (hover:hover) and (pointer:fine){
+  .of-card:hover{
+    transform:translateY(-4px);
+    background:linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.04));
+    box-shadow:inset 0 0 0 1px rgba(227,179,78,.36), inset 0 1px 0 rgba(255,238,190,.2),
+               0 20px 44px -26px rgba(0,0,0,.9);
+  }
+  .of-card:hover .of-ic{
+    border-color:rgba(227,179,78,.55);
+    box-shadow:0 0 26px 2px rgba(227,179,78,.22);
+  }
+}
+.of-ic{
+  display:flex; align-items:center; justify-content:center; flex:0 0 auto;
+  width:clamp(44px,3.4vw,54px); height:clamp(44px,3.4vw,54px);
+  margin:0 0 clamp(14px,1.3vw,20px);
+  border-radius:50%; border:1px solid rgba(227,179,78,.34);
+  background:radial-gradient(closest-side, rgba(227,179,78,.16), rgba(227,179,78,.04));
+  transition:border-color .45s ease, box-shadow .45s ease;
+}
+.of-ic svg{width:52%; height:52%; display:block; color:#FFD189;
+  fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+.of-ct{margin:0 0 clamp(7px,.65vw,10px);
+  font-family:"Golos Text",Arial,sans-serif; font-weight:600;
+  font-size:clamp(16px,1.22vw,19px); line-height:1.26; color:#fff}
+.of-cs{margin:0; font-family:"Golos Text",Arial,sans-serif; font-weight:400;
+  font-size:clamp(13.6px,1.02vw,15.2px); line-height:1.5; color:#AEBDE4}
+.of-cs b{font-weight:600; color:#FFD189}
+
+/* ---------- подпись-разделитель перед документами ----------
+   Тонкая линия с надписью посередине: она отделяет «как мы работаем»
+   от «чем это подтверждается», и без неё сканы читаются как ещё две карточки. */
+.of-sep{
+  position:relative; z-index:2;
+  display:flex; align-items:center; gap:clamp(14px,1.4vw,24px);
+  margin:clamp(46px,5vw,86px) 0 clamp(26px,2.6vw,42px);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#93A6DA;
+}
+.of-sep::before,.of-sep::after{
+  content:""; flex:1 1 auto; height:1px;
+  background:linear-gradient(90deg, rgba(158,180,255,0), rgba(158,180,255,.28));
+}
+.of-sep::after{background:linear-gradient(90deg, rgba(158,180,255,.28), rgba(158,180,255,0))}
+
+/* ---------- два скана ----------
+   ЛИСТЫ РАВНЯЮТСЯ ПО ВЫСОТЕ, А НЕ ПО ШИРИНЕ. У сканов разные пропорции
+   (838x1236 и 1012x1362), и при равной ширине их нижние края разъезжаются
+   на четыре сантиметра - выглядит как недоделка. Равная высота даёт два
+   листа бумаги, поставленных рядом, и подписи под ними встают в одну строку.
+   Поэтому у картинки задана ВЫСОТА, а ширина считается сама. */
+.of-docs{
+  position:relative; z-index:2;
+  display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:center;
+  gap:clamp(20px,2.4vw,44px);
+}
+.of-doc{margin:0; display:flex; flex-direction:column; align-items:center}
+/* Лист - кнопка: по нему щёлкают, чтобы открыть крупно. Своих полей и фона
+   у кнопки нет, вся видимая часть - сама бумага. */
+.of-sheet{
+  position:relative; display:block; padding:0; border:0; background:none;
+  cursor:zoom-in; border-radius:clamp(6px,.6vw,10px); overflow:hidden;
+  box-shadow:0 1px 0 rgba(255,255,255,.5), 0 26px 50px -26px rgba(0,0,0,.95);
+  transition:transform .5s cubic-bezier(.2,.7,.2,1), box-shadow .5s ease;
+}
+.of-sheet img{
+  display:block; height:clamp(330px,40vw,720px); width:auto; max-width:100%;
+  background:#fff;
+}
+@media (hover:hover) and (pointer:fine){
+  .of-sheet:hover{transform:translateY(-6px);
+    box-shadow:0 1px 0 rgba(255,255,255,.6), 0 34px 64px -26px rgba(0,0,0,.95),
+               0 0 42px 2px rgba(227,179,78,.26)}
+  .of-sheet:hover .of-zoom{opacity:1; transform:none}
+}
+.of-sheet:focus-visible{outline:2px solid #FFD189; outline-offset:4px}
+/* Значок лупы. Лежит поверх листа в углу и проявляется под курсором:
+   без него по белому прямоугольнику не видно, что он щёлкается.
+   На телефоне курсора нет, поэтому там он виден всегда - правило ниже. */
+.of-zoom{
+  position:absolute; right:clamp(8px,.7vw,12px); bottom:clamp(8px,.7vw,12px);
+  display:flex; align-items:center; gap:7px;
+  padding:7px clamp(10px,.8vw,13px); border-radius:999px;
+  background:rgba(6,10,32,.82); color:#FFE6B4;
+  font-family:"Golos Text",Arial,sans-serif; font-size:12px; font-weight:600;
+  white-space:nowrap; pointer-events:none;
+  opacity:0; transform:translateY(6px);
+  transition:opacity .35s ease, transform .35s ease;
+}
+.of-zoom svg{width:14px; height:14px; display:block;
+  fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
+.of-cap{margin:clamp(12px,1.1vw,18px) 0 0; text-align:center; max-width:34ch}
+.of-cap b{display:block; font-family:"Golos Text",Arial,sans-serif; font-weight:600;
+  font-size:clamp(14.5px,1.06vw,16px); line-height:1.3; color:#fff}
+.of-cap span{display:block; margin-top:5px;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.6px,.92vw,13.8px);
+  line-height:1.4; color:#93A6DA}
+
+/* ---------- реквизиты ---------- */
+.of-req{
+  position:relative; z-index:2;
+  margin:clamp(40px,4.4vw,76px) auto 0; width:min(100%,1100px);
+  padding:clamp(24px,2.4vw,40px) clamp(20px,2.4vw,44px);
+  border-radius:clamp(18px,1.5vw,26px);
+  background:linear-gradient(180deg, rgba(9,16,50,.72), rgba(7,11,36,.88));
+  box-shadow:inset 0 0 0 1px rgba(227,179,78,.3), inset 0 1px 0 rgba(255,238,190,.16),
+             0 30px 60px -40px rgba(0,0,0,.95);
+}
+.of-req-head{display:flex; align-items:center; gap:clamp(12px,1.1vw,18px);
+  padding-bottom:clamp(16px,1.6vw,24px); margin-bottom:clamp(16px,1.6vw,24px);
+  border-bottom:1px solid rgba(158,180,255,.16)}
+.of-seal{flex:0 0 auto; width:clamp(38px,3vw,48px); height:clamp(38px,3vw,48px);
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%; border:1px solid rgba(227,179,78,.42);
+  background:radial-gradient(closest-side, rgba(227,179,78,.18), rgba(227,179,78,.04))}
+.of-seal svg{width:54%; height:54%; display:block; color:#FFD189;
+  fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+.of-req-head p{margin:0}
+.of-req-k{display:block; font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#93A6DA}
+.of-req-n{display:block; margin-top:4px; font-family:"Golos Text",Arial,sans-serif; font-weight:600;
+  font-size:clamp(16px,1.34vw,21px); line-height:1.2; color:#fff}
+.of-rows{display:grid; grid-template-columns:1fr; gap:clamp(12px,1.1vw,18px)}
+@media (min-width:620px){ .of-rows{grid-template-columns:repeat(3,1fr)} }
+/* Каждый реквизит - своя плашка, а не строка на общем поле. Причина
+   практическая: кнопка «скопировать» прижата к правому краю колонки, и без
+   плашки между коротким ИНН и кнопкой зияет пустое место - кнопка читается
+   сама по себе, а не как часть поля. */
+.of-row{display:flex; align-items:center; gap:10px; min-width:0;
+  padding:clamp(11px,.95vw,15px) clamp(12px,1vw,16px);
+  border-radius:clamp(11px,.95vw,15px);
+  background:rgba(255,255,255,.045);
+  box-shadow:inset 0 0 0 1px rgba(158,180,255,.13)}
+.of-row > div{min-width:0}
+.of-k{display:block; font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
+  font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:#93A6DA}
+/* Цифры моноширинные: реквизиты сверяют глазами по разрядам, и в обычной
+   пропорциональной цифре единица вдвое уже восьмёрки - счёт сбивается. */
+.of-v{margin-top:4px; font-family:"Golos Text",Arial,sans-serif; font-weight:500;
+  font-size:clamp(14.6px,1.12vw,17px); line-height:1.25; color:#fff;
+  font-variant-numeric:tabular-nums; letter-spacing:.02em;
+  overflow-wrap:anywhere}
+/* Кнопка «скопировать». Это утилита поля, а не кнопка экрана: стандарт
+   кнопок сайта на неё не распространяется - тот же случай, что у крестика
+   в поиске ответов (`.qa-clear`) → sayt-nn/standart-knopok.md */
+.of-copy{
+  flex:0 0 auto; width:34px; height:34px; margin-left:auto; padding:0;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(158,180,255,.22); border-radius:10px;
+  background:rgba(255,255,255,.05); color:#AEBDE4; cursor:pointer;
+  transition:color .25s ease, border-color .25s ease, background .25s ease;
+}
+.of-copy svg{width:16px; height:16px; display:block;
+  fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round}
+.of-copy .of-ok{display:none}
+.of-copy.ok{color:#8FE3A8; border-color:rgba(143,227,168,.44); background:rgba(143,227,168,.1)}
+.of-copy.ok .of-no{display:none}
+.of-copy.ok .of-ok{display:block}
+@media (hover:hover) and (pointer:fine){
+  .of-copy:hover{color:#FFD189; border-color:rgba(227,179,78,.45); background:rgba(227,179,78,.1)}
+}
+.of-copy:focus-visible{outline:2px solid #FFD189; outline-offset:2px}
+/* Сноска под реквизитами. Тут же сказано, что договор высылаем до оплаты:
+   на источнике это спрятано в текст карточки, а вопрос «а можно сначала
+   посмотреть договор» у школ первый. */
+.of-note{margin:clamp(16px,1.6vw,24px) 0 0; padding-top:clamp(14px,1.4vw,22px);
+  border-top:1px solid rgba(158,180,255,.16);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.8px,.96vw,14.4px);
+  line-height:1.5; color:#93A6DA}
+.of-note b{font-weight:600; color:#C2CEEF}
+
+/* Область для читалки: скрипт пишет сюда «ИНН скопирован». Класс свой,
+   а не `.qa-sr` соседнего экрана: блок стилей ответов правит другая сессия,
+   и этот экран не должен зависеть от чужих селекторов. */
+.of-sr{position:absolute; width:1px; height:1px; margin:0; padding:0;
+  overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap}
+
+/* ---------- крупный просмотр скана ----------
+   z-index:90 - НИЖЕ окна заявки (100): если человек откроет заявку, она
+   обязана лечь поверх. Своего скрипта отправки тут нет, это просто картинка. */
+.of-ov{
+  position:fixed; inset:0; z-index:90;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(12px,3vw,28px);
+  background:rgba(2,4,12,.88);
+  -webkit-backdrop-filter:blur(7px) saturate(.85); backdrop-filter:blur(7px) saturate(.85);
+  opacity:0; transition:opacity .3s ease;
+}
+.of-ov[hidden]{display:none}
+.of-ov.on{opacity:1}
+.of-fig{margin:0; position:relative; display:flex; flex-direction:column;
+  align-items:center; max-width:100%; max-height:100%}
+/* Лист вписывается в окно целиком: `max-height` считается от высоты экрана
+   минус поля и подпись под ним. Без вычета подпись уезжает за нижнюю кромку
+   на невысоких ноутбуках. */
+.of-fig img{display:block; max-width:100%; max-height:calc(100vh - clamp(150px,16vh,210px));
+  width:auto; height:auto; background:#fff; border-radius:clamp(4px,.5vw,8px);
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.95);
+  transform:scale(.96); opacity:0; transition:transform .35s cubic-bezier(.2,.7,.2,1), opacity .35s ease}
+.of-ov.on .of-fig img{transform:none; opacity:1}
+.of-fig figcaption{margin-top:clamp(12px,1.2vw,18px); text-align:center; max-width:56ch}
+.of-fig figcaption b{display:block; font-family:"Golos Text",Arial,sans-serif;
+  font-weight:600; font-size:clamp(14.5px,1.06vw,16px); color:#fff}
+.of-fig figcaption span{display:block; margin-top:4px; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(12.6px,.92vw,13.8px); color:#93A6DA}
+.of-x,.of-arr{
+  position:fixed; display:flex; align-items:center; justify-content:center;
+  width:clamp(42px,3.4vw,52px); height:clamp(42px,3.4vw,52px); padding:0;
+  border:1px solid rgba(255,255,255,.18); border-radius:999px;
+  background:rgba(8,12,34,.72); color:#DCE5FF; cursor:pointer;
+  transition:color .25s ease, border-color .25s ease, background .25s ease;
+}
+.of-x svg,.of-arr svg{width:44%; height:44%; display:block;
+  fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}
+@media (hover:hover) and (pointer:fine){
+  .of-x:hover,.of-arr:hover{color:#FFD189; border-color:rgba(227,179,78,.5); background:rgba(227,179,78,.14)}
+}
+.of-x:focus-visible,.of-arr:focus-visible{outline:2px solid #FFD189; outline-offset:2px}
+/* `display:flex` выше перебивает браузерное правило `[hidden]{display:none}`,
+   и спрятанная скриптом стрелка осталась бы на экране. Сработает, когда
+   документ останется один: скрипт прячет стрелки, листать нечего. */
+.of-x[hidden],.of-arr[hidden]{display:none}
+.of-x{top:clamp(12px,2vw,26px); right:clamp(12px,2vw,26px)}
+.of-arr{top:50%; transform:translateY(-50%)}
+.of-arr.prev{left:clamp(10px,2vw,26px)}
+.of-arr.next{right:clamp(10px,2vw,26px)}
+
+/* ---------- телефон ---------- */
+@media (max-width:767px){
+  /* На телефоне общий контейнер отдаёт поля целиком
+     (`@media (max-width:767px){ .cr-cont{width:100%; padding:0} }`),
+     и текст упёрся бы в кромку экрана. Возвращаем их. */
+  .of .cr-cont{padding-inline:20px}
+  /* Курсора нет - значок лупы виден всегда, иначе непонятно, что лист
+     щёлкается. */
+  .of-zoom{opacity:1; transform:none}
+  /* Листы встают друг под друга, и равнять их по высоте больше не нужно:
+     в столбик каждый занимает свою ширину. Потолок 420 px - чтобы на
+     планшете в портрете скан не раздувался во весь экран. */
+  .of-sheet img{height:auto; width:100%}
+  .of-doc{width:min(100%,420px)}
+  .of-docs{gap:clamp(26px,7vw,40px)}
+  .of-arr{width:42px; height:42px}
+  .of-arr.prev{left:6px}
+  .of-arr.next{right:6px}
+}
+@media (prefers-reduced-motion:reduce){
+  .of-card,.of-sheet,.of-zoom,.of-copy,.of-fig img,.of-x,.of-arr{transition:none}
+  .of-fig img{transform:none; opacity:1}
 }
 </style>
 
@@ -10173,7 +10561,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </div>
 
 <!-- ==================== ЭКРАН 20: ФИЛЬМ О ПРОЕКТЕ ====================
-     Один ролик на двадцать минут. САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ — просьба
+     Один ролик на двадцать минут. Просьба
      Серёги 10.09.2026. За день экран переехал дважды: собран между короткими
      роликами и ценами (как на боевом ministrynn.ru), потом за экран условий
      и бонусов, потом сюда. Устройство, почему поле тёмное и почему классы
@@ -10231,8 +10619,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 
 <!-- ==================== ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ ====================
-     САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - просьба Серёги 11.09.2026 («создай ниже
-     всех экран с ответами на вопросы»). Наш ответ странице ministrynn.ru/info.
+     Просьба Серёги 11.09.2026 («создай ниже всех экран с ответами
+     на вопросы»). Наш ответ странице ministrynn.ru/info. Ниже с 12.09.2026
+     стоит ещё один экран - официальная информация.
      Устройство, почему поле белое и почему ответы в разметке раскрыты →
      блок «ЭКРАН 22: ОТВЕТЫ НА ВОПРОСЫ» в стилях и sayt-nn/ustroystvo.md.
 
@@ -10663,6 +11052,232 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
   </div>
 </section>
+
+
+<!-- ==================== ЭКРАН 23: ОФИЦИАЛЬНАЯ ИНФОРМАЦИЯ ====================
+     САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - просьба Серёги 12.09.2026: «найди на
+     ministrynn.ru экран с официальной информацией и сделай в самом низу
+     похожий, только красиво, и добавь туда документы, которые там лежат
+     фотографиями». Устройство, чем отличается от источника и почему поле
+     тёмное → блок «ЭКРАН 23» в стилях и sayt-nn/ustroystvo.md.
+
+     ДОКУМЕНТЫ - ТЕ ЖЕ ДВА СКАНА, что выложены на боевом ministrynn.ru:
+     уведомление о постановке на учёт ИП (ОГРНИП) и свидетельство о постановке
+     на учёт (ИНН). Сняты оттуда 12.09.2026 и переведены в webp без обрезки
+     и ретуши: документ обязан читаться таким, какой он есть.
+
+     РЕКВИЗИТЫ СВЕРЕНЫ с business/company/founder-info.md. Меняются реквизиты -
+     правь сначала там, сюда переноси.
+
+     Скрипт экрана (крупный просмотр и копирование) - в конце страницы,
+     блок «ЭКРАН 23: ОФИЦИАЛЬНАЯ ИНФОРМАЦИЯ». Без него экран остаётся рабочим:
+     сканы видно, реквизиты видно, не работает только увеличение и копирование
+     в один щелчок. -->
+<div class="of-hold">
+  <!-- Блик на шве со светлым полем ответов на вопросы. Стоит СНАРУЖИ секции:
+       у неё `overflow:hidden`, и изнутри верхнюю половину блика срезало бы. -->
+  <div class="of-blik" aria-hidden="true"></div>
+
+  <section class="cr of" id="official" aria-labelledby="ofT">
+    <canvas class="of-sky" id="ofSky" aria-hidden="true"></canvas>
+    <div class="of-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <div class="of-grain" aria-hidden="true"></div>
+
+    <!-- Значки нарисованы один раз и подставляются через <use>: шесть копий
+         одного <svg> в разметке - шесть шансов, что при правке разъедутся.
+         Тот же приём, что с подарком на экране бонусов и темами в ответах. -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+      <symbol id="ofIcCal" viewBox="0 0 24 24">
+        <path d="M4.2 7.6A1.8 1.8 0 0 1 6 5.8h12a1.8 1.8 0 0 1 1.8 1.8v10.6A1.8 1.8 0 0 1 18 20H6a1.8 1.8 0 0 1-1.8-1.8Z"/>
+        <path d="M4.2 10.2h15.6M8.4 4v3.4M15.6 4v3.4"/>
+        <path d="m9 15.1 2 2 4-4.2"/>
+      </symbol>
+      <symbol id="ofIcDoc" viewBox="0 0 24 24">
+        <path d="M6 3.6h7.2L18.4 8.8v11.6H6Z"/>
+        <path d="M13.2 3.6v5.2h5.2"/>
+        <path d="M8.8 12.2h6.4M8.8 15h4"/>
+        <circle cx="15.4" cy="17.2" r="2.3"/>
+      </symbol>
+      <symbol id="ofIcBank" viewBox="0 0 24 24">
+        <path d="M3.4 9.6 12 4.6l8.6 5"/>
+        <path d="M5.6 9.8v7.8M10 9.8v7.8M14 9.8v7.8M18.4 9.8v7.8"/>
+        <path d="M3.2 19.6h17.6"/>
+      </symbol>
+      <symbol id="ofIcSign" viewBox="0 0 24 24">
+        <path d="M3.4 6.2A1.6 1.6 0 0 1 5 4.6h14a1.6 1.6 0 0 1 1.6 1.6v8.4A1.6 1.6 0 0 1 19 16.2H5a1.6 1.6 0 0 1-1.6-1.6Z"/>
+        <path d="M8.6 19.8h6.8"/>
+        <path d="M7.6 11.6c1.5-2.8 2.7-2.8 3.5 0 .8 2.8 2 2.8 3.5 0"/>
+      </symbol>
+      <symbol id="ofIcPin" viewBox="0 0 24 24">
+        <path d="M12 20.8s6.4-5.6 6.4-10.2a6.4 6.4 0 1 0-12.8 0c0 4.6 6.4 10.2 6.4 10.2Z"/>
+        <circle cx="12" cy="10.4" r="2.4"/>
+      </symbol>
+      <symbol id="ofIcSms" viewBox="0 0 24 24">
+        <rect x="4.4" y="4.8" width="15.2" height="11" rx="1.9"/>
+        <path d="M9.4 15.8v3.6l4.2-3.6"/>
+        <path d="M8.4 8.8h7.2M8.4 11.8h4.6"/>
+      </symbol>
+      <symbol id="ofIcSeal" viewBox="0 0 24 24">
+        <path d="M12 3.6 5.2 6.2v5.4c0 4.3 2.9 7.7 6.8 8.8 3.9-1.1 6.8-4.5 6.8-8.8V6.2Z"/>
+        <path d="m9 11.8 2.2 2.2 4-4.3"/>
+      </symbol>
+    </svg>
+
+    <div class="cr-cont">
+      <p class="of-eyebrow">Работаем официально с 2019 года</p>
+      <h2 class="of-t" id="ofT"><span class="of-y">Официальная</span> информация</h2>
+      <p class="of-lead">Мы не просим верить на слово и не берём деньги «на карту».
+        Ниже&nbsp;- условия, по которым работаем, документы из налоговой
+        и реквизиты организатора. <b>Любой лист открывается крупно</b>,
+        реквизиты копируются в один щелчок.</p>
+
+      <!-- ---------- шесть условий ---------- -->
+      <div class="of-grid">
+
+        <div class="of-card">
+          <span class="of-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#ofIcCal"/></svg></span>
+          <h3 class="of-ct">Предоплата 5000&nbsp;₽ за всю группу</h3>
+          <p class="of-cs">Этого хватает, чтобы дата и время закрепились за вашим
+            классом. На остальную сумму у вас есть <b>14 дней</b>&nbsp;- собрать
+            деньги с родителей сразу удаётся редко.</p>
+        </div>
+
+        <div class="of-card">
+          <span class="of-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#ofIcDoc"/></svg></span>
+          <h3 class="of-ct">Заключаем официальный договор</h3>
+          <p class="of-cs">На каждую группу свой договор от ИП&nbsp;- с подписью
+            и печатью. Подписанный экземпляр остаётся у вас.</p>
+        </div>
+
+        <div class="of-card">
+          <span class="of-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#ofIcBank"/></svg></span>
+          <h3 class="of-ct">Оплата на расчётный счёт, а не «на карту»</h3>
+          <p class="of-cs">Платёж идёт по счёту от ИП, и у школы с родительским
+            комитетом остаются <b>документы для отчётности</b>.</p>
+        </div>
+
+        <div class="of-card">
+          <span class="of-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#ofIcSign"/></svg></span>
+          <h3 class="of-ct">Договор подписывается онлайн</h3>
+          <p class="of-cs">Работаем с электронной подписью: подписанный
+            дистанционно договор имеет <b>ту же юридическую силу</b>,
+            что и бумажный.</p>
+        </div>
+
+        <div class="of-card">
+          <span class="of-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#ofIcPin"/></svg></span>
+          <h3 class="of-ct">Можно приехать к нам в офис</h3>
+          <p class="of-cs">Нижний Новгород, ул.&nbsp;Невзоровых,&nbsp;111. Там же
+            подписывают договор и платят наличными&nbsp;- если так спокойнее.</p>
+        </div>
+
+        <div class="of-card">
+          <span class="of-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#ofIcSms"/></svg></span>
+          <h3 class="of-ct">SMS на каждом шаге</h3>
+          <p class="of-cs">Подтверждение брони, напоминание об оплате
+            и организационные детали перед самим праздником&nbsp;- ничего
+            не потеряется в переписке.</p>
+        </div>
+
+      </div><!-- /.of-grid -->
+
+      <!-- ---------- документы ---------- -->
+      <p class="of-sep">Документы организатора</p>
+
+      <div class="of-docs" id="ofDocs">
+
+        <figure class="of-doc">
+          <button class="of-sheet" type="button" data-of="0"
+                  aria-label="Открыть крупно: уведомление о постановке на учёт в налоговом органе">
+            <img src="v2-doc-ogrnip.webp" width="838" height="1236" loading="lazy" decoding="async"
+                 alt="Уведомление Федеральной налоговой службы о постановке Киричка Сергея Васильевича на учёт в качестве индивидуального предпринимателя, ОГРНИП 319911200114762 от 5 сентября 2019 года">
+            <span class="of-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><circle cx="10.8" cy="10.8" r="6.4"/><path d="M15.5 15.5 20 20M10.8 8.2v5.2M8.2 10.8h5.2"/></svg>
+              Открыть крупно</span>
+          </button>
+          <figcaption class="of-cap"><b>Уведомление о постановке на учёт</b>
+            <span>ФНС России, 5 сентября 2019&nbsp;года. Регистрация ИП, ОГРНИП&nbsp;319911200114762</span></figcaption>
+        </figure>
+
+        <figure class="of-doc">
+          <button class="of-sheet" type="button" data-of="1"
+                  aria-label="Открыть крупно: свидетельство о постановке на учёт в налоговом органе">
+            <img src="v2-doc-inn.webp" width="1012" height="1362" loading="lazy" decoding="async"
+                 alt="Свидетельство Федеральной налоговой службы о постановке Киричка Сергея Васильевича на учёт в налоговом органе с присвоением ИНН 910314959705">
+            <span class="of-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><circle cx="10.8" cy="10.8" r="6.4"/><path d="M15.5 15.5 20 20M10.8 8.2v5.2M8.2 10.8h5.2"/></svg>
+              Открыть крупно</span>
+          </button>
+          <figcaption class="of-cap"><b>Свидетельство о постановке на учёт</b>
+            <span>ФНС России. Присвоен ИНН&nbsp;910314959705</span></figcaption>
+        </figure>
+
+      </div><!-- /.of-docs -->
+
+      <!-- ---------- реквизиты ---------- -->
+      <div class="of-req">
+        <div class="of-req-head">
+          <span class="of-seal" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#ofIcSeal"/></svg></span>
+          <p><span class="of-req-k">Информация об организаторе</span>
+            <span class="of-req-n">ИП Киричок Сергей Васильевич</span></p>
+        </div>
+
+        <div class="of-rows">
+          <div class="of-row">
+            <div><span class="of-k">ИНН</span>
+              <p class="of-v" id="ofInn">910314959705</p></div>
+            <button class="of-copy" type="button" data-of-copy="ofInn" aria-label="Скопировать ИНН">
+              <svg class="of-no" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5.4 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.8"/></svg>
+              <svg class="of-ok" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 12.6 4.6 4.6L19 7.2"/></svg>
+            </button>
+          </div>
+          <div class="of-row">
+            <div><span class="of-k">ОГРНИП</span>
+              <p class="of-v" id="ofOgrn">319911200114762</p></div>
+            <button class="of-copy" type="button" data-of-copy="ofOgrn" aria-label="Скопировать ОГРНИП">
+              <svg class="of-no" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5.4 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.8"/></svg>
+              <svg class="of-ok" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 12.6 4.6 4.6L19 7.2"/></svg>
+            </button>
+          </div>
+          <div class="of-row">
+            <div><span class="of-k">Расчётный счёт</span>
+              <p class="of-v" id="ofAcc">40802810842000036265</p></div>
+            <button class="of-copy" type="button" data-of-copy="ofAcc" aria-label="Скопировать расчётный счёт">
+              <svg class="of-no" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5.4 15H4.6A1.6 1.6 0 0 1 3 13.4V4.6A1.6 1.6 0 0 1 4.6 3h8.8A1.6 1.6 0 0 1 15 4.6v.8"/></svg>
+              <svg class="of-ok" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m5 12.6 4.6 4.6L19 7.2"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <p class="of-note"><b>Счёт и договор</b> менеджер присылает на почту
+          или в мессенджер сразу после брони&nbsp;- их можно показать школе
+          и родительскому комитету до того, как собирать деньги.</p>
+      </div>
+
+      <!-- Область для читалки: скрипт пишет сюда «ИНН скопирован». Зрячий
+           видит галочку на кнопке, а голосу галочка ничего не сообщает. -->
+      <p class="of-sr" id="ofSay" role="status" aria-live="polite"></p>
+    </div>
+  </section>
+</div><!-- /.of-hold -->
+
+<!-- Крупный просмотр скана. Лежит в разметке целиком и спрятан `hidden`:
+     отдельного окна на каждый документ не заводим, оно одно на оба. -->
+<div class="of-ov" id="ofOv" hidden>
+  <button class="of-x" type="button" id="ofX" aria-label="Закрыть просмотр">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <button class="of-arr prev" type="button" id="ofPrev" aria-label="Предыдущий документ">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 19 8 12l7-7"/></svg>
+  </button>
+  <button class="of-arr next" type="button" id="ofNext" aria-label="Следующий документ">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m9 5 7 7-7 7"/></svg>
+  </button>
+  <figure class="of-fig" id="ofFig" role="dialog" aria-modal="true" aria-label="Документ организатора" tabindex="-1">
+    <img id="ofBig" src="" alt="">
+    <figcaption><b id="ofBigT"></b><span id="ofBigS"></span></figcaption>
+  </figure>
+</div>
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
@@ -12456,6 +13071,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   add('calc', 'kvSky', {
     div: 6200, cap: 300, bias: 1.7, knotTop: 0.04, knotLen: 0.40,
     fadeFrom: 0.74, fadeLen: 0.26, alpha: 0.9, shift: 46,
+    first: 3, gap: 4, gapSpread: 6
+  });
+
+  /* двадцать третий экран, официальная информация: секция вся тёмная сверху
+     донизу, поэтому звёзды идут по всей высоте без затухания. Густота чуть
+     ниже соседей - середину занимают карточки и два белых листа, звёзды видно
+     только по полям, и на плотной рассыпке они читались бы шумом у кромки
+     бумаги. Это конец страницы: звездопад как у всех, раз в 4-10 секунд. */
+  add('official', 'ofSky', {
+    div: 7000, cap: 320, bias: 1, knotTop: 0.05, knotLen: 0.84,
+    fadeFrom: 1.2, fadeLen: 1, alpha: 0.85, shift: 44,
     first: 3, gap: 4, gapSpread: 6
   });
 
@@ -15710,6 +16336,223 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   podpisat();
   wide.addEventListener ? wide.addEventListener('change', podpisat)
                         : wide.addListener && wide.addListener(podpisat);
+})();
+</script>
+
+<!-- Скрипт экрана официальной информации держится отдельно, как у квиза
+     и ответов на вопросы: файл правят из двух окон, и ошибка в чужом блоке
+     не должна ронять этот экран. -->
+<script>
+/* ==================== ЭКРАН 23: ОФИЦИАЛЬНАЯ ИНФОРМАЦИЯ ====================
+   Скрипт делает ровно две вещи: открывает скан крупно и копирует реквизит.
+
+   БЕЗ НЕГО ЭКРАН ОСТАЁТСЯ РАБОЧИМ. Сканы лежат в разметке обычными
+   картинками, реквизиты - обычным текстом: выключен JS - человек всё равно
+   видит документы и может выделить ИНН мышью. Не работает только увеличение
+   и копирование в один щелчок.
+
+   СПИСОК ДОКУМЕНТОВ НЕ ДУБЛИРУЕТСЯ В КОДЕ, а собирается из самой разметки:
+   картинка, подпись и пояснение берутся у тех же `.of-sheet`, что стоят
+   на экране. Добавишь третий документ - в скрипт лезть не надо. */
+(function(){
+  'use strict';
+  var sec = document.getElementById('official');
+  if (!sec) return;
+
+  /* ---------- копирование реквизитов ---------- */
+  var say = document.getElementById('ofSay');
+  var copies = sec.querySelectorAll('.of-copy');
+
+  /* ЗАПАСНОЙ ПУТЬ - невидимое поле и execCommand. Он объявлен устаревшим,
+     но работает там, где современный буфер не работает вовсе. */
+  function starym(text){
+    return new Promise(function(ok, no){
+      var t = document.createElement('textarea');
+      t.value = text;
+      t.setAttribute('readonly', '');
+      t.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0';
+      document.body.appendChild(t);
+      t.select();
+      var done = false;
+      try { done = document.execCommand('copy'); } catch(e){ done = false; }
+      document.body.removeChild(t);
+      done ? ok() : no();
+    });
+  }
+  /* navigator.clipboard есть не везде и не всегда СРАБАТЫВАЕТ там, где есть:
+     Safari отдаёт его только по https, а браузер может отказать в доступе
+     к буферу уже после вызова. Поэтому мало проверить, что метод существует, -
+     надо поймать и отказ: на нём уходим на старый путь, а не показываем
+     человеку «не получилось». */
+  function toBuffer(text){
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text).catch(function(){ return starym(text); });
+    }
+    return starym(text);
+  }
+
+  for (var c = 0; c < copies.length; c++){
+    (function(btn){
+      var tmr = 0;
+      btn.addEventListener('click', function(){
+        var src = document.getElementById(btn.getAttribute('data-of-copy'));
+        if (!src) return;
+        var val = (src.textContent || '').replace(/\s+/g, '');
+        toBuffer(val).then(function(){
+          btn.classList.add('ok');
+          /* Голосу галочка на кнопке ничего не сообщает, поэтому говорим
+             словами. Имя реквизита берём из aria-label самой кнопки:
+             «Скопировать ИНН» → «ИНН скопирован». */
+          if (say) say.textContent = (btn.getAttribute('aria-label') || '').replace(/^Скопировать\s*/, '') + ' скопирован';
+          clearTimeout(tmr);
+          tmr = setTimeout(function(){ btn.classList.remove('ok'); }, 1800);
+        }, function(){
+          if (say) say.textContent = 'Не получилось скопировать, выделите номер вручную';
+        });
+      });
+    })(copies[c]);
+  }
+
+  /* ---------- крупный просмотр скана ---------- */
+  var ov = document.getElementById('ofOv');
+  var sheets = sec.querySelectorAll('.of-sheet');
+  if (!ov || !sheets.length) return;
+
+  var fig  = document.getElementById('ofFig');
+  var big  = document.getElementById('ofBig');
+  var bigT = document.getElementById('ofBigT');
+  var bigS = document.getElementById('ofBigS');
+  var prev = document.getElementById('ofPrev');
+  var next = document.getElementById('ofNext');
+  var xBtn = document.getElementById('ofX');
+
+  /* Данные собираем из разметки один раз: вторая копия подписей в коде
+     разъехалась бы с экраном при первой же правке текста. */
+  var docs = [], i;
+  for (i = 0; i < sheets.length; i++){
+    var img = sheets[i].querySelector('img');
+    var cap = sheets[i].parentNode.querySelector('.of-cap');
+    docs.push({
+      src: img ? img.getAttribute('src') : '',
+      alt: img ? (img.getAttribute('alt') || '') : '',
+      t:   cap && cap.querySelector('b')    ? cap.querySelector('b').textContent    : '',
+      s:   cap && cap.querySelector('span') ? cap.querySelector('span').textContent : ''
+    });
+  }
+  /* Стрелки не нужны, когда документ один: кнопка, которая никуда не ведёт,
+     хуже отсутствующей. */
+  if (docs.length < 2){ prev.hidden = true; next.hidden = true; }
+
+  var cur = 0, from = null, open = false;
+
+  function paint(n){
+    cur = (n + docs.length) % docs.length;
+    var d = docs[cur];
+    big.setAttribute('src', d.src);
+    big.setAttribute('alt', d.alt);
+    bigT.textContent = d.t;
+    bigS.textContent = d.s;
+  }
+
+  function show(n, trigger){
+    from = trigger || null;
+    paint(n);
+    ov.hidden = false;
+    /* Класс появления вешаем следующим кадром: поставь его сразу - браузер
+       успеет применить оба состояния за один проход, и перехода не будет.
+       Тот же приём, что у окна заявки. */
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ ov.classList.add('on'); }); });
+    open = true;
+    lock();
+    fig.focus();
+  }
+
+  function hide(){
+    if (!open) return;
+    open = false;
+    ov.classList.remove('on');
+    unlock();
+    /* Ждём конец затухания, иначе картинка пропадает рывком. 300 мс - та же
+       длительность, что в переходе `.of-ov`. */
+    setTimeout(function(){
+      /* Именно removeAttribute, а не src='': пустая строка в src заставляет
+         часть браузеров запросить адрес самой страницы ещё раз. */
+      if (!open){ ov.hidden = true; big.removeAttribute('src'); }
+    }, 300);
+    if (from && from.focus) from.focus();
+    from = null;
+  }
+
+  /* Прокрутку запираем тем же способом и тем же классом, что окно заявки
+     (`html.zs-lock`): это состояние всей страницы, а не одного окна, и двух
+     разных замков на одной странице быть не должно. Ширину исчезнувшей полосы
+     прокрутки отдаём в CSS, чтобы страница и шапка не прыгнули вправо. */
+  function lock(){
+    var sbw = window.innerWidth - document.documentElement.clientWidth;
+    document.documentElement.style.setProperty('--zs-sbw', (sbw > 0 ? sbw : 0) + 'px');
+    document.documentElement.classList.add('zs-lock');
+  }
+  function unlock(){
+    document.documentElement.classList.remove('zs-lock');
+    document.documentElement.style.removeProperty('--zs-sbw');
+  }
+
+  for (i = 0; i < sheets.length; i++){
+    (function(btn, n){
+      btn.addEventListener('click', function(){ show(n, btn); });
+    })(sheets[i], i);
+  }
+
+  xBtn.addEventListener('click', hide);
+  prev.addEventListener('click', function(){ paint(cur - 1); });
+  next.addEventListener('click', function(){ paint(cur + 1); });
+
+  /* Щелчок мимо листа закрывает. Проверяем именно `target === ov`: щелчок
+     по самой картинке всплывает сюда же, и без проверки окно закрывалось бы
+     от попытки рассмотреть печать. */
+  ov.addEventListener('click', function(e){ if (e.target === ov) hide(); });
+
+  document.addEventListener('keydown', function(e){
+    if (!open) return;
+    if (e.key === 'Escape'){ e.preventDefault(); hide(); return; }
+    if (docs.length < 2) return;
+    if (e.key === 'ArrowLeft')  paint(cur - 1);
+    if (e.key === 'ArrowRight') paint(cur + 1);
+  });
+
+  /* Листание пальцем. Порог 46 px и проверка на вертикаль: без неё окно
+     перелистывалось бы от попытки прокрутить высокий лист. */
+  var tx = 0, ty = 0, tracking = false;
+  ov.addEventListener('touchstart', function(e){
+    if (!e.touches || e.touches.length !== 1) return;
+    tx = e.touches[0].clientX; ty = e.touches[0].clientY; tracking = true;
+  }, {passive:true});
+  ov.addEventListener('touchend', function(e){
+    if (!tracking || !e.changedTouches || !e.changedTouches.length) return;
+    tracking = false;
+    if (docs.length < 2) return;
+    var dx = e.changedTouches[0].clientX - tx;
+    var dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) < 46 || Math.abs(dx) < Math.abs(dy)) return;
+    paint(cur + (dx < 0 ? 1 : -1));
+  }, {passive:true});
+
+  /* Фокус не выпускаем из окна: за ним лежит вся страница, и по Tab человек
+     уезжал бы в невидимые ссылки под затемнением. */
+  ov.addEventListener('keydown', function(e){
+    if (e.key !== 'Tab') return;
+    /* Видимость меряем через getClientRects, а НЕ через offsetParent:
+       у элемента с `position:fixed` offsetParent всегда null, и проверка
+       на него отсеяла бы крестик и обе стрелки - в ловушке остался бы
+       один сам figure, и Tab перестал бы работать вовсе. */
+    var able = [fig];
+    var all = ov.querySelectorAll('button:not([hidden])');
+    for (var k = 0; k < all.length; k++) if (all[k].getClientRects().length) able.push(all[k]);
+    if (able.length < 2) return;
+    var first = able[0], last = able[able.length - 1];
+    if (e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+  });
 })();
 </script>
 
