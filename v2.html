@@ -2116,6 +2116,82 @@ html.touch .curtain{opacity:1}
 }
 .zs-btn--purple:focus-visible{outline:3px solid rgba(221,205,255,.9)}
 
+/* ---------- ТОТ ЖЕ ВИД 1 В ЦВЕТАХ МЕССЕНДЖЕРОВ ----------
+   Заведено 12.09.2026 по выбору Серёги для подвала: «мессенджеры своими
+   цветами». Опять НЕ новые виды кнопок, а первый вид в другом цвете: высота,
+   кегль, форма, бортик, глянец и бегущий блик те же, меняются только заливка,
+   надпись и свечение. Виды по-прежнему два - обычная и прозрачная.
+
+   ПОЧЕМУ ЦВЕТА РАЗРЕШЕНЫ ИМЕННО ТУТ: в подвале четыре кнопки стоят подряд
+   и отличаются друг от друга только надписью. Одинаковым золотом они
+   читались бы как один длинный ряд, и человек искал бы нужный мессенджер
+   чтением, а не взглядом. Цвет тут - не украшение, а способ различить.
+
+   ВКонтакте берёт готовый `--blue` (тот же синий, что у кнопки роликов),
+   МАХ - готовый `--purple`. Новых оттенков ровно два: голубой и зелёный.
+   Надпись у обоих белая, как у синей и фиолетовой. Бортик и кромка темнее
+   заливки во столько же раз, во сколько у золотой, - иначе кнопка перестаёт
+   «стоять на толщине» и ложится плашмя.
+
+   НОВЫЙ ЦВЕТ В НОВОМ МЕСТЕ - СПРАШИВАТЬ СЕРЁГУ, как велит standart-knopok.md.
+   Эти четыре цвета живут в подвале, а не «на выбор по всему сайту». */
+.zs-btn--tg{
+  color:#fff;
+  background:linear-gradient(180deg, #8FDAFB 0%, #2196D6 52%, #1276AF 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.5),
+    inset 0 0 0 1px rgba(10,70,110,.34),
+    0 0 0 1px rgba(143,218,251,.5),
+    0 4px 0 #0B5A8A,
+    0 10px 15px -3px rgba(0,0,0,.5),
+    0 0 30px 4px rgba(33,150,214,.42);
+}
+.zs-btn--tg:hover{
+  filter:brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.5), inset 0 0 0 1px rgba(10,70,110,.34),
+    0 0 0 1px rgba(143,218,251,.5), 0 4px 0 #0B5A8A,
+    0 12px 18px -3px rgba(0,0,0,.5),
+    0 0 44px 8px rgba(33,150,214,.66);
+}
+.zs-btn--tg:active{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.36), inset 0 0 0 1px rgba(10,70,110,.34),
+    0 0 0 1px rgba(143,218,251,.5), 0 2px 0 #0B5A8A,
+    0 6px 10px -3px rgba(0,0,0,.45),
+    0 0 26px 4px rgba(33,150,214,.44);
+}
+.zs-btn--tg:focus-visible{outline:3px solid rgba(190,230,255,.9)}
+
+.zs-btn--wa{
+  color:#fff;
+  background:linear-gradient(180deg, #7BE2A6 0%, #17A853 52%, #0E8341 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.5),
+    inset 0 0 0 1px rgba(8,80,40,.34),
+    0 0 0 1px rgba(123,226,166,.5),
+    0 4px 0 #0A6633,
+    0 10px 15px -3px rgba(0,0,0,.5),
+    0 0 30px 4px rgba(23,168,83,.42);
+}
+.zs-btn--wa:hover{
+  filter:brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.5), inset 0 0 0 1px rgba(8,80,40,.34),
+    0 0 0 1px rgba(123,226,166,.5), 0 4px 0 #0A6633,
+    0 12px 18px -3px rgba(0,0,0,.5),
+    0 0 44px 8px rgba(23,168,83,.66);
+}
+.zs-btn--wa:active{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.36), inset 0 0 0 1px rgba(8,80,40,.34),
+    0 0 0 1px rgba(123,226,166,.5), 0 2px 0 #0A6633,
+    0 6px 10px -3px rgba(0,0,0,.45),
+    0 0 26px 4px rgba(23,168,83,.44);
+}
+.zs-btn--wa:focus-visible{outline:3px solid rgba(190,255,214,.9)}
+
+
 /* ---------- СЛОВО «МАХ» ВСЕГДА ФИОЛЕТОВОЕ ----------
    Просьба Серёги 12.09.2026: «везде, где есть упоминание МАХ, сделай его
    фиолетовым, оттенок в зависимости от фона». Фиолетовый - фирменный цвет
@@ -8216,6 +8292,274 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .of-card,.of-sheet,.of-zoom,.of-copy,.of-fig img,.of-x,.of-arr{transition:none}
   .of-fig img{transform:none; opacity:1}
 }
+
+/* ==================== ПОДВАЛ САЙТА ====================
+   Пространство имён `pd-` (подвал). Просьба Серёги 12.09.2026: «в самом низу
+   сайта под экраном с формой сделай подвал, как на ministrynn.ru, только
+   красивее и по правилам современного веб-дизайна; снег с ёлочками можно
+   добавить». Устройство → sayt-nn/ustroystvo.md, блок «Подвал».
+
+   ЧТО ВЗЯТО С БОЕВОГО САЙТА: телефон, адрес площадки, офис продаж, почта
+   и реквизиты. Всё остальное - своё. Реквизиты сверены с блоком
+   «Официальная информация» выше: меняешь там - меняй и тут, иначе на одной
+   странице окажутся два разных ИНН.
+
+   ЭТО ПОСЛЕДНИЙ БЛОК СТРАНИЦЫ, и стоит он под БЕЛЫМ экраном заявки.
+   Поэтому фон собран по общему рецепту тёмного поля под светлым (как
+   у экранов 14, 17, 19Б, 21 и 23): синее зарево у верхней кромки и старт
+   с #0A1046. Без зарева шов с белым бланком выходит резкой чёрной чертой.
+   Шов держит тот же золотой блик, что на других швах (v2-sm-blik.webp),
+   и лежит он СНАРУЖИ секции: у неё overflow:hidden, изнутри верхнюю
+   половину блика срезало бы → так же сделано у .of-blik.
+
+   z-index:29 - та же ступень, что у официальной информации и светлой заявки.
+   Выше поднимать нельзя (на 30 шапка), и не нужно: при равном слое побеждает
+   тот, кто НИЖЕ в разметке, а ниже подвала на странице нет ничего
+   → lessons/element-na-shve-sekciy-z-index.md
+
+   РАЗМЕРЫ НЕ В МНОЖИТЕЛЕ --u: это не копия старого сайта, всё через clamp()
+   от ширины окна - как у экранов 5, 18, 21 и 23. */
+.pd-hold{position:relative; z-index:29}
+.pd-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.pd{
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  /* Нижнее поле считается от полосы ёлок: они стоят по нижней кромке,
+     и текст обязан кончаться ВЫШЕ их макушек. Меняешь высоту полосы -
+     меняй и это число, иначе реквизиты окажутся в лесу. */
+  padding:clamp(64px,6.6vw,116px) 0 calc(clamp(104px,10.4vw,180px) + clamp(26px,2.6vw,44px));
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 18%,#0A1140 44%,#070C2E 74%,#04071A 100%);
+}
+/* Отблески и зерно - общий рецепт тёмного экрана, движение по тем же
+   keyframes bkDrift1-3, что у экранов 5, 18, 21 и 23. Своих не заводим. */
+.pd-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.pd-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.pd-glow i:nth-child(1){left:-18vw; top:-10%; width:68vw; height:56%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.44) 0%, rgba(47,49,146,.28) 32%, rgba(47,49,146,.09) 64%, rgba(47,49,146,0) 100%);
+  animation:bkDrift1 44s ease-in-out infinite alternate}
+.pd-glow i:nth-child(2){right:-20vw; top:2%; width:70vw; height:62%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.3) 0%, rgba(108,43,217,.19) 32%, rgba(108,43,217,.06) 64%, rgba(108,43,217,0) 100%);
+  animation:bkDrift2 51s ease-in-out infinite alternate}
+.pd-glow i:nth-child(3){left:50%; bottom:-18%; width:78vw; height:52%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.16) 0%, rgba(227,179,78,.1) 32%, rgba(227,179,78,.035) 64%, rgba(227,179,78,0) 100%);
+  animation:bkDrift3 38s ease-in-out infinite alternate-reverse}
+@media (prefers-reduced-motion:reduce){ .pd-glow i{animation:none} }
+.pd-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* ---------- СНЕГОПАД ----------
+   Два слоя точек: ближний крупнее и быстрее, дальний мельче и медленнее -
+   от этого у снега появляется глубина. Ни одного <div> на снежинку и ни
+   одного холста: точки нарисованы фоном плитки, а едет сама плитка.
+
+   ПОЧЕМУ ЕДЕТ TRANSFORM, А НЕ background-position: при сдвиге фона браузер
+   каждый кадр перерисовывает все градиенты плитки, и на телефоне это видно
+   как рывки. Тот же довод записан у бегущего блика кнопки.
+
+   СДВИГ РОВНО НА ВЫСОТУ ПЛИТКИ - за счёт этого петля незаметна: к концу
+   прохода узор встаёт точно на место следующего повтора. Слой выше секции
+   на высоту плитки и ниже её на столько же, иначе в начале и конце прохода
+   у кромок появлялись бы пустые полосы. */
+.pd-snow{position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden}
+.pd-snow i{
+  position:absolute; left:0; right:0; top:-260px; height:calc(100% + 520px);
+  display:block; background-repeat:repeat; will-change:transform;
+}
+.pd-snow i:nth-child(1){
+  background-size:260px 260px; animation:pdFall1 17s linear infinite;
+  background-image:
+    radial-gradient(2.3px 2.3px at 34px 46px, rgba(255,255,255,.9), rgba(255,255,255,0)),
+    radial-gradient(1.9px 1.9px at 186px 22px, rgba(255,255,255,.8), rgba(255,255,255,0)),
+    radial-gradient(2.1px 2.1px at 112px 132px, rgba(255,255,255,.85), rgba(255,255,255,0)),
+    radial-gradient(1.7px 1.7px at 238px 176px, rgba(226,238,255,.8), rgba(226,238,255,0)),
+    radial-gradient(2.4px 2.4px at 64px 214px, rgba(255,255,255,.75), rgba(255,255,255,0)),
+    radial-gradient(1.8px 1.8px at 156px 86px, rgba(226,238,255,.7), rgba(226,238,255,0));
+}
+.pd-snow i:nth-child(2){
+  background-size:340px 340px; opacity:.55; animation:pdFall2 31s linear infinite;
+  background-image:
+    radial-gradient(1.5px 1.5px at 52px 28px, rgba(255,255,255,.8), rgba(255,255,255,0)),
+    radial-gradient(1.3px 1.3px at 214px 96px, rgba(226,238,255,.75), rgba(226,238,255,0)),
+    radial-gradient(1.6px 1.6px at 128px 188px, rgba(255,255,255,.7), rgba(255,255,255,0)),
+    radial-gradient(1.2px 1.2px at 298px 246px, rgba(226,238,255,.7), rgba(226,238,255,0)),
+    radial-gradient(1.5px 1.5px at 82px 304px, rgba(255,255,255,.65), rgba(255,255,255,0)),
+    radial-gradient(1.3px 1.3px at 246px 152px, rgba(226,238,255,.6), rgba(226,238,255,0));
+}
+/* Снег не падает строго вниз: к концу прохода узор уезжает вбок на ширину
+   плитки - тогда сдвиг по горизонтали тоже замыкается и петли не видно. */
+@keyframes pdFall1{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-260px,260px,0)}
+}
+@keyframes pdFall2{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(340px,340px,0)}
+}
+@media (prefers-reduced-motion:reduce){ .pd-snow i{animation:none} }
+
+/* ---------- ПОЛОСА ЁЛОК ----------
+   Картинка `v2-pd-elki.svg` - одна плитка 640x180: снежная земля, дальний
+   ряд ёлок посветлее и ближний потемнее, на лапах ближнего ряда блики снега.
+   Земля нарисована синусом с периодом, который целое число раз укладывается
+   в плитку, поэтому при повторении по горизонтали шва не видно.
+
+   ВЫСОТУ ЗАДАЁМ, ШИРИНУ - НЕТ: `background-size:auto 100%` масштабирует
+   плитку по высоте и повторяет по ширине. На любом мониторе ёлки остаются
+   одного роста, а лес просто длиннее.
+
+   ЛЕЖИТ НИЖЕ НАЧИНКИ (z-index:1 против 7 у .cr-cont) - текст поверх леса
+   читаться не должен, поэтому нижнее поле секции с запасом больше полосы. */
+.pd-forest{
+  position:absolute; left:0; right:0; bottom:0; z-index:1; pointer-events:none;
+  height:clamp(104px,10.4vw,180px);
+  background:url(v2-pd-elki.svg) repeat-x center bottom/auto 100%;
+}
+/* ---------- ГОРОД: СТРОКА ПЕРЕКЛЮЧЕНИЯ ----------
+   Первое, что человек видит в подвале. Это не призыв, а подсказка: страница
+   про Нижний, а городов шесть. Поэтому кнопка тут ПРОЗРАЧНАЯ (вид 2
+   стандарта): золотая заливка стоит в бланке прямо над подвалом, и вторая
+   золотая пилюля через сантиметр спорила бы с ней за главное действие
+   → sayt-nn/standart-knopok.md */
+.pd-city{
+  position:relative; z-index:7;
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap;
+  gap:clamp(14px,1.5vw,26px);
+  padding:0 0 clamp(30px,3.2vw,54px);
+  border-bottom:1px solid rgba(158,180,255,.14);
+}
+/* НЕ ФЛЕКС, И ЭТО ВАЖНО: во флексе каждый кусок текста вокруг <b> становится
+   отдельным элементом, и gap раздвигает их - между «Новгорода» и точкой
+   вылезает пробел. Значок держится в строке как обычная буква. */
+.pd-city-t{
+  margin:0; text-align:center;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.12vw,16.6px);
+  line-height:1.5; color:#C2CEEF;
+}
+.pd-city-t b{font-weight:600; color:#fff}
+.pd-city-t i{display:inline-block; vertical-align:-.3em; width:1.35em; height:1.35em;
+  margin-right:.4em; color:#FFD189}
+.pd-city-t i svg{width:100%; height:100%; display:block;
+  fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
+
+/* ---------- МЕССЕНДЖЕРЫ ---------- */
+.pd-cta{position:relative; z-index:7; text-align:center;
+  padding:clamp(34px,3.6vw,60px) 0 clamp(34px,3.6vw,58px);
+  border-bottom:1px solid rgba(158,180,255,.14)}
+.pd-cta-t{
+  margin:0 0 clamp(16px,1.7vw,28px);
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(19px,2.1vw,32px); line-height:1.15; letter-spacing:.005em;
+  text-transform:uppercase; color:#fff;
+}
+.pd-cta-t span{color:#FFD189}
+.pd-msgs{display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+  gap:clamp(10px,1vw,16px)}
+.pd-cta-n{margin:clamp(14px,1.5vw,24px) 0 0; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(12.6px,.95vw,14.2px); line-height:1.5; color:#8FA2D4}
+/* Значок внутри кнопки обязан лежать НА слое надписи (z-index:3): ниже него
+   идут глянец и бегущий блик, и без своего слоя значок оказался бы под ними.
+   Тот же приём, что у .zs-t → блок «СТАНДАРТ КНОПОК». */
+.pd-i{position:relative; z-index:3; display:block; flex:0 0 auto;
+  width:1.35em; height:1.35em; margin-right:.1em}
+.pd-i svg{width:100%; height:100%; display:block}
+
+/* ---------- ЧЕТЫРЕ КОЛОНКИ ---------- */
+.pd-main{
+  position:relative; z-index:7;
+  display:grid; grid-template-columns:1fr; gap:clamp(30px,3.2vw,54px);
+  padding:clamp(36px,3.8vw,62px) 0 clamp(30px,3.2vw,52px);
+  border-bottom:1px solid rgba(158,180,255,.14);
+}
+@media (min-width:700px){ .pd-main{grid-template-columns:repeat(2,1fr)} }
+/* Логотипу колонка шире прочих: под ним подпись в две строки, и при равных
+   долях она рвалась бы по одному слову. */
+@media (min-width:1080px){ .pd-main{grid-template-columns:1.25fr 1fr 1.05fr 1fr; gap:clamp(24px,2.4vw,44px)} }
+.pd-col{min-width:0}
+.pd-ct{
+  margin:0 0 clamp(12px,1.2vw,18px);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.7px,.86vw,11.1px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#93A6DA;
+}
+/* Логотип маленький и служебный: он тут не вывеска, а подпись под всем
+   сказанным выше. Ширину держим в clamp, у картинки свои width/height -
+   без них при медленной загрузке подвал дёргается на высоту логотипа. */
+.pd-logo{display:block; width:clamp(148px,13vw,212px); height:auto; margin:0 0 clamp(14px,1.4vw,22px)}
+.pd-slogan{margin:0; max-width:34ch; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(13.4px,1.02vw,15.2px); line-height:1.55; color:#A9B8E0}
+.pd-slogan b{font-weight:600; color:#fff}
+/* Телефон - самая крупная строка подвала: в подвал приходят за ним. */
+.pd-tel{
+  display:inline-block; text-decoration:none; color:#FFD189;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(21px,1.85vw,29px); line-height:1.2; letter-spacing:.01em;
+  white-space:nowrap; transition:color .25s ease, text-shadow .25s ease;
+}
+.pd-tel:hover,.pd-tel:focus-visible{color:#FFE7BC; text-shadow:0 0 26px rgba(227,179,78,.5)}
+.pd-note{margin:clamp(6px,.6vw,10px) 0 0; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(12.6px,.95vw,14.2px); line-height:1.5; color:#8FA2D4}
+.pd-mail{display:inline-block; margin:clamp(14px,1.4vw,22px) 0 0; text-decoration:none;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(13.4px,1.02vw,15.2px);
+  line-height:1.5; color:#C2CEEF; border-bottom:1px solid rgba(194,206,239,.32);
+  transition:color .25s ease, border-color .25s ease}
+.pd-mail:hover,.pd-mail:focus-visible{color:#fff; border-color:rgba(255,255,255,.7)}
+.pd-adr{margin:0; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(13.4px,1.02vw,15.2px); line-height:1.55; color:#A9B8E0}
+.pd-adr + .pd-adr{margin-top:clamp(14px,1.4vw,22px)}
+.pd-adr b{display:block; font-weight:600; color:#fff}
+.pd-adr span{display:block; color:#8FA2D4}
+.pd-nav{margin:0; padding:0; list-style:none;
+  display:grid; gap:clamp(9px,.85vw,13px)}
+.pd-nav a{
+  text-decoration:none; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(13.4px,1.02vw,15.2px); line-height:1.4; color:#C2CEEF;
+  transition:color .25s ease, padding-left .25s ease;
+}
+.pd-nav a:hover,.pd-nav a:focus-visible{color:#FFD189; padding-left:6px}
+
+/* ---------- НИЖНЯЯ СТРОКА ----------
+   Реквизиты тут короткие: полные лежат экраном выше, в «Официальной
+   информации», и ссылка ведёт именно туда - дублировать их целиком незачем. */
+.pd-legal{
+  position:relative; z-index:7;
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+  gap:clamp(10px,1.1vw,20px); padding:clamp(22px,2.2vw,36px) 0 0;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.2px,.92vw,13.8px);
+  line-height:1.55; color:#7D8DBC;
+}
+.pd-legal p{margin:0}
+.pd-legal a{color:#A9B8E0; text-decoration:none; border-bottom:1px solid rgba(169,184,224,.3);
+  transition:color .25s ease, border-color .25s ease}
+.pd-legal a:hover,.pd-legal a:focus-visible{color:#FFD189; border-color:rgba(227,179,78,.6)}
+.pd-legal .pd-dot{padding:0 .45em; color:#4F5C86}
+
+/* ---------- ТЕЛЕФОН ----------
+   На узком экране колонки идут одна под другой и всё равняется по центру:
+   левый край у логотипа, телефона и списка ссылок разной длины, и в столбик
+   они читаются как ступеньки. Кнопки мессенджеров тут во всю ширину бланка -
+   тот же случай, что у кнопок форм на экранах 5, 7, 8, 11, 15 и 22
+   → sayt-nn/standart-knopok.md, раздел «Где ширина задана отдельно». */
+@media (max-width:699px){
+  .pd-main{text-align:center}
+  .pd-logo{margin-left:auto; margin-right:auto}
+  .pd-slogan{margin-left:auto; margin-right:auto}
+  .pd-nav a:hover,.pd-nav a:focus-visible{padding-left:0}
+  .pd-legal{justify-content:center; text-align:center}
+}
+@media (max-width:559px){
+  .pd-msgs .zs-btn{width:min(100%,420px)}
+  .pd-city{flex-direction:column}
+  .pd-city .zs-btn{width:min(100%,420px)}
+}
+/* На телефоне общий контейнер отдаёт поля тексту (`.cr-cont{padding:0}`),
+   и подвал упёрся бы в кромки экрана. Поля свои, как у экранов 15, 17 и 23. */
+@media (max-width:767px){
+  .pd .cr-cont{padding-inline:20px}
+}
 </style>
 
 
@@ -11375,6 +11719,134 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
   </div>
 </section>
+
+
+<!-- ==================== ПОДВАЛ САЙТА ====================
+     Просьба Серёги 12.09.2026: «в самом низу сайта под экраном с формой
+     сделай подвал, как на ministrynn.ru, только красивее и стильнее,
+     по правилам современного веб-дизайна; снег с ёлочками можно добавить».
+     Устройство → sayt-nn/ustroystvo.md, блок «Подвал».
+
+     ПОСЛЕДНИЙ БЛОК СТРАНИЦЫ. Ниже него нет ничего, поэтому подвал не зовёт
+     оставить заявку (бланк стоит прямо над ним), а отвечает на вопрос
+     «как с вами связаться» и закрывает страницу реквизитами.
+
+     ЦВЕТА КНОПОК МЕССЕНДЖЕРОВ - выбор Серёги 12.09.2026 («мессенджеры своими
+     цветами»). Это тот же ВИД 1 стандарта в другом цвете, а не новые виды
+     кнопок → блок «ТОТ ЖЕ ВИД 1 В ЦВЕТАХ МЕССЕНДЖЕРОВ» в стилях кнопок
+     и sayt-nn/standart-knopok.md.
+
+     АДРЕСА СООБЩЕСТВ сняты с боевого ministrynn.ru 12.09.2026. Телефон тоже
+     оттуда - Серёга попросил пока оставить тот, что указан на боевом. -->
+<div class="pd-hold">
+  <!-- Блик на шве с белым бланком заявки. Стоит СНАРУЖИ подвала: у него
+       overflow:hidden, и изнутри верхнюю половину блика срезало бы. -->
+  <div class="pd-blik" aria-hidden="true"></div>
+
+  <footer class="pd" id="podval">
+    <div class="pd-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="pd-grain" aria-hidden="true"></div>
+    <div class="pd-snow" aria-hidden="true"><i></i><i></i></div>
+    <div class="pd-forest" aria-hidden="true"></div>
+
+    <div class="cr-cont">
+
+      <!-- ---------- строка города ---------- -->
+      <div class="pd-city">
+        <p class="pd-city-t">
+          <i aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 20.8s6.4-5.6 6.4-10.2a6.4 6.4 0 1 0-12.8 0c0 4.6 6.4 10.2 6.4 10.2Z"/><circle cx="12" cy="10.4" r="2.4"/></svg></i>
+          Вы смотрите страницу <b>Нижнего Новгорода</b>. Мы работаем в шести городах</p>
+        <!-- Кнопка прозрачная (вид 2): золотая заливка стоит в бланке прямо
+             над подвалом, вторая золотая пилюля спорила бы с ней за главное
+             действие → sayt-nn/standart-knopok.md.
+             АДРЕСА ПОКА НЕТ - решение Серёги 12.09.2026 «пока заглушка».
+             Появится страница выбора города - вписать её сюда, заменив
+             <button> на <a href="…"> с теми же классами, больше ничего
+             менять не надо. -->
+        <button class="zs-btn zs-btn--ghost" type="button" data-pd-city>
+          <span class="zs-t">Выбрать другой город</span></button>
+      </div>
+
+      <!-- ---------- мессенджеры ---------- -->
+      <div class="pd-cta">
+        <p class="pd-cta-t">Напишите нам <span>там, где вам удобно</span></p>
+        <div class="pd-msgs">
+          <a class="zs-btn zs-btn--blue" href="https://vk.com/ministrynn" target="_blank" rel="noopener">
+            <i class="pd-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M12.9 16.9c-5.2 0-8.4-3.6-8.5-9.6h2.6c.1 4.4 2.1 6.3 3.6 6.7V7.3h2.5v3.8c1.5-.2 3.1-1.9 3.6-3.8h2.5c-.4 2.4-2.1 4.1-3.3 4.8 1.2.6 3.2 2.1 3.9 4.8h-2.7c-.6-1.8-2-3.2-4-3.4v3.4h-.2z"/></svg></i>
+            <span class="zs-t">Написать в ВК</span></a>
+
+          <a class="zs-btn zs-btn--purple" href="https://max.ru/id910314959705_biz" target="_blank" rel="noopener">
+            <i class="pd-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M3.6 19V7.1c0-.8.98-1.16 1.48-.55L12 15l6.92-8.45c.5-.61 1.48-.25 1.48.55V19"/></svg></i>
+            <span class="zs-t">Написать в <span class="mx">МАХ</span></span></a>
+
+          <a class="zs-btn zs-btn--tg" href="https://t.me/ministry_newyear" target="_blank" rel="noopener">
+            <i class="pd-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" focusable="false"><path d="M23.9 3.8 20.3 20.8c-.27 1.2-.99 1.5-2 .93l-5.5-4.06-2.65 2.56c-.3.3-.55.55-1.1.55l.39-5.6L19.6 6.05c.44-.4-.1-.6-.68-.22L6.3 13.7l-5.44-1.7c-1.18-.37-1.2-1.18.25-1.75L22.37 2.06c.98-.36 1.84.23 1.53 1.74z"/></svg></i>
+            <span class="zs-t">Написать в ТГ</span></a>
+
+          <!-- Значок вотсапа нарисован свой: пузырь сообщения с трубкой.
+               Официального глифа в открытом виде нет, и подставлять чужой
+               знак сюда не надо - смысл «написать» читается и так. -->
+          <a class="zs-btn zs-btn--wa" href="https://wa.me/79994447569" target="_blank" rel="noopener">
+            <i class="pd-i" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M20.6 11.3c0 4.2-3.9 7.6-8.6 7.6-1.2 0-2.3-.2-3.3-.6l-4.5 1.5 1.5-4.2c-1.2-1.3-1.9-2.9-1.9-4.3 0-4.2 3.9-7.6 8.6-7.6s8.2 3.4 8.2 7.6Z"/><path d="M9.8 8.5c.2 2.2 2 4 4.2 4.2l.8-1.3 1.8 1-.6 1.6c-2 .2-4-.8-5.3-2.1-1.3-1.3-2-3-1.8-4.7l1.6-.5.9 1.8z" fill="currentColor" stroke="none"/></svg></i>
+            <span class="zs-t">Написать в вотсап</span></a>
+        </div>
+        <p class="pd-cta-n">Отвечаем в рабочее время, с 10:00 до 19:00. В вотсапе - только сообщения</p>
+      </div>
+
+      <!-- ---------- четыре колонки ---------- -->
+      <div class="pd-main">
+
+        <div class="pd-col">
+          <img class="pd-logo" src="v2-pd-logo.webp" width="520" height="472"
+               loading="lazy" decoding="async"
+               alt="Министерство новогодних дел Деда Мороза">
+          <p class="pd-slogan">Экскурсия-шоу <b>«Звёздная смена»</b> в Министерство
+            новогодних дел Деда Мороза. Сезон 2026/27, Нижний Новгород</p>
+        </div>
+
+        <div class="pd-col">
+          <h3 class="pd-ct">Позвонить</h3>
+          <a class="pd-tel" href="tel:+79994447569">+7 (999) 444-75-69</a>
+          <p class="pd-note">Ежедневно с 10:00 до 19:00</p>
+          <a class="pd-mail" href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>
+        </div>
+
+        <div class="pd-col">
+          <h3 class="pd-ct">Адреса</h3>
+          <p class="pd-adr"><b>Площадка</b>Нижний Новгород, Ольгино, 62
+            <span>Приокский район, 20 минут от центра</span></p>
+          <p class="pd-adr"><b>Офис продаж</b>Нижний Новгород, ул. Белинского, 36
+            <span>2 этаж, офис 4</span></p>
+        </div>
+
+        <div class="pd-col">
+          <h3 class="pd-ct">На этой странице</h3>
+          <ul class="pd-nav">
+            <li><a href="#whatawaits">Что ждёт детей</a></li>
+            <li><a href="#prices">Цены и даты</a></li>
+            <li><a href="#bonuses">Условия для групп</a></li>
+            <li><a href="#otzyvy">Отзывы</a></li>
+            <li><a href="#faq">Ответы на вопросы</a></li>
+            <li><a href="#official">Официальная информация</a></li>
+          </ul>
+        </div>
+
+      </div><!-- /.pd-main -->
+
+      <!-- ---------- нижняя строка ----------
+           Реквизиты короткие: полные лежат экраном выше, ссылка ведёт туда.
+           Меняются реквизиты - правь business/company/founder-info.md,
+           потом экран «Официальная информация», потом эту строку. -->
+      <div class="pd-legal">
+        <p>© 2019-2026 Министерство новогодних дел<span class="pd-dot">·</span>Нижний Новгород</p>
+        <p>ИП Киричок Сергей Васильевич<span class="pd-dot">·</span>ИНН 910314959705<span class="pd-dot">·</span><a href="#official">Документы и реквизиты</a></p>
+      </div>
+
+    </div>
+  </footer>
+</div><!-- /.pd-hold -->
 
 <!-- ==================== ЕДИНАЯ ФОРМА ЗАЯВКИ ====================
      Одно окно на весь сайт. Открывает его любая кнопка с атрибутом data-zs:
