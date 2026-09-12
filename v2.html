@@ -15309,9 +15309,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 (function(){
   'use strict';
   var BOT = '';                       /* ← сюда адрес бота, например https://max.ru/mnd_bot */
-  if (!BOT) return;
   var k = document.querySelectorAll('a[data-mx-bot]');
-  for (var i = 0; i < k.length; i++) k[i].href = BOT;
+  for (var i = 0; i < k.length; i++){
+    if (BOT){ k[i].href = BOT; continue; }
+    /* Пока адреса нет, ссылка ведёт на href="#" - и с target="_blank" это
+       открыло бы человеку копию той же страницы в новой вкладке. Хуже, чем
+       ничего: он решит, что сайт сломался. Поэтому нажатие на пустую кнопку
+       просто ничего не делает, а средствам чтения с экрана она честно
+       говорит, что сейчас недоступна. */
+    k[i].setAttribute('aria-disabled', 'true');
+    k[i].addEventListener('click', function(e){ e.preventDefault(); });
+  }
 })();
 </script>
 
