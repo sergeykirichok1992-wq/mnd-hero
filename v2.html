@@ -6747,9 +6747,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
 }
 .oz{
-  /* ЗАДАЁМ ВЫСОТУ КАДРА, ШИРИНА У КАЖДОГО СВОЯ. 334*--u — это 415 px на 1600
-     и 334 px до 1250 px, где множитель упирается в свой пол 1 px; на телефоне
+  /* ЗАДАЁМ ВЫСОТУ КАДРА, ШИРИНА У КАЖДОГО СВОЯ. 301*--u — это 374 px на 1600
+     и 301 px до 1250 px, где множитель упирается в свой пол 1 px; на телефоне
      высоту ограничивает 42vw.
+
+     БЫЛО 334, СТАЛО 301 — «на 10 % меньше на компьютерной версии» (просьба
+     Серёги 12.09.2026). Телефон при этом не тронут: там высоту задаёт первый
+     член `42vw`, и он меньше второго на всех экранах уже 795 px.
 
      ТРЕБОВАНИЕ СЕРЁГИ (11.09.2026): на главной все кадры одной высоты
      и каждый скрин целиком. Тот же приём, что у ленты Деда Морозов
@@ -6769,7 +6773,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      по которой видно, что отзывов много. Стало 290 px — и через несколько
      минут «увеличь на 60 %». Хочешь другой размер — меняется одно это число,
      остальное считается от него. */
-  --oh: min(42vw, calc(334 * var(--u)));
+  --oh: min(42vw, calc(301 * var(--u)));
   --og: calc(var(--oh) * .078);            /* зазор между кадрами */
   --or: calc(var(--oh) * .042);            /* скругление углов кадра */
   position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
@@ -6791,6 +6795,24 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   animation:bkDrift3 33s ease-in-out infinite alternate}
 .oz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* ПЯТЬ ЗВЁЗД НАД ЗАГОЛОВКОМ. Просьба Серёги 12.09.2026: «чтобы визуально
+   понятно было, что экран про отзывы». Звезда — тот же контур, что у печати
+   в окне заявки (`.zs-seal`), язык на сайте один; жёлтая, а не золотая
+   обводкой, потому что именно так звёзды выглядят в самих отзывах
+   на Яндекс Картах ниже.
+
+   Размер задаётся кеглем блока, а сами звёзды считаются от него в `em`:
+   меняешь один `font-size` — ряд едет целиком и остаётся ровным. */
+.oz-stars{
+  display:flex; justify-content:center; align-items:center;
+  gap:.3em; margin:0 auto clamp(10px,1vw,16px);
+  font-size:clamp(15px,1.35vw,21px); line-height:1;
+}
+.oz-stars svg{
+  display:block; width:1em; height:1em; fill:#FBBF24;
+  filter:drop-shadow(0 1px 5px rgba(251,191,36,.45));
+}
 
 /* Заголовок как на других тёмных экранах: Blogger Sans Bold прописными,
    белый, вторая половина — золотом. Золотом выделено «только с прошлого
@@ -10042,6 +10064,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="oz-grain" aria-hidden="true"></div>
 
   <div class="cr-cont">
+    <!-- Пять звёзд: по ним сразу видно, что экран про отзывы. Для читалки
+         это одна картинка с подписью, а не пять безымянных значков. -->
+    <p class="oz-stars" role="img" aria-label="Пять звёзд из пяти">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+    </p>
     <h2 class="oz-t" id="ozT">Более 1000 реальных текстовых отзывов<br>
       <span class="oz-q">только с прошлого сезона!</span></h2>
     <p class="oz-lead">Вот несколько случайных из них. Это скриншоты с Яндекс Карт
