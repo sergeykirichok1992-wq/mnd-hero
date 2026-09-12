@@ -2426,8 +2426,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   background-blend-mode:overlay, normal;
 }
 
-/* ЗАГОЛОВОК ЛОМАЕТСЯ ПЕРЕД «ВАШИ ДЕТИ!» (Серёга, вечер 11.09.2026:
-   «слова „ваши дети“ оставь на второй строке»). Перенос задан руками —
+/* ЗАГОЛОВОК ЛОМАЕТСЯ ПЕРЕД «ПОПАДУТ» (Серёга, вечер 11.09.2026: «слова
+   „ваши дети“ оставь на второй строке»; 12.09.2026 на вторую строку переехало
+   и «ПОПАДУТ» — теперь там три слова). Перенос задан руками —
    `<br class="kr-h2br">` в разметке, — а не подобран кеглем: от ширины окна
    он тогда не зависит и не поедет, если поменять текст или шрифт.
 
@@ -3440,7 +3441,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pgs-t{
   margin:0 auto calc(34 * var(--u)); text-align:center;   /* 09.09.2026: воздуха под заголовком больше, было 18 */
   font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
-  font-size:clamp(26px,3.7vw,57.8px); line-height:1.06; letter-spacing:.005em;
+  font-size:clamp(24px,3.33vw,52px); line-height:1.06; letter-spacing:.005em;   /* 12.09.2026: на 10 % мельче прежних 3.7vw/57.8px — просьба Серёги «немного меньше»; телефонные 52 px не трогаем */
   text-transform:uppercase; text-wrap:balance; color:#fff;
 }
 /* Подзаголовок экрана. Кегль и семейство — как у подзаголовков соседних
@@ -7894,7 +7895,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
          оставленный СНАРУЖИ, набирается мелким кеглем и слова слипаются
          («ПОСМОТРИТЕВ КАКУЮ»). Проверено 11.09.2026. -->
     <div class="cr-n">
-      <h2 class="cr-t cr-h2" id="krT"><span class="cr-red"><strong>ПОСМОТРИТЕ</strong></span><span class="cr-blue"><strong> В КАКУЮ КРАСОТУ ПОПАДУТ<br class="kr-h2br"> ВАШИ ДЕТИ!</strong></span></h2>
+      <h2 class="cr-t cr-h2" id="krT"><span class="cr-red"><strong>ПОСМОТРИТЕ</strong></span><span class="cr-blue"><strong> В КАКУЮ КРАСОТУ<br class="kr-h2br"> ПОПАДУТ ВАШИ ДЕТИ!</strong></span></h2>
     </div>
 
     <div style="height:calc(26 * var(--u))"></div>
