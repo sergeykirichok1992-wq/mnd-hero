@@ -7909,10 +7909,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      скобка в чужом блоке не должна ронять этот экран. -->
 <style>
 /* ==================== ЭКРАН 23: ОФИЦИАЛЬНАЯ ИНФОРМАЦИЯ ====================
-   Пространство имён `of-` (official). САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - просьба
-   Серёги 12.09.2026: «найди на ministrynn.ru экран с официальной информацией
-   и сделай в самом низу похожий, только красиво, и добавь туда документы,
-   которые там лежат фотографиями».
+   Пространство имён `of-` (official). Просьба Серёги 12.09.2026: «найди
+   на ministrynn.ru экран с официальной информацией и сделай в самом низу
+   похожий, только красиво, и добавь туда документы, которые там лежат
+   фотографиями». Ставился самым нижним экраном страницы; в тот же день
+   соседняя сессия поставила под ним заявку на светлом (`.sv`) и подвал
+   (`.pd-hold`), так что низ у страницы теперь другой.
 
    ЧТО ВЗЯТО С ИСТОЧНИКА. Шесть условий (предоплата, договор, расчётный счёт,
    электронная подпись, офис, SMS), два скана из налоговой и блок реквизитов.
@@ -7936,10 +7938,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       белая бумага скана на тёмном читается как лист под музейной подсветкой,
       а на светлом - как серый прямоугольник.
 
-   ПОЧЕМУ НЕТ КНОПКИ ЗАЯВКИ. Прямо над этим экраном стоит `.qa-cta`
-   с золотой кнопкой «Оставить заявку». Вторая кнопка через полтора экрана -
-   это не второй шанс, а шум; официальная информация закрывает страницу
-   доверием, а не ещё одним призывом → sayt-nn/standart-knopok.md.
+   ПОЧЕМУ НЕТ КНОПКИ ЗАЯВКИ. Прямо НАД этим экраном стоит `.qa-cta` с золотой
+   кнопкой «Оставить заявку», а прямо ПОД ним - целая форма заявки на светлом
+   (`.sv`). Кнопка между ними была бы третьим призывом подряд; официальная
+   информация работает не призывом, а доверием → sayt-nn/standart-knopok.md.
 
    ФОН СОБРАН ПО ОБЩЕМУ РЕЦЕПТУ ТЁМНОГО ЭКРАНА ПОД СВЕТЛЫМ (как у квиза,
    фильма, отзывов и Деда Мороза): синее зарево у верхней кромки и старт
@@ -7949,10 +7951,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    и двадцать первого экранов.
 
    z-index:29 - та же ступень, что у экранов о Деде Морозе, газетки, фильма,
-   квиза и ответов. Выше нельзя: на 30 стоит шапка сайта. И не нужно - при
-   равном слое побеждает тот, кто НИЖЕ в разметке, а этот экран последний,
-   поэтому его блик спокойно ложится на светлое поле соседа сверху
-   → lessons/element-na-shve-sekciy-z-index.md
+   квиза, ответов и заявки на светлом под ним. Выше нельзя: на 30 стоит шапка
+   сайта. И не нужно - при равном слое побеждает тот, кто НИЖЕ в разметке:
+   мой блик ложится на светлое поле ответов сверху, а сугроб соседа снизу
+   ложится на моё тёмное поле → lessons/element-na-shve-sekciy-z-index.md
 
    РАЗМЕРЫ НЕ В МНОЖИТЕЛЕ --u: это не копия старого сайта, всё через clamp()
    от ширины окна - как у экранов 5, 18 и 21. */
@@ -8075,7 +8077,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Тонкая линия с надписью посередине: она отделяет «как мы работаем»
    от «чем это подтверждается», и без неё сканы читаются как ещё две карточки. */
 .of-sep{
-  position:relative; z-index:2;
+  position:relative; z-index:2; width:min(100%,1100px); margin-inline:auto;
   display:flex; align-items:center; gap:clamp(14px,1.4vw,24px);
   margin:clamp(46px,5vw,86px) 0 clamp(26px,2.6vw,42px);
   font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
@@ -8095,8 +8097,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Поэтому у картинки задана ВЫСОТА, а ширина считается сама. */
 .of-docs{
   position:relative; z-index:2;
-  display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:center;
-  gap:clamp(20px,2.4vw,44px);
+  display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:flex-start;
+  gap:clamp(18px,2vw,36px);
 }
 .of-doc{margin:0; display:flex; flex-direction:column; align-items:center}
 /* Лист - кнопка: по нему щёлкают, чтобы открыть крупно. Своих полей и фона
@@ -8107,8 +8109,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   box-shadow:0 1px 0 rgba(255,255,255,.5), 0 26px 50px -26px rgba(0,0,0,.95);
   transition:transform .5s cubic-bezier(.2,.7,.2,1), box-shadow .5s ease;
 }
+/* ВЫСОТА ВДВОЕ МЕНЬШЕ ПРЕЖНЕЙ (Серёга, 12.09.2026: «документы сделай меньше
+   в 2 раза, не на весь экран»). Было clamp(330px,40vw,720px) - лист занимал
+   почти весь экран и читался как главное на нём, хотя главное тут человек.
+
+   ПОДЕЛЕНЫ НАДВОЕ ДВА ЧИСЛА ИЗ ТРЁХ: рост от ширины окна (40vw → 20vw)
+   и потолок (720 → 360) - это то, что видно на компьютере. А НИЖНИЙ ПРЕДЕЛ
+   поднят до 230, а не опущен до 165: на 1024 половина давала лист шириной
+   139 px, и документ превращался в марку - не видно ни герба, ни печати,
+   ни того, что это вообще бумага. Замерено на пяти ширинах. */
 .of-sheet img{
-  display:block; height:clamp(330px,40vw,720px); width:auto; max-width:100%;
+  display:block; height:clamp(230px,20vw,360px); width:auto; max-width:100%;
   background:#fff;
 }
 @media (hover:hover) and (pointer:fine){
@@ -8133,12 +8144,86 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 .of-zoom svg{width:14px; height:14px; display:block;
   fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
-.of-cap{margin:clamp(12px,1.1vw,18px) 0 0; text-align:center; max-width:34ch}
+.of-zoom i{font-style:normal}
+/* Подпись не шире 24 знаков: лист теперь вдвое мельче, и широкая подпись
+   стала бы шире самого документа - фигура поехала бы за него. Длинный текст
+   (номер, дата) живёт в data-of-s и виден в крупном просмотре. */
+.of-cap{margin:clamp(11px,1vw,16px) 0 0; text-align:center; max-width:24ch}
 .of-cap b{display:block; font-family:"Golos Text",Arial,sans-serif; font-weight:600;
   font-size:clamp(14.5px,1.06vw,16px); line-height:1.3; color:#fff}
 .of-cap span{display:block; margin-top:5px;
   font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.6px,.92vw,13.8px);
   line-height:1.4; color:#93A6DA}
+
+/* ---------- ОРГАНИЗАТОР: снимок блога слева, имя и документы справа ----------
+   Просьба Серёги 12.09.2026: «добавь красиво скрин моего инстаграма и напиши
+   Организатор Сергей Киричок (87 тыс подписчиков). Это доказательная база,
+   что мы известные, публичные, открытые. И + документы тут же».
+
+   ПОЧЕМУ ОДНОЙ ПОЛОСОЙ, А НЕ ДВУМЯ БЛОКАМИ. Доказательство тут одно и то же -
+   «нас можно проверить». Открытое лицо и бумаги из налоговой работают вместе;
+   врозь они читаются как два разных разговора, и каждый слабее.
+
+   ПОЧЕМУ СЕТЬ НЕ НАЗВАНА СЛОВОМ. Instagram принадлежит Meta, признанной
+   в России экстремистской организацией, и каждое упоминание названия
+   по закону требует сноски об этом. Сноска про экстремизм посреди экрана
+   про доверие работает ровно наоборот. Поэтому в тексте «личный блог»
+   и «87 тыс. подписчиков», а сеть узнаётся по самому снимку. ЕСЛИ СЕРЁГА
+   ЗАХОЧЕТ НАЗВАТЬ СЕТЬ СЛОВОМ - сноску придётся поставить, это не вкус,
+   а закон. */
+/* Ширина полосы та же, что у карточки реквизитов под ней (1100), а не вся
+   ширина контейнера. Так у низа экрана появляется общая ось: шесть карточек
+   во всю ширину, потом полоса с организатором и документами, потом реквизиты -
+   две последние одной ширины. Во всю ширину полоса разъезжалась: справа
+   от документов оставалось полметра пустоты. */
+.of-who{
+  position:relative; z-index:2; width:min(100%,1100px); margin:0 auto;
+  display:grid; grid-template-columns:auto minmax(0,1fr);
+  gap:clamp(24px,3vw,60px); align-items:start;
+}
+.of-who-shot{margin:0; display:flex; flex-direction:column; align-items:center}
+/* У СНИМКА ЗАДАНА ШИРИНА, а не высота, как у сканов: телефон вдвое уже листа,
+   и при равной высоте он вытянулся бы в полоску. Тут наоборот - ширина своя,
+   высота считается сама. */
+.of-who-shot .of-sheet img{width:clamp(190px,17vw,272px); height:auto}
+.of-who-txt{min-width:0}
+.of-who-n{
+  margin:5px 0 0; font-family:"Blogger Sans","CR Blogger",Arial,sans-serif;
+  font-weight:700; font-size:clamp(22px,2.25vw,35px); line-height:1.1;
+  letter-spacing:.005em; color:#fff;
+}
+/* Цифра отдельной строкой и крупно - её читают первой, а «подписчиков»
+   объясняет уже прочитанное. В одну строку с текстом цифру ставить нельзя:
+   разный кегль на общей базовой линии вечно съезжает. */
+.of-who-big{margin:clamp(12px,1.2vw,20px) 0 0;
+  display:flex; align-items:baseline; gap:clamp(9px,.8vw,13px); flex-wrap:wrap}
+.of-who-big b{font-family:"Blogger Sans","CR Blogger",Arial,sans-serif;
+  font-weight:700; font-size:clamp(30px,3vw,46px); line-height:1; color:#FFD189}
+.of-who-big span{font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(14.5px,1.1vw,16.5px); line-height:1.3; color:#C2CEEF}
+.of-who-s{margin:clamp(12px,1.2vw,20px) 0 0; max-width:56ch;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(13.8px,1.04vw,15.6px);
+  line-height:1.55; color:#AEBDE4}
+.of-who-s b{font-weight:600; color:#fff}
+/* Подпись под снимком - та же типографика, что под сканами, чтобы три
+   доказательства читались одним рядом, а не разными блоками. */
+.of-shot-cap{margin:clamp(11px,1vw,16px) 0 0; text-align:center; max-width:26ch}
+.of-shot-cap b{display:block; font-family:"Golos Text",Arial,sans-serif; font-weight:600;
+  font-size:clamp(14.5px,1.06vw,16px); line-height:1.3; color:#fff}
+.of-shot-cap span{display:block; margin-top:5px;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.6px,.92vw,13.8px);
+  line-height:1.4; color:#93A6DA}
+/* Подзаголовок над документами внутри правой колонки: тот же надзаголовочный
+   кегль, что у `.of-sep`, но линия только справа - слева его держит край
+   колонки. */
+.of-sub{
+  margin:clamp(26px,2.8vw,46px) 0 clamp(14px,1.4vw,22px);
+  display:flex; align-items:center; gap:clamp(12px,1.2vw,20px);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.68px,.86vw,11.05px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#93A6DA;
+}
+.of-sub::after{content:""; flex:1 1 auto; height:1px;
+  background:linear-gradient(90deg, rgba(158,180,255,.28), rgba(158,180,255,0))}
 
 /* ---------- реквизиты ---------- */
 .of-req{
@@ -8269,6 +8354,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .of-arr.prev{left:clamp(10px,2vw,26px)}
 .of-arr.next{right:clamp(10px,2vw,26px)}
 
+/* Ниже 1024 px правая колонка уже не держит два скана рядом с текстом,
+   и снимок уезжает наверх, а не вбок. Порог поднят с 900 до 1023 замером:
+   на 900 в правой колонке оставалось 380 px, и листы ужимались до 122 px
+   шириной - меньше, чем на телефоне. */
+@media (max-width:1023px){
+  .of-who{grid-template-columns:1fr; justify-items:center; gap:clamp(22px,4vw,38px)}
+  .of-who-txt{text-align:center}
+  .of-who-big{justify-content:center}
+  .of-who-s{margin-inline:auto}
+  .of-docs{justify-content:center}
+  .of-sub{justify-content:center}
+  .of-sub::after{display:none}
+}
+
 /* ---------- телефон ---------- */
 @media (max-width:767px){
   /* На телефоне общий контейнер отдаёт поля целиком
@@ -8281,9 +8380,26 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* Листы встают друг под друга, и равнять их по высоте больше не нужно:
      в столбик каждый занимает свою ширину. Потолок 420 px - чтобы на
      планшете в портрете скан не раздувался во весь экран. */
-  .of-sheet img{height:auto; width:100%}
-  .of-doc{width:min(100%,420px)}
-  .of-docs{gap:clamp(26px,7vw,40px)}
+  /* Снимок блога на телефоне - во всю колонку: мельче его делать некуда,
+     подписчиков на нём уже не разобрать. */
+  .of-who-shot .of-sheet img{width:min(100%,300px)}
+  /* СКАНЫ ОСТАЮТСЯ В ДВА СТОЛБЦА И НА ТЕЛЕФОНЕ. Прежде они разворачивались
+     во всю ширину друг под другом, но Серёга просил «не на весь экран»:
+     два мелких листа рядом читаются как «вот бумаги, нажми - откроются»,
+     а лист во весь экран отбирает у страницы полтора пролистывания. */
+  /* И ТУТ ЛИСТЫ РАВНЯЮТСЯ ПО ВЫСОТЕ, как на компьютере. Пробовал равнять
+     по ширине (flex:1 1 0) - у сканов разные пропорции, высота разошлась
+     на 22 px, и подписи под ними встали ступенькой. Замерено на 360 и 390. */
+  .of-docs{flex-wrap:nowrap; justify-content:center; gap:14px}
+  .of-doc{flex:0 1 auto; min-width:0}
+  .of-doc .of-sheet img{height:min(230px, 52vw); width:auto}
+  .of-cap{max-width:22ch}
+  /* НА МЕЛКОМ ЛИСТЕ У ЛУПЫ ОСТАЁТСЯ ТОЛЬКО ЗНАЧОК. Лист на телефоне около
+     160 px шириной, а плашка с надписью «Открыть крупно» - под 140: она
+     закрывала половину документа и читалась как главное на нём. У снимка
+     блога он втрое шире, там надпись остаётся. */
+  .of-doc .of-zoom{padding:8px; gap:0}
+  .of-doc .of-zoom i{display:none}
   .of-arr{width:42px; height:42px}
   .of-arr.prev{left:6px}
   .of-arr.next{right:6px}
@@ -11394,10 +11510,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 
 <!-- ==================== ЭКРАН 23: ОФИЦИАЛЬНАЯ ИНФОРМАЦИЯ ====================
-     САМЫЙ НИЖНИЙ ЭКРАН СТРАНИЦЫ - просьба Серёги 12.09.2026: «найди на
-     ministrynn.ru экран с официальной информацией и сделай в самом низу
-     похожий, только красиво, и добавь туда документы, которые там лежат
-     фотографиями». Устройство, чем отличается от источника и почему поле
+     Просьба Серёги 12.09.2026: «найди на ministrynn.ru экран с официальной
+     информацией и сделай в самом низу похожий, только красиво, и добавь туда
+     документы, которые там лежат фотографиями». Ставился самым нижним экраном;
+     в тот же день соседняя сессия поставила под ним заявку на светлом
+     и подвал, шов с ними держит их сугроб. Устройство, чем отличается от источника и почему поле
      тёмное → блок «ЭКРАН 23» в стилях и sayt-nn/ustroystvo.md.
 
      ДОКУМЕНТЫ - ТЕ ЖЕ ДВА СКАНА, что выложены на боевом ministrynn.ru:
@@ -11464,7 +11581,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     <div class="cr-cont">
       <p class="of-eyebrow">Работаем официально с 2019 года</p>
-      <h2 class="of-t" id="ofT"><span class="of-y">Официальная</span> информация</h2>
+      <h2 class="of-t" id="ofT"><span class="of-y">Официальная и юридическая</span> информация</h2>
       <p class="of-lead">Мы не просим верить на слово и не берём деньги «на карту».
         Ниже&nbsp;- условия, по которым работаем, документы из налоговой
         и реквизиты организатора. <b>Любой лист открывается крупно</b>,
@@ -11520,38 +11637,84 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
       </div><!-- /.of-grid -->
 
-      <!-- ---------- документы ---------- -->
-      <p class="of-sep">Документы организатора</p>
+      <!-- ---------- ОРГАНИЗАТОР И ДОКУМЕНТЫ ----------
+           Слева снимок личного блога Серёги, справа имя, число подписчиков
+           и два скана из налоговой. Просьба Серёги 12.09.2026.
 
-      <div class="of-docs" id="ofDocs">
+           СЕТЬ НЕ НАЗВАНА СЛОВОМ НАМЕРЕННО: за упоминание Instagram по закону
+           положена сноска про Meta и экстремизм, а такая сноска на экране про
+           доверие работает ровно наоборот. Сеть узнаётся по самому снимку.
+           Подробно → блок «ОРГАНИЗАТОР» в стилях.
 
-        <figure class="of-doc">
-          <button class="of-sheet" type="button" data-of="0"
-                  aria-label="Открыть крупно: уведомление о постановке на учёт в налоговом органе">
-            <img src="v2-doc-ogrnip.webp" width="838" height="1236" loading="lazy" decoding="async"
-                 alt="Уведомление Федеральной налоговой службы о постановке Киричка Сергея Васильевича на учёт в качестве индивидуального предпринимателя, ОГРНИП 319911200114762 от 5 сентября 2019 года">
+           ЧИСЛО ПОДПИСЧИКОВ СТАРЕЕТ. На снимке 86,9 тыс., в тексте 87 тыс. -
+           так просил Серёга. Меняется снимок - меняй и цифру в тексте,
+           и пояснение в data-of-s. -->
+      <p class="of-sep">Организатор и документы</p>
+
+      <div class="of-who">
+
+        <figure class="of-who-shot">
+          <button class="of-sheet" type="button"
+                  data-of-t="Личный блог Сергея Киричка"
+                  data-of-s="240 публикаций, 86,9 тыс. подписчиков, 492,9 тыс. просмотров за последние 30 дней"
+                  aria-label="Открыть крупно: личный блог Сергея Киричка">
+            <img src="v2-insta.webp" width="589" height="1070" loading="lazy" decoding="async"
+                 alt="Личный блог Сергея Киричка: 240 публикаций, 86,9 тыс. подписчиков, записи о вингфойле, велотуризме и новогодних мероприятиях">
             <span class="of-zoom" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false"><circle cx="10.8" cy="10.8" r="6.4"/><path d="M15.5 15.5 20 20M10.8 8.2v5.2M8.2 10.8h5.2"/></svg>
-              Открыть крупно</span>
+              <i>Открыть крупно</i></span>
           </button>
-          <figcaption class="of-cap"><b>Уведомление о постановке на учёт</b>
-            <span>ФНС России, 5 сентября 2019&nbsp;года. Регистрация ИП, ОГРНИП&nbsp;319911200114762</span></figcaption>
+          <figcaption class="of-shot-cap"><b>Личный блог организатора</b>
+            <span>Открытый профиль, 240&nbsp;публикаций</span></figcaption>
         </figure>
 
-        <figure class="of-doc">
-          <button class="of-sheet" type="button" data-of="1"
-                  aria-label="Открыть крупно: свидетельство о постановке на учёт в налоговом органе">
-            <img src="v2-doc-inn.webp" width="1012" height="1362" loading="lazy" decoding="async"
-                 alt="Свидетельство Федеральной налоговой службы о постановке Киричка Сергея Васильевича на учёт в налоговом органе с присвоением ИНН 910314959705">
-            <span class="of-zoom" aria-hidden="true">
+        <div class="of-who-txt">
+          <span class="of-k">Организатор</span>
+          <h3 class="of-who-n">Сергей Киричок</h3>
+          <p class="of-who-big"><b>87 тыс.</b><span>подписчиков в личном блоге</span></p>
+          <p class="of-who-s">Лицо проекта не спрятано за названием. Живые видео
+            с наших мероприятий, семья, путешествия&nbsp;- всё под своим именем
+            и в открытом доступе. <b>Нас можно найти и рассмотреть до того, как
+            платить</b>, а не после.</p>
+
+          <p class="of-sub">Документы организатора</p>
+
+          <div class="of-docs" id="ofDocs">
+
+            <figure class="of-doc">
+              <button class="of-sheet" type="button"
+                      data-of-t="Уведомление о постановке на учёт"
+                      data-of-s="ФНС России, 5 сентября 2019 года. Регистрация ИП, ОГРНИП 319911200114762"
+                      aria-label="Открыть крупно: уведомление о постановке на учёт в налоговом органе">
+                <img src="v2-doc-ogrnip.webp" width="838" height="1236" loading="lazy" decoding="async"
+                     alt="Уведомление Федеральной налоговой службы о постановке Киричка Сергея Васильевича на учёт в качестве индивидуального предпринимателя, ОГРНИП 319911200114762 от 5 сентября 2019 года">
+                <span class="of-zoom" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false"><circle cx="10.8" cy="10.8" r="6.4"/><path d="M15.5 15.5 20 20M10.8 8.2v5.2M8.2 10.8h5.2"/></svg>
-              Открыть крупно</span>
-          </button>
-          <figcaption class="of-cap"><b>Свидетельство о постановке на учёт</b>
-            <span>ФНС России. Присвоен ИНН&nbsp;910314959705</span></figcaption>
-        </figure>
+              <i>Открыть крупно</i></span>
+              </button>
+              <figcaption class="of-cap"><b>Регистрация ИП</b>
+                <span>Уведомление ФНС, 2019&nbsp;год</span></figcaption>
+            </figure>
 
-      </div><!-- /.of-docs -->
+            <figure class="of-doc">
+              <button class="of-sheet" type="button"
+                      data-of-t="Свидетельство о постановке на учёт"
+                      data-of-s="ФНС России. Присвоен ИНН 910314959705"
+                      aria-label="Открыть крупно: свидетельство о постановке на учёт в налоговом органе">
+                <img src="v2-doc-inn.webp" width="1012" height="1362" loading="lazy" decoding="async"
+                     alt="Свидетельство Федеральной налоговой службы о постановке Киричка Сергея Васильевича на учёт в налоговом органе с присвоением ИНН 910314959705">
+                <span class="of-zoom" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><circle cx="10.8" cy="10.8" r="6.4"/><path d="M15.5 15.5 20 20M10.8 8.2v5.2M8.2 10.8h5.2"/></svg>
+              <i>Открыть крупно</i></span>
+              </button>
+              <figcaption class="of-cap"><b>Свидетельство ИНН</b>
+                <span>ФНС России</span></figcaption>
+            </figure>
+
+          </div><!-- /.of-docs -->
+        </div><!-- /.of-who-txt -->
+
+      </div><!-- /.of-who -->
 
       <!-- ---------- реквизиты ---------- -->
       <div class="of-req">
@@ -16996,16 +17159,25 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   var xBtn = document.getElementById('ofX');
 
   /* Данные собираем из разметки один раз: вторая копия подписей в коде
-     разъехалась бы с экраном при первой же правке текста. */
+     разъехалась бы с экраном при первой же правке текста.
+
+     ПОДПИСЬ В КРУПНОМ ПРОСМОТРЕ СВОЯ, а не та, что под листом. Причина:
+     лист на экране вдвое мельче прежнего, и подпись под ним обязана быть
+     короткой («Регистрация ИП», «Уведомление ФНС, 2019 год») - иначе она
+     выходит шире самого документа. А в крупном просмотре места много,
+     и там нужен полный номер с датой. Длинный вариант лежит в data-of-t
+     и data-of-s; нет их - берётся подпись со страницы. */
   var docs = [], i;
   for (i = 0; i < sheets.length; i++){
     var img = sheets[i].querySelector('img');
-    var cap = sheets[i].parentNode.querySelector('.of-cap');
+    var cap = sheets[i].parentNode.querySelector('.of-cap, .of-shot-cap');
     docs.push({
       src: img ? img.getAttribute('src') : '',
       alt: img ? (img.getAttribute('alt') || '') : '',
-      t:   cap && cap.querySelector('b')    ? cap.querySelector('b').textContent    : '',
-      s:   cap && cap.querySelector('span') ? cap.querySelector('span').textContent : ''
+      t:   sheets[i].getAttribute('data-of-t') ||
+           (cap && cap.querySelector('b')    ? cap.querySelector('b').textContent    : ''),
+      s:   sheets[i].getAttribute('data-of-s') ||
+           (cap && cap.querySelector('span') ? cap.querySelector('span').textContent : '')
     });
   }
   /* Стрелки не нужны, когда документ один: кнопка, которая никуда не ведёт,
