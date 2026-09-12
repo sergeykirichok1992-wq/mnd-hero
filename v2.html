@@ -3160,11 +3160,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Золото «СОБИРАЕМ» и последнего абзаца — #FFBB57, снято пипеткой с макета
    и со старого сайта (там он же). */
 .im{
+  /* ШИРИНА КАРТОЧКИ — одно число на весь экран. 12.09.2026 Серёга попросил
+     «блок с текстом и фото на 15 % меньше, чтобы экран стал ниже»: прежние
+     min(94vw,1462px) умножены на 0,85. Через неё же считается и множитель,
+     поэтому текст с картинкой не разъедутся: меняешь одну строку — едет всё.
+     Высота экрана падает следом сама, отдельно её не трогаем. */
+  --im-w: min(79.9vw, 1242.7px);
   /* один пиксель компьютерного макета: картинка ровно такой ширины */
-  --im-v: calc(min(94vw, 1462px) / 1770);
-  /* один пиксель мобильного макета: 1080 холста = вся ширина телефона.
-     Потолок 980 px — как у экрана комнаты, чтобы на планшете не раздувало */
-  --im-m: calc(min(100vw, 980px) / 1080);
+  --im-v: calc(var(--im-w) / 1770);
+  /* Один пиксель мобильного макета: 1080 холста = вся ширина телефона.
+     12.09.2026 Серёга попросил «сам блок пропорционально на 5 % больше» —
+     поэтому не 100vw, а 105vw (и потолок 980 → 1029, те же 5 %).
+     Прозрачные поля у картинки по 31 px холста, так что даже при 105vw
+     видимая карточка занимает 92,6 % ширины экрана, а не упирается в края. */
+  --im-m: calc(min(105vw, 1029px) / 1080);
   position:relative; z-index:25; isolation:isolate; overflow:hidden;
   /* воздух сверху чуть больше, чем снизу: у картинки снизу свой запас —
      золотая подсветка и тень уходят за нижнюю кромку файла */
@@ -3241,7 +3250,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .im-sky{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none}
 
 /* ---------- карточка ---------- */
-.im-wrap{position:relative; z-index:2; width:min(94vw,1462px); margin:0 auto}
+.im-wrap{position:relative; z-index:2; width:var(--im-w); margin:0 auto}
 .im-card{position:relative; display:block; width:100%; aspect-ratio:1770/908}
 /* Подсветка под курсором (просьба Серёги): лиловый ореол вокруг карточки,
    тёплый — под её золотой кромкой снизу, и сама картинка чуть ярче.
@@ -3327,20 +3336,30 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .im-wrap{width:100%}
   /* картинка 1014 px холста из 1080, поля по 33 — центруем её саму */
   .im-card{width:calc(1014 * var(--im-m)); margin:calc(18.5 * var(--im-m)) auto 0;
-    aspect-ratio:1014/1649}
-  .im-pic{aspect-ratio:1014/1649}
+    aspect-ratio:1014/1789}
+  /* высота файла 1789, а не 1649: панель надставлена на 140 px холста
+     под более крупный текст (12.09.2026) */
+  .im-pic{aspect-ratio:1014/1789}
   .im-card::before{inset:calc(-40 * var(--im-m))}
   .im-card::after{bottom:calc(-30 * var(--im-m)); height:calc(130 * var(--im-m))}
+  /* заголовок на 15 % крупнее макета (12.09.2026, просьба Серёги
+     «немного больше»); вместе с ростом блока на 5 % это 23,9 px на телефоне
+     390 против прежних 19,9 */
   .im-t{
     position:static; left:auto; top:auto; text-align:center;
-    font-size:calc(55 * var(--im-m)); line-height:calc(67 * var(--im-m));
+    font-size:calc(63 * var(--im-m)); line-height:calc(77 * var(--im-m));
   }
+  /* Кегль абзацев поднят с 33,9 до 39,5 холста (12.09.2026: «текст слишком
+     мелкий»). Вместе с ростом блока это 15 px на телефоне 390 вместо 12,2 —
+     вровень с остальными экранами страницы. Колонка осталась 890 холста
+     (шире панель не пускает), поэтому строк стало больше, и под них
+     ПЕРЕРИСОВАНА сама картинка: лиловая панель надставлена по высоте. */
   .im-body{
     left:calc(91 * var(--im-m)); top:calc(911.7 * var(--im-m));
     width:calc(890 * var(--im-m));
-    font-size:calc(33.9 * var(--im-m)); line-height:calc(45.5 * var(--im-m));
+    font-size:calc(39.5 * var(--im-m)); line-height:calc(53 * var(--im-m));
   }
-  .im-body p + p{margin-top:calc(45.5 * var(--im-m))}
+  .im-body p + p{margin-top:calc(53 * var(--im-m))}
   .im-brd{display:none}
   /* первая фраза отдельной жирной строкой */
   .im-lead{
@@ -7828,10 +7847,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <picture>
         <source media="(max-width:1023px)"
                 srcset="v2-im-mob-760.webp 760w, v2-im-mob.webp 1014w"
-                sizes="(min-width:980px) 920px, 93.9vw">
+                sizes="(min-width:980px) 966px, 98.6vw">
         <img class="im-pic" src="v2-im-card.webp"
              srcset="v2-im-card-1100.webp 1100w, v2-im-card.webp 1770w"
-             sizes="(min-width:1556px) 1462px, 94vw"
+             sizes="(min-width:1556px) 1243px, 79.9vw"
              width="1770" height="908" loading="lazy" decoding="async" draggable="false"
              alt="Новогодняя изба «Звёздной смены»: ракета у крыльца, гирлянды на брёвнах, дети смотрят на неё">
       </picture>
