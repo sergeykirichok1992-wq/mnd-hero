@@ -12,7 +12,7 @@
          python3 "sayt-nn/instrumenty/sinhron.py"
      Скрипт вливает сюда всё, что изменилось в Нижнем, городское не трогает.
 
-     СИНХРОНИЗИРОВАНА С v2.html ВЕРСИИ: 2d83b32288d12f62c647216b7b99f37691663efe
+     СИНХРОНИЗИРОВАНА С v2.html ВЕРСИИ: cdd7e25f009df6b29ac8320d7c4e2d177acebc37
      Строку выше правит сам скрипт - руками её не трогать.
      ====================================================================== -->
 <meta charset="utf-8">
@@ -14510,6 +14510,24 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     } catch(_){}    /* приватный режим — память недоступна, ронять форму из-за этого незачем */
   }
 
+  /* ---------- одноразовый код для бота в МАХ ----------
+     Уходит на сервер вместе с заявкой и зашивается в ссылку «Перейти в МАХ»
+     (скрипт «ССЫЛКА НА БОТА В МАХ» внизу страницы). Бот по коду находит заявку
+     и берёт из неё телефон - так в AmoCRM появляется сделка из МАХ с тем же
+     номером, и виджет дублей склеивает обе. Сам НОМЕР в ссылку не кладём:
+     ссылку можно переписать руками и привязать чужой МАХ к чужой сделке.
+     Код придумываем здесь, а не ждём от сервера: форма показывает «принято»,
+     не дожидаясь ответа, и кнопка должна вести в бота сразу.
+     Случайность только из crypto: Math.random код можно предсказать. */
+  function zsMaxCode(){
+    try {
+      var b = new Uint8Array(16), s = '';
+      crypto.getRandomValues(b);
+      for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]);
+      return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    } catch(_){ return ''; }   /* старый браузер: бот откроется без кода, заявка не страдает */
+  }
+
   /* ================= zsBind: общая логика любой формы заявки ================= */
   function zsBind(form, opts){
     opts = opts || {};
@@ -14631,6 +14649,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           if (Object.prototype.hasOwnProperty.call(ex, k) && ex[k] !== '' && ex[k] != null) lead[k] = ex[k];
         }
       }
+      lead.maxCode = zsMaxCode();
       window.__zsLead = lead;
       remember(lead);
 
@@ -17059,8 +17078,25 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   'use strict';
   var BOT = '';                       /* ← сюда адрес бота, например https://max.ru/mnd_bot */
   var k = document.querySelectorAll('a[data-mx-bot]');
+
+  /* К адресу бота дописываем код последней заявки (?start=код): по нему бот
+     узнаёт, чья это заявка. Кнопка стоит на экране «заявка принята», то есть
+     последняя отправленная заявка и есть нужная. Адрес ставим в момент нажатия
+     (и на касание, и на фокус с клавиатуры) - к загрузке страницы кода ещё нет. */
+  function withCode(a){
+    var code = window.__zsLead && window.__zsLead.maxCode;
+    a.href = code ? BOT + '?start=' + encodeURIComponent(code) : BOT;
+  }
+  function onPress(){ withCode(this); }
+
   for (var i = 0; i < k.length; i++){
-    if (BOT){ k[i].href = BOT; continue; }
+    if (BOT){
+      k[i].href = BOT;
+      k[i].addEventListener('pointerdown', onPress);
+      k[i].addEventListener('focus', onPress);
+      k[i].addEventListener('click', onPress);
+      continue;
+    }
     /* Пока адреса нет, ссылка ведёт на href="#" - и с target="_blank" это
        открыло бы человеку копию той же страницы в новой вкладке. Хуже, чем
        ничего: он решит, что сайт сломался. Поэтому нажатие на пустую кнопку
