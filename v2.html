@@ -70,10 +70,24 @@ body{
   letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
 }
 .brand span{color:var(--gold)}
-/* Кнопка «Написать в МАХ» в шапке (14.09.2026, Серёга: обычная, фиолетовая).
-   Это стандартная .zs-btn--purple, только ниже и мельче: шапка узкая, кнопка
-   экранного размера (64 px) её бы раздула. Меняем лишь переменные размера. */
-.nav .zs-btn{--zs-btn-h:42px; --zs-btn-fs:13px; padding:8px 20px; margin-left:auto}
+/* Кнопка «Написать в МАХ» в шапке. 14.09.2026 Серёга сначала выбрал обычную
+   фиолетовую, посмотрел и попросил «уже, прозрачной фиолетовой, минималистичнее».
+   Это вид 2 (прозрачная, .zs-btn--ghost) в фиолетовом цвете МАХ: обводка и
+   надпись фиолетовые, без свечения. В шапке она ниже и уже экранных кнопок. */
+/* двойной класс: правила .zs-btn--ghost стоят в файле ниже и иначе перебили бы цвет */
+.zs-btn--ghost.zs-btn--ghost-purple{
+  color:#DDD6FE;
+  box-shadow:inset 0 0 0 1.5px rgba(167,139,250,.75);
+}
+.zs-btn--ghost.zs-btn--ghost-purple:hover,.zs-btn--ghost.zs-btn--ghost-purple:focus-visible{
+  color:#fff; background:rgba(139,92,246,.16);
+  box-shadow:inset 0 0 0 1.5px rgba(196,181,253,1);
+}
+.zs-btn--ghost.zs-btn--ghost-purple:active{
+  background:rgba(139,92,246,.24);
+  box-shadow:inset 0 0 0 1.5px rgba(167,139,250,.9);
+}
+.nav .zs-btn{--zs-btn-h:34px; --zs-btn-fs:12px; padding:6px 16px; letter-spacing:.06em; margin-left:auto}
 .navinfo{
   font:400 11px/1 "Golos Text",sans-serif; color:var(--faint);
   border:1px dashed var(--line); border-radius:2px; padding:5px 9px; white-space:nowrap;
@@ -86,7 +100,7 @@ body{
   .nav{gap:12px; padding:14px 16px}
   .nav.solid{padding:10px 16px}
   .brand{font-size:11px; letter-spacing:.07em}
-  .nav .zs-btn{--zs-btn-h:36px; --zs-btn-fs:11.5px; padding:6px 14px}
+  .nav .zs-btn{--zs-btn-h:32px; --zs-btn-fs:11px; padding:5px 12px}
 }
 
 /* ---------- первый экран ---------- */
@@ -8715,8 +8729,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <header class="nav" id="nav">
   <div class="brand">МНД 2026-2027</div>
   <span class="navinfo">Нижний Новгород, Ольгино, 62 · 27 ноября - 10 января</span>
-  <a class="zs-btn zs-btn--purple" href="https://max.ru/id910314959705_biz" target="_blank" rel="noopener">
-    <span class="zs-t">Написать в <span class="mx">МАХ</span></span></a>
+  <a class="zs-btn zs-btn--ghost zs-btn--ghost-purple" href="https://max.ru/id910314959705_biz" target="_blank" rel="noopener">
+    <span class="zs-t">Написать в МАХ</span></a>
 </header>
 
 <section id="hero">
