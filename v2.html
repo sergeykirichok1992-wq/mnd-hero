@@ -268,7 +268,10 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
      числом возвращаем блок на место: текст не сдвинулся, дужка появилась.
      Трогать line-height нельзя — разъедутся две строки на компьютере. */
   padding-top:.22em; margin-top:-.22em;
-  font-size:clamp(19px,2.15vw,32.3px);
+  /* 14.09.2026 весь блок города на компьютере крупнее в 1,6 раза (просьба Серёги):
+     кегль города, кегль фактов и золотая черта с отступами — все числа x1,6.
+     Было clamp(19px,2.15vw,32.3px). Телефон не трогали: там свои размеры ниже. */
+  font-size:clamp(30.4px,3.44vw,51.68px);
   text-transform:uppercase; letter-spacing:.045em;
   background:
     linear-gradient(102deg, rgba(255,255,255,0) 36%, rgba(255,255,255,.95) 49%, rgba(255,255,255,0) 62%),
@@ -281,14 +284,14 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 }
 .season{ animation:sheenSilver 13s linear 5s infinite; background-size:250% 100%, 100% 100%; background-repeat:no-repeat }
 .rule{
-  height:1px; margin:clamp(12px,1.3vw,18.7px) 0 clamp(12px,1.2vw,17px);
-  margin-left:auto; width:clamp(70px,7vw,102px);
+  height:1px; margin:clamp(19.2px,2.08vw,29.92px) 0 clamp(19.2px,1.92vw,27.2px);
+  margin-left:auto; width:clamp(112px,11.2vw,163.2px);
   background:linear-gradient(90deg,rgba(227,179,78,0),rgba(227,179,78,.85));
 }
 .facts{list-style:none; margin:0; padding:0}
 .facts li{
   font-family:"Golos Text",Arial,sans-serif;
-  font-size:clamp(12px,1.04vw,14.45px); letter-spacing:.055em;
+  font-size:clamp(19.2px,1.664vw,23.12px); letter-spacing:.055em;
   color:rgba(214,226,245,.9); line-height:1.65;
 }
 .facts li + li{color:rgba(196,210,234,.72)}
