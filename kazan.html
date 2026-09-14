@@ -12,7 +12,7 @@
          python3 "sayt-nn/instrumenty/sinhron.py"
      Скрипт вливает сюда всё, что изменилось в Нижнем, городское не трогает.
 
-     СИНХРОНИЗИРОВАНА С v2.html ВЕРСИИ: c96ff127090d477066ab0d7c09e2750fcf595f9b
+     СИНХРОНИЗИРОВАНА С v2.html ВЕРСИИ: 8e984b167be78ab94c9f99f664f4f288887355a9
      Строку выше правит сам скрипт - руками её не трогать.
      ====================================================================== -->
 <meta charset="utf-8">
@@ -103,10 +103,17 @@ body{
   box-shadow:inset 0 0 0 1.5px rgba(167,139,250,.9);
 }
 .nav .zs-btn{--zs-btn-h:34px; --zs-btn-fs:12px; padding:6px 16px; letter-spacing:.06em; margin-left:auto}
+/* Адрес и даты в шапке. 14.09.2026 Серёга: «чтобы нормально было видно» —
+   вместо бледной метки в пунктирной рамке светлый текст обычного кегля,
+   тонкая черта отделяет его от «МНД 2026-2027», тень держит его на светлых
+   кадрах ролика. Точка между адресом и датами золотая. */
 .navinfo{
-  font:400 11px/1 "Golos Text",sans-serif; color:var(--faint);
-  border:1px dashed var(--line); border-radius:2px; padding:5px 9px; white-space:nowrap;
+  font:500 14px/1.2 "Golos Text",sans-serif; color:rgba(255,255,255,.9);
+  letter-spacing:.01em; white-space:nowrap;
+  padding-left:26px; border-left:1px solid rgba(255,255,255,.28);
+  text-shadow:0 1px 8px rgba(0,0,0,.65);
 }
+.navinfo b{color:var(--gold); font-weight:700; padding:0 .35em}
 /* Адрес и даты рядом с «МНД 2026-2027» (14.09.2026) — на месте прежней метки «демо».
    На телефоне в шапку не помещаются, там они есть на первом экране. */
 @media(max-width:880px){ .navinfo{display:none} }
@@ -8902,7 +8909,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 <header class="nav" id="nav">
   <div class="brand">МНД 2026-2027</div>
-  <span class="navinfo">Казань, Утренняя, 8А · 27 ноября - 10 января</span>
+  <span class="navinfo">Казань, Утренняя, 8А<b>·</b>27 ноября - 10 января</span>
   <a class="zs-btn zs-btn--ghost zs-btn--ghost-purple" href="https://max.ru/id910314959705_biz" target="_blank" rel="noopener">
     <span class="zs-t">Написать в МАХ</span></a>
 </header>
