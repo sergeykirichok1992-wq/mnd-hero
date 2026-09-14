@@ -70,26 +70,23 @@ body{
   letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
 }
 .brand span{color:var(--gold)}
-.navbtn{
-  border:1px solid var(--gold); color:var(--gold); background:transparent;
-  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
-  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
-}
-.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
-.demoflag{
+/* Кнопка «Написать в МАХ» в шапке (14.09.2026, Серёга: обычная, фиолетовая).
+   Это стандартная .zs-btn--purple, только ниже и мельче: шапка узкая, кнопка
+   экранного размера (64 px) её бы раздула. Меняем лишь переменные размера. */
+.nav .zs-btn{--zs-btn-h:42px; --zs-btn-fs:13px; padding:8px 20px; margin-left:auto}
+.navinfo{
   font:400 11px/1 "Golos Text",sans-serif; color:var(--faint);
   border:1px dashed var(--line); border-radius:2px; padding:5px 9px; white-space:nowrap;
 }
-@media(max-width:880px){ .demoflag{display:none} }
-/* Пункты «Программа · Города · Отзывы» убраны 14.09.2026 (Серёга). Раньше кнопку
-   к правому краю прижимали они; на телефоне их не было, там кнопка стоит как стояла. */
-@media(min-width:881px){ .navbtn{margin-left:auto} }
+/* Адрес и даты рядом с «МНД 2026-2027» (14.09.2026) — на месте прежней метки «демо».
+   На телефоне в шапку не помещаются, там они есть на первом экране. */
+@media(max-width:880px){ .navinfo{display:none} }
 /* на телефоне шапка не помещалась: кнопка уезжала за правый край */
 @media(max-width:520px){
   .nav{gap:12px; padding:14px 16px}
   .nav.solid{padding:10px 16px}
   .brand{font-size:11px; letter-spacing:.07em}
-  .navbtn{padding:8px 12px; font-size:12px}
+  .nav .zs-btn{--zs-btn-h:36px; --zs-btn-fs:11.5px; padding:6px 14px}
 }
 
 /* ---------- первый экран ---------- */
@@ -8717,8 +8714,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 <header class="nav" id="nav">
   <div class="brand">МНД 2026-2027</div>
-  <span class="demoflag">демо первого экрана</span>
-  <button class="navbtn" type="button">Выбрать город</button>
+  <span class="navinfo">Нижний Новгород, Ольгино, 62 · 27 ноября - 10 января</span>
+  <a class="zs-btn zs-btn--purple" href="https://max.ru/id910314959705_biz" target="_blank" rel="noopener">
+    <span class="zs-t">Написать в <span class="mx">МАХ</span></span></a>
 </header>
 
 <section id="hero">
