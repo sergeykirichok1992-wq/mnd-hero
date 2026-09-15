@@ -7,6 +7,9 @@
      экране, экран «Где, когда и для кого», надзаголовки секций, цены
      (VIP и взрослый билет у Тюмени дороже на 100), ответы на вопросы
      (вместимость, адрес, трансфер), подвал и порядок городов в формах.
+     Первый экран на компьютере свой: ролик ty-hero.mp4 и постер ty-poster.webp
+     (собирает sayt-nn/instrumenty/fon_tyumen.py), прокрутка #hero 400vh, к посадке
+     логотипа луна доезжает в центр экрана и фон размывается (ищи «ТЮМЕНЬ (15.09»).
      Полный список отличий → sayt-nn/tyumen.md
 
      ОБЩИЕ ПРАВКИ СЮДА РУКАМИ НЕ ПЕРЕНОСЯТ. Правится Нижний, потом:
@@ -33,7 +36,7 @@
 <meta property="og:url" content="https://mnd-nn.ru/tyumen.html">
 <link rel="canonical" href="https://mnd-nn.ru/tyumen.html">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preload" as="image" href="poster.webp" fetchpriority="high" media="(min-width: 820px)">
+<link rel="preload" as="image" href="ty-poster.webp" fetchpriority="high" media="(min-width: 820px)">
 <link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -131,7 +134,8 @@ body{
 }
 
 /* ---------- первый экран ---------- */
-#hero{height:330vh; position:relative}
+#hero{height:400vh; position:relative}   /* Тюмень: свой ролик 11,25 с против 7,2 у Нижнего — прокрутка
+   длиннее (330vh -> 400vh), иначе ролик бежит под колесом в полтора раза быстрее. Ещё медленнее — 450vh */
 .stage{position:sticky; top:0; height:100vh; overflow:hidden; background:var(--ink)}
 .stage > *{position:absolute; inset:0}
 #v{width:100%; height:100%; object-fit:cover; display:block; z-index:1;
@@ -12619,7 +12623,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   var cvSF=document.getElementById('smokeFront'), ctxSF=cvSF.getContext('2d');
   var ctxB=cvB.getContext('2d'), ctxF=cvF.getContext('2d');
   var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var dur=7.2, ready=false, cur=0, W=0, Hh=0;
+  var dur=11.25, ready=false,   /* Тюмень: длина ty-hero.mp4, пока не пришли метаданные */ cur=0, W=0, Hh=0;
   // пока предыдущая перемотка не закончилась, новую не просим:
   // иначе на слабом декодере seek'и встают в очередь и кадр застывает навсегда
   var seekBusy=false, seekAt=0;
@@ -12634,11 +12638,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   // autoplay нужен только телефону. На десктопе ролик ведёт прокрутка, поэтому снимаем сразу —
   // до того, как у видео появится источник, так что ничего само не поедет.
   if(!TOUCH){ v.autoplay = false; v.removeAttribute('autoplay'); }
-  poster.src = TOUCH ? 'poster-mob.webp' : 'poster.webp';
+  poster.src = TOUCH ? 'poster-mob.webp' : 'ty-poster.webp';   // Тюмень: постер = кадр 0 ty-hero.mp4
 
   // канва-двойник ролика: только на компьютере, см. комментарий к #vpaint
   var cvV=document.getElementById('vpaint'), ctxV=cvV.getContext('2d');
   var VCANVAS = !TOUCH;
+  var vBlur = 0, BLUR_VW = 0.32;   // Тюмень: размытие фона под логотипом, в vw (6 px на окне 1920)
   if(VCANVAS) document.body.classList.add('vcanvas'); else cvV.style.display='none';
   if(!BAKED) logo.src = 'logo.webp';   // на телефоне логотип уже в ролике — файл не качаем
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
@@ -13007,10 +13012,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     // и там файл по ссылке лучше: Safari умеет докачивать его кусками.
     // На десктопе качаем целиком в память: перемотка идёт без рывков.
     if(TOUCH){ v.loop = true; start('hero-mob.mp4'); return; }   // вертикальный ролик, крутится петлёй
-    if(!window.fetch || !window.ReadableStream){ start('hero.mp4'); return; }
+    if(!window.fetch || !window.ReadableStream){ start('ty-hero.mp4'); return; }
 
     say('Загружаем ролик… <b>0\u00a0%</b>', true);
-    fetch('hero.mp4').then(function(r){
+    fetch('ty-hero.mp4').then(function(r){
       if(!r.ok) throw new Error('HTTP '+r.status);
       var total = +(r.headers.get('content-length') || 0);
       if(!r.body) return r.blob();
@@ -13024,7 +13029,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         });
       })();
     }).then(function(b){ start(URL.createObjectURL(b)); })
-      .catch(function(){ say('Ролик грузится напрямую…'); start('hero.mp4'); });
+      .catch(function(){ say('Ролик грузится напрямую…'); start('ty-hero.mp4'); });
   })();
 
   // ?debug — маленькая плашка с тем, что реально происходит с воспроизведением.
@@ -13128,8 +13133,33 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     // кадр ролика на канву — «cover», как делал object-fit у самого видео
     if(VCANVAS && v.videoWidth){
       var vk=Math.max(cvV.width/v.videoWidth, cvV.height/v.videoHeight),
-          vdw=v.videoWidth*vk, vdh=v.videoHeight*vk;
-      try{ ctxV.drawImage(v,(cvV.width-vdw)/2,(cvV.height-vdh)/2,vdw,vdh); }catch(e){}
+          vdw=v.videoWidth*vk, vdh=v.videoHeight*vk,
+          vx=(cvV.width-vdw)/2, vy=(cvV.height-vdh)/2;
+      // ТЮМЕНЬ (15.09.2026, просьба Серёги): пока спускается логотип, камера доезжает так,
+      // чтобы луна встала ровно по центру экрана, и фон размывается. Отрезок тот же, что
+      // у спуска логотипа ниже (DROP_A…DROP_B). Центр кольца луны снят с последних кадров
+      // ty-hero.mp4: x = 0.531 ширины кадра. По высоте луна видна от верха кадра до холмов
+      // и уже стоит посередине — её не двигаем, верх кольца (0.023 высоты) держим на месте.
+      // Сдвиг без приближения открыл бы пустую полосу у края, поэтому кадр чуть наезжает:
+      // ровно настолько, насколько нужно на этой пропорции окна (на 16:9 — 6,5 %).
+      var mA=0.545-VIDEO_END/dur, mB=0.790-VIDEO_END/dur;
+      var mu=cl((p-mA)/(mB-mA)); mu=mu*mu*(3-2*mu);
+      if(mu>0){
+        var MX=0.531, MTOP=0.023, cw=cvV.width, ch=cvV.height;
+        var sz=Math.max(1, cw/(2*(1-MX)*vdw), cw/(2*MX*vdw));
+        var ex=cw/2-MX*vdw*sz,
+            ey=Math.min(0, Math.max(ch-vdh*sz, vy+MTOP*vdh*(1-sz)));
+        vx+=(ex-vx)*mu; vy+=(ey-vy)*mu;
+        vdw*=1+(sz-1)*mu; vdh*=1+(sz-1)*mu;
+      }
+      try{ ctxV.drawImage(v,vx,vy,vdw,vdh); }catch(e){}
+      var vb=Math.round(mu*BLUR_VW*innerWidth)/100;
+      if(vb!==vBlur){
+        vBlur=vb;
+        // размытие по краю канвы тянет прозрачность внутрь — канва чуть больше сцены, край за кадром
+        cvV.style.filter = vb ? 'saturate(1.14) contrast(1.07) brightness(1.04) blur('+vb+'px)' : '';
+        cvV.style.transform = vb ? 'scale('+(1+6*vb/Math.min(innerWidth,innerHeight)).toFixed(4)+')' : '';
+      }
     }
 
     // ---- логотип выезжает сверху навстречу восходящей луне ----
