@@ -134,8 +134,10 @@ body{
 }
 
 /* ---------- первый экран ---------- */
-#hero{height:400vh; position:relative}   /* Тюмень: свой ролик 11,25 с против 7,2 у Нижнего — прокрутка
-   длиннее (330vh -> 400vh), иначе ролик бежит под колесом в полтора раза быстрее. Ещё медленнее — 450vh */
+#hero{height:320vh; position:relative}   /* Тюмень: темп ролика под колесом считается от 400vh (ролик 11,25 с
+   против 7,2 у Нижнего), а сама сцена короче — отпускает сразу после того, как закрылись кулисы
+   (кулисы на 213vh прокрутки, сцена до 220vh). Раньше стояла ещё 87vh — «3 свайпа, а экран стоит».
+   Темп и длина стоянки — два разных числа: HERO_PACE_VH в скрипте и эта высота. */
 .stage{position:sticky; top:0; height:100vh; overflow:hidden; background:var(--ink)}
 .stage > *{position:absolute; inset:0}
 #v{width:100%; height:100%; object-fit:cover; display:block; z-index:1;
@@ -13066,6 +13068,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   // раньше (в Нижнем 1 с) — спуск логотипа стартует на кадре 133 ty-hero.mp4, когда Дед Мороз
   // начинает опускать руку (просьба Серёги), посадка — кадр 216.
   var LEAD_S=2.1;
+  var HERO_PACE_VH=400;   // ТЮМЕНЬ: от какой высоты #hero считаются доли прокрутки (см. стиль #hero)
   var t0=performance.now();
 
   if (TOUCH){
@@ -13127,7 +13130,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       if (vp > 0.985 || v.ended) tailP = cl(tailP + dt/1.2);
       p = VIDEO_END*vp + (1-VIDEO_END)*tailP;
     } else {
-      var total=hero.offsetHeight-window.innerHeight;
+      // ТЮМЕНЬ: доли прокрутки считаем от прежних 400vh, а #hero короче (320vh) — все события
+      // в том же темпе, но p доходит только до ~0,73 и хвост после кулис не стоит на месте
+      var total=(HERO_PACE_VH-100)/100*window.innerHeight;
       p = total>0 ? cl(-hero.getBoundingClientRect().top/total) : 0;
       var target=cl(p/VIDEO_END)*dur;
       cur = reduce ? target : cur+(target-cur)*0.17;
