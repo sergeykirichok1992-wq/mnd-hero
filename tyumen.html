@@ -1956,8 +1956,12 @@ html.touch .curtain{opacity:1}
      рассыпается, поэтому порог такой, а не 1024.
 
    Фон: картинка Серёги + три плывущих отблеска + зерно + звёзды «живого
-   неба», тот же рецепт, что у экрана 6Б ниже. Отблески без filter:blur
-   (замер 04.09.2026: размытые пятна роняют частоту кадров). */
+   неба», тот же рецепт, что у экрана 6Б в Нижнем (стили `.im-*`). Отблески
+   без filter:blur (замер 04.09.2026: размытые пятна роняют частоту кадров).
+
+   ЕСЛИ `sinhron.py` ОСТАНОВИТСЯ НА ЭТОМ БЛОКЕ (Нижний дописал стили сразу
+   после `.sm`): оставить ОБЕ стороны, тюменскую первой. Взять одну — значит
+   потерять либо правку Нижнего, либо все стили этого экрана. */
 .tm-hold{position:relative; z-index:26}
 /* блик на шве с пятым экраном — тот же, что был у афиши (см. `.sm-blik`):
    обёртке нужен z-index 26, иначе блик уходит под экран-копию (25) */
@@ -1977,14 +1981,16 @@ html.touch .curtain{opacity:1}
   position:absolute; inset:0; z-index:0; pointer-events:none;
   background:url(ty-mn-fon.webp) center/cover no-repeat;
 }
-/* Верхняя кромка растворяется в цвет низа пятого экрана (#090C1F, замер
-   15.09.2026 на 1920 и 390): у картинки верх заметно синее, и без этой
-   полосы шов читался бы ступенькой по бокам от блика. */
+/* Верхняя кромка растворяется в цвет низа пятого экрана: #04071A — фон `.bk`
+   у нижней кромки. Сначала стоял #090C1F, снятый со снимка, но на снимке
+   уже подмешано зерно формы, а наше зерно ложится поверх второй раз —
+   по краям от блика выходила ступенька в 5 уровней (замер проверки
+   15.09.2026). С цветом из стилей зерно идёт через шов без разрыва. */
 .tm-bg::before,
 .tm-bg::after{content:''; position:absolute; left:0; right:0; pointer-events:none}
 .tm-bg::before{
   top:0; height:clamp(90px,8vw,170px);
-  background:linear-gradient(180deg,#090C1F 0%,rgba(9,12,31,.72) 34%,rgba(9,12,31,.26) 68%,rgba(9,12,31,0) 100%);
+  background:linear-gradient(180deg,#04071A 0%,rgba(4,7,26,.72) 34%,rgba(4,7,26,.26) 68%,rgba(4,7,26,0) 100%);
 }
 /* низ чуть темнее: ниже светлая карусель площадки (экран 6Б в Тюмени удалён
    15.09.2026), тёмная кромка против её утопленной тени даёт чёткий шов */
@@ -2063,6 +2069,8 @@ html.touch .curtain{opacity:1}
 @keyframes tmHalo{from{opacity:.7; transform:scale(.97)} to{opacity:1; transform:scale(1.03)}}
 
 .tm-list{position:relative; z-index:3; display:grid; gap:12px; margin-top:6px}
+/* колонки нужны только компьютеру; на телефоне и планшете их нет */
+.tm-col{display:contents}
 /* Карточка факта: полупрозрачное лиловое стекло с волосяной золотой кромкой
    (кромка — внутренней тенью, не border: так высота карточки не зависит
    от толщины линии). Значок в кружке — «узел»: на компьютере он сидит
@@ -2080,6 +2088,8 @@ html.touch .curtain{opacity:1}
     0 22px 44px -26px rgba(0,0,0,.8);
   font-family:"Blogger Sans Medium","Blogger Sans",Arial,sans-serif; font-weight:500;
   font-size:16px; line-height:1.42; color:rgba(255,255,255,.94);
+  /* без одиноких слов на последней строке; где не поддерживается — просто пропустится */
+  text-wrap:pretty;
   text-shadow:0 1px 12px rgba(0,0,0,.35);
   transition:box-shadow .45s ease;
 }
@@ -2101,6 +2111,14 @@ html.touch .curtain{opacity:1}
   opacity:.55; animation:tmPulse 3.6s ease-in-out infinite alternate;
   animation-delay:var(--tm-d, 0s);
 }
+/* разгорание под курсором — третьим слоем. Пульс `::before` на наведение
+   не трогаем: анимация главнее обычного правила, и на паузе свечение
+   застывало на случайной яркости, а при снятии анимации прыгало скачком. */
+.tm-ic::after{
+  content:''; position:absolute; z-index:-1; inset:-45%; border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(255,186,90,.42) 0%, rgba(255,186,90,.14) 52%, rgba(255,186,90,0) 100%);
+  opacity:0; transition:opacity .35s ease;
+}
 .tm-ic svg{position:relative; width:52%; height:52%; fill:none; stroke:currentColor;
   stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round}
 @keyframes tmPulse{from{opacity:.35} to{opacity:.95}}
@@ -2115,7 +2133,7 @@ html.touch .curtain{opacity:1}
       0 22px 44px -26px rgba(0,0,0,.8),
       0 0 34px -6px rgba(146,98,255,.45);
   }
-  .tm-f:hover .tm-ic::before{opacity:1; animation-play-state:paused}
+  .tm-f:hover .tm-ic::after{opacity:1}
 }
 
 .tm-send{position:relative; z-index:3; margin:clamp(28px,3vw,60px) 0 0; text-align:center}
@@ -2148,8 +2166,14 @@ html.touch .curtain{opacity:1}
   .tm-glow i:nth-child(2){bottom:2%; height:44%}
   .tm-glow i:nth-child(3){top:4%; height:36%}
   /* коллаж на телефоне главный: почти во всю ширину, поля ему только мешают */
-  .tm-art{width:auto; max-width:560px;
-    margin-left:calc(-1 * clamp(8px,2.4vw,14px)); margin-right:calc(-1 * clamp(8px,2.4vw,14px))}
+  /* Поля — большее из двух: небольшой вылет за поля на узком телефоне или
+     центровка 560-пиксельного коллажа, когда места больше (584-767 px:
+     повёрнутый телефон, планшет с разделённым экраном). Раньше тут стояли
+     max-width и жёсткое левое поле, и на этих ширинах коллаж прижимался
+     влево. Проценты — от ширины `.tm-stage`. */
+  .tm-art{width:auto;
+    margin-left:max(calc(-1 * clamp(8px,2.4vw,14px)), calc((100% - 560px) / 2));
+    margin-right:max(calc(-1 * clamp(8px,2.4vw,14px)), calc((100% - 560px) / 2))}
   .tm-t{font-size:clamp(24px,6.6vw,30px)}
 }
 @media (min-width:768px){
@@ -2157,14 +2181,21 @@ html.touch .curtain{opacity:1}
   .tm-art{width:min(100%,560px)}
   .tm-list{grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:10px}
   .tm-f{font-size:16.5px}
+  /* на планшете общий clamp давал 25-26 px — мельче телефона (30) и
+     компьютера (33,6); отсюда до 1179 px плавно 30 → 33,6, без скачка на 1180 */
+  .tm-t{font-size:clamp(30px,2.85vw,34px)}
 }
 
 /* ---------- компьютер: коллаж посередине, факты вокруг ---------- */
-/* Сетка на 12 рядов одинаковой высоты: слева 4 факта по 3 ряда, справа
-   тоже 4 по 3 (до 15.09.2026 справа было 3 по 4 ряда — добавилась «пресса»),
-   коллаж на все 12. Ни одна карточка не зависит от длины текста соседки.
-   Станет фактов нечётно — вернуть правой колонке 4 ряда на карточку. `.tm-list` на компьютере растворяется (`display:contents`),
-   и карточки становятся ячейками той же сетки, что и коллаж.
+/* Сетка в одну строку из трёх колонок: слева колонка фактов, посередине
+   коллаж, справа колонка фактов. Колонка — flex сверху вниз от верха
+   до низа коллажа, карточки разнесены `space-between`: промежутки внутри
+   колонки равные при любой длине текста. (До 15.09.2026 здесь были 12
+   рядов одинаковой высоты и карточка по центру своих рядов — промежутки
+   зависели от длины текста соседей, на 1920 правые карточки почти
+   слипались: 14/42/69 px.) Станет справа фактов меньше, чем слева, —
+   правой колонке `space-around`. `.tm-list` на компьютере растворяется
+   (`display:contents`), и колонки становятся ячейками той же сетки, что коллаж.
    Колонки: 28,5 % / 40 % / 28,5 % ширины, коллаж шире своей колонки на 12 %
    (у файла прозрачные поля со спиралями — они уходят под карточки). */
 @media (min-width:1180px){
@@ -2177,7 +2208,6 @@ html.touch .curtain{opacity:1}
   .tm-stage{
     display:grid; align-items:center;
     grid-template-columns:minmax(0,28.5fr) minmax(0,40fr) minmax(0,28.5fr);
-    grid-template-rows:repeat(12,minmax(0,1fr));
     column-gap:2.4%;
     margin-top:calc(clamp(22px,2.6vw,52px) + .4cm);
     /* Сетка выходит за поля контейнера на 1,5 см с каждой стороны. На узком
@@ -2188,19 +2218,23 @@ html.touch .curtain{opacity:1}
     margin-left:calc(-1 * var(--tm-out)); margin-right:calc(-1 * var(--tm-out));
   }
   .tm-list{display:contents}
-  .tm-art{grid-column:2; grid-row:1 / -1; width:100%; margin:0}
+  .tm-col{display:flex; flex-direction:column; justify-content:space-between;
+    gap:clamp(14px,1.2vw,24px); grid-row:1; align-self:stretch}
+  .tm-col--l{grid-column:1}
+  .tm-col--r{grid-column:3}
+  .tm-art{grid-column:2; grid-row:1; width:100%; margin:0}
   .tm-art img{width:112%; margin-left:-6%}
   .tm-f{
     --tm-ic:clamp(40px,2.6vw,52px);
-    position:relative; z-index:3; align-self:center;
+    position:relative; z-index:3;
     padding:clamp(16px,1.15vw,22px) clamp(18px,1.3vw,26px);
     min-height:0;
-    font-size:clamp(15px,1.02vw,19.5px); border-radius:clamp(16px,1.15vw,22px);
+    /* кегль растёт уже с 1180: прежний 1.02vw упирался в 15 px до 1470,
+       и на ноутбуке текст был мельче, чем на планшете (16,5) */
+    font-size:clamp(15px,calc(.62vw + 7.5px),19.5px); border-radius:clamp(16px,1.15vw,22px);
   }
-  .tm-f--l{grid-column:1; padding-right:calc(var(--tm-ic) / 2 + clamp(14px,1.1vw,22px))}
-  .tm-f--r{grid-column:3; padding-left:calc(var(--tm-ic) / 2 + clamp(14px,1.1vw,22px))}
-  .tm-f1{grid-row:1 / 4} .tm-f2{grid-row:4 / 7} .tm-f3{grid-row:7 / 10} .tm-f4{grid-row:10 / 13}
-  .tm-f5{grid-row:1 / 4} .tm-f6{grid-row:4 / 7} .tm-f8{grid-row:7 / 10} .tm-f7{grid-row:10 / 13}
+  .tm-f--l{padding-right:calc(var(--tm-ic) / 2 + clamp(14px,1.1vw,22px))}
+  .tm-f--r{padding-left:calc(var(--tm-ic) / 2 + clamp(14px,1.1vw,22px))}
   /* узел на кромке со стороны коллажа, ровно посередине высоты карточки */
   .tm-ic{top:50%; margin-top:calc(var(--tm-ic) / -2)}
   .tm-f--l .tm-ic{left:auto; right:calc(var(--tm-ic) / -2)}
@@ -9451,17 +9485,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <!-- ==================== ЭКРАН 6 ТЮМЕНИ: «ТАЙНОЕ МИНИСТЕРСТВО» ====================
      ТОЛЬКО В ТЮМЕНИ (15.09.2026, просьба Серёги). В Нижнем и Казани на этом
      месте афиша «Звёздной смены» (`.sm`, #smena): у Тюмени программа А,
-     афиша новой программы ей не подходит. Если `sinhron.py` остановится
-     на этом куске из-за правки афиши в Нижнем — оставлять тюменский экран.
-     Стили и скрипт афиши в файле остались (скрипт сам выходит без #smena):
-     так общие правки из Нижнего вливаются без спорных мест.
+     афиша новой программы ей не подходит. Стили и скрипты афиши в файле
+     остались (скрипты сами выходят без #smena): так общие правки из Нижнего
+     вливаются без спорных мест.
+
+     ЕСЛИ `sinhron.py` ОСТАНОВИТСЯ ЗДЕСЬ (спор в разметке шестого экрана):
+     из стороны Нижнего выкинуть только афишу (`sm-*`, #smena) и экран 6Б
+     (`im-*`, #istoria), всё остальное оттуда (например, новый экран)
+     перенести к себе. Пустая тюменская сторона в споре — нормально.
+     Закрывающие теги ниже помечены комментариями «/tm-wrap», «/tm», «/tm-hold»
+     нарочно (саму метку сюда не вписывать: её «минус-минус-больше» закрыл бы
+     этот комментарий, и текст вылез бы на страницу): без меток
+     они совпадают с концовкой афиши, и кусок афиши из Нижнего молча
+     вставлялся бы внутрь этого экрана (проверено на клоне 15.09.2026).
 
      По референсу Серёги со старого сайта: заголовок, коллаж по центру,
      факты вокруг. Коллаж и фон — из «сайт тюмень/экран что/» (лого 2.png,
      фон.jpg). Факты стоят в разметке ОДИН раз и в порядке чтения
-     на телефоне: 1-4 — левая колонка компьютера, остальные — правая (класс
-     с номером у «прессы» tm-f8, хотя стоит она перед tm-f7: добавлена позже). Раскладку
-     меняют только стили `.tm-*`. Тексты Серёга ещё будет править. -->
+     на телефоне: колонка `.tm-col--l` — левая на компьютере, `.tm-col--r` —
+     правая (у «прессы» класс tm-f8, хотя стоит она перед tm-f7: добавлена
+     позже). На телефоне и планшете колонки растворяются (display:contents).
+     Раскладку меняют только стили `.tm-*`. Тексты Серёга ещё будет править. -->
 <div class="tm-hold">
   <div class="tm-blik" aria-hidden="true"></div>
   <section class="tm" id="ministerstvo" aria-labelledby="tmT">
@@ -9479,14 +9523,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                alt="Экскурсия-шоу в Министерство новогодних дел: министр волшебных дел, Электрошка, пульт управления делами Деда Мороза, Чебурашка и олимпийский мишка у избы">
         </div>
         <div class="tm-list">
-          <p class="tm-f tm-f--l tm-f1"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6.5"/><path d="M12 9c0-1.4 1.1-2.2 2.2-1.9 1.6.4 2 2.6.9 3.8-1.5 1.7-4.6 1.3-5.6-.8-1.2-2.6.9-5.4 3.6-5.3"/><path d="M12 15.5V22"/></svg></span>Именно здесь производятся вкусные новогодние леденцы <b>в&nbsp;карамельном цеху</b></p>
+          <div class="tm-col tm-col--l">
+          <p class="tm-f tm-f--l tm-f1"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="6.5"/><path d="M12 9c0-1.4 1.1-2.2 2.2-1.9 1.6.4 2 2.6.9 3.8-1.5 1.7-4.6 1.3-5.6-.8-1.2-2.6.9-5.4 3.6-5.3"/><path d="M12 15.5V22"/></svg></span>Именно здесь производятся вкусные новогодние леденцы <b>в&nbsp;карамельном цеху</b>!</p>
           <p class="tm-f tm-f--l tm-f2"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2.5"/><circle cx="8.5" cy="13" r="2.3"/><path d="M14 11h4M14 15h4M12 3.5V7"/></svg></span><b>Интерактивный пульт</b> управления делами Деда Мороза установлен в самом сердце министерства!</p>
-          <p class="tm-f tm-f--l tm-f3"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.8 7 8.2 6 8.2-6"/></svg></span>Прием писем Деду Морозу, <b>отправка подарков детям</b> происходят тоже здесь!</p>
-          <p class="tm-f tm-f--l tm-f4"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5 15.6 8h-2.2l4.1 5.5h-2.6L19 19H5l4.1-5.5H6.5L10.6 8H8.4z"/><path d="M12 19v2.5"/></svg></span>Именно отсюда Дед Мороз <b>зажигает городские ёлки</b> и наблюдает за детьми в течение года (дети это увидят)</p>
-          <p class="tm-f tm-f--r tm-f5"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.6 14.3c2.4-.3 4.4 1.2 4.9 4.2"/></svg></span><b>Здесь работает</b> Министр Новогодних Дел, деловая секретарь Баба Яга, юный проказник Электрошка, световая художница Люминисцена, а&nbsp;также мастера карамели Кремка и Тофи.</p>
+          <p class="tm-f tm-f--l tm-f3"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="m3.8 7 8.2 6 8.2-6"/></svg></span>Прием писем Деду Морозу и <b>отправка подарков детям</b> тоже происходят здесь!</p>
+          <p class="tm-f tm-f--l tm-f4"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5 15.6 8h-2.2l4.1 5.5h-2.6L19 19H5l4.1-5.5H6.5L10.6 8H8.4z"/><path d="M12 19v2.5"/></svg></span>Именно отсюда Дед Мороз <b>зажигает городские ёлки</b> и наблюдает за детьми в течение года (дети это увидят)!</p>
+          </div>
+          <div class="tm-col tm-col--r">
+          <p class="tm-f tm-f--r tm-f5"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.6 14.3c2.4-.3 4.4 1.2 4.9 4.2"/></svg></span><b>Здесь работает</b> Министр Новогодних Дел, деловая секретарь Баба Яга, юный проказник Электрошка, световая художница Люминисцена, а&nbsp;также мастера карамели Кремка и Тофи!</p>
           <p class="tm-f tm-f--r tm-f6"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="15.5" r="4"/><path d="m11 12.5 8.5-8.5M16.5 7l2.5 2.5M14 9.5l2 2"/></svg></span>И именно тут находится <b>главный кабинет</b> настоящего Деда Мороза и склад со старыми игрушками родителей!</p>
           <p class="tm-f tm-f--r tm-f8"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h12.5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M16.5 9H20v9.5a2 2 0 0 1-2 2h-3.5"/><path d="M7 9h6.5M7 12.5h6.5M7 16h4"/></svg></span>У Министерства есть <b>своя новогодняя пресса</b>, в которую попадет каждая группа!</p>
           <p class="tm-f tm-f--r tm-f7"><span class="tm-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m11 3 1.8 5.2L18 10l-5.2 1.8L11 17l-1.8-5.2L4 10l5.2-1.8z"/><path d="m18.5 15 .7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg></span>Это самое <b>сказочное и фантастическое место</b> для детей в канун Нового года!</p>
+          </div>
         </div>
       </div>
 
@@ -9494,9 +9542,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <button class="zs-btn" type="button" data-zs="6-й экран Тюмени, «Оставить заявку»">
           <span class="zs-t">Оставить заявку!</span></button>
       </p>
-    </div>
-  </section>
-</div>
+    </div><!-- /tm-wrap -->
+  </section><!-- /tm -->
+</div><!-- /tm-hold -->
 
 
 <!-- ЭКРАН 6Б «ИСТОРИЯ МЕРОПРИЯТИЯ» В ТЮМЕНИ УДАЛЁН (15.09.2026, просьба Серёги):
@@ -14525,7 +14573,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
   /* экран 6 Тюмени, «тайное Министерство» (стоит на месте афиши): поле
      тёмное сверху донизу, звёзды по всей высоте без затухания. Густота как
-     у 6Б — середину занимают коллаж и карточки. Только tyumen.html. */
+     у 6Б — середину занимают коллаж и карточки. Только tyumen.html.
+     Спор `sinhron.py` здесь (Нижний дописал своё небо рядом) — оставить
+     обе строки, тюменскую первой. */
   add('ministerstvo', 'tmSky', {
     div: 5200, cap: 380, bias: 1, knotTop: 0.05, knotLen: 0.84,
     fadeFrom: 1.2, fadeLen: 1, alpha: 0.9, shift: 46,
