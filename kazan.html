@@ -12,7 +12,7 @@
          python3 "sayt-nn/instrumenty/sinhron.py"
      Скрипт вливает сюда всё, что изменилось в Нижнем, городское не трогает.
 
-     СИНХРОНИЗИРОВАНА С v2.html ВЕРСИИ: 3589a384a095a3d251470690232c5da22424e482
+     СИНХРОНИЗИРОВАНА С v2.html ВЕРСИИ: da94f5917d635bba5c7f0f65bf3797a395684dc0
      Строку выше правит сам скрипт - руками её не трогать.
      ====================================================================== -->
 <meta charset="utf-8">
@@ -1755,6 +1755,13 @@ html.touch .curtain{opacity:1}
 }
 /* звёзды: слой над фоном и под текстом. Рисует общий движок «живого неба» */
 .sm-sky{position:absolute; inset:0; z-index:1; display:block; width:100%; height:100%; pointer-events:none}
+/* звёздная пыль за курсором (15.09.2026, просьба Серёги — «такой же след,
+   как на экране Тюмени»). Холст создаёт скрипт «ЗВЁЗДНАЯ ПЫЛЬ ЗА КУРСОРОМ»,
+   в разметке его нет нарочно: в Тюмени афиши нет, и правка разметки
+   остановила бы там синхронизацию. Слой выше контейнера с коллажем (7),
+   мимо него проходят щелчки. Показывается только при мыши (.is-live). */
+.sm-trail{position:absolute; inset:0; z-index:8; display:none; width:100%; height:100%; pointer-events:none}
+.sm-trail.is-live{display:block}
 .sm-in{position:relative; z-index:2}
 
 /* ---------- надзаголовок «АстроГномы зовут на миссию!» ---------- */
@@ -13456,6 +13463,157 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   document.addEventListener('visibilitychange', function(){ document.hidden ? halt() : kick(); });
   if (slow.addEventListener) slow.addEventListener('change', function(){ slow.matches ? halt() : kick(); });
   kick();
+})();
+</script>
+
+<script>
+/* ==================== ШЕСТОЙ ЭКРАН: ЗВЁЗДНАЯ ПЫЛЬ ЗА КУРСОРОМ ====================
+   15.09.2026, просьба Серёги: тот же след, что на экране «Тайное Министерство»
+   в Тюмени (tyumen.html, #tmTrail). Числа и заготовки те же — меняешь след
+   здесь, поменяй и там, иначе два города разойдутся.
+
+   За курсором сыплются золотые искры (изредка голубоватые и лиловые)
+   и четырёхлучевые звёздочки: живут меньше полутора секунд, чуть оседают
+   вниз и гаснут. Дёшево: искра штампуется готовой заготовкой, цикл кадров
+   крутится только пока искры в воздухе, число искр ограничено, плотность
+   холста не выше 1,5. Только мышь или тачпад; «уменьшить движение» — следа нет.
+
+   Холст создаётся здесь, а не стоит в разметке: правка разметки афиши
+   остановила бы синхронизацию Тюмени, где афиши нет (там скрипт сразу выходит). */
+(function(){
+  'use strict';
+  var s = document.getElementById('smena');
+  if (!s || !window.matchMedia) return;
+  var cv = document.createElement('canvas');
+  if (!cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  if (!ctx) return;
+  cv.className = 'sm-trail';
+  cv.setAttribute('aria-hidden', 'true');
+  s.appendChild(cv);
+  var fine = window.matchMedia('(hover:hover) and (pointer:fine)');
+  var slow = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  var MAX = 340;          // потолок искр в воздухе
+  var STEP = 5;           // одна искра на столько пикселей пути курсора
+  var DPR = Math.min(1.5, window.devicePixelRatio || 1);
+  var W = 0, H = 0, raf = 0, last = 0, px = null, py = null;
+  var P = [];
+
+  function dot(rgb){
+    var c = document.createElement('canvas'); c.width = c.height = 32;
+    var g = c.getContext('2d'), r = g.createRadialGradient(16,16,0,16,16,16);
+    r.addColorStop(0,   'rgba(255,255,255,1)');
+    r.addColorStop(0.2, 'rgba(' + rgb + ',1)');
+    r.addColorStop(0.5, 'rgba(' + rgb + ',.5)');
+    r.addColorStop(1,   'rgba(' + rgb + ',0)');
+    g.fillStyle = r; g.fillRect(0,0,32,32);
+    return c;
+  }
+  function star(rgb){
+    var c = document.createElement('canvas'); c.width = c.height = 48;
+    var g = c.getContext('2d');
+    var r = g.createRadialGradient(24,24,0,24,24,10);
+    r.addColorStop(0,'rgba(255,255,255,1)'); r.addColorStop(1,'rgba(' + rgb + ',0)');
+    g.fillStyle = r; g.fillRect(0,0,48,48);
+    g.fillStyle = 'rgba(' + rgb + ',.95)';
+    g.beginPath(); g.moveTo(24,2); g.lineTo(26,24); g.lineTo(24,46); g.lineTo(22,24); g.closePath(); g.fill();
+    g.beginPath(); g.moveTo(2,24); g.lineTo(24,22); g.lineTo(46,24); g.lineTo(24,26); g.closePath(); g.fill();
+    return c;
+  }
+  var GOLD = dot('255,200,105'), ICE = dot('190,215,255'), LILAC = dot('205,160,255');
+  var STAR = star('255,220,150');
+
+  function size(){
+    var r = s.getBoundingClientRect();
+    var w = Math.max(1, Math.round(r.width)), h = Math.max(1, Math.round(r.height));
+    if (w === W && h === H) return;
+    W = w; H = h;
+    cv.width = Math.round(w * DPR); cv.height = Math.round(h * DPR);
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
+  function spawn(x, y, speed){
+    if (P.length >= MAX) return;
+    var k = Math.random(), sprite, sz;
+    if (k < 0.12){ sprite = STAR; sz = 16 + Math.random() * 14; }
+    else if (k < 0.74){ sprite = GOLD; sz = 8 + Math.random() * 12; }
+    else if (k < 0.88){ sprite = ICE; sz = 6 + Math.random() * 9; }
+    else { sprite = LILAC; sz = 6 + Math.random() * 9; }
+    var a = Math.random() * 6.2832, v = 6 + Math.random() * 22 + Math.min(40, speed * 0.04);
+    P.push({
+      x: x + (Math.random() - 0.5) * 6, y: y + (Math.random() - 0.5) * 6,
+      vx: Math.cos(a) * v, vy: Math.sin(a) * v - 8,
+      life: 0.65 + Math.random() * 0.75, t: 0, sz: sz, img: sprite,
+      spin: sprite === STAR ? (Math.random() - 0.5) * 3 : 0, rot: Math.random() * 3.14
+    });
+  }
+
+  function frame(now){
+    raf = 0;
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
+    last = now;
+    ctx.clearRect(0, 0, W, H);
+    ctx.globalCompositeOperation = 'lighter';
+    for (var i = P.length - 1; i >= 0; i--){
+      var p = P[i];
+      p.t += dt;
+      if (p.t >= p.life){ P.splice(i, 1); continue; }
+      p.vx *= 0.94; p.vy = p.vy * 0.94 + 46 * dt;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      var u = p.t / p.life;
+      var al = (u < 0.12 ? u / 0.12 : Math.pow(1 - (u - 0.12) / 0.88, 1.6));
+      var sz = p.sz * (1 - u * 0.45);
+      ctx.globalAlpha = al;
+      if (p.spin){
+        ctx.globalAlpha = al * (0.75 + 0.25 * Math.sin(p.t * 22));
+        p.rot += p.spin * dt;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+        ctx.drawImage(p.img, -sz / 2, -sz / 2, sz, sz);
+        ctx.restore();
+      } else {
+        ctx.drawImage(p.img, p.x - sz / 2, p.y - sz / 2, sz, sz);
+      }
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+    if (P.length && !document.hidden) raf = requestAnimationFrame(frame);
+    else { last = 0; if (!P.length) ctx.clearRect(0, 0, W, H); }
+  }
+  function kick(){ if (!raf) raf = requestAnimationFrame(frame); }
+
+  function move(e){
+    if (e.pointerType && e.pointerType !== 'mouse' && e.pointerType !== 'pen') return;
+    var r = cv.getBoundingClientRect();
+    var x = e.clientX - r.left, y = e.clientY - r.top;
+    if (px === null){ px = x; py = y; }
+    var dx = x - px, dy = y - py, d = Math.sqrt(dx * dx + dy * dy);
+    var n = Math.min(12, Math.floor(d / STEP));
+    for (var i = 1; i <= n; i++) spawn(px + dx * i / n, py + dy * i / n, d * 60);
+    if (n || Math.random() < 0.12) { if (!n) spawn(x, y, 0); px = x; py = y; }
+    kick();
+  }
+  function leave(){ px = py = null; }
+
+  var on = false;
+  function setup(){
+    var want = fine.matches && !slow.matches;
+    if (want === on) return;
+    on = want;
+    if (on){
+      cv.classList.add('is-live'); size();
+      s.addEventListener('pointermove', move, {passive:true});
+      s.addEventListener('pointerleave', leave);
+    } else {
+      cv.classList.remove('is-live'); P.length = 0; px = py = null;
+      s.removeEventListener('pointermove', move);
+      s.removeEventListener('pointerleave', leave);
+    }
+  }
+  setup();
+  if (fine.addEventListener){ fine.addEventListener('change', setup); slow.addEventListener('change', setup); }
+  if (window.ResizeObserver) new ResizeObserver(function(){ if (on) size(); }).observe(s);
+  else window.addEventListener('resize', function(){ if (on) size(); });
 })();
 </script>
 
