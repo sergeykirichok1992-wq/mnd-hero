@@ -9909,7 +9909,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      не встают в ряд.
 
      Подпись у каждого персонажа нарисована внутри картинки, поэтому она же
-     стоит в `alt`: без этого читалка и поисковик видят пустое место. -->
+     стоит в `alt`: без этого читалка и поисковик видят пустое место.
+
+     ТЮМЕНЬ (16.09.2026): СВОИ ШЕСТЬ КАРТОЧЕК вместо нижегородских семи —
+     у Тюмени программа А, Незнайки, Байконкурочки, Мандарианца и астрогнома
+     в ней нет; есть Баба Яга, Электрошка и Люминесцена. Картинки Серёги
+     из `~/Desktop/сайт тюмень/экран персонажи/`, собирает `personazhi.py
+     tyumen` в `pers/ty-*.webp`, порядок — как в его папке (по алфавиту).
+     Скрипт карусели берёт число карточек из разметки, править
+     его не нужно. Разметка ниже городская: правка карточек в Нижнем
+     остановит `sinhron.py` на Тюмени — тюменские карточки оставлять.
+
+     Концовка ленты помечена комментариями `/ty-pers` и `/cfTrack ty`:
+     без них последние `</figure>` и `</div>` совпадали с Нижним, и новая
+     нижегородская карточка в конце ленты вставлялась в Тюмень молча, мимо
+     спорных мест (проверено на клоне). После разбора спора сверить:
+     в `#cfTrack` только `pers/ty-*.webp`, подписи «N из 6» подряд. -->
 <div class="cf-hold">
 <div class="cf-blik" aria-hidden="true"></div>
 <section class="cf cr" id="heroes" aria-labelledby="cfT">
@@ -9931,42 +9946,37 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="cf-frame" id="cfFrame" tabindex="0" role="region"
        aria-roledescription="карусель" aria-label="Персонажи вселенной МНД">
     <div class="cf-track" id="cfTrack">
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="1 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="1 из 6">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/neznayka.webp"
-             alt="Незнайка с Луны в скафандре и с рюкзаком - яркий, весёлый и дружелюбный">
+             src="pers/ty-baba-yaga.webp"
+             alt="Деловая Баба Яга с планшетом и метлой - главная в канцелярии министерства. Теперь добрая!">
       </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="2 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="2 из 6">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/ded.webp"
-             alt="Дед Мороз с посохом в роскошном синем костюме со звёздным декором">
+             src="pers/ty-ded.webp"
+             alt="Дед Мороз с посохом в роскошном синем костюме и с бородой 70 см из сарлыка">
       </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="3 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="3 из 6">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/baykonkurochka.webp"
-             alt="Байконкурочка в серебристом костюме космонавта - с особым заданием в Министерстве">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="4 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/mandarianec.webp"
-             alt="Мандарианец, оранжевый уличный персонаж, любитель фото-вспышек">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="5 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/astrognomy.webp"
-             alt="Астрогном с подзорной трубой - помощники Деда Мороза в его обсерватории">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="6 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/ministr.webp"
-             alt="Министр Новогодних Дел с посохом - главный ведущий программы в доме">
-      </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="7 из 7">
-        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/karamelshchiki.webp"
+             src="pers/ty-karamelshchiki.webp"
              alt="Доктора карамельных наук - карамельщики, ведущие мастер-класса">
       </figure>
-    </div>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="4 из 6">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/ty-luminiscena.webp"
+             alt="Люминесцена в ярком костюме и со светящимися очками - художница, рисующая волшебные сказки светом">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="5 из 6">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/ty-ministr.webp"
+             alt="Министр Новогодних Дел с посохом - главный ведущий программы в доме">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="6 из 6">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/ty-elektroshka.webp"
+             alt="Электрошка в гирляндах на стремянке - умеет создать электричество с помощью танца!">
+      </figure><!-- /ty-pers: последняя тюменская карточка -->
+    </div><!-- /cfTrack ty -->
   </div>
 </section>
 </div>
