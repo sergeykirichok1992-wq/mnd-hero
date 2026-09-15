@@ -2817,6 +2817,31 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .kr-red-mob{color:rgb(157,10,15)}
 }
 
+/* ПОЛОСА ОТЗЫВОВ ПОД СЛАЙДЕРОМ (просьба Серёги: 15.09.2026 в Тюмени,
+   16.09.2026 во всех городах). Картинка со ставропольского сайта, 1461x210
+   с прозрачностью. На компьютере — три четверти ширины слайдера (`--kr-w`),
+   по центру под миниатюрами: во весь слайдер было крупно, в половину — мелко
+   (Серёга: «меньше в 2 раза», потом «больше на 50%»). До 1024 px в такую
+   ширину текст на скриншотах мельчает до 5 px, поэтому там полоса по краям
+   экрана, высотой 112-158 px, шире экрана и листается пальцем. Остановки
+   листания — три пустых `i` по центрам карточек (доли ширины картинки сняты
+   по краям карточек): у одной картинки точка остановки была бы только одна. */
+.kr-rev{width:calc(var(--kr-w) * .75); margin:calc(36 * var(--u)) auto 0}
+.kr-rev-in{position:relative; margin-inline:auto}
+.kr-rev img{display:block; width:100%; height:auto; -webkit-user-select:none; user-select:none}
+.kr-rev-s{position:absolute; top:0; width:1px; height:1px}
+@media (max-width:1023px){
+  .kr-rev{
+    width:100vw; margin:28px calc(50% - 50vw) 0;
+    overflow-x:auto; scroll-snap-type:x mandatory; overscroll-behavior-x:contain;
+    scrollbar-width:none; -ms-overflow-style:none;
+  }
+  .kr-rev::-webkit-scrollbar{display:none}
+  .kr-rev-in{width:max-content}
+  .kr-rev img{width:auto; max-width:none; height:clamp(112px,19.5vw,158px)}
+  .kr-rev-s{scroll-snap-align:center}
+}
+
 /* Кнопка под слайдером: 2,5 см воздуха от полосы миниатюр (просьба Серёги
    07.09.2026). Вид обычный, золотой — по стандарту кнопок сайта.
    ШИРИНА. На телефоне — во всю ширину блока, как у кнопки в форме пятого
@@ -9400,6 +9425,26 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <button class="kr-th" type="button" data-i="16" aria-label="Слайд 17: Стол с письмами, часами и фонарём"><img src="karus_v/m42.webp?v=17" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
       <button class="kr-th kr-th--4th" type="button" data-i="16" aria-label="Слайд 17: Ещё кадр площадки"><img src="karus_v/m56.webp?v=17" width="220" height="330" alt="" loading="lazy" decoding="async" draggable="false"></button>
     </div>
+
+    <!-- ПОЛОСА ИЗ ТРЁХ СКРИНШОТОВ ОТЗЫВОВ ПРО ПЛОЩАДКУ (просьба Серёги: 15.09.2026
+         в Тюмени, 16.09.2026 во всех городах; картинка со ставропольского
+         сайта). Одна картинка с прозрачным фоном: карточки наложены друг
+         на друга, резать нельзя. До 1024 px она крупнее экрана и листается
+         пальцем — во всю ширину текст отзывов вышел бы в 5 px. -->
+    <div class="kr-rev"><div class="kr-rev-in">
+      <img src="kr-otzyvy.webp" width="1461" height="210" alt="Отзывы о площадке: «Очень понравился интерьер, всё убранство», «Площадка шикарная!», «Огромное спасибо за такой тёплый, добрый, атмосферный приём. Дети в полном восторге»" loading="lazy" decoding="async" draggable="false">
+      <i class="kr-rev-s" style="left:18.9%"></i><i class="kr-rev-s" id="krRevMid" style="left:49.6%"></i><i class="kr-rev-s" style="left:80.8%"></i>
+    </div></div>
+    <!-- На телефоне полоса открывается на средней карточке: по бокам выглядывают
+         соседние, и видно, что листается в обе стороны. С первой карточки край
+         второй торчал на 10 px и листать никто бы не догадался. На компьютере
+         полоса не шире окна, и `scrollLeft` ничего не делает. -->
+    <!-- Ширину картинки браузер знает до загрузки (атрибуты width/height),
+         поэтому ждать `load` не нужно. -->
+    <script>(function(){
+      var r=document.querySelector('.kr-rev'), m=document.getElementById('krRevMid');
+      if(r&&m&&r.scrollWidth>r.clientWidth) r.scrollLeft=m.offsetLeft-r.clientWidth/2;
+    })();</script>
 
     <p class="kr-note"><span class="kr-red-mob">Настоящая большая изба Деда Мороза</span> - то редкое место,
       где дети хотя бы допускают мысль «А вдруг здесь всё по-настоящему?»</p>
