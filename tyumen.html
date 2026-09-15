@@ -2079,7 +2079,8 @@ html.touch .curtain{opacity:1}
 .tm-br{display:none}
 
 /* ---------- коллаж и факты: телефон (основа) ---------- */
-.tm-stage{position:relative; margin-top:clamp(22px,2.6vw,52px)}
+/* +1 см от заголовка до коллажа — просьба Серёги 15.09.2026 (телефон и планшет) */
+.tm-stage{position:relative; margin-top:calc(clamp(22px,2.6vw,52px) + 1cm)}
 .tm-art{position:relative; z-index:1; margin:0 auto}
 /* ореол за коллажем: тихий лиловый свет, дышит вместе с коллажем */
 .tm-art::before{
@@ -2237,7 +2238,8 @@ html.touch .curtain{opacity:1}
     display:grid; align-items:center;
     grid-template-columns:minmax(0,28.5fr) minmax(0,40fr) minmax(0,28.5fr);
     column-gap:2.4%;
-    margin-top:calc(clamp(22px,2.6vw,52px) + .4cm);
+    /* +0,4 см первым заходом, ещё +1 см вторым (15.09.2026) */
+    margin-top:calc(clamp(22px,2.6vw,52px) + 1.4cm);
     /* Сетка выходит за поля контейнера на 1,5 см с каждой стороны. На узком
        окне столько места нет: тогда выходим, пока до края окна остаётся
        32 px (100 % в поле — ширина контейнера, (100vw - 100 %) / 2 — поле
