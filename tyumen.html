@@ -608,6 +608,15 @@ html.touch .curtain{opacity:1}
 @media (max-width:767px){
   .cr-s2 .cr-h2{font-size:clamp(9.333px,2.7333vw,12.4667px)}
 }
+/* ТОЛЬКО ТЮМЕНЬ, 15.09.2026: заголовок втрое длиннее нижегородского.
+   От 1250 px он ровно в три строки — переносы стоят в разметке. Ниже второй
+   перенос (после «ДЛЯ ДЕТЕЙ,») убран, а строки выравнивает браузер: иначе
+   на 1024 «ДЕТЕЙ,» висело отдельной строкой, а на телефоне «БЫЛО!»
+   и «РОССИИ!». */
+@media (max-width:1249px){
+  .cr-s2 .cr-h2{text-wrap:balance}
+  .crT2-br{display:none}
+}
 
 /* ---- ГОДА НА ФОНЕ ВТОРОГО ЭКРАНА ----
    За лентой снимков вспыхивают и сразу гаснут года прошлых сезонов: 2018 ... 2026.
@@ -8837,7 +8846,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="cr-cont">
 
     <div class="cr-n">
-      <h2 class="cr-t cr-h2" id="crT2"><span class="cr-red"><strong>ГРАНДИОЗНОЕ НОВОГОДНЕЕ МЕРОПРИЯТИЕ&nbsp;</strong></span><span class="cr-blue"><strong>ДЛЯ ШКОЛЬНИКОВ</strong></span><span class="cr-blue"><strong>,</strong></span><span class="cr-red"><strong>&nbsp;</strong></span><span class="cr-blue"><strong>АНАЛОГОВ КОТОРОМУ НЕТ В РОССИИ!&nbsp;</strong></span></h2>
+      <!-- ТОЛЬКО ТЮМЕНЬ, 15.09.2026: свой заголовок (текст Серёги). Он почти
+           вдвое длиннее нижегородского и в две строки не влезает, поэтому
+           три строки заданы переносами: красная зацепка про Тюмень, потом
+           синим «ГРАНДИОЗНОЕ... ДЛЯ ДЕТЕЙ,» и «АНАЛОГОВ... В РОССИИ!».
+           Без второго переноса строка рвалась бы после «АНАЛОГОВ». -->
+      <h2 class="cr-t cr-h2" id="crT2"><span class="cr-red"><strong>ТАКОГО В&nbsp;ТЮМЕНИ ЕЩЕ НЕ&nbsp;БЫЛО!</strong></span><br><span class="cr-blue"><strong>ГРАНДИОЗНОЕ НОВОГОДНЕЕ МЕРОПРИЯТИЕ ДЛЯ&nbsp;ДЕТЕЙ,</strong></span><br class="crT2-br"><span class="cr-blue"><strong> АНАЛОГОВ КОТОРОМУ НЕТ В&nbsp;РОССИИ!</strong></span></h2>
     </div>
 
     <div style="height:calc(44 * var(--u))"></div>
