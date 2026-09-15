@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Тестовая страница: три варианта оформления экрана «Что в программе».
+     Ни с одной страницы сюда не ведёт ссылка, поиску закрыта. Живой экран
+     сайта тут НЕ меняется — это отдельный файл, ничего общего с v2.html. -->
+<meta name="robots" content="noindex, nofollow">
+<title>Что в программе - три варианта экрана | МНД</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&display=swap">
+<style>
+/* ======================= шрифты =======================
+   Те же файлы, что у боевой страницы: заголовки — Blogger Sans,
+   текст — Golos Text (шрифт экрана цен и нынешних карточек). */
+@font-face{font-family:"BS"; font-weight:700; font-style:normal; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff")}
+@font-face{font-family:"BS"; font-weight:500; font-style:normal; font-display:swap;
+  src:url(blogger-sans-medium.woff2) format("woff2"), url(blogger-sans-medium.woff) format("woff")}
+@font-face{font-family:"BS"; font-weight:400; font-style:normal; font-display:swap;
+  src:url(cr-bloggersans.woff2) format("woff2"), url(cr-bloggersans.woff) format("woff")}
+
+:root{
+  --gold:#E3B34E; --red:#F4372B;
+  --text:#E9EFFB; --dim:#AFBDDA; --faint:#7F8FB3;
+  --cont:min(94vw,1462px);
+  --pad:clamp(16px,3vw,47.6px);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:linear-gradient(180deg,#04081A 0%,#070E22 26%,#091132 58%,#070D1C 86%,#060C18 100%);
+  background-attachment:fixed;
+  color:var(--text);
+  font:400 17px/1.55 "Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block; max-width:100%}
+h1,h2,h3{margin:0; font-family:"BS","Golos Text",Arial,sans-serif; font-weight:700}
+p{margin:0}
+
+/* ======================= ночь: отблески и зерно =======================
+   Рецепт фона взят с боевой страницы: глубокий синий, размытые синие
+   и фиолетовые пятна, еле заметное дыхание, зерно поверх. */
+.sky{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.sky i{position:absolute; display:block; border-radius:50%}
+.sky i:nth-child(1){left:-18vw; top:-12vh; width:76vw; height:58vh;
+  background:radial-gradient(closest-side, rgba(47,49,146,.50), rgba(47,49,146,.30) 38%, rgba(47,49,146,0) 100%);
+  animation:dr1 38s ease-in-out infinite alternate}
+.sky i:nth-child(2){right:-22vw; top:6vh; width:72vw; height:56vh;
+  background:radial-gradient(closest-side, rgba(108,43,217,.34), rgba(108,43,217,.20) 38%, rgba(108,43,217,0) 100%);
+  animation:dr2 45s ease-in-out infinite alternate}
+.sky i:nth-child(3){left:-6vw; bottom:-14vh; width:68vw; height:54vh;
+  background:radial-gradient(closest-side, rgba(176,106,224,.26), rgba(176,106,224,.15) 38%, rgba(176,106,224,0) 100%);
+  animation:dr3 33s ease-in-out infinite alternate}
+.sky i:nth-child(4){right:-10vw; bottom:-18vh; width:64vw; height:50vh;
+  background:radial-gradient(closest-side, rgba(227,179,78,.13), rgba(227,179,78,.07) 38%, rgba(227,179,78,0) 100%);
+  animation:dr2 41s ease-in-out infinite alternate-reverse}
+@keyframes dr1{from{transform:translate3d(0,0,0) scale(1)}    to{transform:translate3d(4%,3%,0) scale(1.08)}}
+@keyframes dr2{from{transform:translate3d(0,0,0) scale(1.06)} to{transform:translate3d(-5%,-3%,0) scale(1)}}
+@keyframes dr3{from{transform:translate3d(0,0,0) scale(1)}    to{transform:translate3d(5%,-4%,0) scale(1.1)}}
+.grain{position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+@media (prefers-reduced-motion:reduce){ .sky i{animation:none} }
+
+/* ======================= карамельная рамка =======================
+   Та же рамка, что на боевом экране, но собрана проще: полоски — фон
+   коробочки, фото лежит внутри с полем. Так рамка садится на кадр любой
+   формы (квадрат, вертикаль, широкий кадр), а не только на квадрат. */
+.fr{
+  --fw:10px;               /* толщина рамки */
+  --fr-r:28px;             /* скругление */
+  position:relative; padding:var(--fw); border-radius:var(--fr-r);
+  background:repeating-linear-gradient(118.8deg,
+    var(--red) 0 calc(var(--fw)*2.1), #fff calc(var(--fw)*2.1) calc(var(--fw)*4.2));
+  box-shadow:
+    inset 0 2px 0 rgba(255,255,255,.85),
+    inset 0 -2px 0 rgba(74,10,5,.30),
+    0 18px 44px rgba(0,0,0,.50),
+    0 0 30px rgba(244,55,43,.16);
+}
+.fr::after{ /* фаска: светлая полоска по верхней грани, как в макете */
+  content:""; position:absolute; inset:0; border-radius:var(--fr-r); pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.45) 0 2px, rgba(255,255,255,0) 6px);
+  mix-blend-mode:screen;
+}
+.fr .win{position:relative; overflow:hidden; border-radius:calc(var(--fr-r) - var(--fw) + 2px);
+  background:#0B1330; aspect-ratio:1/1}
+.fr .win img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  opacity:0; transition:opacity .26s ease}
+.fr .win img.on{opacity:1}
+
+/* ======================= шапка страницы и переключатель =======================
+   Кнопок на этой странице нет намеренно: стандарт кнопок сайта — про
+   обычную и прозрачную пилюли на боевых экранах, а тут служебная навигация.
+   Поэтому переключатель — подчёркнутые надписи. */
+.top{position:sticky; top:0; z-index:40; backdrop-filter:blur(14px);
+  background:rgba(4,8,26,.82); border-bottom:1px solid rgba(255,255,255,.08)}
+.top-in{width:var(--cont); margin:0 auto; padding:14px var(--pad);
+  display:flex; align-items:center; gap:28px; flex-wrap:wrap}
+.top-n{font:700 13px/1 "Golos Text",Arial,sans-serif; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--faint); white-space:nowrap}
+.tabs{display:flex; gap:26px; flex-wrap:wrap}
+.tab{appearance:none; background:none; border:0; padding:6px 0; cursor:pointer;
+  font:600 16px/1.2 "Golos Text",Arial,sans-serif; color:var(--dim);
+  border-bottom:2px solid transparent; transition:color .2s, border-color .2s}
+.tab:hover{color:#fff}
+.tab.on{color:var(--gold); border-bottom-color:var(--gold)}
+.tab i{font-style:normal; color:var(--faint); margin-right:7px}
+.tab.on i{color:var(--gold)}
+
+/* ======================= общий каркас варианта ======================= */
+.vr{position:relative; z-index:2; display:none; padding:0 0 120px}
+.vr.on{display:block}
+.cont{width:var(--cont); margin:0 auto; padding:0 var(--pad)}
+.note{width:var(--cont); margin:0 auto 6px; padding:22px var(--pad) 0;
+  color:var(--faint); font-size:15px}
+.note b{color:var(--dim); font-weight:600}
+
+.h2{text-align:center; text-transform:uppercase; letter-spacing:.01em;
+  font-size:clamp(24px,3.33vw,52px); line-height:1.06; padding-top:46px}
+.h2 span{color:var(--gold)}
+.lead{max-width:62ch; margin:20px auto 0; text-align:center; color:var(--dim); font-size:clamp(15px,1.25vw,19px)}
+.lead b{color:#fff; font-weight:600}
+.allin{display:flex; align-items:center; justify-content:center; gap:10px;
+  margin:26px auto 0; width:fit-content; padding:9px 20px 10px; border-radius:999px;
+  background:rgba(227,179,78,.10); border:1px solid rgba(227,179,78,.35);
+  color:var(--gold); font:600 14px/1 "Golos Text",Arial,sans-serif; letter-spacing:.02em}
+.allin svg{width:15px; height:15px; flex:none}
+
+/* ======================= ВАРИАНТ 1: маршрут ======================= */
+.rt{position:relative; width:var(--cont); margin:44px auto 0; padding:0 var(--pad)}
+/* дорога лежит ПОД содержимым: z-index 0 у полосы, 2 у глав.
+   Иначе полоса перечёркивает текст карточек. */
+.rt-line{position:absolute; z-index:0; left:50%; top:0; bottom:90px; width:12px; margin-left:-6px;
+  border-radius:6px; opacity:.8;
+  background:repeating-linear-gradient(118.8deg, var(--red) 0 13px, #fff 13px 26px);
+  box-shadow:0 0 26px rgba(244,55,43,.35), inset 0 0 0 1px rgba(255,255,255,.35)}
+.rt-line::after{content:""; position:absolute; left:50%; bottom:-24px; width:24px; height:24px;
+  margin-left:-12px; border-radius:50%; background:var(--gold);
+  box-shadow:0 0 26px rgba(227,179,78,.75)}
+
+.ch{position:relative; z-index:2; padding:6px 0 14px}
+.ch-h{position:relative; z-index:3; width:fit-content; margin:0 auto 34px;
+  display:flex; align-items:center; gap:14px; padding:11px 26px 12px; border-radius:999px;
+  background:rgba(7,13,32,.92); border:1px solid rgba(227,179,78,.35);
+  box-shadow:0 10px 34px rgba(0,0,0,.5)}
+.ch-n{display:grid; place-items:center; width:26px; height:26px; border-radius:50%;
+  background:var(--gold); color:#1A1204; font:700 14px/1 "Golos Text",Arial,sans-serif}
+.ch-h h3{font-size:clamp(17px,1.5vw,23px); letter-spacing:.01em; text-transform:uppercase; color:#fff}
+
+.st{position:relative; display:grid; grid-template-columns:1fr 112px 1fr; align-items:center;
+  margin:0 0 26px}
+.st .ph{grid-column:1; justify-self:end; width:min(100%,312px)}
+.st .tx{grid-column:3; padding-left:6px}
+.st.r .ph{grid-column:3; justify-self:start}
+/* текст всегда выключен влево: правый край «лесенкой» читается тяжело */
+.st.r .tx{grid-column:1; justify-self:end; padding:0 6px 0 0}
+.st .dot{position:absolute; left:50%; top:50%; width:18px; height:18px; margin:-9px 0 0 -9px;
+  border-radius:50%; background:#0B1330; border:3px solid var(--gold); z-index:3;
+  box-shadow:0 0 0 6px rgba(4,8,26,.9), 0 0 22px rgba(227,179,78,.5)}
+.st h4{margin:0 0 9px; font-family:"BS",Arial,sans-serif; font-weight:700;
+  font-size:clamp(19px,1.6vw,25px); line-height:1.15; color:#fff}
+.st p{color:var(--dim); font-size:clamp(15px,1.05vw,16.5px); max-width:44ch}
+
+/* главная станция — карамельный МК: шире, фото крупнее, золотая плашка.
+   Фон непрозрачный: под плитой проходит дорога, и сквозь неё она бы просвечивала. */
+.st-hero{grid-template-columns:1fr; gap:0; margin:4px 0 28px;
+  background:linear-gradient(180deg, rgba(23,24,58,.97), rgba(10,15,38,.97));
+  border:1px solid rgba(227,179,78,.30); border-radius:30px; padding:24px;
+  box-shadow:0 26px 60px rgba(0,0,0,.45)}
+.st-hero .in{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:32px; align-items:center}
+.st-hero .ph{grid-column:auto; justify-self:stretch; width:100%}
+.st-hero .tx{grid-column:auto; padding:0}
+.st-hero .fr{--fw:13px; --fr-r:34px}
+.st-hero .fr .win{aspect-ratio:4/3}
+.st-hero h4{font-size:clamp(24px,2.5vw,38px)}
+.st-hero p{font-size:clamp(16px,1.25vw,19px); max-width:52ch; color:#D6E0F4}
+.top-plate{display:inline-flex; align-items:center; gap:9px; margin-bottom:14px;
+  padding:7px 16px 8px; border-radius:999px; background:var(--gold); color:#1A1204;
+  font:700 12px/1 "Golos Text",Arial,sans-serif; letter-spacing:.12em; text-transform:uppercase}
+
+/* Мелкие пункты главы — витрина кабинета. Плита непрозрачная по той же
+   причине, что и у главной станции: под ней проходит карамельная дорога. */
+/* подпись лежит на своей плашке: под ней проходит карамельная дорога */
+.mini-h{width:fit-content; margin:2px auto 16px; padding:9px 18px 10px; border-radius:999px;
+  background:rgba(7,13,32,.94); border:1px solid rgba(255,255,255,.10); color:var(--dim);
+  font:600 13px/1 "Golos Text",Arial,sans-serif; letter-spacing:.16em; text-transform:uppercase}
+.mini, .ch-side{background:linear-gradient(180deg, rgba(12,18,44,.94), rgba(8,13,32,.94));
+  border:1px solid rgba(255,255,255,.08); border-radius:26px; padding:24px;
+  box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.mini{display:grid; grid-template-columns:repeat(3,1fr); gap:22px 28px; margin:0 0 22px}
+.mini .it{display:grid; grid-template-columns:96px 1fr; gap:15px; align-items:start}
+.mini .fr{--fw:7px; --fr-r:18px}
+.mini h5{margin:2px 0 6px; font-family:"BS",Arial,sans-serif; font-weight:700; font-size:16.5px; line-height:1.2; color:#fff}
+.mini p{color:var(--dim); font-size:14px; line-height:1.5}
+.ch-side{display:grid; grid-template-columns:repeat(2,1fr); gap:24px 30px; margin:0 0 22px}
+.ch-side .it{display:grid; grid-template-columns:110px 1fr; gap:18px; align-items:start}
+.ch-side .fr{--fw:7px; --fr-r:18px}
+.ch-side h5{margin:2px 0 6px; font-family:"BS",Arial,sans-serif; font-weight:700; font-size:17px; color:#fff}
+.ch-side p{color:var(--dim); font-size:14.5px; line-height:1.5}
+
+/* ======================= ВАРИАНТ 2: афиша ======================= */
+.bn{width:var(--cont); margin:52px auto 0; padding:0 var(--pad);
+  display:grid; grid-template-columns:repeat(12,1fr); gap:20px}
+.bt{position:relative; display:flex; flex-direction:column; overflow:hidden;
+  background:rgba(10,16,38,.58); border:1px solid rgba(255,255,255,.08); border-radius:26px;
+  padding:14px 14px 20px; transition:transform .25s ease, box-shadow .25s ease, border-color .25s}
+.bt:hover{transform:translateY(-5px); border-color:rgba(227,179,78,.35);
+  box-shadow:0 26px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(227,179,78,.12)}
+.bt .fr{--fw:8px; --fr-r:20px; flex:1 1 auto}
+.bt .fr .win{aspect-ratio:auto; height:100%; min-height:168px}
+.bt .bd{padding:16px 6px 0}
+.bt h4{margin:0 0 8px; font-family:"BS",Arial,sans-serif; font-weight:700;
+  font-size:19px; line-height:1.18; color:#fff}
+.bt p{color:var(--dim); font-size:14.5px; line-height:1.5}
+.bt.c3{grid-column:span 3} .bt.c4{grid-column:span 4}
+.bt.c6{grid-column:span 6} .bt.c12{grid-column:span 12}
+
+/* Хедлайнер: фотография занимает плитку целиком, текст лежит поверх неё.
+   Рамка-фото абсолютная, иначе она делит высоту с текстовым блоком
+   и кадр обрезается ровной полосой посередине. */
+.bt-hero{grid-column:span 6; display:block; position:relative; padding:0; border:0; min-height:560px}
+.bt-hero .fr{--fw:0px; --fr-r:26px; position:absolute; inset:0; box-shadow:none; background:none}
+.bt-hero .fr::after{display:none}
+.bt-hero .fr .win{position:absolute; inset:0; border-radius:26px; aspect-ratio:auto}
+.bt-hero .bd{position:absolute; z-index:2; left:0; right:0; bottom:0; padding:150px 34px 30px;
+  background:linear-gradient(180deg, rgba(4,8,26,0), rgba(4,8,26,.70) 46%, rgba(4,8,26,.94));
+  border-radius:0 0 26px 26px}
+.bt-hero h4{font-size:clamp(24px,2.1vw,34px); margin-bottom:12px}
+.bt-hero p{color:#D6E0F4; font-size:16.5px; max-width:56ch}
+.bt-hero .ring{position:absolute; inset:0; border-radius:26px; pointer-events:none; z-index:3;
+  border:10px solid transparent;
+  background:repeating-linear-gradient(118.8deg, var(--red) 0 21px, #fff 21px 42px) border-box;
+  -webkit-mask:linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask:linear-gradient(#000 0 0) padding-box, linear-gradient(#000 0 0);
+  mask-composite:exclude}
+/* широкая плитка: фото слева, текст справа */
+.bt-wide{flex-direction:row; align-items:center; gap:22px; padding:16px}
+.bt-wide .fr{flex:0 0 clamp(150px,16vw,210px)}
+.bt-wide .fr .win{aspect-ratio:1/1; min-height:0}
+.bt-wide .bd{padding:0}
+
+/* ======================= ВАРИАНТ 3: кинозал ======================= */
+.kn{width:var(--cont); margin:46px auto 0; padding:0 var(--pad);
+  display:grid; grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr); gap:clamp(28px,3.2vw,56px);
+  align-items:start}
+.kn-stage{position:sticky; top:86px}
+.kn-stage .fr{--fw:12px; --fr-r:32px}
+.kn-cap{margin-top:22px}
+.kn-num{display:inline-block; margin-bottom:10px; color:var(--gold);
+  font:700 13px/1 "Golos Text",Arial,sans-serif; letter-spacing:.18em}
+.kn-cap h4{margin:0 0 10px; font-family:"BS",Arial,sans-serif; font-weight:700;
+  font-size:clamp(21px,1.9vw,30px); line-height:1.15; color:#fff}
+.kn-cap p{color:var(--dim); font-size:clamp(15px,1.12vw,17px); max-width:56ch; min-height:96px}
+.kn-list{list-style:none; margin:0; padding:0; counter-reset:kn}
+.kn-list li{margin:0}
+.kn-it{display:grid; grid-template-columns:38px 1fr; gap:14px; align-items:center; width:100%;
+  appearance:none; background:none; border:0; border-bottom:1px solid rgba(255,255,255,.08);
+  padding:13px 12px 13px 4px; cursor:pointer; text-align:left; transition:background .2s}
+.kn-it:hover{background:rgba(255,255,255,.04)}
+.kn-it .n{font:600 14px/1 "Golos Text",Arial,sans-serif; color:var(--faint); transition:color .2s}
+.kn-it .t{font-family:"BS",Arial,sans-serif; font-weight:700; font-size:clamp(16px,1.35vw,20px);
+  line-height:1.2; color:var(--dim); transition:color .2s}
+.kn-it.on{background:linear-gradient(90deg, rgba(227,179,78,.14), rgba(227,179,78,0) 78%)}
+.kn-it.on .t{color:#fff}
+.kn-it.on .n{color:var(--gold)}
+.kn-it .key{display:inline-block; margin-left:10px; padding:4px 9px 5px; border-radius:999px;
+  background:rgba(227,179,78,.16); color:var(--gold); vertical-align:middle;
+  font:700 10px/1 "Golos Text",Arial,sans-serif; letter-spacing:.12em; text-transform:uppercase}
+/* Описание на телефоне живёт в самой строке списка: там рамка приклеена
+   сверху, и текст под ней не поместился бы. На компьютере оно рядом с фото. */
+.kn-it .desc{display:none; grid-column:1/-1; margin-top:8px; color:var(--dim);
+  font-size:14.5px; line-height:1.5}
+.kn-hint{margin:0 0 10px; color:var(--faint); font-size:14px}
+.kn-hint b{color:var(--gold); font-weight:600}
+.kn-it .bar{grid-column:1/-1; height:2px; margin-top:11px; background:rgba(227,179,78,.18); border-radius:2px;
+  overflow:hidden; display:none}
+.kn-it.on .bar{display:block}
+.kn-it .bar i{display:block; height:100%; width:0; background:var(--gold)}
+.kn-it.on .bar i{animation:knbar var(--knms,5000ms) linear forwards}
+@keyframes knbar{from{width:0} to{width:100%}}
+@media (prefers-reduced-motion:reduce){ .kn-it.on .bar i{animation:none; width:100%} }
+
+/* ======================= телефон ======================= */
+@media (max-width:900px){
+  .h2{padding-top:30px}
+  .rt{padding:0 16px}
+  .rt-line{left:24px; margin-left:0; width:10px; bottom:60px}
+  .ch-h{margin-left:0; margin-right:auto; width:auto; padding-left:20px}
+  .st{display:block; margin:0 0 26px; padding-left:54px}
+  .st .ph, .st.r .ph{width:100%; justify-self:stretch}
+  /* на телефоне кадр не квадрат, а шире: так экран короче почти на метр */
+  .st .fr .win{aspect-ratio:4/3}
+  .st .tx, .st.r .tx{text-align:left; padding:16px 0 0}
+  .st.r p{margin-left:0}
+  .st p, .st.r p{max-width:none}
+  .st .dot{left:24px; top:26px; margin-left:-9px}
+  .st-hero{padding:18px; margin-left:0; border-radius:26px}
+  .st-hero .in{display:block}
+  .st-hero .tx{padding-top:18px}
+  .mini{grid-template-columns:1fr; gap:18px; padding-left:54px}
+  .ch-side{grid-template-columns:1fr; padding-left:54px}
+  .mini-h{text-align:left; padding-left:54px}
+  .bn{grid-template-columns:repeat(2,1fr); gap:14px; padding:0 16px}
+  .bt.c3,.bt.c4,.bt.c6,.bt.c12,.bt-hero{grid-column:span 2}
+  .bt-hero{min-height:0; aspect-ratio:4/5; max-height:78vh}
+  .bt-hero .bd{padding:110px 18px 22px; background:linear-gradient(180deg, rgba(4,8,26,0), rgba(4,8,26,.9) 40%)}
+  .bt-wide{flex-direction:column; align-items:stretch}
+  .bt-wide .fr{flex:none}
+  .bt-wide .bd{padding:16px 6px 0}
+  .kn{display:block; padding:0 16px}
+  .kn-stage{position:sticky; top:62px; z-index:5; padding:10px 0 12px;
+    background:linear-gradient(180deg,#05091C 82%, rgba(5,9,28,0))}
+  .kn-stage .fr{--fw:9px; --fr-r:24px}
+  .kn-cap{margin-top:14px}
+  .kn-cap p{display:none}
+  .kn-list{margin-top:10px}
+  .kn-it{padding:15px 10px}
+  .kn-it.on .desc{display:block}
+}
+@media (max-width:560px){
+  .bn{grid-template-columns:1fr}
+  .bt.c3,.bt.c4,.bt.c6,.bt.c12,.bt-hero{grid-column:span 1}
+  .mini .it{grid-template-columns:86px 1fr; gap:13px}
+  .ch-side .it{grid-template-columns:96px 1fr}
+  /* Афиша на телефоне: крупными остаются хедлайнер и две главные плитки,
+     остальные становятся строками с миниатюрой — иначе экран растёт
+     до семи метров прокрутки. */
+  .bt:not(.bt-hero):not(.bt-big){flex-direction:row; align-items:flex-start; gap:14px; padding:12px}
+  .bt:not(.bt-hero):not(.bt-big) .fr{flex:0 0 112px; --fw:6px; --fr-r:16px}
+  .bt:not(.bt-hero):not(.bt-big) .fr .win{aspect-ratio:1/1; min-height:0; height:auto}
+  .bt:not(.bt-hero):not(.bt-big) .bd{padding:0}
+  .bt:not(.bt-hero):not(.bt-big) h4{font-size:17px; margin-bottom:6px}
+  .bt:not(.bt-hero):not(.bt-big) p{font-size:14px}
+  .bt-big .fr .win{aspect-ratio:4/3}
+}
+</style>
+</head>
+<body>
+<div class="sky" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="top-in">
+    <span class="top-n">МНД · черновик экрана «Что в программе»</span>
+    <nav class="tabs" id="tabs">
+      <button class="tab on" data-v="v1"><i>01</i>Маршрут</button>
+      <button class="tab" data-v="v2"><i>02</i>Афиша</button>
+      <button class="tab" data-v="v3"><i>03</i>Кинозал</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="vr on" id="v1"></section>
+  <section class="vr" id="v2"></section>
+  <section class="vr" id="v3"></section>
+</main>
+
+<script>
+/* ============================================================
+   Данные одни на три варианта: тексты и кадры — те же, что
+   на боевом экране. Меняется только оформление.
+   k   — папка кадров (karta/kN — 640 px, vp/kN — 900 px)
+   big — сколько кадров пересобрано крупно
+   n   — всего кадров у карточки
+   ============================================================ */
+const D = [
+ {k:'k1', n:22, big:6, g:'dvor',  w:'mid',
+  t:'Динамичное велком-шоу во дворе',
+  p:'Приветственное шоу у 5-метровой елки с главными героями, космо-реквизитом, спецэффектами для разогрева (10-15 минут)'},
+ {k:'k15', n:2, big:2, g:'dvor', w:'small',
+  t:'Колпаки и бейджи для красивых фото',
+  p:'На все время пребывания в Министерстве Новогодних Дел детям раздадим специальные астрономические бейджики-пропуски, а на карамельном мастер-классе - гигиенические шапочки и колпаки карамельщиков для красоты.'},
+ {k:'k2', n:9, big:6, g:'dvor', w:'small',
+  t:'Фонарики в темное время',
+  p:'В темное время суток (примерно с 16:00) мы раздаем детям фонарики на время уличной программы. Они с ними выглядят как светлячки :) И получаются классные фото!'},
+
+ {k:'k3', n:7, big:6, g:'kosmos', w:'mid',
+  t:'Необычный сценарий мероприятия',
+  p:'Оказывается в нашем Министерстве есть тайный отдел космических поздравлений. Астрогномы приглашают детей в обсерваторию Деда Мороза, чтобы поучаствовать в новогоднем задании межгалактического масштаба!'},
+ {k:'k5', n:13, big:6, g:'kosmos', w:'mid',
+  t:'Экскурсия в кабинет-обсерваторию Деда Мороза',
+  p:'Министр проведет деток в астро-кабинет, который будет исполнен в стиле ретро-футуризма. Это будет очень необыкновенно! Винтажные телескопы, интерактивный планетарий на потолке, винтажные звездные карты, пульт управления радио-телескопом и т.п. Максимальная детализация и погружение!'},
+ {k:'k8', n:11, big:6, g:'kosmos', w:'small',
+  t:'Пульт управления делами Деда Мороза',
+  p:'Дед Мороз и Министр докажут детям, что следят за их поведением и знают о них все, показав фото каждого ребенка на экранах пульта управления делами Деда Мороза. Дети всегда в приятном шоке!'},
+ {k:'k6', n:6, big:6, g:'kosmos', w:'small',
+  t:'Экспозиция настоящих метеоритов от Незнайки с Луны',
+  p:'Коллекция настоящих метеоритов из разных уголков нашей Земли будет представлена в кабинете-обсерватории Деда Мороза. Некоторые будут размещены на левитирующих платформах. Это не бутафория, мы привезем настоящие экспонаты со своей историей!'},
+ {k:'k9', n:3, big:3, g:'kosmos', w:'small',
+  t:'Терменвокс-шоу',
+  p:'Терменвокс — самый необыкновенный музыкальный синтезатор, создающий звуки с помощью электромагнитных полей. Используется в министерстве для шифрования новогодних поздравлений. Каждый ребенок попробует сыграть на нем. Такого еще не видели даже взрослые!'},
+ {k:'k11', n:2, big:2, g:'kosmos', w:'small',
+  t:'Космофон — станция новогодней связи',
+  p:'Интерактив с еще одним супер-гаджетом Деда Мороза, который ни дети ни взрослые никогда не видели! Мы максимально наполняем программу различными технологичными штуками, используем ИИ и пишем свои программы, чтобы по-настоящему удивить современного ребенка!'},
+ {k:'k10', n:2, big:2, g:'kosmos', w:'small',
+  t:'Интерактив с 3D-принтером',
+  p:'Дети вместе с АстроГномами создадут макет и запустят в печать сувенир на память себе в класс — деталь для радио-телескопа, которая поможет министерству расшифровать сигнал с рецептом карамели.'},
+ {k:'k12', n:5, big:5, g:'kosmos', w:'small',
+  t:'Десятки интересных фактов о связи космоса и Нового года',
+  p:'Во время экскурсии-шоу дети узнают множество интересных фактов из истории исследования космоса, внеземных цивилизаций, а также о взаимосвязи астрономии и Нового года.'},
+
+ {k:'k4', n:26, big:6, g:'karamel', w:'hero',
+  t:'Главное — карамельный мастер-класс',
+  p:'Главная часть программы, вокруг которой строится весь сценарий! Каждый ребенок сделает красивые новогодние леденцы, прям как с прилавка. Мы сами производим натуральную вкуснейшую карамель по ГОСТу для наших МК.'},
+ {k:'k7', n:6, big:6, g:'karamel', w:'mid',
+  t:'Выставка карамельного искусства',
+  p:'Это уже традиция! В главном зале наш карамельный цех представит новую экспозицию больших авторских леденцов ручной работы в новогодней и космической тематике. На фото леденцы прошлого сезона.'},
+
+ {k:'k13', n:7, big:6, g:'zal', w:'mid',
+  t:'Чайное заседание по-министерски!',
+  p:'Как обычно, в конце программы деток ждет веселое чаепитие в виде мини-фуршета. Почему веселое? Часто оно сопровождается музыкой и танцами, дети отжигают по полной! А угощаем детей мы вкусным и свежим Чокопаем.'},
+ {k:'k14', n:15, big:6, g:'zal', w:'mid',
+  t:'Групповые и индивидуальные фото с нашими героями!',
+  p:'У нас весь дом - как одна большая фото-зона, очень красиво! Поэтому в конце программы деток обязательно ждет групповое фотографирование с Дедом Морозом и индивидуальные фото с остальными персонажами в главном зале избы.'}
+];
+
+/* Главы маршрута. Порядок — как идёт программа. */
+const CH = [
+ {id:'dvor',    n:1, t:'Сначала - во дворе'},
+ {id:'kosmos',  n:2, t:'Дальше - обсерватория Деда Мороза', sub:'Что дети увидят и потрогают в кабинете'},
+ {id:'karamel', n:3, t:'Главное - карамельный цех'},
+ {id:'zal',     n:4, t:'В конце - главный зал'}
+];
+
+const byId = k => D.find(d => d.k === k);
+const num  = i => String(i).padStart(2,'0');
+const src  = (d,i) => (i <= d.big ? 'vp/' : 'karta/') + d.k + '/' + num(i) + '.webp';
+
+/* ---------- окно с кадром: два слоя, наплывом ---------- */
+function win(d, {big=true, ratio=null} = {}){
+  const w = document.createElement('div');
+  w.className = 'win';
+  if (ratio) w.style.aspectRatio = ratio;
+  const a = new Image(), b = new Image();
+  a.className = 'on'; a.src = big ? src(d,1) : 'karta/'+d.k+'/01.webp';
+  a.loading = 'lazy'; a.decoding = 'async'; a.alt = '';
+  b.loading = 'lazy'; b.decoding = 'async'; b.alt = '';
+  w.append(a,b);
+  w._d = d; w._big = big; w._i = 1; w._cur = a; w._off = b;
+  return w;
+}
+function frame(d, opt = {}){
+  const f = document.createElement('div');
+  f.className = 'fr';
+  f.append(win(d, opt));
+  return f;
+}
+/* показать следующий кадр карточки */
+function nextShot(w){
+  const d = w._d, total = w._big ? Math.max(d.big,1) : Math.min(d.n, 8);
+  if (total < 2) return;
+  w._i = w._i % total + 1;
+  const img = w._off;
+  img.onload = () => {
+    img.classList.add('on'); w._cur.classList.remove('on');
+    const t = w._cur; w._cur = img; w._off = t;
+  };
+  img.src = w._big ? src(d, w._i) : 'karta/'+d.k+'/'+num(w._i)+'.webp';
+  if (img.complete) img.onload();
+}
+/* кадры сменяются только под курсором — как на боевом экране */
+const CAN_HOVER = window.matchMedia('(hover:hover) and (min-width:768px)').matches;
+const CALM = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+function liveOnHover(box, ms = 620){
+  if (!CAN_HOVER || CALM) return;
+  let t = null;
+  box.addEventListener('mouseenter', () => {
+    const w = box.querySelector('.win');
+    t = setInterval(() => nextShot(w), ms);
+  });
+  box.addEventListener('mouseleave', () => { clearInterval(t); t = null; });
+}
+
+const el = (tag, cls, html) => {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html != null) e.innerHTML = html;
+  return e;
+};
+function head(where, note){
+  const n = el('div','note', note);
+  const c = el('div','cont');
+  c.append(el('h2','h2','Что же ждёт <span>детей?</span>'),
+           el('p','lead','<b>Продолжительность программы 1 час 20 минут</b> - самое оптимальное время, чтобы дети получали всё, не утомляясь и не теряя внимание'),
+           el('p','allin','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Всё, что ниже, входит в стоимость'));
+  where.append(n, c);
+}
+
+/* ============================================================
+   ВАРИАНТ 1. Маршрут: программа как путь ребёнка по избе.
+   Карамельная полоска — сама дорога, на ней четыре главы.
+   ============================================================ */
+function build1(root){
+  head(root, 'Вариант 01. <b>Маршрут.</b> Программа выложена по порядку: двор → обсерватория → карамельный цех → главный зал. Главное крупнее, мелочи мельче.');
+  const rt = el('div','rt');
+  rt.append(el('div','rt-line'));
+  CH.forEach(ch => {
+    const box = el('div','ch');
+    const h = el('div','ch-h');
+    h.append(el('span','ch-n', String(ch.n)), el('h3', null, ch.t));
+    box.append(h);
+    const items = D.filter(d => d.g === ch.id);
+    let midIdx = 0;
+    items.filter(d => d.w !== 'small').forEach(d => {
+      if (d.w === 'hero'){
+        const s = el('div','st st-hero');
+        const inn = el('div','in');
+        const ph = el('div','ph'); ph.append(frame(d,{ratio:'4/3'}));
+        const tx = el('div','tx');
+        tx.append(el('span','top-plate','Главное в программе'), el('h4',null,d.t), el('p',null,d.p));
+        inn.append(ph,tx); s.append(inn); box.append(s);
+        liveOnHover(ph);
+      } else {
+        const s = el('div','st' + (midIdx % 2 ? ' r' : ''));
+        midIdx++;
+        const ph = el('div','ph'); ph.append(frame(d));
+        const tx = el('div','tx');
+        tx.append(el('h4',null,d.t), el('p',null,d.p));
+        s.append(ph, el('span','dot'), tx); box.append(s);
+        liveOnHover(ph);
+      }
+    });
+    const small = items.filter(d => d.w === 'small');
+    if (small.length){
+      if (ch.sub) box.append(el('div','mini-h', ch.sub));
+      const grid = el('div', small.length > 3 ? 'mini' : 'ch-side');
+      small.forEach(d => {
+        const it = el('div','it');
+        const ph = el('div','ph'); ph.append(frame(d));
+        it.append(ph, el('div','bd','<h5>'+d.t+'</h5><p>'+d.p+'</p>'));
+        grid.append(it); liveOnHover(ph);
+      });
+      box.append(grid);
+    }
+    rt.append(box);
+  });
+  root.append(rt);
+}
+
+/* ============================================================
+   ВАРИАНТ 2. Афиша: плитки разного размера. Размер плитки =
+   важность пункта. Хедлайнер — карамельный МК во всю ширину.
+   ============================================================ */
+const BN = [
+  ['k4','hero'], ['k1','c3 bt-big'], ['k5','c3 bt-big'],
+  ['k3','c4'], ['k8','c4'], ['k6','c4'],
+  ['k9','c3'], ['k11','c3'], ['k10','c3'], ['k12','c3'],
+  ['k7','c4'], ['k13','c4'], ['k14','c4'],
+  ['k15','c6 bt-wide'], ['k2','c6 bt-wide']
+];
+function build2(root){
+  head(root, 'Вариант 02. <b>Афиша.</b> Пятнадцать плиток разного размера: чем важнее пункт, тем крупнее плитка. Фотография занимает плитку целиком.');
+  const bn = el('div','bn');
+  BN.forEach(([k, cls]) => {
+    const d = byId(k);
+    const card = el('article','bt ' + (cls === 'hero' ? 'bt-hero' : cls));
+    if (cls === 'hero'){
+      const f = frame(d);
+      card.append(f, el('span','ring'));
+      const bd = el('div','bd');
+      bd.append(el('span','top-plate','Главное в программе'), el('h4',null,d.t), el('p',null,d.p));
+      card.append(bd);
+    } else {
+      card.append(frame(d), el('div','bd','<h4>'+d.t+'</h4><p>'+d.p+'</p>'));
+    }
+    liveOnHover(card);
+    bn.append(card);
+  });
+  root.append(bn);
+}
+
+/* ============================================================
+   ВАРИАНТ 3. Кинозал: одна большая рамка слева и список всех
+   пунктов справа. Список едет сам, любой щелчок берёт управление.
+   ============================================================ */
+function build3(root){
+  head(root, 'Вариант 03. <b>Кинозал.</b> Все пятнадцать пунктов видно сразу списком, а рядом одна большая рамка: что выбрал - то и показывает.');
+  const kn = el('div','kn');
+  const stage = el('div','kn-stage');
+  const d0 = D[0];
+  const f = frame(d0, {ratio:'1/1'});
+  const cap = el('div','kn-cap');
+  const capN = el('span','kn-num','01 / 15'), capT = el('h4',null,d0.t), capP = el('p',null,d0.p);
+  cap.append(capN, capT, capP);
+  stage.append(f, cap);
+
+  const right = el('div','kn-right');
+  right.append(el('p','kn-hint', CAN_HOVER
+    ? 'Пункты сменяют друг друга сами. <b>Нажмите любой</b> - покажет его.'
+    : '<b>Нажмите любой пункт</b> - откроется описание и фотографии.'));
+  const list = el('ol','kn-list');
+  const btns = D.map((d,i) => {
+    const li = document.createElement('li');
+    const b = el('button','kn-it' + (i ? '' : ' on'));
+    b.innerHTML = '<span class="n">'+num(i+1)+'</span><span class="t">'+d.t
+                + (d.w === 'hero' ? '<span class="key">главное</span>' : '') + '</span>'
+                + '<span class="desc">' + d.p + '</span>'
+                + '<span class="bar"><i></i></span>';
+    b.addEventListener('click', () => { hand = true; show(i); });
+    li.append(b); list.append(li);
+    return b;
+  });
+  right.append(list);
+  kn.append(stage, right);
+  root.append(kn);
+
+  const STEP = 5000, SHOT = 1700;
+  let cur = -1, hand = false, tItem = null, tShot = null;
+
+  function show(i){
+    if (i === cur) return;
+    btns.forEach((b,j) => b.classList.toggle('on', j === i));
+    const d = D[i];
+    cur = i;
+    const w = f.querySelector('.win');
+    w._d = d; w._i = 1;
+    w._off.onload = () => {
+      w._off.classList.add('on'); w._cur.classList.remove('on');
+      const t = w._cur; w._cur = w._off; w._off = t;
+    };
+    w._off.src = src(d,1);
+    if (w._off.complete) w._off.onload();
+    capN.textContent = num(i+1) + ' / ' + D.length;
+    capT.textContent = d.t;
+    capP.textContent = d.p;
+    btns[i].style.setProperty('--knms', STEP + 'ms');
+    /* перезапуск полоски времени */
+    const bar = btns[i].querySelector('.bar i');
+    bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
+    clearInterval(tShot);
+    if (!CALM) tShot = setInterval(() => nextShot(w), SHOT);
+  }
+  function tick(){ if (!hand) show((cur + 1) % D.length); }
+  show(0);
+
+  /* идёт только когда экран виден и вкладка открыта */
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => {
+      clearInterval(tItem); tItem = null;
+      /* сам листает только на компьютере: на телефоне пункт раскрывается
+         текстом, и самовольная смена сбивала бы чтение */
+      if (e.isIntersecting && !CALM && !hand && CAN_HOVER) tItem = setInterval(tick, STEP);
+    });
+  }, {threshold:.25});
+  io.observe(kn);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden){ clearInterval(tItem); tItem = null; clearInterval(tShot); }
+  });
+}
+
+build1(document.getElementById('v1'));
+build2(document.getElementById('v2'));
+build3(document.getElementById('v3'));
+
+function openVar(id){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.v === id));
+  document.querySelectorAll('.vr').forEach(s => s.classList.toggle('on', s.id === id));
+}
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('.tab'); if (!b) return;
+  openVar(b.dataset.v);
+  history.replaceState(null, '', '#' + b.dataset.v);
+  window.scrollTo({top:0});
+});
+/* адрес с #v2 открывает сразу второй вариант — так удобнее делиться ссылкой */
+if (/^#v[123]$/.test(location.hash)) openVar(location.hash.slice(1));
+</script>
+</body>
+</html>
