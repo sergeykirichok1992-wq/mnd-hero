@@ -3228,9 +3228,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    ширину текст на скриншотах мельчает до 5-8 px, поэтому там полоса по краям
    экрана, высотой 150-210 px, и листается пальцем. Остановки листания —
    три пустых `i` по центрам карточек (доли ширины картинки сняты по краям
-   карточек): у одной картинки своя точка остановки была бы только одна. */
-.kr-rev{width:var(--kr-w); margin:calc(36 * var(--u)) auto 0}
-.kr-rev-in{position:relative}
+   карточек): у одной картинки своя точка остановки была бы только одна.
+   Тем же вечером Серёга: «сделай меньше в 2 раза» — вдвое меньше и ширина
+   на компьютере (половина `--kr-w`), и высота на телефоне (75-105 px вместо
+   150-210). Где полоса стала уже экрана, она стоит по центру и не листается. */
+.kr-rev{width:calc(var(--kr-w) / 2); margin:calc(36 * var(--u)) auto 0}
+.kr-rev-in{position:relative; margin-inline:auto}
 .kr-rev img{display:block; width:100%; height:auto; -webkit-user-select:none; user-select:none}
 .kr-rev-s{position:absolute; top:0; width:1px; height:1px}
 @media (max-width:1023px){
@@ -3241,7 +3244,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }
   .kr-rev::-webkit-scrollbar{display:none}
   .kr-rev-in{width:max-content}
-  .kr-rev img{width:auto; max-width:none; height:clamp(150px,26vw,210px)}
+  .kr-rev img{width:auto; max-width:none; height:clamp(75px,13vw,105px)}
   .kr-rev-s{scroll-snap-align:center}
 }
 
