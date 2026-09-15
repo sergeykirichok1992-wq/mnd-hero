@@ -9169,7 +9169,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <canvas id="beams" style="z-index:5"></canvas>
     <div id="glow"></div>
     <canvas id="smokeBack"></canvas>
-    <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Звёздная смена">
+    <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Самый волшебный ивент 2026. Впервые в Тюмени">
     <canvas id="logoFx"></canvas>
     <canvas id="smokeFront"></canvas>
     <canvas id="logoLight"></canvas>
@@ -12647,7 +12647,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   var VCANVAS = !TOUCH;
   var vBlur = 0, BLUR_VW = 0.32;   // Тюмень: размытие фона под логотипом, в vw (6 px на окне 1920)
   if(VCANVAS) document.body.classList.add('vcanvas'); else cvV.style.display='none';
-  if(!BAKED) logo.src = 'logo.webp';   // на телефоне логотип уже в ролике — файл не качаем
+  if(!BAKED) logo.src = 'ty-logo.webp';   // ТЮМЕНЬ: свой логотип (15.09.2026), в Нижнем logo.webp   // на телефоне логотип уже в ролике — файл не качаем
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
   var DPR=Math.min(2, window.devicePixelRatio||1);
   var LW=2, LH=2;
@@ -13216,9 +13216,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       curL.style.transform='translateX('+(-coff)+'%) rotate('+(-sw1)+'deg)';
       curR.style.transform='translateX('+( coff)+'%) rotate('+( sw2)+'deg)';
 
-      // логотип оживает вместе со своим появлением
-      cvFX.style.opacity=lp;
-      paintLogoFx(t, lp, 1+2.2*(1-fall));
+      // ТЮМЕНЬ: огни логотипа (радиоволны, дюзы, гирлянда, окна) нарисованы по картинке
+      // «Звёздной смены» координатами — у тюменского логотипа нет ни антенны, ни дюз, выключены.
+      cvFX.style.opacity=0;
     }
 
     // ---- дым из-под острова ----
