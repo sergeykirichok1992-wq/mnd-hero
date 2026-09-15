@@ -208,6 +208,28 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   transform:translate(-50%,-50%) scale(1.085);
   opacity:0; will-change:transform,opacity;
 }
+/* ТЮМЕНЬ (15.09.2026): паровозик и лошадка по макету Серёги. Коробка #tyToys — копия коробки
+   логотипа (та же ширина, пропорция картинки ty-logo.webp 1689x1174), скрипт каждый кадр даёт
+   ей тот же transform и opacity, что логотипу: игрушки спускаются, садятся и растут вместе с ним.
+   Места и размеры — в долях логотипа, сняты с макета поиском по совпадению. Лежат поверх логотипа.
+   Плавают: паровозик влево-вверх, лошадка вправо-вверх и обратно; ход и срок — --toy-*. */
+#tyToys{
+  z-index:7; inset:auto; pointer-events:none;
+  left:50%; top:var(--logo-top); width:var(--logo-w); aspect-ratio:1689/1174;
+  transform:translate(-50%,-50%) scale(1.085);
+  opacity:0; will-change:transform,opacity;
+  --toy-dur:2.4s; --toy-dx:16%; --toy-dy:20%;
+}
+.ty-toy{position:absolute; display:block; height:auto; will-change:transform;
+  animation:tyToyL var(--toy-dur) ease-in-out infinite alternate}
+.ty-train{left:-2.28%; top:40.07%; width:15.64%}
+.ty-horse{left:87.78%; top:43.45%; width:18.45%; animation-name:tyToyR; animation-delay:calc(var(--toy-dur) * -0.5)}
+@keyframes tyToyL{ from{transform:translate(0,0) rotate(0deg)}
+  to{transform:translate(calc(-1 * var(--toy-dx)), calc(-1 * var(--toy-dy))) rotate(-4deg)} }
+@keyframes tyToyR{ from{transform:translate(0,0) rotate(0deg)}
+  to{transform:translate(var(--toy-dx), calc(-1 * var(--toy-dy))) rotate(4deg)} }
+html.touch #tyToys{display:none}
+@media (prefers-reduced-motion:reduce){ .ty-toy{animation:none} }
 #snowFront{z-index:11; pointer-events:none; width:100%; height:100%; display:block}
 @media (max-aspect-ratio:1/1){
   :root{ --logo-w:min(98vw, 106vh); --logo-top:47%; }
@@ -9170,6 +9192,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <div id="glow"></div>
     <canvas id="smokeBack"></canvas>
     <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Самый волшебный ивент 2026. Впервые в Тюмени">
+    <div id="tyToys" aria-hidden="true"><img class="ty-toy ty-train" alt=""><img class="ty-toy ty-horse" alt=""></div>
     <canvas id="logoFx"></canvas>
     <canvas id="smokeFront"></canvas>
     <canvas id="logoLight"></canvas>
@@ -12647,6 +12670,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   var VCANVAS = !TOUCH;
   var vBlur = 0, BLUR_VW = 0.32;   // Тюмень: размытие фона под логотипом, в vw (6 px на окне 1920)
   if(VCANVAS) document.body.classList.add('vcanvas'); else cvV.style.display='none';
+  var tyToys=document.getElementById('tyToys');
+  if(!BAKED){ tyToys.children[0].src='ty-toy-train.webp'; tyToys.children[1].src='ty-toy-horse.webp'; }   // ТЮМЕНЬ: игрушки у логотипа
   if(!BAKED) logo.src = 'ty-logo.webp';   // ТЮМЕНЬ: свой логотип (15.09.2026), в Нижнем logo.webp   // на телефоне логотип уже в ролике — файл не качаем
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
   var DPR=Math.min(2, window.devicePixelRatio||1);
@@ -13195,6 +13220,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var dySgn  = dyVh<0 ? ' - ' : ' + ';
     logo.style.transform='translate(-50%, calc('+(-50+float).toFixed(3)+'%'+dySgn+Math.abs(dyVh).toFixed(3)+'vh)) scale('
       +(1.055-0.055*fall+grow+breath).toFixed(4)+')';
+    tyToys.style.opacity=lp; tyToys.style.transform=logo.style.transform;   // ТЮМЕНЬ: игрушки едут с логотипом
 
     if(!BAKED) glow.style.opacity = ez(p,0.56-LEAD,0.66-LEAD)*(1-0.74*ez(p,0.73-LEAD,0.88-LEAD));
 
