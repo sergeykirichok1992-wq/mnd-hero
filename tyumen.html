@@ -10310,8 +10310,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 <!-- ==================== ТЮМЕНЬ: ЭКРАН «ДЕТИ ВЫЗОВУТ НАСТОЯЩИЙ СНЕГ» ====================
      ТОЛЬКО В tyumen.html (16.09.2026, просьба Серёги): сразу за программой,
-     перед великанами. Видеофон во весь экран, слева текст, под текстом
-     затемнение. Ролики — `~/Desktop/сайт тюмень/экран снег/` (комп и моб
+     перед леденцами (великанов под ним в тот же день удалили). Видеофон во весь
+     экран, слева текст, под текстом затемнение. Сверху дуга с золотой нитью
+     (как была у великанов), снизу сугроб. Ролики — `~/Desktop/сайт тюмень/экран снег/` (комп и моб
      версии), пережаты в ty-sneg-1920/1280/mob.mp4, заставки ty-sneg-*.webp.
 
      Стили, разметка и скрипт лежат ОДНИМ куском намеренно: для sinhron.py
@@ -10324,19 +10325,52 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    окна (1080 px на 1920), поэтому высота — половина ширины, не больше 92 %
    окна; лишнее по высоте срезает object-fit:cover поровну сверху и снизу.
 
-   Слои: заставка и ролик (0) → затемнение (1) → текст (7, как .cr-cont).
-   z-index секции 26 — ниже великанов (27): их золотая волна заезжает сюда
-   снизу на 3vw и показывает над нитью низ этого ролика. */
+   Слои: фон с вырезом .sn-bg (0: заставка и ролик, над ними затемнение) →
+   нить (5) → текст (7, как .cr-cont) → сугроб (8).
+   z-index секции 27 — выше программы (26): дуга заезжает на неё сверху. */
 .sn{
   /* Низ экрана программы, снят пипеткой со снимка: #000B36 из его градиента
      плюс зерно поверх. Взять чистый #000B36 — на шве видна черта. */
   --sn-top:#040F39;
-  position:relative; z-index:26; overflow:hidden;
+  /* Полоса дуги на шве с программой. ТОЛЬКО в vw, как --vl-wave у великанов:
+     из этой доли считано сплющивание звёздочек на нити (scale у .vl-sp),
+     при 3vw множитель 0,3. Меняешь число — пересчитывай звёздочки. */
+  --sn-wave:3vw;
+  position:relative; z-index:27; overflow:hidden;
   display:flex; align-items:flex-start;
-  height:min(177.78vw, 100vh);
-  height:min(177.78vw, 100svh);
-  background:var(--sn-top);
+  /* Секция заезжает на программу полосой дуги и ровно на столько же выше —
+     ролик под дугой не теряет высоты. */
+  margin-top:calc(var(--sn-wave) * -1);
+  height:calc(min(177.78vw, 100vh) + var(--sn-wave));
+  height:calc(min(177.78vw, 100svh) + var(--sn-wave));
   color:#fff;
+}
+/* ДУГА НА ШВЕ С ПРОГРАММОЙ — тот же приём и та же кривая, что были у великанов
+   (16.09.2026, просьба Серёги «переход как ниже: дуга и золотая оправа»).
+   Вырез маской в слое .sn-bg, над дугой видна сама программа.
+   ЦВЕТ ПОЛЯ СТОИТ НА .sn-bg, А НЕ НА СЕКЦИИ: фон секции маска не режет, и он
+   лёг бы полосой над нитью
+   → schedule-app/lessons/vyrez-maskoy-fon-roditelya-prosvechivaet.md
+   Маска из двух слоёв: картинка дуги ростом в полосу + сплошная заливка ниже. */
+.sn-bg{
+  position:absolute; inset:0; z-index:0; overflow:hidden;
+  background:var(--sn-top);
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0 L1200,120 L0,120 Z' fill='black'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
+          mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0 L1200,120 L0,120 Z' fill='black'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
+  -webkit-mask-size:100% var(--sn-wave), 100% calc(100% - var(--sn-wave) + 1px);
+          mask-size:100% var(--sn-wave), 100% calc(100% - var(--sn-wave) + 1px);
+  -webkit-mask-position:left top, left bottom;
+          mask-position:left top, left bottom;
+  -webkit-mask-repeat:no-repeat, no-repeat;
+          mask-repeat:no-repeat, no-repeat;
+}
+/* Золотая нить по кромке выреза: тот же viewBox и preserveAspectRatio, что
+   у маски. Цвета, свечение, бегущая искра и мерцание звёздочек — общие классы
+   великанов (.vl-thread*, .vl-sp*), «меньше движения» там же. */
+.sn-wave{
+  position:absolute; left:0; right:0; top:0; z-index:5;
+  width:100%; height:var(--sn-wave); display:block;
+  pointer-events:none; overflow:visible;
 }
 .sn-vid{position:absolute; inset:0; z-index:0; overflow:hidden}
 .sn-still,.sn-video{
@@ -10365,12 +10399,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   position:absolute; inset:0; z-index:1; pointer-events:none;
   background:
     linear-gradient(180deg,
-      var(--sn-top) 0%, rgba(4,15,57,.88) 16%, rgba(4,15,57,.74) 38%,
+      rgba(4,15,57,.84) 0%, rgba(4,15,57,.82) 16%, rgba(4,15,57,.72) 38%,
       rgba(4,15,57,.42) 54%, rgba(4,15,57,0) 72%),
     linear-gradient(0deg, rgba(0,10,62,.5) 0%, rgba(0,10,62,0) 12%);
 }
 
-.sn-in{padding-top:clamp(44px,12vw,80px)}
+.sn-in{padding-top:calc(clamp(44px,12vw,80px) + var(--sn-wave))}
 @media (max-width:767px){ .sn .cr-cont{padding-inline:19px} }
 
 .sn-t{
@@ -10400,11 +10434,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* КОМПЬЮТЕР: текст слева по центру высоты, затемнение слева направо.
    Сверху короткий переход из цвета программы — шов не виден. */
 @media (min-width:1024px){
-  .sn{height:clamp(460px, 50vw, 92vh); align-items:center}
-  .sn-in{padding-top:0}
+  .sn{height:calc(clamp(460px, 50vw, 92vh) + var(--sn-wave)); align-items:center}
+  .sn-in{padding-top:var(--sn-wave)}
+  /* Сверху перехода из цвета программы больше нет: шов держит нить,
+     ролик подходит к ней вплотную, как фото у великанов. */
   .sn-shade{
     background:
-      linear-gradient(180deg, var(--sn-top) 0%, rgba(4,15,57,.55) 7%, rgba(4,15,57,0) 18%),
       linear-gradient(0deg, rgba(0,10,62,.5) 0%, rgba(0,10,62,0) 12%),
       linear-gradient(90deg,
         rgba(0,8,44,.88) 0%, rgba(0,8,44,.74) 26%, rgba(0,8,44,.4) 44%,
@@ -10415,19 +10450,31 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .sn-p{font-size:clamp(15px,1.16vw,21px)}
 }
 
-/* СТЫК С ВЕЛИКАНАМИ. Их золотая волна — вырез в слое .vl-bg, а сплошной цвет
-   поля стоит на самой секции .vl и сквозь вырез тоже виден: над нитью шла
-   тёмная полоса вместо низа ролика. Под программой (Нижний, Казань) этого
-   не видно — там сверху тот же тёмно-синий. Здесь цвет поля переносим
-   внутрь вырезанного слоя; на телефоне остальное поле красит панель .vl-in. */
-#sneg ~ .vl{background:none}
-#sneg ~ .vl .vl-bg{background:var(--vl-field)}
+/* СУГРОБ НА ШВЕ С ЛЕДЕНЦАМИ. Перешёл от удалённых великанов вместе со стыком,
+   числа те же (`.vl .cr-snow`, объяснение там и в ustroystvo.md, «Стык с экраном
+   леденцов»): прижат к нижней кромке и срезан ею — у леденцов верх и так белый.
+   Низ доводим до чистого белого, иначе на стыке черта. */
+.sn .cr-snow{
+  top:auto; bottom:-2px; z-index:8;
+  aspect-ratio:auto; height:min(9.2646vw,240px);
+  background-position:center top; background-size:100% auto;
+  transform:none;
+}
+.sn .cr-snow::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,0) 62%, #FFFFFF 97%);
+}
+@media (max-width:760px){
+  .sn .cr-snow{height:17.79vw; background-size:192% auto}
+}
 </style>
 
 <section class="cr sn" id="sneg" aria-labelledby="snT">
-  <!-- Кадр: снизу заставка (первый кадр ролика), сверху ролик. У <video>
-       нет src намеренно — файл подставляет скрипт ниже, когда экран
-       подъезжает к окну, и выбирает: телефонный или компьютерный. -->
+  <!-- Фон с вырезом дуги: ролик и затемнение. Кадр: снизу заставка (первый
+       кадр ролика), сверху ролик. У <video> нет src намеренно — файл
+       подставляет скрипт ниже, когда экран подъезжает к окну, и выбирает:
+       телефонный или компьютерный. -->
+  <div class="sn-bg">
   <div class="sn-vid" aria-hidden="true">
     <picture>
       <source media="(max-width:1023px)" srcset="ty-sneg-mob.webp" width="720" height="1280">
@@ -10441,6 +10488,36 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
            data-wide="ty-sneg-1920.mp4" data-mid="ty-sneg-1280.mp4" data-mob="ty-sneg-mob.mp4"></video>
   </div>
   <div class="sn-shade" aria-hidden="true"></div>
+  </div>
+
+  <!-- Золотая нить дуги — копия нити великанов. Градиент объявлен ЗДЕСЬ под
+       прежним именем vlThreadGrad: на него ссылается общий стиль .vl-thread--line,
+       а разметку великанов с ним в Тюмени удалили. -->
+  <svg class="sn-wave" viewBox="0 0 1200 120" preserveAspectRatio="none"
+       aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="vlThreadGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#F7C561" stop-opacity=".3"/>
+        <stop offset=".14" stop-color="#FCD34D" stop-opacity=".92"/>
+        <stop offset=".5"  stop-color="#FDE68A"/>
+        <stop offset=".85" stop-color="#F59E0B" stop-opacity=".85"/>
+        <stop offset="1"   stop-color="#F7C561" stop-opacity=".1"/>
+      </linearGradient>
+      <path id="snWaveD" d="M0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0" fill="none" vector-effect="non-scaling-stroke"/>
+    </defs>
+    <use class="vl-thread vl-thread--glow2" href="#snWaveD"/>
+    <use class="vl-thread vl-thread--glow1" href="#snWaveD"/>
+    <use class="vl-thread vl-thread--line"  href="#snWaveD"/>
+    <use class="vl-thread vl-thread--spark" href="#snWaveD"/>
+    <g>
+      <path class="vl-sp vl-sp1" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(170.0,51.7) scale(3.00,10.00)"/>
+      <path class="vl-sp vl-sp2" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(420.0,72.6) scale(2.16,7.20)"/>
+      <path class="vl-sp vl-sp3" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(600.0,76.0) scale(3.84,12.80)"/>
+      <path class="vl-sp vl-sp4" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(780.0,72.6) scale(2.16,7.20)"/>
+      <path class="vl-sp vl-sp5" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(1030.0,51.7) scale(3.00,10.00)"/>
+    </g>
+  </svg>
+
   <div class="cr-cont sn-in">
     <h2 class="sn-t" id="snT">Дети вызовут<br> <span class="sn-gold">настоящий снег!</span></h2>
     <p class="sn-lead">Куда же без волшебства?</p>
@@ -10448,6 +10525,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       вызовут снег, который под&nbsp;музыку пойдет со&nbsp;спрятанного на&nbsp;крыше генератора снега,
       что обычно очень веселит деток! Обычно они в&nbsp;восторге: прыгают, кричат, ловят снег руками...</p>
   </div>
+
+  <!-- Сугроб на шве с леденцами (перешёл от удалённых великанов). -->
+  <div class="cr-snow" aria-hidden="true"></div>
 </section>
 
 <script>
@@ -10530,151 +10610,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </script>
 <!-- /sn ТЮМЕНЬ: конец экрана «снег» -->
 
-<!-- ==================== ЭКРАН 10Б: ФЕЕРИЧНЫЙ ФЛЕШМОБ ====================
-     «Фееричный флешмоб с великанами-марионетками в рамках велком-шоу».
-     Макеты Серёги 11.09.2026. Номер с буквой — чтобы не перенумеровывать
-     двенадцать экранов в файле, который правят из двух окон; так же
-     заведён «ЭКРАН 19Б». Устройство → sayt-nn/ustroystvo.md, «Экран 10Б».
-
-     ПОРЯДОК СЛОЁВ ВНУТРИ СЕКЦИИ, переставлять нельзя:
-     фон с вырезом волны (.vl-bg, 0) → фотография (0) → вуаль (1) →
-     снегопад (3) → нить волны (.vl-wave, 5) → текст (.cr-cont, 7). -->
-<section class="cr vl" id="flashmob" aria-labelledby="vlT">
-
-  <!-- Фон целиком: он же вырезан волной сверху. Снегопад и вуаль лежат
-       внутри намеренно — иначе они сыпались бы и светили над волной,
-       на чужом экране. -->
-  <div class="vl-bg">
-    <picture class="vl-pichold">
-      <source media="(max-width:1023px)" srcset="v2-vl-mob-760.webp 760w, v2-vl-mob.webp 1080w" sizes="100vw">
-      <img class="vl-pic" src="v2-vl-1280.webp"
-           srcset="v2-vl-1280.webp 1280w, v2-vl.webp 2048w" sizes="100vw"
-           width="2048" height="1152" loading="lazy" decoding="async"
-           alt="Двое ведущих управляют огромными светящимися великанами-марионетками на снегу у избы, вокруг стоят дети">
-    </picture>
-    <div class="vl-veil" aria-hidden="true"></div>
-    <!-- Снегопад: у каждой снежинки свои пять чисел — место по ширине,
-         размер, прозрачность, сколько летит и отрицательная задержка
-         (снежинка уже в пути, иначе первые полминуты небо пустое). -->
-    <div class="vl-snow" aria-hidden="true">
-      <i style="--x:3%;--s:4px;--o:.80;--dur:25s;--t:-4s"></i>
-      <i style="--x:9%;--s:6px;--o:.62;--dur:31s;--t:-18s"></i>
-      <i style="--x:14%;--s:3px;--o:.88;--dur:22s;--t:-9s"></i>
-      <i style="--x:20%;--s:7px;--o:.55;--dur:36s;--t:-27s"></i>
-      <i style="--x:26%;--s:4px;--o:.78;--dur:27s;--t:-13s"></i>
-      <i style="--x:31%;--s:3px;--o:.85;--dur:23s;--t:-31s"></i>
-      <i style="--x:37%;--s:6px;--o:.60;--dur:33s;--t:-6s"></i>
-      <i style="--x:43%;--s:4px;--o:.82;--dur:26s;--t:-21s"></i>
-      <i style="--x:48%;--s:5px;--o:.70;--dur:29s;--t:-35s"></i>
-      <i style="--x:54%;--s:3px;--o:.88;--dur:21s;--t:-11s"></i>
-      <i style="--x:59%;--s:7px;--o:.52;--dur:38s;--t:-24s"></i>
-      <i style="--x:65%;--s:4px;--o:.80;--dur:28s;--t:-2s"></i>
-      <i style="--x:70%;--s:5px;--o:.68;--dur:30s;--t:-16s"></i>
-      <i style="--x:76%;--s:3px;--o:.86;--dur:24s;--t:-33s"></i>
-      <i style="--x:81%;--s:6px;--o:.58;--dur:34s;--t:-8s"></i>
-      <i style="--x:86%;--s:4px;--o:.79;--dur:27s;--t:-29s"></i>
-      <i style="--x:91%;--s:5px;--o:.66;--dur:32s;--t:-14s"></i>
-      <i style="--x:96%;--s:3px;--o:.88;--dur:23s;--t:-20s"></i>
-    </div>
-  </div>
-
-  <!-- Золотая нить волны. Кривая та же, что у выреза в фоне: один и тот же
-       viewBox и одинаковое `preserveAspectRatio`, поэтому при любой ширине
-       окна нить лежит ровно по кромке выреза. -->
-  <svg class="vl-wave" viewBox="0 0 1200 120" preserveAspectRatio="none"
-       aria-hidden="true" focusable="false">
-    <defs>
-      <linearGradient id="vlThreadGrad" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0"   stop-color="#F7C561" stop-opacity=".3"/>
-        <stop offset=".14" stop-color="#FCD34D" stop-opacity=".92"/>
-        <stop offset=".5"  stop-color="#FDE68A"/>
-        <stop offset=".85" stop-color="#F59E0B" stop-opacity=".85"/>
-        <stop offset="1"   stop-color="#F7C561" stop-opacity=".1"/>
-      </linearGradient>
-      <!-- Кривая объявлена ОДИН раз, дальше на неё ссылаются по имени —
-           тот же приём, что у рамки карточек программы (`<use href="#pgRing">`).
-           `vector-effect` стоит атрибутом прямо тут, а не в стилях: свойство
-           это НЕ наследуемое, и заданное на `<use>` внутрь копии не попадёт —
-           толщина нити поехала бы вместе с окном. Всё остальное (цвет,
-           толщина, штрих) наследуется и задаётся классами ниже. -->
-      <path id="vlWaveD" d="M0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0" fill="none" vector-effect="non-scaling-stroke"/>
-    </defs>
-    <use class="vl-thread vl-thread--glow2" href="#vlWaveD"/>
-    <use class="vl-thread vl-thread--glow1" href="#vlWaveD"/>
-    <use class="vl-thread vl-thread--line"  href="#vlWaveD"/>
-    <use class="vl-thread vl-thread--spark" href="#vlWaveD"/>
-    <g class="vl-stars">
-      <path class="vl-sp vl-sp1" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(170.0,51.7) scale(3.00,10.00)"/>
-      <path class="vl-sp vl-sp2" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(420.0,72.6) scale(2.16,7.20)"/>
-      <path class="vl-sp vl-sp3" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(600.0,76.0) scale(3.84,12.80)"/>
-      <path class="vl-sp vl-sp4" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(780.0,72.6) scale(2.16,7.20)"/>
-      <path class="vl-sp vl-sp5" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(1030.0,51.7) scale(3.00,10.00)"/>
-    </g>
-  </svg>
-
-  <div class="cr-cont">
-    <div class="vl-in">
-      <!-- Уголки рамки — только на телефоне, на компьютере скрыты. -->
-      <div class="vl-fr" aria-hidden="true"><i></i><i></i></div>
-
-      <div class="vl-rule vl-rule--top">
-        <span class="vl-badge">
-          <svg viewBox="0 0 100 100" aria-hidden="true" focusable="false">
-            <defs>
-              <linearGradient id="vlStarG" x1=".2" y1="0" x2=".8" y2="1">
-                <stop offset="0" stop-color="#FFF0A8"/>
-                <stop offset=".45" stop-color="#FCD34D"/>
-                <stop offset="1" stop-color="#F0A213"/>
-              </linearGradient>
-            </defs>
-            <!-- Звезда нарисована ДВАЖДЫ. Первая копия с толстой обводкой —
-                 только чтобы скруглить лучи: `stroke-linejoin:round` округляет
-                 углы, а обводка в 5 единиц даёт радиус. Вторая копия поверх
-                 закрывает обводку изнутри, иначе тёмное золото залезло бы
-                 на заливку и звезда вышла бы мутной. -->
-            <path d="M50 6 L62.6 36.6 L95.6 39.2 L70.4 60.8 L78.1 93 L50 75.6 L21.9 93 L29.6 60.8 L4.4 39.2 L37.4 36.6 Z"
-                  fill="url(#vlStarG)" stroke="#E08E0B" stroke-width="5" stroke-linejoin="round"/>
-            <path d="M50 6 L62.6 36.6 L95.6 39.2 L70.4 60.8 L78.1 93 L50 75.6 L21.9 93 L29.6 60.8 L4.4 39.2 L37.4 36.6 Z"
-                  fill="url(#vlStarG)"/>
-            <!-- блик на верхнем левом луче, как в макете -->
-            <path d="M43 22 C38 33 35 39 30 42 C36 42 41 40 45 35 Z" fill="#FFFBE3" opacity=".85"/>
-          </svg>
-          <span>TOP</span>
-        </span>
-      </div>
-
-      <div class="vl-body">
-        <h2 class="vl-t" id="vlT">Фееричный флешмоб с <span class="vl-gold">великанами-марионетками</span><br>
-          в рамках велком-шоу</h2>
-        <p class="vl-lead">Такого вы не найдете даже в Гугле на фото!</p>
-        <p class="vl-p">Каждый ребенок группы будет управлять огромным великаном-марионеткой,
-          <span class="vl-gold">заставив его станцевать звездный танец</span> - и всё это в контексте
-          нового космического сценария. Это будет очень весело и зрелищно!
-          У родителей останутся классные видео на память.</p>
-      </div>
-
-      <!-- Кнопка прозрачная по стандарту — выбор Серёги 11.09.2026.
-           Экран тёмный, поэтому в список светлых экранов
-           (`.cr-s2 .zs-btn--ghost, ...`) его дописывать НЕ надо: там
-           прозрачная кнопка переключается на тёмное золото, а на этом поле
-           она должна остаться светлой. → sayt-nn/standart-knopok.md -->
-      <div class="vl-rule vl-rule--bot">
-        <button class="zs-btn zs-btn--ghost" type="button"
-                data-zs="экран флешмоба - «Хочу к вам!»"><span class="zs-t">Хочу к вам!</span></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- СУГРОБ НА ШВЕ С ЭКРАНОМ ЛЕДЕНЦОВ.
-       Раньше его рисовала светлая заявка, которая шла следом: у неё сугроб
-       стоял по ВЕРХНЕЙ кромке и вылезал вверх, сюда. 12.09.2026 заявка уехала
-       в самый низ страницы, а стык остался - и сугроб теперь свой, прижатый
-       к НИЖНЕЙ кромке этого экрана. Видно ровно то же, что и раньше: гребни
-       на тёмном поле и белое основание под ними. Ниже кромки картинка не нужна
-       вовсе - там начинается экран леденцов, а у него верх и так чисто белый.
-       Числа → sayt-nn/ustroystvo.md, раздел «Стык с экраном леденцов». -->
-  <div class="cr-snow" aria-hidden="true"></div>
-</section>
+<!-- ЭКРАН 10Б «ФЕЕРИЧНЫЙ ФЛЕШМОБ С ВЕЛИКАНАМИ-МАРИОНЕТКАМИ»
+     В ТЮМЕНИ УДАЛЁН (16.09.2026, просьба Серёги): под экраном «снег» сразу
+     леденцы, их шов держит сугроб экрана «снег». Стили `.vl-*` в файле остались
+     ради синхронизации с Нижним; нить экрана «снег» берёт из них классы
+     `.vl-thread*` и `.vl-sp*`. Если `sinhron.py` остановится здесь — экран
+     не возвращать. -->
 
 <!-- ==================== ЭКРАН 13: КРАСИВЫЕ ЛЕДЕНЦЫ (слайдер МК) ====================
      Заголовок, подпись и слайдер с кадрами карамельного мастер-класса.
