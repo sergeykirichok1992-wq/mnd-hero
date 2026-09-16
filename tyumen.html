@@ -11275,6 +11275,506 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   </div>
 </section>
 
+<!-- ==================== ТЮМЕНЬ: ЭКРАН «ПУЛЬТ ДЕДА МОРОЗА» ====================
+     ТОЛЬКО В tyumen.html (16.09.2026, просьба Серёги по референсу): между
+     леденцами (#candy) и короткими видео (#video). Заголовок, абзац, слева
+     пульт с неоновыми экранами, справа мозаика «ваши дети на экране пульта»
+     с отзывом, ниже три карточки «А также Дед Мороз покажет». Картинки —
+     папка «сайт тюмень/экран пульт/для пульта», собирает
+     sayt-nn/instrumenty/pult_tyumen.py в pult/ (на фото 6 экран с именами
+     детей нарочно размыт).
+
+     Стили, разметка и скрипт лежат ОДНИМ куском намеренно: для sinhron.py
+     это одна городская вставка между леденцами и роликами, по одной пустой
+     строке сверху и снизу (не удалять и не добавлять: лишняя пустая строка
+     останавливает скрипт на безобидных правках соседей). Если он остановится
+     здесь — пульт оставлять (в Нижнем его нет); если на стороне Нижнего
+     новый экран — оставить и его, до или после пульта, и проверить оба шва.
+     Закрывающие теги помечены (метки /pu и /pu-hold) — страховка.
+     Устройство → sayt-nn/tyumen.md, раздел «Экран „Пульт Деда Мороза“». -->
+<style>
+/* Слои секции: фон-картинка Серёги (0) → отблески (0) → зерно (0) → звёзды (1)
+   → содержимое (2). Обёртка .pu-hold на слое 26: выше леденцов (25), чтобы
+   свой блик лёг на верхний шов, и НЕ выше обёртки роликов (.vd-hold, 26,
+   стоит ниже в разметке) — тогда её блик сам ложится на наш низ.
+   Размеры — clamp() от окна: класса .cr у секции нет, --u здесь не определена. */
+.pu-hold{position:relative; z-index:26}
+.pu-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+.pu{
+  /* неон экранов пульта: красный (подарок), зелёный (ёлка), голубой (письмо) */
+  --pu-red:255,96,120; --pu-green:74,240,164; --pu-cyan:86,212,255;
+  --pu-gap:clamp(10px,.95vw,16px);   /* зазор мозаики */
+  --pu-r:clamp(12px,1.05vw,18px);    /* скругление фото */
+  position:relative; z-index:1; isolation:isolate; overflow:hidden;
+  color:#fff;
+  /* блик на каждом шве занимает ±3,1vw — поля больше этого с запасом */
+  padding:clamp(64px,6.4vw,116px) 0 clamp(72px,6.2vw,124px);
+  background:#0D0830;
+}
+.pu-bg{
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:url(pult/ty-fon.webp?v=1) 50% 38%/cover no-repeat;
+}
+/* Низ растворяется в фон роликов: #0A1046 и поверх то же синее зарево,
+   что у них вдоль верхней кромки (эллипс 64vw x 18vw) — отражённое вверх.
+   Без зарева у краёв окна была ступенька в 11-18 уровней синего: эллипс
+   роликов широкий и подсвечивает края (замер 17.09.2026). Высота не меньше
+   18vw, иначе эллипс обрезался бы верхом слоя. */
+.pu-bg::after{
+  content:''; position:absolute; left:0; right:0; bottom:0;
+  height:max(clamp(160px,15vw,300px), 18vw);
+  background:
+    radial-gradient(64vw 18vw at 50% 100%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(0deg,#0A1046 0%,rgba(10,16,70,.72) 30%,rgba(10,16,70,.24) 66%,rgba(10,16,70,0) 100%);
+}
+/* Отблески без filter:blur (как у всех тёмных экранов). Нижнее розовое
+   зарево гаснет маской всего слоя до кромки: кадры bkDrift двигают
+   и растят пятна, край иначе уезжал бы за шов. */
+.pu-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,#000 0,#000 80%,transparent 100%);
+          mask-image:linear-gradient(180deg,#000 0,#000 80%,transparent 100%)}
+.pu-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.pu-glow i:nth-child(1){left:-18vw; top:-4%; width:60vw; height:56%;
+  background:radial-gradient(closest-side, rgba(62,70,230,.26) 0%, rgba(62,70,230,.14) 40%, rgba(62,70,230,.04) 70%, rgba(62,70,230,0) 100%);
+  animation:bkDrift1 38s ease-in-out infinite alternate}
+.pu-glow i:nth-child(2){right:-24vw; top:22%; width:62vw; height:60%;
+  background:radial-gradient(closest-side, rgba(150,60,220,.26) 0%, rgba(150,60,220,.15) 38%, rgba(150,60,220,.05) 70%, rgba(150,60,220,0) 100%);
+  animation:bkDrift2 44s ease-in-out infinite alternate}
+.pu-glow i:nth-child(3){left:50%; bottom:10%; width:76vw; height:40%; margin-left:-38vw;
+  background:radial-gradient(closest-side, rgba(236,96,170,.20) 0%, rgba(236,96,170,.11) 40%, rgba(236,96,170,.03) 70%, rgba(236,96,170,0) 100%);
+  animation:bkDrift3 34s ease-in-out infinite alternate}
+.pu-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Звёзды: точки расставляет скрипт (без него их просто нет). Мерцание —
+   только прозрачность и масштаб; вне окна стоят (.pu-off). */
+.pu-stars{position:absolute; inset:0; z-index:1; pointer-events:none}
+.pu-stars i{position:absolute; display:block; border-radius:50%; background:#fff;
+  box-shadow:0 0 6px 1px rgba(204,224,255,.75); opacity:.2;
+  animation:puTw var(--t,3s) ease-in-out var(--d,0s) infinite}
+@keyframes puTw{0%,100%{opacity:.14; transform:scale(.6)} 50%{opacity:.95; transform:scale(1)}}
+
+.pu-wrap{
+  position:relative; z-index:2; box-sizing:border-box;
+  width:min(94vw,1462px); margin:0 auto; padding:0 clamp(16px,3vw,47.6px);
+}
+
+/* ---------- заголовок и абзац ----------
+   Набор как у соседних тёмных экранов; вторая строка золотом, заливка
+   как у «Тайного Министерства» (с запасом сверху под краткую и точки). */
+.pu-t{
+  margin:0 auto; text-align:center; color:#fff;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(22px,6.3vw,30px); line-height:1.1; letter-spacing:-.02em;
+  text-transform:uppercase; text-wrap:balance;
+  text-shadow:0 2px 22px rgba(0,0,0,.5);
+}
+.pu-t b{font-weight:700; color:#E9C36C}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .pu-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+    text-shadow:none; padding-top:.22em; margin-top:-.22em;
+    -webkit-box-decoration-break:clone; box-decoration-break:clone}
+}
+.pu-br{display:none}
+.pu-lead{
+  margin:clamp(14px,1.3vw,22px) auto 0; max-width:80ch; text-align:center;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:max(15px, clamp(15px,1.3vw,22px)); line-height:1.45;
+  color:#E4EAFB; text-wrap:balance;
+}
+/* жирное — из «Blogger Sans»: у «CR Blogger» жирного нет */
+.pu-lead b{font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700; color:#FFD189}
+
+/* ---------- сцена: пульт + мозаика ---------- */
+.pu-stage{
+  position:relative; display:grid; align-items:center;
+  gap:clamp(26px,3.6vw,56px); margin-top:clamp(30px,3.6vw,62px);
+}
+.pu-art{position:relative; justify-self:center; width:min(78vw,380px)}
+/* ореол за пультом: лиловый со следом бирюзы его светодиодов */
+.pu-art::before{
+  content:''; position:absolute; z-index:0; left:-14%; right:-14%; top:-8%; bottom:4%;
+  border-radius:50%; pointer-events:none;
+  background:
+    radial-gradient(closest-side at 50% 30%, rgba(64,224,208,.16) 0%, rgba(64,224,208,.05) 55%, rgba(64,224,208,0) 100%),
+    radial-gradient(closest-side, rgba(126,86,255,.40) 0%, rgba(96,64,230,.20) 46%, rgba(70,44,200,0) 100%);
+  animation:puHalo 7s ease-in-out infinite alternate;
+}
+/* розовое пятно света на полу под пультом, как на фоне Серёги */
+.pu-art::after{
+  content:''; position:absolute; z-index:0; left:-6%; right:-6%; bottom:-9%; height:26%;
+  border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(255,120,190,.42) 0%, rgba(236,96,170,.16) 52%, rgba(236,96,170,0) 100%);
+}
+@keyframes puHalo{from{opacity:.7; transform:scale(.97)} to{opacity:1; transform:scale(1.03)}}
+/* пока пульт грузится, пятна света висели бы в пустоте; класс ставит скрипт.
+   visibility, а не opacity: прозрачностью ореола управляет его анимация */
+.pu-art.pu-wait::before,.pu-art.pu-wait::after,.pu-art.pu-wait .pu-neon{visibility:hidden}
+.pu-img{position:relative; z-index:1; display:block; width:100%; height:auto;
+  filter:drop-shadow(0 24px 30px rgba(0,0,0,.55))}
+/* Свет неоновых экранов пульта: пятно поверх каждого экрана в режиме
+   «осветление», дышит и изредка моргает, как настоящий неон. Места —
+   доли картинки ty-pult.webp (замер по тёмным окнам экранов). */
+.pu-neon{position:absolute; inset:0; z-index:2; pointer-events:none; mix-blend-mode:screen}
+.pu-neon i{position:absolute; display:block; border-radius:30%;
+  background:radial-gradient(closest-side, rgba(var(--c),.34) 0%, rgba(var(--c),.12) 55%, rgba(var(--c),0) 100%);
+  animation:puNeon var(--t) ease-in-out var(--d) infinite}
+.pu-neon i:nth-child(1){--c:255,120,96; left:8%;  top:3%;  width:31%; height:42%; --t:6.4s; --d:-1.2s}
+.pu-neon i:nth-child(2){--c:var(--pu-green); left:33%; top:5%; width:32%; height:40%; --t:7.3s; --d:-3.6s}
+.pu-neon i:nth-child(3){--c:var(--pu-cyan); left:57%; top:7%; width:30%; height:38%; --t:5.8s; --d:-.4s}
+@keyframes puNeon{
+  0%,100%{opacity:.7} 45%{opacity:1} 86%{opacity:.95}
+  87%{opacity:.35} 88%{opacity:1} 90%{opacity:.5} 91%{opacity:.95}
+}
+
+/* звёздочки-искры вокруг сцены (только компьютер) */
+.pu-spark{position:absolute; z-index:3; display:none; left:var(--x); top:var(--y);
+  width:var(--sz); height:var(--sz); pointer-events:none;
+  fill:#FFF3CF; filter:drop-shadow(0 0 4px rgba(243,214,140,.8));
+  animation:puTwinkle 3.2s ease-in-out var(--d) infinite}
+@keyframes puTwinkle{0%,100%{opacity:.25; transform:scale(.7)} 50%{opacity:1; transform:scale(1)}}
+
+/* Мозаика: 3 колонки. Фото 6 на две колонки и два ряда — пропорция
+   выходит ~1,53, почти как у кадра. Ряды задают фото 5 и 7 своей
+   пропорцией; в третьем ряду фото 4 тянется под высоту отзыва. */
+.pu-main{position:relative; min-width:0}
+.pu-bento{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--pu-gap)}
+.pu-ph{
+  position:relative; margin:0; overflow:hidden; border-radius:var(--pu-r);
+  background:#1A1250;
+  box-shadow:0 18px 38px -20px rgba(2,5,22,.9);
+}
+.pu-ph img{position:absolute; inset:0; display:block; width:100%; height:100%;
+  object-fit:cover; border-radius:inherit;
+  transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+/* волосяная кромка поверх фото (тенью, не рамкой) */
+.pu-ph::after{content:''; position:absolute; inset:0; z-index:1; border-radius:inherit; pointer-events:none;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.11), inset 0 1px 0 rgba(255,255,255,.08)}
+.pu-ph5,.pu-ph7,.pu-ph4{aspect-ratio:1200/775}
+.pu-ph6{grid-column:1/3; grid-row:1/3}
+.pu-ph5{grid-column:3; grid-row:1}
+.pu-ph7{grid-column:3; grid-row:2}
+/* фото 4 тянется под высоту отзыва, если тот выше ряда. Ширина задана
+   явно: иначе пропорция пересчитала бы её от вытянутой высоты, и фото
+   залезло бы под отзыв (было на 1024 px). */
+.pu-ph4{grid-column:1; grid-row:3; align-self:stretch; width:100%}
+.pu-rev{grid-column:2/4; grid-row:3}
+.pu-ph6 img{object-position:50% 45%}
+.pu-ph7 img{object-position:50% 30%}
+
+/* метка на фото */
+.pu-chip{
+  position:absolute; z-index:2; left:clamp(8px,.75vw,14px); bottom:clamp(8px,.75vw,14px);
+  display:inline-flex; align-items:center; gap:7px;
+  padding:6px 11px 6px 9px; border-radius:999px;
+  background:rgba(6,8,34,.7); box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
+  font:600 clamp(10px,.7vw,12px)/1 "Golos Text",Arial,sans-serif;
+  letter-spacing:.08em; text-transform:uppercase; color:#fff; white-space:nowrap;
+}
+.pu-chip i{flex:none; width:7px; height:7px; border-radius:50%;
+  background:#FF4D5E; box-shadow:0 0 8px 1px rgba(255,77,94,.8);
+  animation:puRec 1.6s ease-in-out infinite}
+.pu-chip--gold i{background:#FFD189; box-shadow:0 0 8px 1px rgba(255,209,137,.7); animation:none}
+@keyframes puRec{0%,100%{opacity:1} 50%{opacity:.25}}
+/* на ноутбуках плитка фото 4 мелкая, метка закрывала бы лица */
+@media (min-width:1024px) and (max-width:1439px){ .pu-ph4 .pu-chip{display:none} }
+
+/* Отзыв — белая карточка, как комментарий во ВКонтакте, текст живой.
+   Под ней розово-лиловое свечение: она светлое пятно на тёмной сцене. */
+.pu-rev{
+  position:relative; margin:0; box-sizing:border-box;
+  display:flex; flex-direction:column; justify-content:center; gap:clamp(8px,.65vw,12px);
+  padding:clamp(14px,1.25vw,24px) clamp(16px,1.5vw,28px);
+  border-radius:var(--pu-r); background:#fff; color:#1B1D29;
+  box-shadow:0 22px 50px -24px rgba(0,0,0,.85), 0 0 64px -14px rgba(236,110,190,.5);
+}
+.pu-rev-who{display:flex; align-items:center; gap:clamp(10px,.8vw,14px); margin:0; padding-right:clamp(30px,2.4vw,44px)}
+.pu-rev-ava{flex:none; display:block; width:clamp(38px,2.8vw,48px); height:clamp(38px,2.8vw,48px);
+  border-radius:50%; object-fit:cover}
+.pu-rev-id{display:flex; flex-direction:column; gap:3px; min-width:0}
+.pu-rev-name{font:600 clamp(14px,1vw,17px)/1.2 "Golos Text",Arial,sans-serif; color:#1B1D29}
+.pu-rev-src{font:400 clamp(11.5px,.78vw,13px)/1.2 "Golos Text",Arial,sans-serif; color:#6A7582}
+.pu-rev-q{margin:0}
+.pu-rev-q p{margin:0; font:400 clamp(14px,1.02vw,17px)/1.45 "Golos Text",Arial,sans-serif;
+  color:#1B1D29; text-wrap:pretty}
+/* кавычка в правом верхнем углу — золото сайта */
+.pu-rev-mark{position:absolute; top:clamp(12px,1vw,18px); right:clamp(14px,1.2vw,22px);
+  width:clamp(22px,1.7vw,30px); height:auto; fill:#E3B34E; opacity:.9}
+
+/* ---------- «А также Дед Мороз покажет» ---------- */
+.pu-also{margin-top:clamp(44px,5.2vw,92px)}
+.pu-also-t{
+  display:flex; align-items:center; justify-content:center; gap:clamp(12px,1.4vw,24px);
+  margin:0 0 clamp(20px,2.2vw,38px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(20px,1.8vw,31px); line-height:1.15; letter-spacing:.005em; color:#fff;
+}
+.pu-also-t::before,.pu-also-t::after{content:''; flex:1 1 0; max-width:clamp(34px,14vw,280px); height:1px;
+  background:linear-gradient(90deg, rgba(158,180,255,0), rgba(158,180,255,.5))}
+.pu-also-t::after{transform:scaleX(-1)}
+.pu-cards{list-style:none; margin:0; padding:0; display:grid; gap:clamp(14px,1.6vw,28px)}
+/* Карточка — лиловая подложка и волосяная кромка, как факты «Тайного
+   Министерства». Свой неон у каждой — цвет её значка (--c). */
+.pu-card{
+  --pu-ic:clamp(46px,3.5vw,62px);
+  --pu-pad:clamp(8px,.6vw,11px);
+  position:relative; display:flex; flex-direction:column;
+  /* внешнее скругление = скругление фото + отступ, иначе рамка в углах толще */
+  padding:var(--pu-pad); border-radius:calc(var(--pu-r) + var(--pu-pad));
+  background:linear-gradient(160deg, rgba(86,60,196,.32) 0%, rgba(38,26,112,.28) 52%, rgba(20,14,70,.42) 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,214,150,.16), inset 0 1px 0 rgba(255,255,255,.07), 0 26px 50px -30px rgba(0,0,0,.85);
+  transition:translate .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s ease;
+}
+.pu-card--gift{--c:var(--pu-red)}
+.pu-card--tree{--c:var(--pu-green)}
+.pu-card--cam{--c:var(--pu-cyan)}
+.pu-card .pu-ph{aspect-ratio:1200/775}
+.pu-ic{
+  position:relative; z-index:3; align-self:center; display:grid; place-items:center;
+  width:var(--pu-ic); height:var(--pu-ic); margin-top:calc(var(--pu-ic) / -2);
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 28%, #231B60 0%, #130E42 60%, #0A0828 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(var(--c),.72), 0 0 0 4px rgba(12,10,48,.55), 0 0 26px rgba(var(--c),.42);
+}
+.pu-ic svg{width:58%; height:58%; overflow:visible; fill:none; stroke:rgb(var(--c)); stroke-width:1.7;
+  stroke-linecap:round; stroke-linejoin:round;
+  filter:drop-shadow(0 0 2px rgba(var(--c),.95)) drop-shadow(0 0 6px rgba(var(--c),.55));
+  animation:puFlick 9s linear var(--d,0s) infinite}
+.pu-ic .pu-rec{fill:#FF5A6E; stroke:#FF5A6E}
+@keyframes puFlick{0%,89%,100%{opacity:1} 90%{opacity:.4} 91%{opacity:1} 93%{opacity:.55} 94%{opacity:1}}
+.pu-card--tree .pu-ic svg{--d:-3s}
+.pu-card--cam .pu-ic svg{--d:-6s}
+.pu-cap{
+  margin:clamp(10px,.8vw,14px) 0 clamp(8px,.7vw,12px); padding:0 clamp(8px,1vw,18px);
+  text-align:center; text-wrap:balance;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:clamp(16px,1.3vw,23px); line-height:1.3; color:#fff;
+}
+@media (hover:hover) and (pointer:fine){
+  .pu-ph:hover img{transform:scale(1.045)}
+  .pu-card:hover{translate:0 -6px;
+    box-shadow:inset 0 0 0 1px rgba(var(--c),.45), inset 0 1px 0 rgba(255,255,255,.1),
+      0 30px 60px -30px rgba(0,0,0,.9), 0 0 46px -12px rgba(var(--c),.5)}
+}
+
+/* ---------- телефон (до 767 px) ---------- */
+@media (max-width:767px){
+  .pu{padding:48px 0 64px}
+  /* поля как у роликов под швом: край блоков 20 px, текст 30 */
+  .pu-wrap{width:100%; padding:0 20px}
+  .pu-t,.pu-lead{padding-inline:10px}
+  .pu-bg{background-image:url(pult/ty-fon-800.webp?v=1); background-position:42% 0}
+  .pu-bento{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .pu-ph6,.pu-ph5,.pu-ph7,.pu-ph4,.pu-rev{grid-row:auto}
+  .pu-ph6{grid-column:1/3; aspect-ratio:1200/775}
+  .pu-ph5{grid-column:1}
+  .pu-ph7{grid-column:2}
+  .pu-ph4{grid-column:1/3; align-self:auto}
+  .pu-rev{grid-column:1/3}
+  /* карточки «А также» — строкой: фото слева, подпись справа,
+     значок на стыке фото и подписи */
+  .pu-card{--pu-ic:38px; --pu-pad:8px; display:grid; grid-template-columns:38% minmax(0,1fr);
+    align-items:center; column-gap:calc(var(--pu-ic) / 2 + 12px)}
+  .pu-card .pu-ph{grid-column:1; grid-row:1}
+  .pu-ic{grid-column:1; grid-row:1; justify-self:end; align-self:center;
+    margin:0 calc(var(--pu-ic) / -2) 0 0}
+  /* balance в узкой колонке дробил подпись на 5 коротких строк */
+  .pu-cap{grid-column:2; grid-row:1; margin:0; padding:0 4px 0 0; text-align:left;
+    font-size:15.5px; line-height:1.28; text-wrap:pretty}
+}
+/* значок торчит за край фото на половину себя и 4 px кольца — зазор до
+   текста считается от него */
+@media (max-width:389px){
+  .pu-card{grid-template-columns:34% minmax(0,1fr); column-gap:calc(var(--pu-ic) / 2 + 10px)}
+}
+@media (max-width:374px){
+  .pu-cap{font-size:14.5px}
+}
+
+/* ---------- планшет и шире ---------- */
+/* на узком телефоне линии по бокам сжимаются в штрихи */
+@media (max-width:479px){
+  .pu-also-t::before,.pu-also-t::after{display:none}
+}
+@media (min-width:768px){
+  .pu-br{display:inline}
+  /* одна формула без ступеней: 768 — 28 px, 1180 — 40, от ~1724 — 56 */
+  .pu-t{font-size:clamp(28px, calc(2.9vw + 6px), 56px)}
+  .pu-art{width:min(46vw,420px)}
+  .pu-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+/* компьютер: пульт слева, мозаика справа */
+@media (min-width:1024px){
+  .pu-stage{grid-template-columns:37fr 63fr}
+  .pu-art{width:100%}
+  .pu-spark{display:block}
+}
+
+/* ---------- появление ----------
+   Прячет только класс .rv на секции, его вешает скрипт — без JS всё видно.
+   Мозаика и карточки всплывают лесенкой. */
+.pu.rv .pu-t,
+.pu.rv .pu-lead,
+.pu.rv .pu-art,
+.pu.rv .pu-bento > *,
+.pu.rv .pu-also-t,
+.pu.rv .pu-card{opacity:0; transform:translate3d(var(--pu-dx,0px),24px,0)}
+.pu.rv .on{opacity:1; transform:none;
+  transition:opacity .8s ease var(--pu-w,0s), transform .9s cubic-bezier(.2,.7,.2,1) var(--pu-w,0s)}
+.pu.rv .pu-card.on{transition:opacity .8s ease var(--pu-w,0s), transform .9s cubic-bezier(.2,.7,.2,1) var(--pu-w,0s),
+  translate .45s cubic-bezier(.2,.7,.2,1), box-shadow .45s ease}
+.pu.rv .pu-lead{--pu-w:.1s}
+@media (min-width:1024px){
+  .pu.rv .pu-art{--pu-dx:-26px}
+  .pu.rv .pu-ph5{--pu-w:.1s} .pu.rv .pu-ph7{--pu-w:.2s}
+  .pu.rv .pu-ph4{--pu-w:.15s} .pu.rv .pu-rev{--pu-w:.28s}
+}
+@media (min-width:768px){
+  .pu.rv .pu-card--tree{--pu-w:.12s} .pu.rv .pu-card--cam{--pu-w:.24s}
+}
+
+/* вне окна всё движение стоит */
+.pu-off .pu-stars i,.pu-off .pu-neon i,.pu-off .pu-glow i,.pu-off .pu-spark,
+.pu-off .pu-chip i,.pu-off .pu-ic svg,.pu-off .pu-art::before{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){
+  .pu.rv .pu-t,.pu.rv .pu-lead,.pu.rv .pu-art,.pu.rv .pu-bento > *,.pu.rv .pu-also-t,.pu.rv .pu-card{opacity:1; transform:none; transition:none}
+  /* .pu перед .pu-glow — иначе правила :nth-child с анимацией весят больше */
+  .pu .pu-glow i,.pu-stars i,.pu-neon i,.pu-spark,.pu-chip i,.pu-ic svg,.pu-art::before{animation:none}
+  .pu-stars i{opacity:.55}
+  .pu-ph img,.pu-card{transition:none}
+  .pu-card:hover{translate:none}
+  .pu-ph:hover img{transform:none}
+}
+</style>
+<div class="pu-hold">
+<div class="pu-blik" aria-hidden="true"></div>
+<section class="pu" id="pult" aria-labelledby="puT">
+  <div class="pu-bg" aria-hidden="true"></div>
+  <div class="pu-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="pu-grain" aria-hidden="true"></div>
+  <div class="pu-stars" aria-hidden="true"></div>
+  <div class="pu-wrap">
+    <h2 class="pu-t" id="puT">Ваших деток Дед Мороз покажет на&nbsp;своём<br class="pu-br"> <b>пульте управления новогодними делами!</b></h2>
+    <p class="pu-lead">Через специальный чат-бот вы&nbsp;отправите фото детей или целого класса прямо на&nbsp;пульт Деда Мороза! Дедушка докажет детям, что знает о&nbsp;них всё! Это очень удивительный момент, который мы теперь <b>никогда не&nbsp;уберём из&nbsp;программы!</b></p>
+
+    <div class="pu-stage">
+      <svg class="pu-spark" style="--x:1%;--y:2%;--sz:24px;--d:0s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
+      <svg class="pu-spark" style="--x:34%;--y:-3%;--sz:15px;--d:-1.1s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
+      <svg class="pu-spark" style="--x:36.4%;--y:62%;--sz:19px;--d:-2.2s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
+      <svg class="pu-spark" style="--x:98.6%;--y:-4%;--sz:22px;--d:-.6s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
+      <svg class="pu-spark" style="--x:-1.5%;--y:78%;--sz:14px;--d:-1.7s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
+
+      <div class="pu-art">
+        <img class="pu-img" src="pult/ty-pult.webp?v=1" srcset="pult/ty-pult-640.webp?v=1 640w, pult/ty-pult.webp?v=1 1200w" sizes="(max-width:767px) 78vw, (max-width:1023px) 46vw, (max-width:1599px) 32vw, 490px" width="1200" height="1323" alt="Пульт управления новогодними делами: деревянный пульт Деда Мороза с тремя неоновыми экранами, кнопками и рычагами" loading="lazy" decoding="async" draggable="false">
+        <div class="pu-neon" aria-hidden="true"><i></i><i></i><i></i></div>
+      </div>
+
+      <div class="pu-main">
+        <div class="pu-bento">
+          <figure class="pu-ph pu-ph6">
+            <img src="pult/ty-p6.webp?v=1" srcset="pult/ty-p6-600.webp?v=1 600w, pult/ty-p6.webp?v=1 1200w" sizes="(max-width:767px) 92vw, (max-width:1023px) 60vw, (max-width:1599px) 36vw, 550px" width="1200" height="775" alt="Экран пульта Деда Мороза: фотографии всей группы детей" loading="lazy" decoding="async" draggable="false">
+            <figcaption class="pu-chip"><i></i>На экране пульта</figcaption>
+          </figure>
+          <figure class="pu-ph pu-ph5">
+            <img src="pult/ty-p5.webp?v=1" srcset="pult/ty-p5-600.webp?v=1 600w, pult/ty-p5.webp?v=1 1200w" sizes="(max-width:767px) 46vw, (max-width:1023px) 30vw, (max-width:1599px) 18vw, 270px" width="1200" height="775" alt="Фото двух мальчиков на экране пульта рядом с Дедом Морозом" loading="lazy" decoding="async" draggable="false">
+          </figure>
+          <figure class="pu-ph pu-ph7">
+            <img src="pult/ty-p7.webp?v=1" srcset="pult/ty-p7-600.webp?v=1 600w, pult/ty-p7.webp?v=1 1200w" sizes="(max-width:767px) 46vw, (max-width:1023px) 30vw, (max-width:1599px) 18vw, 270px" width="1200" height="775" alt="Девочка радостно подняла руки" loading="lazy" decoding="async" draggable="false">
+          </figure>
+          <figure class="pu-ph pu-ph4">
+            <img src="pult/ty-p4.webp?v=1" srcset="pult/ty-p4-600.webp?v=1 600w, pult/ty-p4.webp?v=1 1200w" sizes="(max-width:767px) 92vw, (max-width:1023px) 30vw, (max-width:1599px) 18vw, 270px" width="1200" height="775" alt="Удивлённые дети смотрят на экран пульта" loading="lazy" decoding="async" draggable="false">
+            <figcaption class="pu-chip pu-chip--gold"><i></i>Реакция детей</figcaption>
+          </figure>
+          <figure class="pu-rev">
+            <figcaption class="pu-rev-who">
+              <img class="pu-rev-ava" src="pult/ty-ava.webp?v=1" width="96" height="96" alt="" loading="lazy" decoding="async">
+              <span class="pu-rev-id"><span class="pu-rev-name">Наталья Лёвина</span><span class="pu-rev-src">отзыв во ВКонтакте</span></span>
+              <svg class="pu-rev-mark" viewBox="0 0 32 24" aria-hidden="true"><path d="M0 24V14.4C0 6.6 4.3 1.6 12 0l1.5 3.3C9.2 4.7 7.2 7.3 7 11h6v13H0zm18 0V14.4C18 6.6 22.3 1.6 30 0l1.5 3.3C27.2 4.7 25.2 7.3 25 11h6v13H18z"/></svg>
+            </figcaption>
+            <blockquote class="pu-rev-q"><p>А как они были удивлены и&nbsp;заинтригованы, когда увидели себя на&nbsp;экране дедушки Мороза&nbsp;☺️</p></blockquote>
+          </figure>
+        </div>
+      </div>
+    </div>
+
+    <div class="pu-also">
+      <h3 class="pu-also-t">А также Дед&nbsp;Мороз&nbsp;покажет:</h3>
+      <ul class="pu-cards">
+        <li class="pu-card pu-card--gift">
+          <div class="pu-ph"><img src="pult/ty-p1.webp?v=1" srcset="pult/ty-p1-600.webp?v=1 600w, pult/ty-p1.webp?v=1 1200w" sizes="(max-width:767px) 40vw, (max-width:1599px) 30vw, 440px" width="1200" height="775" alt="Министр волшебных дел у пульта держит подарок" loading="lazy" decoding="async" draggable="false"></div>
+          <span class="pu-ic" aria-hidden="true"><svg viewBox="0 0 32 32"><rect x="6" y="14" width="20" height="13.5" rx="1.6"/><rect x="4.5" y="9.5" width="23" height="4.5" rx="1.2"/><path d="M16 9.5v18"/><path d="M16 9.5c-1.3-3.9-6.6-5.1-6.6-2.1 0 1.7 3 2.1 6.6 2.1z"/><path d="M16 9.5c1.3-3.9 6.6-5.1 6.6-2.1 0 1.7-3 2.1-6.6 2.1z"/><path d="M27 2.5v3.4M25.3 4.2h3.4"/></svg></span>
+          <p class="pu-cap">Трюк с&nbsp;телепортацией подарков из&nbsp;пульта прямо в&nbsp;детские комнаты</p>
+        </li>
+        <li class="pu-card pu-card--tree">
+          <div class="pu-ph"><img src="pult/ty-p2.webp?v=1" srcset="pult/ty-p2-600.webp?v=1 600w, pult/ty-p2.webp?v=1 1200w" sizes="(max-width:767px) 40vw, (max-width:1599px) 30vw, 440px" width="1200" height="775" alt="Мальчик вместе с Дедом Морозом нажимает кнопку на пульте" loading="lazy" decoding="async" draggable="false"></div>
+          <span class="pu-ic" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 1.8l1.05 2.2 2.4.32-1.75 1.66.44 2.38L16 7.2l-2.14 1.16.44-2.38-1.75-1.66 2.4-.32z"/><path d="M16 10.4l-6.3 6.9h3.5L6.4 25h19.2l-6.8-7.7h3.5z"/><path d="M16 25v4.4"/><path d="M13.4 21.4h.01M18.9 22.3h.01M15.9 16.9h.01" stroke-width="2.6"/></svg></span>
+          <p class="pu-cap">Как зажигает городские ёлки нажатием одной кнопки</p>
+        </li>
+        <li class="pu-card pu-card--cam">
+          <div class="pu-ph"><img src="pult/ty-p3.webp?v=1" srcset="pult/ty-p3-600.webp?v=1 600w, pult/ty-p3.webp?v=1 1200w" sizes="(max-width:767px) 40vw, (max-width:1599px) 30vw, 440px" width="1200" height="775" alt="Экран видеонаблюдения на пульте: камеры в детских комнатах" loading="lazy" decoding="async" draggable="false"></div>
+          <span class="pu-ic" aria-hidden="true"><svg viewBox="0 0 32 32"><g transform="translate(1.2 .6)"><path d="M4.6 10.2l15.6-4.4 2.1 7.6-15.6 4.4z"/><path d="M22.4 9.3l4.6-1.3v6.6l-3.4.95"/><path d="M11.6 16l1.3 4.6H7.4"/><path d="M5.4 17.6v8.2"/><circle class="pu-rec" cx="8.6" cy="12.2" r="1.1"/></g></svg></span>
+          <p class="pu-cap">Как работает видеонаблюдение за&nbsp;детскими комнатами</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section><!-- /pu -->
+</div><!-- /pu-hold -->
+<script>
+/* Экран «Пульт Деда Мороза» (только Тюмень): звёзды, пауза вне окна,
+   появление при прокрутке. Без скрипта экран виден целиком, только без звёзд. */
+(function(){
+  'use strict';
+  var s = document.getElementById('pult');
+  if (!s) return;
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  /* свет пульта — только когда пришла сама картинка (при ошибке не показываем) */
+  var art = s.querySelector('.pu-art'), im = art && art.querySelector('.pu-img');
+  if (im && !(im.complete && im.naturalWidth)){
+    art.classList.add('pu-wait');
+    im.addEventListener('load', function(){ art.classList.remove('pu-wait') });
+  }
+
+  /* Звёзды: одни и те же места при каждой загрузке (свой простой счётчик
+     случайных чисел), гуще в верхней половине, где меньше фото. */
+  var sky = s.querySelector('.pu-stars');
+  if (sky && !sky.firstChild){
+    var n = 7, i, st, sz;
+    function rnd(){ n = (n * 16807) % 2147483647; return (n - 1) / 2147483646 }
+    var html = '';
+    for (i = 0; i < 64; i++){
+      sz = (1 + rnd() * 1.8).toFixed(2);
+      st = 'left:' + (rnd() * 100).toFixed(2) + '%;top:' + (Math.pow(rnd(), 1.35) * 92).toFixed(2) + '%;' +
+           'width:' + sz + 'px;height:' + sz + 'px;' +
+           '--t:' + (2.2 + rnd() * 3.4).toFixed(2) + 's;--d:-' + (rnd() * 5).toFixed(2) + 's';
+      html += '<i style="' + st + '"></i>';
+    }
+    sky.innerHTML = html;
+  }
+
+  if (!('IntersectionObserver' in window)) return;
+  new IntersectionObserver(function(es){
+    s.classList.toggle('pu-off', !es[es.length - 1].isIntersecting);
+  }, {rootMargin:'200px 0px'}).observe(s);
+
+  if (calm.matches) return;
+  var parts = s.querySelectorAll('.pu-t, .pu-lead, .pu-art, .pu-bento > *, .pu-also-t, .pu-card');
+  s.classList.add('rv');
+  var io = new IntersectionObserver(function(es){
+    for (var k = 0; k < es.length; k++){
+      if (es[k].isIntersecting){ es[k].target.classList.add('on'); io.unobserve(es[k].target); }
+    }
+  }, {threshold:0, rootMargin:'0px 0px -6% 0px'});
+  for (var j = 0; j < parts.length; j++) io.observe(parts[j]);
+})();
+</script>
+<!-- /pu ТЮМЕНЬ: конец экрана «пульт» -->
 
 <!-- ==================== ЭКРАН 14: КОРОТКИЕ ВИДЕО ====================
      Семь роликов Rutube с боевого сайта ministrynn.ru: шесть коротких сеткой
