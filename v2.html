@@ -12907,6 +12907,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   window.__freeze = function(x){ FORCE = x; };            // отладка: зафиксировать долю прокрутки
   window.__smokeCount = function(){ return SMOKE.length; };   // отладка
   window.__pause  = function(b){ PAUSED = !!b; lastNow=0; }; // отладка: снять нагрузку с CPU, чтобы декодер успел перемотать
+  var vDrawn=false, posterLate=false, posterOp=1;   // стоп-кадр держим до первого настоящего кадра ролика на канве
 
   function frame(now){
     if(PAUSED){ requestAnimationFrame(frame); return; }
@@ -13036,7 +13037,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     else v.style.filter='saturate(1.06) contrast(1.03)';
 
     if(TOUCH && !started && v.currentTime > 0.05 && !v.paused) started = true;
-    poster.style.opacity = TOUCH ? (started ? 0 : 1) : (1 - cl(p/0.006));
+    // Стоп-кадр на компьютере держим, пока на канве не появился настоящий кадр ролика:
+    // иначе, если начать крутить до конца загрузки, под текстами пустой тёмный фон
+    // (16.09.2026). Ролик пришёл, когда уже прокрутили, — стоп-кадр тает за 0,35 с, без рывка.
+    // Обычная загрузка (ролик готов раньше прокрутки) — как было: стоп-кадр гаснет сразу.
+    if(!vDrawn && VCANVAS && v.videoWidth && v.readyState >= 2){ vDrawn = true; posterLate = p > 0.006; }
+    var po = TOUCH ? (started ? 0 : 1) : (vDrawn ? 1 - cl(p/0.006) : 1);
+    if(posterLate){ po = Math.max(po, posterOp - (dt||0)/0.35); if(po <= 0) posterLate = false; }
+    posterOp = po;
+    poster.style.opacity = po;
     // тексты уже на экране при загрузке и тают к моменту, когда логотип встал целиком
     introT = cl(introT + (dt||0)/0.85);
     var so = introT * (BAKED ? 1 : (1 - ez(p,0.495-LEAD,0.600-LEAD,1.7)));
