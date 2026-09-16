@@ -11377,7 +11377,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .pu-t{
   margin:0 auto; text-align:center; color:#fff;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(22px,6.3vw,30px); line-height:1.1; letter-spacing:-.02em;
+  /* телефон: +15 % к прежнему clamp(22px,6.3vw,30px) — просьба Серёги 17.09.2026 */
+  font-size:clamp(25.3px,7.245vw,34.5px); line-height:1.1; letter-spacing:-.02em;
   text-transform:uppercase; text-wrap:balance;
   text-shadow:0 2px 22px rgba(0,0,0,.5);
 }
@@ -11411,20 +11412,37 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   border-radius:calc(var(--pu-r) + clamp(8px,.6vw,11px));
   background:linear-gradient(160deg, rgba(86,60,196,.32) 0%, rgba(38,26,112,.28) 52%, rgba(20,14,70,.42) 100%);
   box-shadow:inset 0 0 0 1px rgba(255,214,150,.16), inset 0 1px 0 rgba(255,255,255,.07), 0 26px 50px -30px rgba(0,0,0,.85);
+  /* затемнение за пультом обрезается скруглением блока */
+  overflow:hidden;
 }
-.pu-art{position:relative; justify-self:center; width:min(70vw,342px)}
+/* Пульт — свой слой (isolation) на 3: выше проводов (1), они выходят
+   из-под него. Внутри: затемнение (0) → ореол и пятно на полу (1) →
+   картинка (2) → неон (3). */
+.pu-art{position:relative; z-index:3; isolation:isolate; justify-self:center; width:min(70vw,342px)}
+/* Затемнение вокруг пульта (просьба Серёги 17.09.2026): пульт стоит в тёмной
+   нише, сверху на него падает мягкий луч — как прожекторы первого экрана.
+   По бокам не дальше зазора до мозаики: слой пульта выше фото, иначе
+   притемнил бы их край. */
+.pu-shade{
+  position:absolute; z-index:0; left:-20%; right:-20%; top:-24%; bottom:-18%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(1,2,14,.9) 0%, rgba(1,2,14,.84) 50%, rgba(1,2,14,.55) 78%, rgba(1,2,14,0) 100%);
+}
+.pu-shade::after{
+  content:''; position:absolute; left:0; right:0; top:0; height:78%;
+  background:radial-gradient(30% 100% at 50% 0%, rgba(186,166,255,.3) 0%, rgba(186,166,255,.11) 55%, rgba(186,166,255,0) 100%);
+}
 /* ореол за пультом: лиловый со следом бирюзы его светодиодов */
 .pu-art::before{
-  content:''; position:absolute; z-index:0; left:-14%; right:-14%; top:-8%; bottom:4%;
+  content:''; position:absolute; z-index:1; left:-14%; right:-14%; top:-8%; bottom:4%;
   border-radius:50%; pointer-events:none;
   background:
     radial-gradient(closest-side at 50% 30%, rgba(64,224,208,.16) 0%, rgba(64,224,208,.05) 55%, rgba(64,224,208,0) 100%),
-    radial-gradient(closest-side, rgba(126,86,255,.40) 0%, rgba(96,64,230,.20) 46%, rgba(70,44,200,0) 100%);
+    radial-gradient(closest-side, rgba(126,86,255,.30) 0%, rgba(96,64,230,.14) 46%, rgba(70,44,200,0) 100%);
   animation:puHalo 7s ease-in-out infinite alternate;
 }
 /* лиловое пятно света на полу под пультом */
 .pu-art::after{
-  content:''; position:absolute; z-index:0; left:-6%; right:-6%; bottom:-9%; height:26%;
+  content:''; position:absolute; z-index:1; left:-6%; right:-6%; bottom:-9%; height:26%;
   border-radius:50%; pointer-events:none;
   background:radial-gradient(closest-side, rgba(176,106,224,.42) 0%, rgba(176,106,224,.16) 52%, rgba(176,106,224,0) 100%);
 }
@@ -11432,12 +11450,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* пока пульт грузится, пятна света висели бы в пустоте; класс ставит скрипт.
    visibility, а не opacity: прозрачностью ореола управляет его анимация */
 .pu-art.pu-wait::before,.pu-art.pu-wait::after,.pu-art.pu-wait .pu-neon{visibility:hidden}
-.pu-img{position:relative; z-index:1; display:block; width:100%; height:auto;
+.pu-img{position:relative; z-index:2; display:block; width:100%; height:auto;
   filter:drop-shadow(0 24px 30px rgba(0,0,0,.55))}
 /* Свет неоновых экранов пульта: пятно поверх каждого экрана в режиме
    «осветление», дышит и изредка моргает, как настоящий неон. Места —
    доли картинки ty-pult.webp (замер по тёмным окнам экранов). */
-.pu-neon{position:absolute; inset:0; z-index:2; pointer-events:none; mix-blend-mode:screen}
+.pu-neon{position:absolute; inset:0; z-index:3; pointer-events:none; mix-blend-mode:screen}
 .pu-neon i{position:absolute; display:block; border-radius:30%;
   background:radial-gradient(closest-side, rgba(var(--c),.34) 0%, rgba(var(--c),.12) 55%, rgba(var(--c),0) 100%);
   animation:puNeon var(--t) ease-in-out var(--d) infinite}
@@ -11499,8 +11517,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   animation:puRec 1.6s ease-in-out infinite}
 .pu-chip--gold i{background:#FFD189; box-shadow:0 0 8px 1px rgba(255,209,137,.7); animation:none}
 @keyframes puRec{0%,100%{opacity:1} 50%{opacity:.25}}
-/* на ноутбуках плитка фото 4 мелкая, метка закрывала бы лица */
-@media (min-width:1024px) and (max-width:1439px){ .pu-ph4 .pu-chip{display:none} }
+/* на ноутбуках плитка фото 4 мелкая, метка с текстом закрывала бы лица —
+   остаётся только точка: к ней идёт провод */
+@media (min-width:1024px) and (max-width:1439px){
+  .pu-ph4 .pu-chip{font-size:0; letter-spacing:0; gap:0; padding:6px}
+}
 
 /* Отзыв — белая карточка, как комментарий во ВКонтакте, текст живой.
    Под ней лиловое свечение: она светлое пятно на тёмной сцене. */
@@ -11523,6 +11544,40 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* кавычка в правом верхнем углу — золото сайта */
 .pu-rev-mark{position:absolute; top:clamp(12px,1vw,18px); right:clamp(14px,1.2vw,22px);
   width:clamp(22px,1.7vw,30px); height:auto; fill:#E3B34E; opacity:.9}
+
+/* ---------- провода от пульта (компьютер, от 1024 px) ----------
+   Просьба Серёги 17.09.2026: светящиеся провода от пульта к точкам на метках
+   фото и к мигающей точке у «А также». Кривые считает скрипт по местам
+   точек. Слой 1: выше фото, но ниже меток (2) и пульта (3) — провод выходит
+   из-под пульта и прячет конец под точкой. Свечение — толстая бледная
+   обводка под тонкой, без filter. По каждому бежит искра (pathLength=100),
+   точка на конце вспыхивает, когда искра доходит (те же 3,6 с и задержка). */
+.pu-wires{position:absolute; left:0; top:0; z-index:1; display:none; overflow:visible; pointer-events:none}
+.pu-wires path{fill:none; stroke-linecap:round}
+.pu-w-glow{stroke:rgba(var(--c),.16); stroke-width:7}
+.pu-w-line{stroke:rgba(var(--c),.6); stroke-width:1.8}
+.pu-w-spark,.pu-w-hot{stroke-dasharray:6 140; stroke-dashoffset:6;
+  animation:puSpark 3.6s cubic-bezier(.45,0,.55,1) var(--d) infinite}
+.pu-w-spark{stroke:rgba(var(--c),.55); stroke-width:6}
+.pu-w-hot{stroke:#fff; stroke-width:1.8}
+@keyframes puSpark{0%{stroke-dashoffset:6} 64%,100%{stroke-dashoffset:-100}}
+.pu-w1{--c:var(--pu-red); --d:0s}
+.pu-w2{--c:255,209,137; --d:-1.2s}
+.pu-w3{--c:var(--pu-cyan); --d:-2.4s}
+@keyframes puHit{
+  0%,56%{opacity:.6; transform:scale(1)}
+  64%{opacity:1; transform:scale(1.7)}
+  80%,100%{opacity:.6; transform:scale(1)}
+}
+/* мигающая точка у «А также» — к ней идёт третий провод */
+.pu-also-dot{display:none; flex:none; width:10px; height:10px; border-radius:50%;
+  background:rgb(var(--pu-cyan)); box-shadow:0 0 0 3px rgba(86,212,255,.16), 0 0 12px 2px rgba(86,212,255,.75)}
+@media (min-width:1024px){
+  .pu-wires{display:block}
+  .pu-also-dot{display:block; animation:puHit 3.6s ease-out -2.4s infinite}
+  .pu-ph5 .pu-chip i{animation:puHit 3.6s ease-out 0s infinite}
+  .pu-ph4 .pu-chip i{animation:puHit 3.6s ease-out -1.2s infinite}
+}
 
 /* ---------- «А также Дед Мороз покажет» ---------- */
 .pu-also{margin-top:clamp(44px,5.2vw,92px)}
@@ -11586,6 +11641,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* поля как у роликов под швом: край блоков 20 px, текст 30 */
   .pu-wrap{width:100%; padding:0 20px}
   .pu-t,.pu-lead{padding-inline:10px}
+  /* заголовок дальше от края экрана на 3 мм, абзац на 50 % крупнее
+     (было 15 px) — просьбы Серёги 17.09.2026 */
+  .pu-t{padding-inline:calc(10px + 3mm)}
+  .pu-lead{font-size:22.5px; line-height:1.38}
   .pu-bento{grid-template-columns:repeat(2,minmax(0,1fr))}
   .pu-ph5,.pu-ph6,.pu-ph7,.pu-ph4,.pu-rev{grid-row:auto}
   .pu-ph5{grid-column:1/3; aspect-ratio:1200/775}
@@ -11664,14 +11723,24 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @media (min-width:768px){
   .pu.rv .pu-card--tree{--pu-w:.12s} .pu.rv .pu-card--cam{--pu-w:.24s}
 }
+/* провода прорисовываются от пульта, когда он доехал; искры — после */
+.pu.rv .pu-w-glow,.pu.rv .pu-w-line{stroke-dasharray:100 100; stroke-dashoffset:100}
+.pu.rv .pu-wires.on .pu-w-glow,.pu.rv .pu-wires.on .pu-w-line{stroke-dashoffset:0;
+  transition:stroke-dashoffset 1.6s cubic-bezier(.3,.6,.3,1) .5s}
+.pu.rv .pu-w-spark,.pu.rv .pu-w-hot{opacity:0}
+.pu.rv .pu-wires.on .pu-w-spark,.pu.rv .pu-wires.on .pu-w-hot{opacity:1; transition:opacity .4s ease 2s}
 
 /* вне окна всё движение стоит */
 .pu-off .pu-stars i,.pu-off .pu-neon i,.pu-off .pu-glow i,.pu-off .pu-spark,
-.pu-off .pu-chip i,.pu-off .pu-ic svg,.pu-off .pu-art::before{animation-play-state:paused}
+.pu-off .pu-chip i,.pu-off .pu-ic svg,.pu-off .pu-art::before,
+.pu-off .pu-w-spark,.pu-off .pu-w-hot,.pu-off .pu-also-dot{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){
   .pu.rv .pu-t,.pu.rv .pu-lead,.pu.rv .pu-art,.pu.rv .pu-bento > *,.pu.rv .pu-also-t,.pu.rv .pu-card{opacity:1; transform:none; transition:none}
   /* .pu перед .pu-glow — иначе правила :nth-child с анимацией весят больше */
-  .pu .pu-glow i,.pu-stars i,.pu-neon i,.pu-spark,.pu-chip i,.pu-ic svg,.pu-art::before{animation:none}
+  .pu .pu-glow i,.pu-stars i,.pu-neon i,.pu-spark,.pu-ic svg,.pu-art::before{animation:none}
+  /* провода стоят без искр, точки не мигают */
+  .pu .pu-chip i,.pu .pu-also-dot{animation:none}
+  .pu-w-spark,.pu-w-hot{display:none}
   .pu-stars i{opacity:.55}
   .pu-ph img,.pu-card{transition:none}
   .pu-card:hover{translate:none}
@@ -11697,6 +11766,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <svg class="pu-spark" style="--x:2%;--y:80%;--sz:14px;--d:-1.7s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
 
       <div class="pu-art">
+        <div class="pu-shade" aria-hidden="true"></div>
         <img class="pu-img" src="pult/ty-pult.webp?v=1" srcset="pult/ty-pult-640.webp?v=1 640w, pult/ty-pult.webp?v=1 1200w" sizes="(max-width:767px) 70vw, (max-width:1023px) 42vw, (max-width:1599px) 29vw, 440px" width="1200" height="1323" alt="Пульт управления новогодними делами: деревянный пульт Деда Мороза с тремя неоновыми экранами, кнопками и рычагами" loading="lazy" decoding="async" draggable="false">
         <div class="pu-neon" aria-hidden="true"><i></i><i></i><i></i></div>
       </div>
@@ -11729,8 +11799,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       </div>
     </div>
 
+    <svg class="pu-wires" aria-hidden="true" focusable="false">
+      <g class="pu-w1"><path class="pu-w-glow" pathLength="100"/><path class="pu-w-line" pathLength="100"/><path class="pu-w-spark" pathLength="100"/><path class="pu-w-hot" pathLength="100"/></g>
+      <g class="pu-w2"><path class="pu-w-glow" pathLength="100"/><path class="pu-w-line" pathLength="100"/><path class="pu-w-spark" pathLength="100"/><path class="pu-w-hot" pathLength="100"/></g>
+      <g class="pu-w3"><path class="pu-w-glow" pathLength="100"/><path class="pu-w-line" pathLength="100"/><path class="pu-w-spark" pathLength="100"/><path class="pu-w-hot" pathLength="100"/></g>
+    </svg>
+
     <div class="pu-also">
-      <h3 class="pu-also-t">А также Дед&nbsp;Мороз&nbsp;покажет:</h3>
+      <h3 class="pu-also-t"><i class="pu-also-dot" aria-hidden="true"></i>А также Дед&nbsp;Мороз&nbsp;покажет:</h3>
       <ul class="pu-cards">
         <li class="pu-card pu-card--gift">
           <div class="pu-ph"><img src="pult/ty-p1.webp?v=1" srcset="pult/ty-p1-600.webp?v=1 600w, pult/ty-p1.webp?v=1 1200w" sizes="(max-width:767px) 40vw, (max-width:1599px) 30vw, 440px" width="1200" height="775" alt="Министр волшебных дел у пульта держит подарок" loading="lazy" decoding="async" draggable="false"></div>
@@ -11753,8 +11829,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </section><!-- /pu -->
 </div><!-- /pu-hold -->
 <script>
-/* Экран «Пульт Деда Мороза» (только Тюмень): звёзды, пауза вне окна,
-   появление при прокрутке. Без скрипта экран виден целиком, только без звёзд. */
+/* Экран «Пульт Деда Мороза» (только Тюмень): звёзды, провода, пауза вне
+   окна, появление при прокрутке. Без скрипта экран виден целиком, только
+   без звёзд и проводов. */
 (function(){
   'use strict';
   var s = document.getElementById('pult');
@@ -11785,6 +11862,47 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     sky.innerHTML = html;
   }
 
+  /* Провода от пульта к точкам меток и к точке у «А также» (от 1024 px).
+     Места считаются смещениями (offsetLeft/Top) от .pu-wrap: на них
+     не влияет сдвиг появления. Пересчёт — при любом изменении размеров. */
+  var wrap = s.querySelector('.pu-wrap'), svg = s.querySelector('.pu-wires');
+  var wide = window.matchMedia('(min-width:1024px)');
+  var ends = [s.querySelector('.pu-ph5 .pu-chip i'), s.querySelector('.pu-ph4 .pu-chip i'), s.querySelector('.pu-also-dot')];
+  function pos(el){ var x = 0, y = 0; while (el && el !== wrap){ x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent } return [x, y] }
+  function mid(el){ var p = pos(el); return [p[0] + el.offsetWidth / 2, p[1] + el.offsetHeight / 2] }
+  function at(fx, fy){ var p = pos(art); return [p[0] + art.offsetWidth * fx, p[1] + art.offsetHeight * fy] }
+  function r1(v){ return Math.round(v * 10) / 10 }
+  function curve(a, c1, c2, b){
+    return 'M' + r1(a[0]) + ' ' + r1(a[1]) + 'C' + r1(c1[0]) + ' ' + r1(c1[1]) + ' ' +
+           r1(c2[0]) + ' ' + r1(c2[1]) + ' ' + r1(b[0]) + ' ' + r1(b[1]);
+  }
+  function wire(){
+    if (!svg || !wrap || !art || !wide.matches || !ends[0] || !ends[1] || !ends[2]) return;
+    svg.setAttribute('width', wrap.offsetWidth);
+    svg.setAttribute('height', wrap.offsetHeight);
+    var a, b, dx, dy, d = [];
+    /* 1: правый бок корпуса (у голубого экрана) → точка «На экране пульта» */
+    a = at(.8, .3); b = mid(ends[0]); dx = b[0] - a[0];
+    d.push(curve(a, [a[0] + dx * .7, a[1] + 26], [b[0] - dx * .9, b[1] - 10], b));
+    /* 2: край стола → точка «Реакция детей» */
+    a = at(.95, .56); b = mid(ends[1]); dx = b[0] - a[0];
+    d.push(curve(a, [a[0] + dx * .7, a[1] + 34], [b[0] - dx * .9, b[1] - 6], b));
+    /* 3: низ пульта → вниз из блока → точка у «А также», сверху */
+    a = at(.58, .9); b = mid(ends[2]); dy = b[1] - a[1];
+    d.push(curve(a, [a[0], a[1] + dy * .62], [b[0], b[1] - dy * .42], b));
+    var g = svg.querySelectorAll('g'), gi, k, ps;
+    for (gi = 0; gi < g.length; gi++){
+      ps = g[gi].querySelectorAll('path');
+      for (k = 0; k < ps.length; k++) ps[k].setAttribute('d', d[gi]);
+    }
+  }
+  if (window.ResizeObserver && wrap && art){ var ro = new ResizeObserver(wire); ro.observe(wrap); ro.observe(art) }
+  window.addEventListener('resize', wire);
+  window.addEventListener('load', wire);
+  if (wide.addEventListener) wide.addEventListener('change', wire); else if (wide.addListener) wide.addListener(wire);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(wire);
+  wire();
+
   if (!('IntersectionObserver' in window)) return;
   new IntersectionObserver(function(es){
     s.classList.toggle('pu-off', !es[es.length - 1].isIntersecting);
@@ -11795,7 +11913,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   s.classList.add('rv');
   var io = new IntersectionObserver(function(es){
     for (var k = 0; k < es.length; k++){
-      if (es[k].isIntersecting){ es[k].target.classList.add('on'); io.unobserve(es[k].target); }
+      if (es[k].isIntersecting){
+        es[k].target.classList.add('on'); io.unobserve(es[k].target);
+        if (es[k].target === art && svg) svg.classList.add('on');
+      }
     }
   }, {threshold:0, rootMargin:'0px 0px -6% 0px'});
   for (var j = 0; j < parts.length; j++) io.observe(parts[j]);
