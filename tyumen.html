@@ -10320,13 +10320,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      остановится здесь — экран оставлять, из Нижнего его нет.
      Устройство → sayt-nn/tyumen.md, раздел «Экран „Дети вызовут настоящий снег“». -->
 <style>
-/* Высота. Телефон: ролик вертикальный 9:16, экран ровно в его пропорцию,
+/* Высота (наименьшая). Телефон: ролик вертикальный 9:16, экран ровно в его пропорцию,
    но не выше окна. Компьютер: ролик 16:9 во всю ширину дал бы экран выше
    окна (1080 px на 1920), поэтому высота — половина ширины, не больше 92 %
    окна; лишнее по высоте срезает object-fit:cover поровну сверху и снизу.
 
    Слои: фон с вырезом .sn-bg (0: заставка и ролик, над ними затемнение) →
-   нить (5) → текст (7, как .cr-cont) → сугроб (8).
+   нить (5) → текст, стрелка и кнопка (7, как .cr-cont) → сугроб (8).
    z-index секции 27 — выше программы (26): дуга заезжает на неё сверху. */
 .sn{
   /* Низ экрана программы, снят пипеткой со снимка: #000B36 из его градиента
@@ -10336,15 +10336,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      из этой доли считано сплющивание звёздочек на нити (scale у .vl-sp),
      при 3vw множитель 0,3. Меняешь число — пересчитывай звёздочки. */
   --sn-wave:3vw;
+  /* Сколько сугроба видно над нижней кромкой (гребни начинаются на 36,7 %
+     высоты его блока). Ниже этой линии кнопку и текст не ставим. */
+  --sn-drift:calc(min(9.2646vw,240px) * .633);
   position:relative; z-index:27; overflow:hidden;
-  display:flex; align-items:flex-start;
+  /* Телефон: текст сверху, кнопка внизу — .sn-in растянут на всю высоту. */
+  display:flex; align-items:stretch;
   /* Секция заезжает на программу полосой дуги и ровно на столько же выше —
      ролик под дугой не теряет высоты. */
   margin-top:calc(var(--sn-wave) * -1);
-  height:calc(min(177.78vw, 100vh) + var(--sn-wave));
-  height:calc(min(177.78vw, 100svh) + var(--sn-wave));
+  /* min-height, а не height: на низком телефоне (или в альбомной ориентации)
+     текст, стрелка и кнопка не влезут — экран вырастет, а не обрежет кнопку. */
+  min-height:calc(min(177.78vw, 100vh) + var(--sn-wave));
+  min-height:calc(min(177.78vw, 100svh) + var(--sn-wave));
   color:#fff;
 }
+@media (max-width:760px){ .sn{--sn-drift:11.27vw} }
 /* ДУГА НА ШВЕ С ПРОГРАММОЙ — тот же приём и та же кривая, что были у великанов
    (16.09.2026, просьба Серёги «переход как ниже: дуга и золотая оправа»).
    Вырез маской в слое .sn-bg, над дугой видна сама программа.
@@ -10401,11 +10408,54 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     linear-gradient(180deg,
       rgba(4,15,57,.84) 0%, rgba(4,15,57,.82) 16%, rgba(4,15,57,.72) 38%,
       rgba(4,15,57,.42) 54%, rgba(4,15,57,0) 72%),
-    linear-gradient(0deg, rgba(0,10,62,.5) 0%, rgba(0,10,62,0) 12%);
+    /* снизу темнее, чем на компьютере: на телефоне тут стоит прозрачная
+       кнопка, а тонкая обводка на ярком кадре теряется */
+    linear-gradient(0deg, rgba(0,10,62,.66) 0%, rgba(0,10,62,.42) 18%, rgba(0,10,62,0) 34%);
 }
 
-.sn-in{padding-top:calc(clamp(44px,12vw,80px) + var(--sn-wave))}
+.sn-in{
+  display:flex; flex-direction:column;
+  padding-top:calc(clamp(44px,12vw,80px) + var(--sn-wave));
+  padding-bottom:calc(var(--sn-drift) + 22px);
+}
 @media (max-width:767px){ .sn .cr-cont{padding-inline:19px} }
+
+/* СТРЕЛКА ОТ ТЕКСТА К КНОПКЕ — только телефон (просьба Серёги 16.09.2026:
+   «лёгкую тонкую извилистую золотую стрелку»). Забирает всё место между
+   абзацем и кнопкой, поэтому растягивается по высоте: кривая нарисована
+   с preserveAspectRatio="none" и non-scaling-stroke (линия тонкая при любом
+   растяжении), а наконечник — отдельная картинка постоянного размера.
+   Кривая кончается ровно по центру низа ВЕРТИКАЛЬНО — так наконечник
+   всегда смотрит вниз, как бы её ни растянуло. По ней раз в 3,6 с сбегает
+   искра к кнопке — эхо нити на дуге сверху. */
+.sn-arrow{position:relative; flex:1 1 auto; min-height:72px; margin:14px 0 12px}
+.sn-arrow-line{
+  position:absolute; left:0; top:0; width:100%; height:calc(100% - 1px);
+  overflow:visible; filter:drop-shadow(0 0 2px rgba(0,6,40,.9));
+}
+.sn-arrow-line path{fill:none; stroke-linecap:round}
+.sn-arrow-glow {stroke:#F59E0B; stroke-width:5;   opacity:.18}
+.sn-arrow-path {stroke:#F7C561; stroke-width:1.6; opacity:.92}
+.sn-arrow-spark{stroke:#FFF7DA; stroke-width:2.2; opacity:.9;
+  stroke-dasharray:8 120; stroke-dashoffset:8;
+  animation:snArrowSpark 3.6s ease-in infinite}
+@keyframes snArrowSpark{ 0%{stroke-dashoffset:8} 75%,100%{stroke-dashoffset:-100} }
+.sn-arrow-head{
+  position:absolute; left:50%; bottom:-1px; width:16px; height:10px;
+  transform:translateX(-50%); overflow:visible;
+  filter:drop-shadow(0 0 2px rgba(0,6,40,.9));
+}
+.sn-arrow-head path{fill:none; stroke:#F7C561; stroke-width:1.6;
+  stroke-linecap:round; stroke-linejoin:round}
+@media (prefers-reduced-motion:reduce){ .sn-arrow-spark{animation:none; opacity:0} }
+
+/* КНОПКА «ХОТИМ В СКАЗКУ!» — прозрачная (вид 2, выбор Серёги 16.09.2026),
+   без свечения: стандарт. На телефоне внизу экрана по ширине бланка, как
+   у кнопок карусели, цен и ответов (min(100%,480px), от 768 px по надписи);
+   на компьютере под текстом слева. → sayt-nn/standart-knopok.md */
+.sn-cta{margin:0; text-align:center}
+.sn-cta .zs-btn{width:min(100%, 480px)}
+@media (min-width:768px){ .sn-cta .zs-btn{width:auto} }
 
 .sn-t{
   margin:0 0 clamp(14px,4vw,22px); max-width:14em;
@@ -10434,8 +10484,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* КОМПЬЮТЕР: текст слева по центру высоты, затемнение слева направо.
    Сверху короткий переход из цвета программы — шов не виден. */
 @media (min-width:1024px){
-  .sn{height:calc(clamp(460px, 50vw, 92vh) + var(--sn-wave)); align-items:center}
-  .sn-in{padding-top:var(--sn-wave)}
+  .sn{min-height:calc(clamp(460px, 50vw, 92vh) + var(--sn-wave)); align-items:center}
+  .sn-in{display:block; padding-top:var(--sn-wave); padding-bottom:var(--sn-drift)}
+  .sn-arrow{display:none}
+  .sn-cta{margin-top:clamp(26px,2.4vw,44px); text-align:left}
   /* Сверху перехода из цвета программы больше нет: шов держит нить,
      ролик подходит к ней вплотную, как фото у великанов. */
   .sn-shade{
@@ -10524,6 +10576,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <p class="sn-p">В&nbsp;рамках квеста дети вместе с&nbsp;Бабой Ягой с&nbsp;помощью специального заклинания
       вызовут снег, который под&nbsp;музыку пойдет со&nbsp;спрятанного на&nbsp;крыше генератора снега,
       что обычно очень веселит деток! Обычно они в&nbsp;восторге: прыгают, кричат, ловят снег руками...</p>
+
+    <!-- Стрелка к кнопке — только телефон. pathLength="100": длина штриха
+         искры задана в долях кривой, как бы её ни растянуло. -->
+    <div class="sn-arrow" aria-hidden="true">
+      <svg class="sn-arrow-line" viewBox="0 0 100 100" preserveAspectRatio="none" focusable="false">
+        <path class="sn-arrow-glow"  pathLength="100" vector-effect="non-scaling-stroke" d="M14,0 C14,16 44,12 46,30 C48,48 18,46 24,64 C29,79 50,74 50,100"/>
+        <path class="sn-arrow-path"  pathLength="100" vector-effect="non-scaling-stroke" d="M14,0 C14,16 44,12 46,30 C48,48 18,46 24,64 C29,79 50,74 50,100"/>
+        <path class="sn-arrow-spark" pathLength="100" vector-effect="non-scaling-stroke" d="M14,0 C14,16 44,12 46,30 C48,48 18,46 24,64 C29,79 50,74 50,100"/>
+      </svg>
+      <svg class="sn-arrow-head" viewBox="0 0 16 10" focusable="false"><path d="M1.5,1.5 L8,8.5 L14.5,1.5"/></svg>
+    </div>
+
+    <p class="sn-cta">
+      <button class="zs-btn zs-btn--ghost" type="button"
+              data-zs="экран «снег» - «Хотим в сказку!»"><span class="zs-t">Хотим в сказку!</span></button>
+    </p>
   </div>
 
   <!-- Сугроб на шве с леденцами (перешёл от удалённых великанов). -->
