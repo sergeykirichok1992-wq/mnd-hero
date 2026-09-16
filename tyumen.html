@@ -10348,7 +10348,55 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
+      <!-- ТЮМЕНЬ. Блок-приглашение в конце ряда (просьба Серёги 16.09.2026):
+           две последние карточки стоят слева под первыми колонками, а этот блок
+           занимает остаток ряда. Не кнопка и не ссылка — поэтому обводка светлая,
+           а не золотая (золотая обводка на сайте = кнопка). -->
+      <div class="pgs-more">
+        <p class="pgs-more-t">Это далеко не всё</p>
+        <p class="pgs-more-p">Листайте сайт до конца</p>
+      </div>
         </div>
+<style>
+/* ТЮМЕНЬ, экран программы: блок «Это далеко не всё» в конце ряда карточек.
+   Своя `<style>` рядом с разметкой — правка только тюменская, общие стили
+   экрана не тронуты, и синхронизация с Нижним их не заденет.
+
+   ШИРИНА. Основа — ширина одной карточки (та же формула `--w`, что у `.pg`),
+   а `flex-grow` растягивает блок на всё, что осталось в последнем ряду:
+   на четырёх колонках это две клетки, на трёх — одна, на двух и на телефоне
+   блок встаёт отдельной строкой во всю ширину. Минус 2 px в основе — запас
+   на округление: без него на трёх колонках блок мог не влезть в ряд и уехать
+   ниже. ВЫСОТА — как у карточек этого ряда (`align-self:stretch`). */
+.pgs-more{
+  --w: calc(100vw - 32px);
+  --u2: calc(var(--w) / 1045);
+  flex:1 1 min(calc(var(--w) - 2px), 100%);
+  align-self:stretch;
+  box-sizing:border-box;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:calc(120 * var(--u2)) calc(80 * var(--u2));
+  border:2px solid rgba(255,255,255,.55);
+  border-radius:calc(76 * var(--u2));          /* скругление как у карточек */
+  background:rgba(255,255,255,.03);
+  text-align:center;
+}
+@media (min-width:560px){  .pgs-more{--w: calc((var(--inner) -     var(--gap)) / 2)} }
+@media (min-width:900px){  .pgs-more{--w: calc((var(--inner) - 2 * var(--gap)) / 3)} }
+@media (min-width:1250px){ .pgs-more{--w: calc((var(--inner) - 3 * var(--gap)) / 4)} }
+.pgs-more-t{
+  margin:0;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:max(28px, calc(118 * var(--u2))); line-height:1.05;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.pgs-more-p{
+  margin:calc(36 * var(--u2)) 0 0;
+  font-family:"Golos Text",Arial,sans-serif; font-weight:400;
+  font-size:max(16px, calc(60 * var(--u2))); line-height:1.4;
+  color:#B9C8F5;                                /* как подзаголовок экрана */
+}
+</style>
 </section>
 
 <!-- ==================== ТЮМЕНЬ: ЭКРАН «ДЕТИ ВЫЗОВУТ НАСТОЯЩИЙ СНЕГ» ====================
