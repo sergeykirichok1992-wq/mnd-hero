@@ -10308,6 +10308,228 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
 </section>
 
+<!-- ==================== ТЮМЕНЬ: ЭКРАН «ДЕТИ ВЫЗОВУТ НАСТОЯЩИЙ СНЕГ» ====================
+     ТОЛЬКО В tyumen.html (16.09.2026, просьба Серёги): сразу за программой,
+     перед великанами. Видеофон во весь экран, слева текст, под текстом
+     затемнение. Ролики — `~/Desktop/сайт тюмень/экран снег/` (комп и моб
+     версии), пережаты в ty-sneg-1920/1280/mob.mp4, заставки ty-sneg-*.webp.
+
+     Стили, разметка и скрипт лежат ОДНИМ куском намеренно: для sinhron.py
+     это одна городская вставка между программой и великанами. Если он
+     остановится здесь — экран оставлять, из Нижнего его нет.
+     Устройство → sayt-nn/tyumen.md, раздел «Экран „Дети вызовут настоящий снег“». -->
+<style>
+/* Высота. Телефон: ролик вертикальный 9:16, экран ровно в его пропорцию,
+   но не выше окна. Компьютер: ролик 16:9 во всю ширину дал бы экран выше
+   окна (1080 px на 1920), поэтому высота — половина ширины, не больше 92 %
+   окна; лишнее по высоте срезает object-fit:cover поровну сверху и снизу.
+
+   Слои: заставка и ролик (0) → затемнение (1) → текст (7, как .cr-cont).
+   z-index секции 26 — ниже великанов (27): их золотая волна заезжает сюда
+   снизу на 3vw и показывает над нитью низ этого ролика. */
+.sn{
+  /* Низ экрана программы, снят пипеткой со снимка: #000B36 из его градиента
+     плюс зерно поверх. Взять чистый #000B36 — на шве видна черта. */
+  --sn-top:#040F39;
+  position:relative; z-index:26; overflow:hidden;
+  display:flex; align-items:flex-start;
+  height:min(177.78vw, 100vh);
+  height:min(177.78vw, 100svh);
+  background:var(--sn-top);
+  color:#fff;
+}
+.sn-vid{position:absolute; inset:0; z-index:0; overflow:hidden}
+.sn-still,.sn-video{
+  position:absolute; inset:0; width:100%; height:100%;
+  display:block; object-fit:cover; pointer-events:none;
+}
+/* Ролик прозрачен, пока не нарисован первый кадр: так не видно чёрной
+   вспышки, а если Safari запретит автозапуск (энергосбережение), его панель
+   с кнопкой остаётся невидимой и на экране стоит заставка. Тот же приём,
+   что у ролика комнаты в Нижнем (.km-video). */
+.sn-video{opacity:0; transition:opacity .6s ease}
+.sn-video.on{opacity:1}
+.sn-video::-webkit-media-controls,
+.sn-video::-webkit-media-controls-enclosure,
+.sn-video::-webkit-media-controls-panel,
+.sn-video::-webkit-media-controls-panel-container,
+.sn-video::-webkit-media-controls-overlay-play-button,
+.sn-video::-webkit-media-controls-start-playback-button{
+  display:none !important; opacity:0 !important; -webkit-appearance:none;
+}
+
+/* ЗАТЕМНЕНИЕ. Телефон: текст стоит сверху, и верх ролика плавно выходит
+   из цвета экрана программы — шва между экранами не видно, а буквы лежат
+   на тёмном в любом кадре (в нарезке есть яркие розовые огни сверху). */
+.sn-shade{
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    linear-gradient(180deg,
+      var(--sn-top) 0%, rgba(4,15,57,.88) 16%, rgba(4,15,57,.74) 38%,
+      rgba(4,15,57,.42) 54%, rgba(4,15,57,0) 72%),
+    linear-gradient(0deg, rgba(0,10,62,.5) 0%, rgba(0,10,62,0) 12%);
+}
+
+.sn-in{padding-top:clamp(44px,12vw,80px)}
+@media (max-width:767px){ .sn .cr-cont{padding-inline:19px} }
+
+.sn-t{
+  margin:0 0 clamp(14px,4vw,22px); max-width:14em;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(26px,8.6vw,46px); line-height:1.08; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+  /* Две тени, как у заголовка великанов: короткая даёт кромку,
+     длинная мягкая — облачко. Держит буквы на ярком снеге. */
+}
+.sn-t,.sn-lead,.sn-p{text-shadow:0 2px 9px rgba(0,6,40,.85), 0 0 26px rgba(0,6,40,.6)}
+.sn-gold{color:#F7C561}      /* то же золото, что у великанов (--vl-gold) */
+/* Подзаголовок набран как у великанов: жирная строка-зацепка на «Blogger
+   Sans» (у «CR Blogger» нет жирного, браузер нарисовал бы поддельный),
+   под ней абзац «CR Blogger» не шире ~46 знаков. */
+.sn-lead{
+  margin:0 0 clamp(6px,1.6vw,12px);
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(17px,4.6vw,24px); line-height:1.3; color:#fff;
+}
+.sn-p{
+  margin:0; max-width:46ch;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:clamp(15px,4vw,20px); line-height:1.5; color:#E4EAFB;
+}
+
+/* КОМПЬЮТЕР: текст слева по центру высоты, затемнение слева направо.
+   Сверху короткий переход из цвета программы — шов не виден. */
+@media (min-width:1024px){
+  .sn{height:clamp(460px, 50vw, 92vh); align-items:center}
+  .sn-in{padding-top:0}
+  .sn-shade{
+    background:
+      linear-gradient(180deg, var(--sn-top) 0%, rgba(4,15,57,.55) 7%, rgba(4,15,57,0) 18%),
+      linear-gradient(0deg, rgba(0,10,62,.5) 0%, rgba(0,10,62,0) 12%),
+      linear-gradient(90deg,
+        rgba(0,8,44,.88) 0%, rgba(0,8,44,.74) 26%, rgba(0,8,44,.4) 44%,
+        rgba(0,8,44,.1) 58%, rgba(0,8,44,0) 66%);
+  }
+  .sn-t{margin-bottom:clamp(16px,1.5vw,28px); font-size:clamp(32px,3.2vw,58px)}
+  .sn-lead{margin-bottom:clamp(8px,.8vw,14px); font-size:clamp(17px,1.35vw,25px)}
+  .sn-p{font-size:clamp(15px,1.16vw,21px)}
+}
+
+/* СТЫК С ВЕЛИКАНАМИ. Их золотая волна — вырез в слое .vl-bg, а сплошной цвет
+   поля стоит на самой секции .vl и сквозь вырез тоже виден: над нитью шла
+   тёмная полоса вместо низа ролика. Под программой (Нижний, Казань) этого
+   не видно — там сверху тот же тёмно-синий. Здесь цвет поля переносим
+   внутрь вырезанного слоя; на телефоне остальное поле красит панель .vl-in. */
+#sneg ~ .vl{background:none}
+#sneg ~ .vl .vl-bg{background:var(--vl-field)}
+</style>
+
+<section class="cr sn" id="sneg" aria-labelledby="snT">
+  <!-- Кадр: снизу заставка (первый кадр ролика), сверху ролик. У <video>
+       нет src намеренно — файл подставляет скрипт ниже, когда экран
+       подъезжает к окну, и выбирает: телефонный или компьютерный. -->
+  <div class="sn-vid" aria-hidden="true">
+    <picture>
+      <source media="(max-width:1023px)" srcset="ty-sneg-mob.webp" width="720" height="1280">
+      <img class="sn-still" src="ty-sneg-1280.webp"
+           srcset="ty-sneg-1280.webp 1280w, ty-sneg-1920.webp 1920w" sizes="100vw"
+           width="1920" height="1080" alt="" loading="lazy" decoding="async">
+    </picture>
+    <video class="sn-video" muted autoplay loop playsinline webkit-playsinline preload="none"
+           disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"
+           tabindex="-1"
+           data-wide="ty-sneg-1920.mp4" data-mid="ty-sneg-1280.mp4" data-mob="ty-sneg-mob.mp4"></video>
+  </div>
+  <div class="sn-shade" aria-hidden="true"></div>
+  <div class="cr-cont sn-in">
+    <h2 class="sn-t" id="snT">Дети вызовут<br> <span class="sn-gold">настоящий снег!</span></h2>
+    <p class="sn-lead">Куда же без волшебства?</p>
+    <p class="sn-p">В&nbsp;рамках квеста дети вместе с&nbsp;Бабой Ягой с&nbsp;помощью специального заклинания
+      вызовут снег, который под&nbsp;музыку пойдет со&nbsp;спрятанного на&nbsp;крыше генератора снега,
+      что обычно очень веселит деток! Обычно они в&nbsp;восторге: прыгают, кричат, ловят снег руками...</p>
+  </div>
+</section>
+
+<script>
+/* Ролик экрана «снег». Файл ставится, только когда экран в 300 px от окна;
+   играет, только пока экран виден и вкладка открыта. Какой файл — по
+   раскладке: до 1024 px телефонный вертикальный, дальше компьютерный,
+   1920 или 1280 по НАСТОЯЩИМ точкам экрана (плотность не выше двух).
+   «Меньше движения», экономия трафика, медленная сеть — ролика нет,
+   стоит заставка. Флаг `hochu` — как у ролика комнаты: без него отказ
+   на наш же pause() принимался за запрет автозапуска и ролик
+   запускался обратно за кадром. */
+(function(){
+  var box = document.querySelector('#sneg .sn-vid');
+  var v = box && box.querySelector('video');
+  if(!v) return;
+
+  var wide = window.matchMedia('(min-width:1024px)');
+  var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var net  = navigator.connection || {};
+  var skupo = net.saveData === true || /(^|-)(slow-)?2g$|^3g$/.test(net.effectiveType || '');
+  var file = '', shown = false, tries = 0, hochu = false, near = false, inView = false;
+
+  function mozhno(){ return !calm.matches && !skupo }
+  function nuzhen(){
+    if(!wide.matches) return v.getAttribute('data-mob');
+    var nado = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
+    return v.getAttribute(nado > 1360 ? 'data-wide' : 'data-mid');
+  }
+  function pokazat(){ if(!shown){ shown = true; v.classList.add('on') } }
+  function zhdatKadr(){
+    if(v.requestVideoFrameCallback) v.requestVideoFrameCallback(pokazat);
+    else v.addEventListener('playing', pokazat, {once:true});
+  }
+  function spryatat(){ shown = false; v.classList.remove('on') }
+
+  function play(){
+    hochu = true;
+    var p = v.play();
+    if(p && p.catch) p.catch(function(){
+      if(!hochu) return;
+      if(++tries < 4) setTimeout(function(){ if(hochu) play() }, 320);
+      else document.addEventListener('pointerdown', function(){ if(hochu) play() }, {once:true});
+    });
+  }
+  function stop(){ hochu = false; if(file) v.pause() }
+
+  function zaryadit(){
+    var f = nuzhen();
+    if(!f || f === file) return;
+    file = f; tries = 0; spryatat();
+    /* muted и свойством тоже, ДО src: Safari решает про звук в момент
+       подстановки файла. */
+    v.muted = true; v.defaultMuted = true; v.playsInline = true;
+    v.src = f; v.load();
+    zhdatKadr();
+  }
+
+  function tick(){
+    if(!mozhno()){ stop(); spryatat(); return }
+    if(!near) return;
+    zaryadit();
+    if(inView && !document.hidden) play(); else stop();
+  }
+
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){ near = es[es.length - 1].isIntersecting; tick() },
+      {rootMargin:'300px 0px'}).observe(box);
+    new IntersectionObserver(function(es){ inView = es[es.length - 1].isIntersecting; tick() })
+      .observe(box);
+  } else { near = inView = true; tick() }
+
+  document.addEventListener('visibilitychange', tick);
+  function slushat(mq, fn){ if(mq.addEventListener) mq.addEventListener('change', fn);
+    else if(mq.addListener) mq.addListener(fn) }
+  /* Окно растянули через 1024 px — нужен другой файл (tick сам сменит,
+     если экран рядом). «Меньше движения» выключили — ждём кадр заново. */
+  slushat(wide, tick);
+  slushat(calm, function(){ if(!calm.matches && file) zhdatKadr(); tick() });
+})();
+</script>
+<!-- /sn ТЮМЕНЬ: конец экрана «снег» -->
+
 <!-- ==================== ЭКРАН 10Б: ФЕЕРИЧНЫЙ ФЛЕШМОБ ====================
      «Фееричный флешмоб с великанами-марионетками в рамках велком-шоу».
      Макеты Серёги 11.09.2026. Номер с буквой — чтобы не перенумеровывать
