@@ -11314,12 +11314,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   color:#fff;
   /* блик на каждом шве занимает ±3,1vw — поля больше этого с запасом */
   padding:clamp(64px,6.4vw,116px) 0 clamp(72px,6.2vw,124px);
-  /* Поле кодом, цвета экрана программы (.pgs): ночь от #000A3D через
-     #001061 и светлую середину #041A6E, сверху широкое свечение под
-     заголовок. До 17.09.2026 тут стояла картинка ty-fon.webp. */
+  /* Поле кодом, цвета экрана программы (.pgs), но на ~15 % темнее
+     (просьба Серёги 17.09.2026): ночь от #000934 через #000E52 и светлую
+     середину #03165E, сверху свечение под заголовок. До 17.09.2026 тут
+     стояла картинка ty-fon.webp. */
   background:
-    radial-gradient(72% 16% at 50% 0%, rgba(30,52,158,.55), rgba(30,52,158,0) 100%),
-    linear-gradient(180deg, #000A3D 0%, #001061 20%, #041A6E 46%, #02114F 74%, #000B36 100%);
+    radial-gradient(72% 16% at 50% 0%, rgba(30,52,158,.46), rgba(30,52,158,0) 100%),
+    linear-gradient(180deg, #000934 0%, #000E52 20%, #03165E 46%, #020E43 74%, #00092E 100%);
 }
 .pu-bg{position:absolute; inset:0; z-index:0; pointer-events:none}
 /* Низ растворяется в фон роликов: #0A1046 и поверх то же синее зарево,
@@ -11343,16 +11344,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           mask-image:linear-gradient(180deg,#000 0,#000 80%,transparent 100%)}
 .pu-glow i{position:absolute; display:block; border-radius:50%}
 .pu-glow i:nth-child(1){left:-18%; top:-2%; width:72%; height:34%;
-  background:radial-gradient(closest-side, rgba(47,49,146,.50) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  background:radial-gradient(closest-side, rgba(47,49,146,.42) 0%, rgba(47,49,146,.29) 32%, rgba(47,49,146,.10) 64%, rgba(47,49,146,0) 100%);
   animation:bkDrift1 38s ease-in-out infinite alternate}
 .pu-glow i:nth-child(2){right:-20%; top:20%; width:70%; height:32%;
-  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.21) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  background:radial-gradient(closest-side, rgba(108,43,217,.27) 0%, rgba(108,43,217,.18) 32%, rgba(108,43,217,.06) 64%, rgba(108,43,217,0) 100%);
   animation:bkDrift2 45s ease-in-out infinite alternate}
 .pu-glow i:nth-child(3){left:-8%; top:44%; width:66%; height:32%;
-  background:radial-gradient(closest-side, rgba(176,106,224,.24) 0%, rgba(176,106,224,.16) 32%, rgba(176,106,224,.05) 64%, rgba(176,106,224,0) 100%);
+  background:radial-gradient(closest-side, rgba(176,106,224,.20) 0%, rgba(176,106,224,.14) 32%, rgba(176,106,224,.04) 64%, rgba(176,106,224,0) 100%);
   animation:bkDrift3 33s ease-in-out infinite alternate}
 .pu-glow i:nth-child(4){right:-16%; top:64%; width:72%; height:32%;
-  background:radial-gradient(closest-side, rgba(47,49,146,.42) 0%, rgba(47,49,146,.28) 32%, rgba(47,49,146,.10) 64%, rgba(47,49,146,0) 100%);
+  background:radial-gradient(closest-side, rgba(47,49,146,.36) 0%, rgba(47,49,146,.24) 32%, rgba(47,49,146,.08) 64%, rgba(47,49,146,0) 100%);
   animation:bkDrift2 41s ease-in-out infinite alternate-reverse}
 .pu-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
@@ -11398,12 +11399,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* жирное — из «Blogger Sans»: у «CR Blogger» жирного нет */
 .pu-lead b{font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700; color:#FFD189}
 
-/* ---------- сцена: пульт + мозаика ---------- */
+/* ---------- сцена: пульт + мозаика ----------
+   Одним блоком того же вида, что карточки «А также» ниже: лиловая подложка,
+   волосяная кромка, то же скругление (просьба Серёги 17.09.2026). Блок во всю
+   ширину контейнера — края совпадают с рядом карточек. Пульт и мозаика
+   внутри на 10 % меньше, чем были до блока. */
 .pu-stage{
   position:relative; display:grid; align-items:center;
-  gap:clamp(26px,3.6vw,56px); margin-top:clamp(44px,5.4vw,100px);
+  gap:clamp(22px,3vw,48px); margin-top:clamp(44px,5.4vw,100px);
+  padding:clamp(14px,2.6vw,48px);
+  border-radius:calc(var(--pu-r) + clamp(8px,.6vw,11px));
+  background:linear-gradient(160deg, rgba(86,60,196,.32) 0%, rgba(38,26,112,.28) 52%, rgba(20,14,70,.42) 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,214,150,.16), inset 0 1px 0 rgba(255,255,255,.07), 0 26px 50px -30px rgba(0,0,0,.85);
 }
-.pu-art{position:relative; justify-self:center; width:min(78vw,380px)}
+.pu-art{position:relative; justify-self:center; width:min(70vw,342px)}
 /* ореол за пультом: лиловый со следом бирюзы его светодиодов */
 .pu-art::before{
   content:''; position:absolute; z-index:0; left:-14%; right:-14%; top:-8%; bottom:4%;
@@ -11613,16 +11622,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .pu-br{display:inline}
   /* одна формула без ступеней: 768 — 28 px, 1180 — 40, от ~1724 — 56 */
   .pu-t{font-size:clamp(28px, calc(2.9vw + 6px), 56px)}
-  .pu-art{width:min(46vw,420px)}
+  .pu-art{width:min(41.4vw,378px)}
   .pu-cards{grid-template-columns:repeat(3,minmax(0,1fr))}
-  /* мозаика на 15 % меньше прежней (просьба Серёги 17.09.2026) */
-  .pu-main{width:85%; justify-self:center}
+  /* мозаика: на 15 %, потом ещё на 10 % меньше (просьбы Серёги 17.09.2026) */
+  .pu-main{width:76.5%; justify-self:center}
 }
-/* Компьютер: пульт слева, мозаика справа. Пульт прежнего размера (35,5 %
-   контейнера), мозаика на 15 % меньше прежней (60,4 → 51,4 %); освободившееся
-   место — зазор между ними и поровну по краям, пара стоит по центру. */
+/* Компьютер: пульт слева, мозаика справа. Доли считаются от ширины
+   контейнера (--pu-cw), а не от блока с полями: пульт 35,5 % × 0,9,
+   мозаика 51,4 % × 0,9 (сначала мозаика -15 %, потом пара -10 %).
+   Остаток — зазор между ними и поровну по краям, пара по центру блока. */
 @media (min-width:1024px){
-  .pu-stage{grid-template-columns:35.5% 51.4%; justify-content:center; column-gap:clamp(36px,5vw,96px)}
+  .pu-stage{
+    --pu-cw:calc(min(94vw,1462px) - 2 * clamp(16px,3vw,47.6px));
+    grid-template-columns:calc(var(--pu-cw) * .3195) calc(var(--pu-cw) * .4626);
+    justify-content:center; column-gap:clamp(36px,5vw,96px);
+  }
   .pu-main{width:auto}
   .pu-art{width:100%}
   .pu-spark{display:block}
@@ -11677,30 +11691,30 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     <div class="pu-stage">
       <svg class="pu-spark" style="--x:3.5%;--y:4%;--sz:24px;--d:0s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
-      <svg class="pu-spark" style="--x:34%;--y:-3%;--sz:15px;--d:-1.1s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
+      <svg class="pu-spark" style="--x:34%;--y:3.5%;--sz:15px;--d:-1.1s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
       <svg class="pu-spark" style="--x:41%;--y:64%;--sz:19px;--d:-2.2s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
-      <svg class="pu-spark" style="--x:95.6%;--y:-3%;--sz:22px;--d:-.6s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
+      <svg class="pu-spark" style="--x:95.6%;--y:4%;--sz:22px;--d:-.6s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
       <svg class="pu-spark" style="--x:2%;--y:80%;--sz:14px;--d:-1.7s" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C12.9 7.6 16.4 11.1 24 12C16.4 12.9 12.9 16.4 12 24C11.1 16.4 7.6 12.9 0 12C7.6 11.1 11.1 7.6 12 0Z"/></svg>
 
       <div class="pu-art">
-        <img class="pu-img" src="pult/ty-pult.webp?v=1" srcset="pult/ty-pult-640.webp?v=1 640w, pult/ty-pult.webp?v=1 1200w" sizes="(max-width:767px) 78vw, (max-width:1023px) 46vw, (max-width:1599px) 32vw, 490px" width="1200" height="1323" alt="Пульт управления новогодними делами: деревянный пульт Деда Мороза с тремя неоновыми экранами, кнопками и рычагами" loading="lazy" decoding="async" draggable="false">
+        <img class="pu-img" src="pult/ty-pult.webp?v=1" srcset="pult/ty-pult-640.webp?v=1 640w, pult/ty-pult.webp?v=1 1200w" sizes="(max-width:767px) 70vw, (max-width:1023px) 42vw, (max-width:1599px) 29vw, 440px" width="1200" height="1323" alt="Пульт управления новогодними делами: деревянный пульт Деда Мороза с тремя неоновыми экранами, кнопками и рычагами" loading="lazy" decoding="async" draggable="false">
         <div class="pu-neon" aria-hidden="true"><i></i><i></i><i></i></div>
       </div>
 
       <div class="pu-main">
         <div class="pu-bento">
           <figure class="pu-ph pu-ph5">
-            <img src="pult/ty-p5.webp?v=1" srcset="pult/ty-p5-600.webp?v=1 600w, pult/ty-p5.webp?v=1 1200w" sizes="(max-width:767px) 92vw, (max-width:1023px) 52vw, (max-width:1599px) 31vw, 470px" width="1200" height="775" alt="Фото двух мальчиков на экране пульта рядом с Дедом Морозом" loading="lazy" decoding="async" draggable="false">
+            <img src="pult/ty-p5.webp?v=1" srcset="pult/ty-p5-600.webp?v=1 600w, pult/ty-p5.webp?v=1 1200w" sizes="(max-width:767px) 86vw, (max-width:1023px) 47vw, (max-width:1599px) 28vw, 425px" width="1200" height="775" alt="Фото двух мальчиков на экране пульта рядом с Дедом Морозом" loading="lazy" decoding="async" draggable="false">
             <figcaption class="pu-chip"><i></i>На экране пульта</figcaption>
           </figure>
           <figure class="pu-ph pu-ph6">
-            <img src="pult/ty-p6.webp?v=2" srcset="pult/ty-p6-600.webp?v=2 600w, pult/ty-p6.webp?v=2 1200w" sizes="(max-width:767px) 46vw, (max-width:1023px) 26vw, (max-width:1599px) 15.5vw, 230px" width="1200" height="775" alt="Экран пульта Деда Мороза: фотографии всей группы детей" loading="lazy" decoding="async" draggable="false">
+            <img src="pult/ty-p6.webp?v=2" srcset="pult/ty-p6-600.webp?v=2 600w, pult/ty-p6.webp?v=2 1200w" sizes="(max-width:767px) 42vw, (max-width:1023px) 24vw, (max-width:1599px) 14vw, 210px" width="1200" height="775" alt="Экран пульта Деда Мороза: фотографии всей группы детей" loading="lazy" decoding="async" draggable="false">
           </figure>
           <figure class="pu-ph pu-ph7">
-            <img src="pult/ty-p7.webp?v=1" srcset="pult/ty-p7-600.webp?v=1 600w, pult/ty-p7.webp?v=1 1200w" sizes="(max-width:767px) 46vw, (max-width:1023px) 26vw, (max-width:1599px) 15.5vw, 230px" width="1200" height="775" alt="Девочка радостно подняла руки" loading="lazy" decoding="async" draggable="false">
+            <img src="pult/ty-p7.webp?v=1" srcset="pult/ty-p7-600.webp?v=1 600w, pult/ty-p7.webp?v=1 1200w" sizes="(max-width:767px) 42vw, (max-width:1023px) 24vw, (max-width:1599px) 14vw, 210px" width="1200" height="775" alt="Девочка радостно подняла руки" loading="lazy" decoding="async" draggable="false">
           </figure>
           <figure class="pu-ph pu-ph4">
-            <img src="pult/ty-p4.webp?v=1" srcset="pult/ty-p4-600.webp?v=1 600w, pult/ty-p4.webp?v=1 1200w" sizes="(max-width:767px) 92vw, (max-width:1023px) 26vw, (max-width:1599px) 15.5vw, 230px" width="1200" height="775" alt="Удивлённые дети смотрят на экран пульта" loading="lazy" decoding="async" draggable="false">
+            <img src="pult/ty-p4.webp?v=1" srcset="pult/ty-p4-600.webp?v=1 600w, pult/ty-p4.webp?v=1 1200w" sizes="(max-width:767px) 86vw, (max-width:1023px) 24vw, (max-width:1599px) 14vw, 210px" width="1200" height="775" alt="Удивлённые дети смотрят на экран пульта" loading="lazy" decoding="async" draggable="false">
             <figcaption class="pu-chip pu-chip--gold"><i></i>Реакция детей</figcaption>
           </figure>
           <figure class="pu-rev">
