@@ -16,7 +16,7 @@
          python3 "sayt-nn/instrumenty/sinhron.py"
      Скрипт вливает сюда всё, что изменилось в Нижнем, городское не трогает.
 
-     СИНХРОНИЗИРОВАНА С v2.html ВЕРСИИ: 2520e35a2ee2e1cd704cf2be92a97088a5f22e57
+     СИНХРОНИЗИРОВАНА С v2.html ВЕРСИИ: 1d5ed82bce16f9072e34ab23e1cea9d0c3292c61
      Строку выше правит сам скрипт - руками её не трогать.
      ====================================================================== -->
 <meta charset="utf-8">
@@ -2942,6 +2942,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"Golos Text",Arial,sans-serif; font-size:11.5px; line-height:1.45; color:#66779A}
 .zs-fine a{color:#8FA3C8}
 
+/* Промокод в формах заявки (16.09.2026, plans/2026-09-13-promokody.md, фаза 5).
+   Необязательное поле, под ним подсказка. В формах с выбором «Индивидуально /
+   Группой» появляется только после «Группой» — семьям промокоды не положены
+   (скрипт «ЕДИНАЯ ФОРМА ЗАЯВКИ», атрибут data-zs-promo). В сетках встаёт во всю
+   строку по центру, как «Как планируете прийти». [hidden] явно: у поля свой display. */
+.zs-promo[hidden]{display:none}
+.bk-grid .zs-promo, .sv-grid .zs-promo, .kv-grid .zs-promo{
+  grid-column:1 / -1; width:min(100%,360px); margin:0 auto; text-align:center}
+.bk-grid .zs-promo .zs-lab, .sv-grid .zs-promo .zs-lab, .kv-grid .zs-promo .zs-lab{text-align:center}
+.zs-promo .zs-inp{text-align:center; letter-spacing:.12em}
+.zs-hint{margin:8px 4px 0; font-family:"Golos Text",Arial,sans-serif;
+  font-size:12.5px; line-height:1.35; color:#8FA3C8}
+
 /* ---------- экран «спасибо» ---------- */
 /* Звезда в круге — та же метка, что над формой, только крупная и загорается:
    человек видит, что бланк проштампован, а не просто сменился текст */
@@ -5431,6 +5444,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .sv .zs-seg.bad .zs-opt{border-color:rgba(214,69,80,.55)}
 .sv .zs-err{color:#C2333B}
 .sv .zs-fine{color:#4E5D82}
+.sv .zs-hint{color:#4E5D82}
 .sv .zs-fine a{color:#3F4F76}
 /* ФОКУС С КЛАВИАТУРЫ. В общих правилах он нарисован для тёмного неба:
    светлое золото по чёрному. На белом его не видно вовсе, и человек, который
@@ -9541,6 +9555,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             </div>
             <p class="zs-err" data-for="visit" hidden>Выберите один из двух вариантов</p>
           </div>
+          <!-- промокод: необязательный, появляется после выбора «Группой». Проверяет его сервер
+               (schedule-app/src/lib/promo-amo.ts), отсюда уезжает как есть -->
+          <div class="bk-f zs-promo" data-zs-promo hidden>
+            <label class="zs-lab" for="bkPromo">Промокод</label>
+            <input class="zs-inp" id="bkPromo" name="promo" type="text" inputmode="numeric"
+                   autocomplete="off" maxlength="20" placeholder="6 цифр" aria-describedby="bkPromoHint">
+            <p class="zs-hint" id="bkPromoHint">Прошлогодние промокоды не действуют</p>
+          </div>
         </div>
         <div class="bk-send">
           <button class="zs-btn zs-btn--lg" type="submit"><span class="zs-t">Забронировать дату</span></button>
@@ -11117,6 +11139,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             </div>
             <p class="zs-err" data-for="visit" hidden>Выберите один из двух вариантов</p>
           </div>
+          <!-- промокод: необязательный, появляется после выбора «Группой». Проверяет его сервер
+               (schedule-app/src/lib/promo-amo.ts), отсюда уезжает как есть -->
+          <div class="sv-f zs-promo" data-zs-promo hidden>
+            <label class="zs-lab" for="sv2Promo">Промокод</label>
+            <input class="zs-inp" id="sv2Promo" name="promo" type="text" inputmode="numeric"
+                   autocomplete="off" maxlength="20" placeholder="6 цифр" aria-describedby="sv2PromoHint">
+            <p class="zs-hint" id="sv2PromoHint">Прошлогодние промокоды не действуют</p>
+          </div>
         </div>
         <div class="sv-send">
           <button class="zs-btn" type="submit"><span class="zs-t">Оставить заявку</span></button>
@@ -11844,6 +11874,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                   <option>Ставрополь</option>
                 </select>
                 <p class="zs-err" id="kvErrCity" data-for="city" hidden>Выберите город</p>
+              </div>
+              <!-- промокод: необязательный, форма только для групп, поле видно сразу. Проверяет его сервер
+                   (schedule-app/src/lib/promo-amo.ts), отсюда уезжает как есть -->
+              <div class="kv-f zs-promo" data-zs-promo>
+                <label class="zs-lab" for="kvPromo">Промокод</label>
+                <input class="zs-inp" id="kvPromo" name="promo" type="text" inputmode="numeric"
+                       autocomplete="off" maxlength="20" placeholder="6 цифр" aria-describedby="kvPromoHint">
+                <p class="zs-hint" id="kvPromoHint">Прошлогодние промокоды не действуют</p>
               </div>
             </div>
             <div class="kv-send">
@@ -13036,6 +13074,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             </div>
             <p class="zs-err" data-for="visit" hidden>Выберите один из двух вариантов</p>
           </div>
+          <!-- промокод: необязательный, появляется после выбора «Группой». Проверяет его сервер
+               (schedule-app/src/lib/promo-amo.ts), отсюда уезжает как есть -->
+          <div class="sv-f zs-promo" data-zs-promo hidden>
+            <label class="zs-lab" for="svPromo">Промокод</label>
+            <input class="zs-inp" id="svPromo" name="promo" type="text" inputmode="numeric"
+                   autocomplete="off" maxlength="20" placeholder="6 цифр" aria-describedby="svPromoHint">
+            <p class="zs-hint" id="svPromoHint">Прошлогодние промокоды не действуют</p>
+          </div>
         </div>
         <div class="sv-send">
           <button class="zs-btn" type="submit"><span class="zs-t">Оставить заявку</span></button>
@@ -13278,6 +13324,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
               </label>
             </div>
             <p class="zs-err" id="zsErrKind" data-for="visit" hidden>Выберите один из двух вариантов</p>
+          </div>
+
+          <!-- промокод: необязательный, появляется после выбора «Группой». Проверяет его сервер
+               (schedule-app/src/lib/promo-amo.ts), отсюда уезжает как есть -->
+          <div class="zs-f zs-promo" data-zs-promo hidden>
+            <label class="zs-lab" for="zsPromo">Промокод</label>
+            <input class="zs-inp" id="zsPromo" name="promo" type="text" inputmode="numeric"
+                   autocomplete="off" maxlength="20" placeholder="6 цифр" aria-describedby="zsPromoHint">
+            <p class="zs-hint" id="zsPromoHint">Прошлогодние промокоды не действуют</p>
           </div>
 
           <div class="zs-send">
@@ -15915,6 +15970,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var errPh = form.querySelector('.zs-err[data-for="phone"]');
     var errCt = form.querySelector('.zs-err[data-for="city"]');
     var errKd = form.querySelector('.zs-err[data-for="visit"]');
+    /* Промокод. В форме с выбором формата поле видно только для «Группой»:
+       семьям промокоды не положены. Без выбора формата (квиз) — видно всегда. */
+    var promoBox = form.querySelector('[data-zs-promo]');
+    var promoI   = promoBox ? promoBox.querySelector('input[name="promo"]') : null;
+    function syncPromo(){
+      if (!promoBox || !seg) return;
+      var g = form.querySelector('input[name="visit"][value="Групповое"]');
+      promoBox.hidden = !(g && g.checked);
+    }
+    syncPromo();
     var baseSend = sendT ? sendT.textContent : '';
     var sending = false, prev = '';
 
@@ -15965,6 +16030,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         }
         seg.classList.remove('bad');
         if (errKd) errKd.hidden = true;
+        syncPromo();
       });
     }
 
@@ -15978,6 +16044,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       if (phone) phone.classList.remove('bad');
       if (city) city.classList.remove('bad');
       if (seg) seg.classList.remove('bad');
+      syncPromo();
     }
 
     form.addEventListener('submit', function(e){
@@ -16013,6 +16080,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         sentAt: new Date().toISOString()
       };
       if (nameI && nameI.value.trim()) lead.name = nameI.value.trim();
+      /* скрытое поле (выбрано «Индивидуально») не отправляем, даже если в нём что-то набрали */
+      if (promoI && !promoBox.hidden && promoI.value.trim()) lead.promo = promoI.value.trim().slice(0, 20);
       /* Свои поля формы (ответы квиза) - их отдаёт сама форма через opts.extra.
          zsBind знает только про имя, телефон, город и формат; всё остальное,
          что нужно конкретному экрану, приходит отсюда. */
