@@ -4910,6 +4910,44 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    Там её просто нет. */
 @media (max-width:1599px){ .sv-dev{display:none} }
 
+/* ---------- вторая светлая форма: над мастер-классом (.sv--mk) ----------
+   16.09.2026 Серёга: 12.09 он просил не переносить светлую форму вниз,
+   а сделать внизу ещё одну такую же. Прежняя вернулась на своё место -
+   между флешмобом (в Тюмени между экраном «снег») и леденцами - с прежней
+   девушкой-карамельщицей справа. Нижняя осталась как есть, с ведущей слева.
+   Стили у обеих общие (.sv), отличие только в этих строках.
+
+   СВОЕГО СУГРОБА СВЕРХУ У НЕЁ НЕТ. Стык над ней держит сугроб соседа
+   (.vl .cr-snow, в Тюмени .sn .cr-snow): он прижат к нижней кромке соседа
+   и доведён до чистого белого, а поле .sv и так чисто белое. Поставишь
+   сюда .cr-snow - гребни встанут двумя рядами подряд.
+
+   ДЕВУШКА И ЧИСЛА - ПРЕЖНИЕ, какими были до 12.09.2026. Картинка Серёги
+   `~/Desktop/новый сайт/девушка длф формы.png`, 628x1418, у нас
+   `v2-sv-devushka.webp` и `v2-sv-devushka-420.webp`. Ширина 30 % бланка,
+   вылет за его правый край 9 % (не дальше свободного места до края окна),
+   ноги уходят ниже кромки экрана на 15 % ширины бланка и срезаются обоймой.
+   Плечом она заходит ПОД поле «Город», а не на него: обойма та же, на
+   отрицательном слое внутри бланка. Порог 1600 px - общий, правило выше. */
+.sv--mk .sv-devhold{
+  left:0;
+  right:calc(-1 * min(var(--cardw) * .09, var(--free)));
+}
+.sv--mk .sv-dev{
+  left:auto; right:0;
+  width:calc(var(--cardw) * .30);
+  bottom:calc(var(--cardw) * -.1514);
+}
+/* ШОВ С ЛЕДЕНЦАМИ БЕЗ ЧЕРТЫ. Отблески прижаты к низу экрана и на его нижней
+   кромке ещё голубые, а верхняя строка экрана леденцов чисто белая - по стыку
+   шла ровная черта во всю ширину (она была и до 12.09.2026). Гасим отблески
+   к низу маской: нижняя строка экрана выходит чисто белой, как у соседа.
+   Одним слоем, без mask-composite. У нижней формы этого шва нет. */
+.sv--mk .sv-glow{
+  -webkit-mask-image:linear-gradient(180deg,#000 72%,transparent 100%);
+          mask-image:linear-gradient(180deg,#000 72%,transparent 100%);
+}
+
 .sv-eyebrow{margin:0 0 clamp(12px,1.3vw,15.3px); font-family:"Golos Text",Arial,sans-serif;
   font-size:clamp(9.68px,.86vw,11.05px); font-weight:600; letter-spacing:.24em;
   text-transform:uppercase; color:#4E5D82}
@@ -10072,6 +10110,104 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
        Числа → sayt-nn/ustroystvo.md, раздел «Стык с экраном леденцов». -->
   <div class="cr-snow" aria-hidden="true"></div>
 </section>
+
+<!-- ==================== ЭКРАН 11А: заявка на светлом над мастер-классом ====================
+     Вторая светлая форма, копия нижней (экран 11). 16.09.2026 вернулась на
+     место, где светлая форма стояла до 12.09.2026, с прежней девушкой-
+     карамельщицей справа. Стили общие (.sv), отличия - в классе .sv--mk.
+     Своего сугроба сверху нет: стык держит сугроб экрана выше, он доведён
+     до белого, а поле этого экрана и так белое.
+     Все id внутри свои (sv2*): светлых форм на странице две, и повтор id
+     увёл бы клик по метке в чужое поле. Скрипт - общий с нижней формой. -->
+<section class="cr sv sv--mk" id="apply-mk" aria-labelledby="sv2T">
+  <div class="sv-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="cr-cont">
+    <div class="sv-card">
+      <!-- обойма девушки: режет её ноги ровно по нижней кромке экрана.
+           Картинку внутрь кладёт скрипт и только на широком экране -->
+      <div class="sv-devhold" id="sv2DevHold" aria-hidden="true"></div>
+      <img class="sv-girl" src="v2-sv-girlyanda-1400.webp"
+           srcset="v2-sv-girlyanda-760.webp 760w, v2-sv-girlyanda-1400.webp 1400w, v2-sv-girlyanda.webp 2774w"
+           sizes="(max-width:559px) 150vw, (max-width:1279px) 94vw, min(94vw, 1400px)"
+           width="2774" height="151" loading="lazy" decoding="async" alt="" aria-hidden="true">
+      <p class="sv-eyebrow">Сезон 2026/27 · Нижний Новгород</p>
+      <h2 class="sv-t" id="sv2T">Успейте забрать лучшие даты<br class="sv-br"> <b>по цене сентября!</b></h2>
+      <p class="zs-price">от <b>1390 руб</b> до <b>1790 руб</b> для групп</p>
+      <p class="sv-lede">Мы перезвоним Вам в течение <b>30&nbsp;минут</b>, предложим лучшие даты
+        и цены, а также <b>отправим в <span class="mx">МАХ</span></b> или ТГ
+        шаблон с полным инфо для родительского чата</p>
+
+      <form class="sv-form" id="sv2Form" novalidate>
+        <div class="sv-grid">
+          <div class="sv-f">
+            <label class="zs-lab" for="sv2Name">Ваше имя</label>
+            <input class="zs-inp" id="sv2Name" name="name" type="text" autocomplete="given-name"
+                   placeholder="Как к вам обращаться" maxlength="60">
+          </div>
+          <div class="sv-f">
+            <label class="zs-lab" for="sv2Phone">Ваш телефон <span class="zs-req" aria-hidden="true">*</span></label>
+            <input class="zs-inp" id="sv2Phone" name="phone" type="tel" inputmode="tel"
+                   autocomplete="tel" placeholder="+7 (___) ___-__-__"
+                   aria-describedby="sv2ErrPhone" required>
+            <p class="zs-err" id="sv2ErrPhone" data-for="phone" hidden>Проверьте номер: нужно 11 цифр</p>
+          </div>
+          <!-- город обязателен: от него зависит воронка в CRM. Ярославля и
+               Екатеринбурга нет намеренно - они у партнёра по франшизе -->
+          <div class="sv-f">
+            <label class="zs-lab" for="sv2City">Город <span class="zs-req" aria-hidden="true">*</span></label>
+            <select class="zs-inp zs-sel" id="sv2City" name="city" aria-describedby="sv2ErrCity" required>
+              <option value="" disabled selected>Выберите город</option>
+              <option>Нижний Новгород</option>
+              <option>Казань</option>
+              <option>Крым</option>
+              <option>Ставрополь</option>
+              <option>Тюмень</option>
+            </select>
+            <p class="zs-err" id="sv2ErrCity" data-for="city" hidden>Выберите город</p>
+          </div>
+          <div class="sv-f sv-f--kind">
+            <span class="zs-lab" id="sv2KindLab">Как планируете прийти</span>
+            <div class="zs-seg" role="radiogroup" aria-labelledby="sv2KindLab">
+              <label class="zs-opt">
+                <input type="radio" name="visit" value="Индивидуальное">
+                Индивидуально<em>семьёй, с друзьями</em>
+              </label>
+              <label class="zs-opt">
+                <input type="radio" name="visit" value="Групповое">
+                Группой<em>класс, от 20 детей</em>
+              </label>
+            </div>
+            <p class="zs-err" data-for="visit" hidden>Выберите один из двух вариантов</p>
+          </div>
+        </div>
+        <div class="sv-send">
+          <button class="zs-btn" type="submit"><span class="zs-t">Оставить заявку</span></button>
+          <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на обработку персональных данных
+            и на звонок от менеджера. Телефон нужен только для связи по заявке.</p>
+        </div>
+      </form>
+
+      <div class="sv-done" id="sv2Done" tabindex="-1" hidden>
+        <div class="sv-seal seal-alert" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16 4.6c1.6 0 2.8 1.3 2.7 2.9l-.9 12.1c-.07 1-.86 1.7-1.8 1.7s-1.73-.7-1.8-1.7l-.9-12.1c-.1-1.6 1.1-2.9 2.7-2.9z"/><circle cx="16" cy="26" r="2.5"/></svg>
+        </div>
+        <h3 class="sv-done-h">Внимание! Важно! 👇</h3>
+        <p class="sv-lede mx-big">Чтобы менеджер смог Вам написать (отправить
+          программу, даты, цены, выставить счёт) и держать связь в переписке,
+          <b>запустите бот в <span class="mx">МАХ</span></b>&nbsp;- это
+          официальный канал связи без блокировок и т.д.</p>
+        <!-- адрес бота подставит скрипт «ССЫЛКА НА БОТА В МАХ» перед </body> -->
+        <div class="mx-cta">
+          <a class="zs-btn zs-btn--purple" data-mx-bot href="#" target="_blank" rel="noopener">
+            <span class="zs-t">Перейти в МАХ</span>
+            <i class="pd-i mx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4.5 12h14M13 6l6 6-6 6"/></svg></i></a>
+        </div>
+        <p class="mx-note">Также в боте есть ответы на все возможные вопросы</p>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- /ЭКРАН 11А -->
 
 <!-- ==================== ЭКРАН 13: КРАСИВЫЕ ЛЕДЕНЦЫ (слайдер МК) ====================
      Заголовок, подпись и слайдер с кадрами карамельного мастер-класса.
@@ -15453,106 +15589,132 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </script>
 
 <script>
-/* ==================== ЭКРАН 11: появление и подключение формы ====================
+/* ==================== ЭКРАН 11 и 11А: появление и подключение светлых форм ====================
    Логика формы общая на весь сайт - window.zsBind из блока «Единая форма
    заявки» (маска телефона, проверка, приёмник). Здесь только: когда экран
    доезжает до глаз - всплывает бланк; заголовок держится в двух строках;
    после отправки форма сменяется на «заявка принята». zsBind объявлен ниже
-   по файлу, поэтому подключаемся после разбора страницы. */
+   по файлу, поэтому подключаемся после разбора страницы.
+
+   СВЕТЛЫХ ФОРМ ДВЕ (с 16.09.2026): над мастер-классом с девушкой-
+   карамельщицей и в самом низу страницы с ведущей. Код у них один,
+   отличаются только id, картинка девушки и метка, откуда пришла заявка
+   (она уезжает менеджеру). Нет экрана на странице - его строка молча
+   пропускается. */
 (function(){
   'use strict';
-  var s = document.getElementById('apply');
-  if (!s) return;
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (window.IntersectionObserver && !reduce){
-    s.classList.add('rv');
-    var io = new IntersectionObserver(function(es){
-      if (es[0].isIntersecting){ s.classList.add('on'); io.disconnect(); }
-    }, {threshold:.12});
-    io.observe(s);
-  }
-
-  /* Заголовок всегда в две строки (на телефоне в три). Разбивку задаёт
-     <br class="sv-br">, но она держится, только пока строка помещается
-     в ширину бланка. Если Blogger Sans ещё не загрузился, текст рисует
-     запасной Golos - он шире на 21 %, и строк становится больше задуманного.
-     Тогда уменьшаем кегль шагами по 6 %; после загрузки шрифта считаем
-     заново, там кегль вернётся к исходному. Тот же приём, что на пятом
-     экране → lessons/ch-zavisit-ot-shrifta.md */
-  var ttl = document.getElementById('svT');
-  function fitT(){
-    if (!ttl) return;
-    ttl.style.fontSize = '';
-    var cs = getComputedStyle(ttl);
-    var size = parseFloat(cs.fontSize);
-    var mult = parseFloat(cs.lineHeight) / size;
-    if (!size || !mult) return;
-    var max = window.innerWidth <= 640 ? 3 : 2;
-    for (var i = 0; i < 12; i++){
-      if (Math.round(ttl.getBoundingClientRect().height / (size * mult)) <= max) return;
-      size *= 0.94;
-      ttl.style.fontSize = size + 'px';
-    }
-  }
-  fitT();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitT);
-  var fitTimer;
-  window.addEventListener('resize', function(){
-    clearTimeout(fitTimer);
-    fitTimer = setTimeout(fitT, 150);
-  }, {passive:true});
-
-  /* ---------- девушка-карамельщица ----------
-     Создаём картинку только на широком экране (от 1600 px): уже него бланк
-     становится тесным для неё, а на телефоне её не
-     показываем по просьбе Серёги, и качать её туда незачем. `loading`
-     и `decoding` ставим ДО `src` - после `src` загрузка уже началась
-     и они опоздают → lessons/loading-lazy-stavit-do-src.md */
-  var hold = document.getElementById('svDevHold');
   var wide = window.matchMedia('(min-width:1600px)');
-  function makeDev(){
-    if (!hold || hold.firstChild || !wide.matches) return;
-    var im = document.createElement('img');
-    im.className = 'sv-dev';
-    im.loading = 'lazy'; im.decoding = 'async'; im.alt = ''; im.setAttribute('aria-hidden','true');
-    im.width = 822; im.height = 1165;
-    im.sizes = '26vw';
-    im.srcset = 'v2-sv-devushka2-560.webp 560w, v2-sv-devushka2.webp 822w';
-    im.src = 'v2-sv-devushka2.webp';
-    hold.appendChild(im);
-  }
-  makeDev();
-  wide.addEventListener ? wide.addEventListener('change', makeDev)
-                        : wide.addListener && wide.addListener(makeDev);
 
-  var form = document.getElementById('svForm'), done = document.getElementById('svDone');
-  if (!form || !done) return;
-  var bound = false;
-  /* пока общая логика не подключена, обычная отправка формы (перезагрузка
-     страницы с телефоном в адресе) не должна случиться */
-  form.addEventListener('submit', function(e){ if (!bound) e.preventDefault(); });
+  var FORMY = [
+    { sec:'apply-mk', t:'sv2T', hold:'sv2DevHold', form:'sv2Form', done:'sv2Done',
+      source:'светлая форма над мастер-классом',
+      /* девушка-карамельщица в полосатом фартуке, справа от полей */
+      dev:{ w:628, h:1418, sizes:'18vw',
+            srcset:'v2-sv-devushka-420.webp 420w, v2-sv-devushka.webp 628w',
+            src:'v2-sv-devushka.webp' } },
+    { sec:'apply', t:'svT', hold:'svDevHold', form:'svForm', done:'svDone',
+      source:'11-й экран, светлая форма',
+      /* ведущая в синем костюме со звёздами, слева, ладонью на кнопку */
+      dev:{ w:822, h:1165, sizes:'26vw',
+            srcset:'v2-sv-devushka2-560.webp 560w, v2-sv-devushka2.webp 822w',
+            src:'v2-sv-devushka2.webp' } }
+  ];
+  for (var n = 0; n < FORMY.length; n++) nastroit(FORMY[n]);
 
-  function wire(){
-    if (bound || typeof window.zsBind !== 'function') return;
-    bound = true;
-    window.zsBind(form, {
-      source: '11-й экран, светлая форма',
-      onDone: function(){
-        /* Экран последний на странице, и короткая плашка «заявка принята»
-           вместо высокой формы укоротила бы документ на 250-540 px - страницу
-           подбросило бы вверх ровно в тот момент, когда человек ждёт ответа.
-           Держим высоту бланка той, что была до отправки. */
-        var card = form.closest ? form.closest('.sv-card') : null;
-        if (card) card.style.minHeight = card.getBoundingClientRect().height + 'px';
-        form.hidden = true;
-        done.hidden = false;
-        try { done.focus({preventScroll:true}); } catch(_){ }
+  function nastroit(c){
+    var s = document.getElementById(c.sec);
+    if (!s) return;
+
+    if (window.IntersectionObserver && !reduce){
+      s.classList.add('rv');
+      var io = new IntersectionObserver(function(es){
+        if (es[0].isIntersecting){ s.classList.add('on'); io.disconnect(); }
+      }, {threshold:.12});
+      io.observe(s);
+    }
+
+    /* Заголовок всегда в две строки (на телефоне в три). Разбивку задаёт
+       <br class="sv-br">, но она держится, только пока строка помещается
+       в ширину бланка. Если Blogger Sans ещё не загрузился, текст рисует
+       запасной Golos - он шире на 21 %, и строк становится больше задуманного.
+       Тогда уменьшаем кегль шагами по 6 %; после загрузки шрифта считаем
+       заново, там кегль вернётся к исходному. Тот же приём, что на пятом
+       экране → lessons/ch-zavisit-ot-shrifta.md */
+    var ttl = document.getElementById(c.t);
+    function fitT(){
+      if (!ttl) return;
+      ttl.style.fontSize = '';
+      var cs = getComputedStyle(ttl);
+      var size = parseFloat(cs.fontSize);
+      var mult = parseFloat(cs.lineHeight) / size;
+      if (!size || !mult) return;
+      var max = window.innerWidth <= 640 ? 3 : 2;
+      for (var i = 0; i < 12; i++){
+        if (Math.round(ttl.getBoundingClientRect().height / (size * mult)) <= max) return;
+        size *= 0.94;
+        ttl.style.fontSize = size + 'px';
       }
-    });
+    }
+    fitT();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitT);
+    var fitTimer;
+    window.addEventListener('resize', function(){
+      clearTimeout(fitTimer);
+      fitTimer = setTimeout(fitT, 150);
+    }, {passive:true});
+
+    /* ---------- девушка у бланка ----------
+       Создаём картинку только на широком экране (от 1600 px): уже него бланк
+       становится тесным для неё, а на телефоне её не
+       показываем по просьбе Серёги, и качать её туда незачем. `loading`
+       и `decoding` ставим ДО `src` - после `src` загрузка уже началась
+       и они опоздают → lessons/loading-lazy-stavit-do-src.md */
+    var hold = document.getElementById(c.hold);
+    function makeDev(){
+      if (!hold || hold.firstChild || !wide.matches) return;
+      var im = document.createElement('img');
+      im.className = 'sv-dev';
+      im.loading = 'lazy'; im.decoding = 'async'; im.alt = ''; im.setAttribute('aria-hidden','true');
+      im.width = c.dev.w; im.height = c.dev.h;
+      im.sizes = c.dev.sizes;
+      im.srcset = c.dev.srcset;
+      im.src = c.dev.src;
+      hold.appendChild(im);
+    }
+    makeDev();
+    wide.addEventListener ? wide.addEventListener('change', makeDev)
+                          : wide.addListener && wide.addListener(makeDev);
+
+    var form = document.getElementById(c.form), done = document.getElementById(c.done);
+    if (!form || !done) return;
+    var bound = false;
+    /* пока общая логика не подключена, обычная отправка формы (перезагрузка
+       страницы с телефоном в адресе) не должна случиться */
+    form.addEventListener('submit', function(e){ if (!bound) e.preventDefault(); });
+
+    function wire(){
+      if (bound || typeof window.zsBind !== 'function') return;
+      bound = true;
+      window.zsBind(form, {
+        source: c.source,
+        onDone: function(){
+          /* Короткая плашка «заявка принята» вместо высокой формы укоротила
+             бы бланк на 250-540 px. У нижней формы страницу подбросило бы
+             вверх, у верхней весь низ страницы уехал бы из-под глаз - ровно
+             в тот момент, когда человек ждёт ответа. Держим высоту бланка
+             той, что была до отправки. */
+          var card = form.closest ? form.closest('.sv-card') : null;
+          if (card) card.style.minHeight = card.getBoundingClientRect().height + 'px';
+          form.hidden = true;
+          done.hidden = false;
+          try { done.focus({preventScroll:true}); } catch(_){ }
+        }
+      });
+    }
+    wire();
+    if (!bound) document.addEventListener('DOMContentLoaded', wire);
   }
-  wire();
-  if (!bound) document.addEventListener('DOMContentLoaded', wire);
 })();
 </script>
 
@@ -17186,9 +17348,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 <script>
 /* ==================== ССЫЛКА НА БОТА В МАХ ====================
-   Кнопка «Перейти в МАХ» стоит на четырёх экранах «заявка принята»: пятый
-   экран, расчёт стоимости, светлый экран заявки и всплывающее окно. Адрес
-   бота вписан СЮДА, в одну строку ниже, - один на все четыре кнопки.
+   Кнопка «Перейти в МАХ» стоит на пяти экранах «заявка принята»: пятый
+   экран, расчёт стоимости, две светлые формы и всплывающее окно. Адрес
+   бота вписан СЮДА, в одну строку ниже, - один на все кнопки.
 
    Бот живёт на нашем сервере (slots.ministrynewyear.ru/api/webhooks/max),
    код - schedule-app/src/lib/max-bot/, план - plans/2026-09-12-bot-max.md.
@@ -17232,8 +17394,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 <script>
 /* ==================== ЦЕНА В ФОРМАХ СЧИТАЕТСЯ ОТ ДАТЫ ====================
-   Строка «от … руб до … руб для групп» стоит в трёх открытых формах: пятый
-   экран, расчёт стоимости и светлый экран заявки. Во всплывающем окне её
+   Строка «от … руб до … руб для групп» стоит в четырёх открытых формах: пятый
+   экран, расчёт стоимости и две светлые формы. Во всплывающем окне её
    нет с 12.09.2026 - см. стили, блок про `.zs-win .zs-price`.
    Числа в ней не вписаны намертво:
    по прайсу цена растёт на 100 рублей каждого 1 числа месяца, и раз в месяц
