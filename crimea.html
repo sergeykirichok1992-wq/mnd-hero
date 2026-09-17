@@ -8,7 +8,7 @@
      и «Пульт Деда Мороза», тюменские карточки программы и персонажи,
      без экрана «История мероприятия».
 
-     Своё у Крыма: город и адрес площадки (Кизиловое, Центральная, 21),
+     Своё у Крыма: город и адрес площадки (Новопавловка, Севастопольская, 134),
      метаданные и домен mnd-crimea.ru, цены (спец 1290 - VIP 1690, взрослый
      от 700, `business/cities/crimea/pricing.md`), вместимость (до 33 детей),
      телефоны перевозчиков, подвал и порядок городов в формах.
@@ -1309,6 +1309,14 @@ html.touch .curtain{opacity:1}
   font-size:1.53cqw; line-height:1.1; letter-spacing:-.04em; white-space:nowrap;
   box-shadow:0 .16cqw .3cqw rgba(120,86,20,.25);
 }
+/* ТОЛЬКО КРЫМ (17.09.2026): адрес площадки длиннее, чем у других городов
+   («Крым, Новопавловка, Севастопольская 134» против тюменского «Тюмень,
+   Боровский, Тракторная 50»), и при общем кегле строка вылезала из плашки
+   на 31 px из 330 — хвост «134» пропадал. Кегль только этой строки меньше
+   на 10 %; остальные пять плашек общие. Поменяется адрес на короткий —
+   правило можно убрать. Замер: cdp.mjs + scrollWidth строки. */
+.dk-list li:nth-child(2){font-size:19px; font-size:1.38cqw}   /* вторая в разметке - это и есть строка адреса */
+
 /* Значок стоит в своём квадрате и центрируется в нём по обеим осям: эмодзи
    у разных систем разной ширины, и без квадрата они вставали вразнобой.
    Тень даёт filter:drop-shadow — она обводит саму картинку эмодзи,
@@ -9322,7 +9330,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 <header class="nav" id="nav">
   <div class="brand">МНД 2026-2027</div>
-  <span class="navinfo">Крым, Кизиловое, Центральная, 21<b>·</b><i>27 ноября - 10 января</i></span>
+  <span class="navinfo">Крым, Новопавловка, Севастопольская, 134<b>·</b><i>27 ноября - 10 января</i></span>
   <a class="zs-btn zs-btn--ghost zs-btn--ghost-purple" href="https://max.ru/id910314959705_biz" target="_blank" rel="noopener">
     <span class="zs-t">Написать в МАХ</span></a>
 </header>
@@ -9356,12 +9364,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <div class="city">Крым</div>
       <div class="rule"></div>
       <ul class="facts">
-        <li>Кизиловое, Центральная, 21</li>
+        <li>Новопавловка, Севастопольская, 134</li>
         <li>27 ноября — 10 января</li>
         <li>Детям 4+</li>
       </ul>
     </div>
-    <div class="tym tym--tekst"><img class="tym-tekst" id="tymTekst" alt="Весь декабрь и январские каникулы. Кизиловое, Центральная, 21"></div>
+    <div class="tym tym--tekst"><img class="tym-tekst" id="tymTekst" alt="Весь декабрь и январские каникулы. Новопавловка, Севастопольская, 134"></div>
     <div class="hint" id="hint">Крути вниз<i></i></div>
   </div>
 </section>
@@ -9546,7 +9554,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <h2 class="dk-t" id="dkT">Где, когда и для кого</h2>
     <ul class="dk-list">
       <li><span class="dk-ico" aria-hidden="true">🐣</span>Для детей от 4 до 11 лет</li>
-      <li><span class="dk-ico" aria-hidden="true">📍</span>Крым, Кизиловое, Центральная 21</li>
+      <li><span class="dk-ico" aria-hidden="true">📍</span>Крым, Новопавловка, Севастопольская 134</li>
       <li><span class="dk-ico" aria-hidden="true">📅</span>Ежедневно с 27 ноября по 10 января</li>
       <li><span class="dk-ico" aria-hidden="true">🕐</span>С 09:00 до 21:30</li>
       <li><span class="dk-ico" aria-hidden="true">⏳</span>Продолжительность: 1 час 25 минут</li>
@@ -13384,10 +13392,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             <span class="qa-qt">Какой точный адрес площадки?</span>
             <span class="qa-sign" aria-hidden="true"></span></button></h4>
           <div class="qa-wrap" id="qaA15"><div><div class="qa-a">
-            <!-- Только то, что есть в business/cities/crimea/venue.md. Есть ли
-                 рядом остановка - там не записано, не дописывать, пока не
-                 подтвердит Серёга. -->
-            <p>Крым, <b>с. Кизиловое, СНТ «Здоровье», ул. Центральная, 21</b>. 28 минут от центра Симферополя, 10 минут от черты города.</p>
+            <!-- Только то, что есть в business/cities/crimea/venue.md. Площадка
+                 сменилась 17.09.2026, и сколько до неё минут от центра - пока
+                 не записано. НЕ ДОПИСЫВАТЬ, пока не подтвердит Серёга. -->
+            <p>Крым, <b>с. Новопавловка, ул. Севастопольская, 134</b>.</p>
             <p>Удобный подъезд для больших автобусов и легковых авто, большая парковка.</p>
           </div></div></div>
         </div>
@@ -13937,8 +13945,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
         <div class="pd-col">
           <h3 class="pd-ct">Адреса</h3>
-          <p class="pd-adr"><b>Площадка</b>Крым, Кизиловое, Центральная, 21
-            <span>28 минут от центра Симферополя</span></p>
+          <!-- Пояснения под адресом нет намеренно: про новую площадку (17.09.2026)
+               в business/cities/crimea/venue.md пока записан только адрес. -->
+          <p class="pd-adr"><b>Площадка</b>Крым, Новопавловка, Севастопольская, 134</p>
           <p class="pd-adr"><b>Офис продаж</b>Нижний Новгород, ул. Белинского, 36
             <span>2 этаж, офис 4</span></p>
         </div>
