@@ -8,17 +8,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
 <title>Согласие на обработку персональных данных - Министерство Новогодних Дел, Крым</title>
-<meta name="theme-color" content="#04070F">
+<meta name="theme-color" content="#FFFFFF">
 <meta name="description" content="Согласие на обработку персональных данных при отправке заявки на сайте Министерства Новогодних Дел в Крыму.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500;600&display=swap">
 <style>
+/* СВЕТЛАЯ СТРАНИЦА (просьба Серёги 18.09.2026 «сделай на белом фоне»).
+   Палитра - со светлого экрана заявки v2.html (.sv «По цене сентября»):
+   синий #001B71 для заголовков, золото на два тона гуще сайтового
+   (#E3B34E на белом не читается), голубой бланк #ECF2FE → #DCE7F9. */
 :root{
-  --ink:#04070F; --ink2:#080D1B; --line:#18223B;
-  --text:#DCE4F3; --dim:#8695B3; --faint:#5A6784;
-  --gold:#E3B34E; --moon:#7FA8D9;
-  color-scheme:dark;
+  --navy:#001B71; --text:#22305A; --dim:#5A6A93; --faint:#7A88AB;
+  --gold:#C9861F; --gold-t:#8A6111; --line:rgba(0,27,113,.12);
+  color-scheme:light;
 }
 @font-face{
   font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
@@ -28,12 +31,13 @@
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
 body{
-  margin:0; background:var(--ink); color:var(--text);
+  margin:0; background:#fff; color:var(--text);
   font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
   -webkit-font-smoothing:antialiased;
 }
 
-/* ---------- шапка (та же, что на v2.html и promokody.html) ---------- */
+/* ---------- шапка: раскладка как на v2.html, цвета светлые ----------
+   Вверху прозрачная (под ней и так белое), при прокрутке - белое стекло. */
 .nav{
   position:fixed; inset:0 0 auto 0; z-index:30;
   padding-top:max(16px, env(safe-area-inset-top));
@@ -42,25 +46,25 @@ body{
   border-bottom:1px solid transparent;
 }
 .nav.solid{
-  background:rgba(4,7,15,.82);
+  background:rgba(255,255,255,.86);
   backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
   border-bottom-color:var(--line); padding:11px 30px;
 }
 .brand{
   font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
-  letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
+  letter-spacing:.12em; color:var(--navy); text-transform:uppercase; white-space:nowrap;
   text-decoration:none;
 }
 .brand span{color:var(--gold)}
 /* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
    экрана (решение Серёги 05.09.2026). Здесь она ссылка «На главную». */
 .navbtn{
-  border:1px solid var(--gold); color:var(--gold); background:transparent;
+  border:1px solid #A96D0D; color:var(--gold-t); background:transparent;
   border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
   cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
   display:inline-flex; align-items:center; text-decoration:none; margin-left:auto;
 }
-.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
+.navbtn:hover,.navbtn:focus-visible{background:#A96D0D; color:#fff}
 @media(max-width:520px){
   .nav{gap:12px; padding:14px 16px}
   .nav.solid{padding:10px 16px}
@@ -68,36 +72,22 @@ body{
   .navbtn{padding:8px 12px; font-size:12px}
 }
 
-/* ---------- поле страницы: ночное небо (рецепт promokody.html) ----------
-   overflow у .oz НЕ hidden, как на promokody: иначе у колонок не работает
-   position:sticky. Отблески и так обрезает своя коробка .oz-glow. */
+/* ---------- поле страницы: белое, с еле заметными отблесками ----------
+   Отблески - рецепт .sv-glow (голубые по бокам, тёплый внизу), без анимации.
+   overflow у .oz НЕ hidden: иначе у колонок не работает position:sticky,
+   отблески обрезает своя коробка .oz-glow. */
 .oz{
-  position:relative; isolation:isolate; min-height:100vh;
+  position:relative; isolation:isolate; min-height:100vh; background:#fff;
   padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
-  background:
-    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
-    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
 }
 .oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
-.oz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
-.oz-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:42%;
-  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
-  animation:ozDrift1 38s ease-in-out infinite alternate}
-.oz-glow i:nth-child(2){right:-20vw; top:24%; width:70vw; height:44%;
-  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
-  animation:ozDrift2 45s ease-in-out infinite alternate}
-.oz-glow i:nth-child(3){left:50%; bottom:-8%; width:78vw; height:40%; margin-left:-39vw;
-  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
-  animation:ozDrift3 33s ease-in-out infinite alternate}
-@keyframes ozDrift1{from{transform:translate3d(0,0,0) scale(1);    opacity:.9}
-                    to  {transform:translate3d(4%,3%,0) scale(1.08); opacity:1}}
-@keyframes ozDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
-                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.86}}
-@keyframes ozDrift3{from{transform:translate3d(0,0,0) scale(1);    opacity:.84}
-                    to  {transform:translate3d(5%,-4%,0) scale(1.1); opacity:1}}
-@media (prefers-reduced-motion:reduce){ .oz-glow i{animation:none} }
-.oz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+.oz-glow i{position:absolute; display:block; border-radius:50%}
+.oz-glow i:nth-child(1){left:-16vw; top:-6%; width:62vw; height:40%;
+  background:radial-gradient(closest-side, rgba(198,219,255,.5) 0%, rgba(198,219,255,.26) 40%, rgba(198,219,255,0) 100%)}
+.oz-glow i:nth-child(2){right:-18vw; top:22%; width:58vw; height:44%;
+  background:radial-gradient(closest-side, rgba(214,224,255,.42) 0%, rgba(214,224,255,.2) 40%, rgba(214,224,255,0) 100%)}
+.oz-glow i:nth-child(3){left:50%; bottom:-14%; width:74vw; height:36%; margin-left:-37vw;
+  background:radial-gradient(closest-side, rgba(255,232,186,.4) 0%, rgba(255,232,186,.18) 40%, rgba(255,232,186,0) 100%)}
 
 /* Контейнер - по общему правилу сайта: широкий, почти во весь экран
    → ai-clone/feedback/shirokaya-verstka-sayta.md. */
@@ -108,17 +98,21 @@ body{
 }
 @media (max-width:767px){ .oz-cont{width:100%; padding-inline:20px} }
 
-/* ---------- заголовок (как на promokody.html) ---------- */
+/* ---------- заголовок: как .sv-t на v2.html ---------- */
 .oz-t{
   margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
   font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
-  text-transform:uppercase; text-wrap:balance; color:#fff;
+  text-transform:uppercase; text-wrap:balance; color:var(--navy);
 }
-.oz-q{color:#F0C97A}
+.oz-q{color:#A96D0D}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .oz-q{background:linear-gradient(180deg,#B0700F 0%,#9E650B 45%,#8A5607 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
 .pl-meta{
   margin:0 auto; text-align:center; text-wrap:balance;
-  font-size:max(14px, clamp(14px,1.05vw,17px)); line-height:1.5; color:#B9C8F5;
+  font-size:max(14px, clamp(14px,1.05vw,17px)); line-height:1.5; color:#3F4F76;
 }
 .pl-meta span{color:var(--dim)}
 
@@ -148,67 +142,76 @@ body{
 /* оглавление */
 .pl-toc-h, .pl-sum-h{
   margin:0 0 12px; font:600 12px/1.2 "Golos Text",sans-serif;
-  letter-spacing:.14em; text-transform:uppercase; color:var(--gold);
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold-t);
 }
-.pl-toc ol{margin:0; padding:0; list-style:none; border-left:1px solid rgba(146,167,214,.18)}
+.pl-toc ol{margin:0; padding:0; list-style:none; border-left:1px solid var(--line)}
 .pl-toc a{
   display:block; padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent;
   font-size:14px; line-height:1.35; color:var(--dim); text-decoration:none;
   transition:color .2s, border-color .2s;
 }
-.pl-toc a:hover, .pl-toc a:focus-visible{color:#fff}
-.pl-toc a.on{color:#F0C97A; border-left-color:var(--gold)}
+.pl-toc a:hover, .pl-toc a:focus-visible{color:var(--navy)}
+.pl-toc a.on{color:var(--gold-t); border-left-color:var(--gold)}
 
-/* карточки (рецепт .pk-card с promokody.html) */
+/* Документ - белый лист с тонкой рамкой и тенью (как бланк .sv-card, только
+   белый: длинный текст на голубом читать тяжелее). «Коротко» - голубой
+   бланк .sv-card, чтобы выжимка читалась отдельным предметом. */
 .pl-card{
   position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.4vw,40px);
-  border-radius:clamp(18px,1.6vw,26px);
-  background:linear-gradient(180deg, rgba(20,28,84,.62), rgba(10,15,52,.62));
-  border:1px solid rgba(146,167,214,.18);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 24px 60px -34px rgba(0,0,0,.8);
+  border-radius:clamp(18px,1.6vw,26px); background:#fff;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.12),
+    0 30px 60px -38px rgba(0,27,113,.32),
+    0 4px 14px -8px rgba(0,27,113,.12);
 }
-.pl-sum .pl-card{border-color:rgba(227,179,78,.42);
-  background:linear-gradient(180deg, rgba(58,44,20,.55), rgba(16,16,44,.62))}
+.pl-sum .pl-card{
+  background:linear-gradient(180deg,#ECF2FE 0%,#DCE7F9 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.16),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 30px 60px -34px rgba(0,27,113,.42),
+    0 4px 14px -6px rgba(0,27,113,.16);
+}
 .pl-sum dl{margin:0}
 .pl-sum dt{margin:0; font-size:13px; line-height:1.3; color:var(--dim)}
-.pl-sum dd{margin:3px 0 0; font-size:15px; line-height:1.4; color:#fff; overflow-wrap:anywhere}
-.pl-sum dd a{color:#EBD3A0}
+.pl-sum dd{margin:3px 0 0; font-size:15px; line-height:1.4; color:#0B1B3F; overflow-wrap:anywhere}
 .pl-sum dd + dt{margin-top:14px}
 .pl-sum-note{margin:16px 0 0; font-size:13px; line-height:1.45; color:var(--dim)}
 .pl-sum-link{margin:14px 0 0; font-size:15px}
-.pl-sum-link a, .pl-foot a{color:#EBD3A0}
+.pl-sum a, .pl-foot a{color:var(--gold-t)}
+.pl-sum a:hover, .pl-foot a:hover{color:#A96D0D}
 
 /* сам документ */
-.pl-doc{font-size:max(15px, clamp(15px,1.05vw,17px)); line-height:1.6; color:#C9D6EE}
+.pl-doc{font-size:max(15px, clamp(15px,1.05vw,17px)); line-height:1.6; color:var(--text)}
 .pl-doc p, .pl-doc li, .pl-doc dd{max-width:68ch}
 .pl-doc p{margin:0}
 .pl-doc p + p, .pl-doc ul + p, .pl-doc .pl-cel + p, .pl-doc p + ul{margin-top:.75em}
-.pl-doc b{color:#fff; font-weight:600}
-.pl-doc a{color:#EBD3A0; overflow-wrap:anywhere}
-.pl-doc a:hover{color:#FFD189}
+.pl-doc b{color:var(--navy); font-weight:600}
+.pl-doc a{color:var(--gold-t); overflow-wrap:anywhere}
+.pl-doc a:hover{color:#A96D0D}
 .nw, a[href^="tel:"]{white-space:nowrap}
-.pl-intro{margin-bottom:1.6em !important; color:#DCE4F3}
+.pl-intro{margin-bottom:1.6em !important; color:#0B1B3F}
 .pl-sec{scroll-margin-top:88px}
-.pl-sec + .pl-sec{margin-top:1.9em; padding-top:1.7em; border-top:1px solid rgba(146,167,214,.14)}
+.pl-sec + .pl-sec{margin-top:1.9em; padding-top:1.7em; border-top:1px solid var(--line)}
 .pl-sec h2{
   margin:0 0 .8em;
   font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(18px,1.45vw,24px); line-height:1.2; text-transform:uppercase; color:#fff;
+  font-size:clamp(18px,1.45vw,24px); line-height:1.2; text-transform:uppercase; color:var(--navy);
 }
 .pl-doc ul{margin:0; padding:0; list-style:none}
 .pl-doc li{position:relative; padding-left:1.35em}
 .pl-doc li + li{margin-top:.45em}
 .pl-doc li::before{
   content:''; position:absolute; left:.2em; top:.66em; width:.42em; height:.42em;
-  border-radius:50%; background:var(--gold); box-shadow:0 0 10px rgba(227,179,78,.55);
+  border-radius:50%; background:var(--gold);
 }
 .pl-cel{
   margin-top:1em; padding:.9em 1.1em 1em;
-  border-left:2px solid rgba(227,179,78,.55); border-radius:0 12px 12px 0;
-  background:rgba(255,255,255,.035);
+  border-left:2px solid var(--gold); border-radius:0 12px 12px 0;
+  background:#F3F7FE;
 }
-.pl-cel-h{color:#fff; font-weight:600}
-.pl-cel-h span{color:#F0C97A}
+.pl-cel-h{color:var(--navy); font-weight:600}
+.pl-cel-h span{color:var(--gold-t)}
 .pl-cel dl{
   display:grid; grid-template-columns:minmax(120px,max-content) minmax(0,1fr);
   gap:.45em 1.2em; margin:.7em 0 0;
@@ -229,21 +232,21 @@ body{
 }
 .pl-foot p{margin:0}
 .pl-foot p + p{margin-top:6px}
-.pl-foot .dot{padding:0 .45em; color:#4F5C86}
+.pl-foot .dot{padding:0 .45em; color:#B4BED6}
 
-/* печать: чёрный текст на белом, без неба, шапки и колонок */
+/* печать: чёрный текст на белом, без шапки и колонок */
 @media print{
-  body, .oz{background:#fff !important; color:#000}
-  .nav, .oz-glow, .oz-grain, .pl-toc, .pl-sum, .pl-foot{display:none !important}
+  .nav, .oz-glow, .pl-toc, .pl-sum, .pl-foot{display:none !important}
   .oz{padding:0; min-height:0}
   .oz-cont{width:100%; padding:0}
-  .oz-t, .oz-q, .pl-meta, .pl-meta span{color:#000}
+  .oz-t, .pl-meta, .pl-meta span{color:#000}
+  .oz-q{background:none; color:#000; -webkit-text-fill-color:#000}
   .pl-grid{display:block; margin-top:12px}
-  .pl-card{background:none; border:0; box-shadow:none; padding:0}
+  .pl-card{box-shadow:none; padding:0}
   .pl-doc, .pl-doc b, .pl-sec h2, .pl-cel-h, .pl-cel-h span, .pl-cel dt, .pl-doc a, .pl-intro, .pl-red{color:#000}
   .pl-doc p, .pl-doc li, .pl-doc dd{max-width:none}
   .pl-cel{background:none; border-left-color:#999}
-  .pl-doc li::before{background:#000; box-shadow:none}
+  .pl-doc li::before{background:#000}
 }
 </style>
 </head>
@@ -256,11 +259,10 @@ body{
 
 <main class="oz">
   <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
-  <div class="oz-grain" aria-hidden="true"></div>
 
   <div class="oz-cont">
     <h1 class="oz-t">Согласие<br><span class="oz-q">на обработку персональных данных</span></h1>
-    <p class="pl-meta">Текст согласия, которое даётся при отправке заявки<br><span>Министерство Новогодних Дел · Крым · редакция от 18 сентября 2026 г.</span></p>
+    <p class="pl-meta">Текст согласия, которое даётся при отправке заявки<br><span>Министерство Новогодних Дел · Крым · редакция от 18 сентября 2026 г.</span></p>
 
     <div class="pl-grid">
       <nav class="pl-toc" aria-label="Содержание">
@@ -332,7 +334,7 @@ body{
   <li>Согласие дано в электронной форме: нажатием кнопки отправки формы на Сайте или началом переписки с Чат-ботом.</li>
 </ul>
 </section>
-<p class="pl-red">Редакция от 18 сентября 2026 г.</p>
+<p class="pl-red">Редакция от 18 сентября 2026 г.</p>
       </article>
 
       <aside class="pl-sum" aria-label="Коротко о главном">
