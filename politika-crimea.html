@@ -1,0 +1,501 @@
+<!doctype html>
+<!-- СОБРАНО СКРИПТОМ sayt-nn/instrumenty/politika.py (основной репозиторий МНД AI).
+     Руками не править: правка текста - в скрипте, потом запуск, и он перепишет
+     все восемь страниц (политика и согласие на четыре города). -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Политика конфиденциальности - Министерство Новогодних Дел, Крым</title>
+<meta name="theme-color" content="#04070F">
+<meta name="description" content="Как Министерство Новогодних Дел в Крыму обрабатывает и защищает персональные данные: что собираем, зачем, где храним и как отозвать согласие.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ink:#04070F; --ink2:#080D1B; --line:#18223B;
+  --text:#DCE4F3; --dim:#8695B3; --faint:#5A6784;
+  --gold:#E3B34E; --moon:#7FA8D9;
+  color-scheme:dark;
+}
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- шапка (та же, что на v2.html и promokody.html) ---------- */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  padding-top:max(16px, env(safe-area-inset-top));
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(4,7,15,.82);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026). Здесь она ссылка «На главную». */
+.navbtn{
+  border:1px solid var(--gold); color:var(--gold); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none; margin-left:auto;
+}
+.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- поле страницы: ночное небо (рецепт promokody.html) ----------
+   overflow у .oz НЕ hidden, как на promokody: иначе у колонок не работает
+   position:sticky. Отблески и так обрезает своя коробка .oz-glow. */
+.oz{
+  position:relative; isolation:isolate; min-height:100vh;
+  padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.oz-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:42%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:ozDrift1 38s ease-in-out infinite alternate}
+.oz-glow i:nth-child(2){right:-20vw; top:24%; width:70vw; height:44%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:ozDrift2 45s ease-in-out infinite alternate}
+.oz-glow i:nth-child(3){left:50%; bottom:-8%; width:78vw; height:40%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:ozDrift3 33s ease-in-out infinite alternate}
+@keyframes ozDrift1{from{transform:translate3d(0,0,0) scale(1);    opacity:.9}
+                    to  {transform:translate3d(4%,3%,0) scale(1.08); opacity:1}}
+@keyframes ozDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
+                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.86}}
+@keyframes ozDrift3{from{transform:translate3d(0,0,0) scale(1);    opacity:.84}
+                    to  {transform:translate3d(5%,-4%,0) scale(1.1); opacity:1}}
+@media (prefers-reduced-motion:reduce){ .oz-glow i{animation:none} }
+.oz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Контейнер - по общему правилу сайта: широкий, почти во весь экран
+   → ai-clone/feedback/shirokaya-verstka-sayta.md. */
+.oz-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1462px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,47.6px);
+}
+@media (max-width:767px){ .oz-cont{width:100%; padding-inline:20px} }
+
+/* ---------- заголовок (как на promokody.html) ---------- */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.oz-q{color:#F0C97A}
+.pl-meta{
+  margin:0 auto; text-align:center; text-wrap:balance;
+  font-size:max(14px, clamp(14px,1.05vw,17px)); line-height:1.5; color:#B9C8F5;
+}
+.pl-meta span{color:var(--dim)}
+
+/* ---------- три колонки: оглавление | документ | коротко ----------
+   Документ - лист шириной с удобную строку, по бокам колонки держат
+   ширину экрана (правило широкой вёрстки). До 1280 px «коротко» встаёт
+   над документом, до 1024 px оглавление убирается совсем. */
+.pl-grid{
+  display:grid; align-items:start;
+  grid-template-columns:minmax(210px,290px) minmax(0,1fr) minmax(240px,330px);
+  grid-template-areas:"toc doc sum";
+  gap:clamp(22px,2.6vw,52px); margin-top:clamp(28px,3.4vw,56px);
+}
+.pl-toc{grid-area:toc; position:sticky; top:84px; max-height:calc(100vh - 104px); overflow:auto}
+.pl-doc{grid-area:doc}
+.pl-sum{grid-area:sum; position:sticky; top:84px}
+@media (max-width:1279px){
+  .pl-grid{grid-template-columns:minmax(200px,260px) minmax(0,1fr);
+    grid-template-areas:"toc sum" "toc doc"}
+  .pl-sum{position:static}
+}
+@media (max-width:1023px){
+  .pl-grid{grid-template-columns:minmax(0,1fr); grid-template-areas:"sum" "doc"}
+  .pl-toc{display:none}
+}
+
+/* оглавление */
+.pl-toc-h, .pl-sum-h{
+  margin:0 0 12px; font:600 12px/1.2 "Golos Text",sans-serif;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold);
+}
+.pl-toc ol{margin:0; padding:0; list-style:none; border-left:1px solid rgba(146,167,214,.18)}
+.pl-toc a{
+  display:block; padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent;
+  font-size:14px; line-height:1.35; color:var(--dim); text-decoration:none;
+  transition:color .2s, border-color .2s;
+}
+.pl-toc a:hover, .pl-toc a:focus-visible{color:#fff}
+.pl-toc a.on{color:#F0C97A; border-left-color:var(--gold)}
+
+/* карточки (рецепт .pk-card с promokody.html) */
+.pl-card{
+  position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.4vw,40px);
+  border-radius:clamp(18px,1.6vw,26px);
+  background:linear-gradient(180deg, rgba(20,28,84,.62), rgba(10,15,52,.62));
+  border:1px solid rgba(146,167,214,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 24px 60px -34px rgba(0,0,0,.8);
+}
+.pl-sum .pl-card{border-color:rgba(227,179,78,.42);
+  background:linear-gradient(180deg, rgba(58,44,20,.55), rgba(16,16,44,.62))}
+.pl-sum dl{margin:0}
+.pl-sum dt{margin:0; font-size:13px; line-height:1.3; color:var(--dim)}
+.pl-sum dd{margin:3px 0 0; font-size:15px; line-height:1.4; color:#fff; overflow-wrap:anywhere}
+.pl-sum dd a{color:#EBD3A0}
+.pl-sum dd + dt{margin-top:14px}
+.pl-sum-note{margin:16px 0 0; font-size:13px; line-height:1.45; color:var(--dim)}
+.pl-sum-link{margin:14px 0 0; font-size:15px}
+.pl-sum-link a, .pl-foot a{color:#EBD3A0}
+
+/* сам документ */
+.pl-doc{font-size:max(15px, clamp(15px,1.05vw,17px)); line-height:1.6; color:#C9D6EE}
+.pl-doc p, .pl-doc li, .pl-doc dd{max-width:68ch}
+.pl-doc p{margin:0}
+.pl-doc p + p, .pl-doc ul + p, .pl-doc .pl-cel + p, .pl-doc p + ul{margin-top:.75em}
+.pl-doc b{color:#fff; font-weight:600}
+.pl-doc a{color:#EBD3A0; overflow-wrap:anywhere}
+.pl-doc a:hover{color:#FFD189}
+.nw, a[href^="tel:"]{white-space:nowrap}
+.pl-intro{margin-bottom:1.6em !important; color:#DCE4F3}
+.pl-sec{scroll-margin-top:88px}
+.pl-sec + .pl-sec{margin-top:1.9em; padding-top:1.7em; border-top:1px solid rgba(146,167,214,.14)}
+.pl-sec h2{
+  margin:0 0 .8em;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(18px,1.45vw,24px); line-height:1.2; text-transform:uppercase; color:#fff;
+}
+.pl-doc ul{margin:0; padding:0; list-style:none}
+.pl-doc li{position:relative; padding-left:1.35em}
+.pl-doc li + li{margin-top:.45em}
+.pl-doc li::before{
+  content:''; position:absolute; left:.2em; top:.66em; width:.42em; height:.42em;
+  border-radius:50%; background:var(--gold); box-shadow:0 0 10px rgba(227,179,78,.55);
+}
+.pl-cel{
+  margin-top:1em; padding:.9em 1.1em 1em;
+  border-left:2px solid rgba(227,179,78,.55); border-radius:0 12px 12px 0;
+  background:rgba(255,255,255,.035);
+}
+.pl-cel-h{color:#fff; font-weight:600}
+.pl-cel-h span{color:#F0C97A}
+.pl-cel dl{
+  display:grid; grid-template-columns:minmax(120px,max-content) minmax(0,1fr);
+  gap:.45em 1.2em; margin:.7em 0 0;
+}
+.pl-cel dt{color:var(--dim); font-size:.92em; line-height:1.55}
+.pl-cel dd{margin:0}
+@media (max-width:640px){
+  .pl-cel{padding:.8em .9em .9em}
+  .pl-cel dl{grid-template-columns:minmax(0,1fr); gap:.1em}
+  .pl-cel dd + dt{margin-top:.55em}
+}
+.pl-red{margin-top:1.8em !important; color:var(--dim); font-style:italic}
+
+/* подвал страницы */
+.pl-foot{
+  margin:clamp(28px,3vw,48px) auto 0; text-align:center;
+  font-size:14px; line-height:1.6; color:var(--faint);
+}
+.pl-foot p{margin:0}
+.pl-foot p + p{margin-top:6px}
+.pl-foot .dot{padding:0 .45em; color:#4F5C86}
+
+/* печать: чёрный текст на белом, без неба, шапки и колонок */
+@media print{
+  body, .oz{background:#fff !important; color:#000}
+  .nav, .oz-glow, .oz-grain, .pl-toc, .pl-sum, .pl-foot{display:none !important}
+  .oz{padding:0; min-height:0}
+  .oz-cont{width:100%; padding:0}
+  .oz-t, .oz-q, .pl-meta, .pl-meta span{color:#000}
+  .pl-grid{display:block; margin-top:12px}
+  .pl-card{background:none; border:0; box-shadow:none; padding:0}
+  .pl-doc, .pl-doc b, .pl-sec h2, .pl-cel-h, .pl-cel-h span, .pl-cel dt, .pl-doc a, .pl-intro, .pl-red{color:#000}
+  .pl-doc p, .pl-doc li, .pl-doc dd{max-width:none}
+  .pl-cel{background:none; border-left-color:#999}
+  .pl-doc li::before{background:#000; box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="crimea.html">МНД<span>·</span>Крым</a>
+  <a class="navbtn" href="crimea.html">На главную</a>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="oz-grain" aria-hidden="true"></div>
+
+  <div class="oz-cont">
+    <h1 class="oz-t">Политика<br><span class="oz-q">конфиденциальности</span></h1>
+    <p class="pl-meta">Политика в отношении обработки персональных данных<br><span>Министерство Новогодних Дел · Крым · редакция от 18 сентября 2026 г.</span></p>
+
+    <div class="pl-grid">
+      <nav class="pl-toc" aria-label="Содержание">
+        <p class="pl-toc-h">Содержание</p>
+        <ol>
+      <li><a href="#r1">1. Общие положения</a></li>
+      <li><a href="#r2">2. Основные понятия</a></li>
+      <li><a href="#r3">3. Цели обработки, состав данных, основания и сроки</a></li>
+      <li><a href="#r4">4. Порядок и условия обработки</a></li>
+      <li><a href="#r5">5. Память браузера и внешние сервисы на Сайте</a></li>
+      <li><a href="#r6">6. Права субъекта персональных данных</a></li>
+      <li><a href="#r7">7. Обязанности Оператора</a></li>
+      <li><a href="#r8">8. Меры по защите персональных данных</a></li>
+      <li><a href="#r9">9. Как обратиться к Оператору</a></li>
+      <li><a href="#r10">10. Заключительные положения</a></li>
+        </ol>
+      </nav>
+
+      <article class="pl-doc pl-card">
+<section class="pl-sec" id="r1">
+<h2>1. Общие положения</h2>
+<p>1.1. Настоящая Политика в отношении обработки персональных данных (далее - Политика) разработана в соответствии с Федеральным законом от 27.07.2006 № 152-ФЗ «О персональных данных» (далее - Закон) и определяет, какие персональные данные, с какой целью и как обрабатываются в проекте «Министерство Новогодних Дел» (далее - МНД), а также какие меры принимаются для их защиты.</p>
+<p>1.2. Оператор персональных данных (далее - Оператор, мы): индивидуальный предприниматель Киричок Сергей Васильевич, ИНН 910314959705, ОГРНИП 319911200114762. Адрес для обращений: г. Нижний Новгород, ул. Белинского, д. 36, офис 4. Электронная почта: <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>. Телефон: <a href="tel:+79994447569">+7 (999) 444-75-69</a>.</p>
+<p>1.3. Политика распространяется на все персональные данные, которые Оператор получает:</p>
+<ul>
+  <li>через сайты <span class="nw">mnd-nn.ru</span>, <span class="nw">mnd-kazan.ru</span>, <span class="nw">mnd-tumen.ru</span>, <span class="nw">mnd-crimea.ru</span>, <span class="nw">slots.ministrynewyear.ru</span> и их страницы (далее - Сайт);</li>
+  <li>через чат-бот МНД в мессенджере МАХ (далее - Чат-бот);</li>
+  <li>по телефону, электронной почте, в сообществах и мессенджерах, где представлен МНД;</li>
+  <li>при бронировании, оплате и посещении мероприятий МНД;</li>
+  <li>от работников, кандидатов на работу и исполнителей по гражданско-правовым договорам.</li>
+</ul>
+<p>1.4. Главная цель Оператора при обработке персональных данных - соблюдение прав и свобод человека, в том числе права на неприкосновенность частной жизни, личную и семейную тайну.</p>
+<p>1.5. Политика опубликована в свободном доступе на Сайте. Отправляя заявку, начиная переписку с Чат-ботом или иным образом передавая Оператору свои данные, человек может ознакомиться с Политикой до передачи данных. Текст согласия на обработку персональных данных опубликован <a href="soglasie-crimea.html">отдельным документом</a>.</p>
+</section>
+
+<section class="pl-sec" id="r2">
+<h2>2. Основные понятия</h2>
+<ul>
+  <li><b>Персональные данные</b> - любая информация, относящаяся прямо или косвенно к определённому или определяемому физическому лицу (субъекту персональных данных).</li>
+  <li><b>Обработка персональных данных</b> - любое действие или совокупность действий с персональными данными, совершаемых с использованием средств автоматизации или без них: сбор, запись, систематизация, накопление, хранение, уточнение, извлечение, использование, передача, обезличивание, блокирование, удаление, уничтожение.</li>
+  <li><b>Предоставление</b> - действия, направленные на раскрытие персональных данных определённому лицу или кругу лиц.</li>
+  <li><b>Распространение</b> - действия, направленные на раскрытие персональных данных неопределённому кругу лиц.</li>
+  <li><b>Блокирование</b> - временное прекращение обработки персональных данных, кроме случаев, когда обработка нужна для их уточнения.</li>
+  <li><b>Уничтожение</b> - действия, в результате которых восстановить содержание персональных данных невозможно.</li>
+</ul>
+</section>
+
+<section class="pl-sec" id="r3">
+<h2>3. Цели обработки, состав данных, основания и сроки</h2>
+<p>3.1. Оператор обрабатывает только те персональные данные, которые нужны для конкретной цели. Для каждой цели ниже указаны чьи это данные, какие именно, на каком основании и как долго они хранятся.</p>
+<div class="pl-cel">
+  <p class="pl-cel-h"><span>3.2.</span> Цель: обработка заявок и обратная связь - ответить на заявку, позвонить или написать, рассказать о программе, датах и ценах, подобрать дату посещения.</p>
+  <dl>
+    <dt>Чьи данные</dt><dd>посетители Сайта, оставившие заявку; лица, обратившиеся к Оператору по телефону, электронной почте, в сообществах и мессенджерах.</dd>
+    <dt>Какие данные</dt><dd>имя; номер телефона; город; формат посещения (индивидуально или группой); количество детей и взрослых; ответы на вопросы анкеты на Сайте; промокод, если он указан; адрес страницы Сайта, с которой отправлена заявка, и метки рекламной кампании в этом адресе; содержание обращения.</dd>
+    <dt>Правовое основание</dt><dd>согласие субъекта персональных данных (пункт 1 части 1 статьи 6 Закона).</dd>
+    <dt>Срок обработки</dt><dd>до достижения цели обработки, но не дольше 3 (трёх) лет с даты последнего обращения, либо до отзыва согласия.</dd>
+  </dl>
+</div>
+<div class="pl-cel">
+  <p class="pl-cel-h"><span>3.3.</span> Цель: заключение и исполнение договора на посещение мероприятия - оформить бронирование, выставить счёт, принять оплату, сообщить об изменениях, провести мероприятие, оформить документы об оплате.</p>
+  <dl>
+    <dt>Чьи данные</dt><dd>клиенты: родители и иные законные представители детей, организаторы групп, представители организаций.</dd>
+    <dt>Какие данные</dt><dd>фамилия, имя, отчество; номер телефона; адрес электронной почты; выбранные город, дата, время и программа; количество участников; сведения об оплате; для представителей организаций - должность и реквизиты организации.</dd>
+    <dt>Правовое основание</dt><dd>исполнение договора, стороной которого является субъект, и заключение договора по его инициативе (пункт 5 части 1 статьи 6 Закона); выполнение обязанностей, возложенных на Оператора налоговым и бухгалтерским законодательством (пункт 2 части 1 статьи 6 Закона).</dd>
+    <dt>Срок обработки</dt><dd>в течение срока действия договора, а документы об оплате - в течение сроков, установленных законодательством о бухгалтерском учёте и налогах (не менее 5 лет).</dd>
+  </dl>
+</div>
+<div class="pl-cel">
+  <p class="pl-cel-h"><span>3.4.</span> Цель: переписка в Чат-боте - связать переписку с заявкой, ответить на вопросы, передать переписку менеджеру.</p>
+  <dl>
+    <dt>Чьи данные</dt><dd>пользователи мессенджера МАХ, написавшие Чат-боту.</dd>
+    <dt>Какие данные</dt><dd>идентификатор пользователя и имя в профиле МАХ; номер телефона, если пользователь перешёл в Чат-бот по ссылке из заявки на Сайте или сам сообщил номер; текст сообщений.</dd>
+    <dt>Правовое основание</dt><dd>согласие субъекта персональных данных (пункт 1 части 1 статьи 6 Закона).</dd>
+    <dt>Срок обработки</dt><dd>до достижения цели обработки, но не дольше 3 (трёх) лет с даты последнего сообщения, либо до отзыва согласия.</dd>
+  </dl>
+</div>
+<div class="pl-cel">
+  <p class="pl-cel-h"><span>3.5.</span> Цель: работа и безопасность Сайта, подсчёт посещений - понимать, сколько людей заходит на Сайт и откуда, защищать Сайт от атак и автоматической рассылки заявок.</p>
+  <dl>
+    <dt>Чьи данные</dt><dd>посетители Сайта.</dd>
+    <dt>Какие данные</dt><dd>случайный номер, который Сайт создаёт и хранит в памяти браузера посетителя (не связан с именем или телефоном); адрес открытой страницы; адрес страницы, с которой пришёл посетитель; тип устройства (телефон или компьютер); метки рекламной кампании; IP-адрес и сведения о браузере, которые автоматически попадают в технические журналы сервера.</dd>
+    <dt>Правовое основание</dt><dd>осуществление прав и законных интересов Оператора при условии, что не нарушаются права и свободы посетителя (пункт 7 части 1 статьи 6 Закона).</dd>
+    <dt>Срок обработки</dt><dd>не дольше 1 (одного) года.</dd>
+  </dl>
+</div>
+<div class="pl-cel">
+  <p class="pl-cel-h"><span>3.6.</span> Цель: трудовые и гражданско-правовые отношения - подбор персонала, оформление и исполнение трудовых договоров и договоров с исполнителями, выплаты, отчётность.</p>
+  <dl>
+    <dt>Чьи данные</dt><dd>работники, кандидаты на работу, исполнители по гражданско-правовым договорам.</dd>
+    <dt>Какие данные</dt><dd>фамилия, имя, отчество; дата рождения; контактные данные; данные документа, удостоверяющего личность; адрес регистрации; ИНН; СНИЛС; сведения об образовании и опыте работы; банковские реквизиты для выплат; иные данные, которые требует трудовое и налоговое законодательство.</dd>
+    <dt>Правовое основание</dt><dd>исполнение договора (пункт 5 части 1 статьи 6 Закона); выполнение требований трудового, налогового законодательства и законодательства об обязательном страховании (пункт 2 части 1 статьи 6 Закона); для кандидатов - согласие (пункт 1 части 1 статьи 6 Закона).</dd>
+    <dt>Срок обработки</dt><dd>в течение сроков, установленных законодательством об архивном деле, налогах и бухгалтерском учёте; данные кандидата, не принятого на работу, - до принятия решения, если кандидат не дал согласия на включение в резерв.</dd>
+  </dl>
+</div>
+<p>3.7. <b>Данные детей.</b> Через Сайт и Чат-бот Оператор не собирает персональные данные детей: в заявке указывается только количество детей. Если для организации посещения нужны сведения о ребёнке, их сообщает родитель или иной законный представитель, и Оператор использует их только в объёме, необходимом для исполнения договора.</p>
+<p>3.8. <b>Фото и видео на мероприятиях.</b> Изображения посетителей, в том числе детей, Оператор публикует на Сайте и в сообществах МНД только с согласия посетителя или законного представителя ребёнка (статья 152.1 Гражданского кодекса РФ, статья 10.1 Закона). Попросить убрать публикацию можно по контактам из раздела 9.</p>
+<p>3.9. Оператор не обрабатывает специальные категории персональных данных (о расовой и национальной принадлежности, политических взглядах, религиозных или философских убеждениях, состоянии здоровья, интимной жизни) и биометрические персональные данные.</p>
+</section>
+
+<section class="pl-sec" id="r4">
+<h2>4. Порядок и условия обработки</h2>
+<p>4.1. Оператор совершает с персональными данными следующие действия: сбор, запись, систематизация, накопление, хранение, уточнение (обновление, изменение), извлечение, использование, передача (предоставление, доступ), блокирование, удаление, уничтожение.</p>
+<p>4.2. Обработка ведётся смешанным способом: с использованием средств автоматизации и без них.</p>
+<p>4.3. Запись, систематизация, накопление, хранение, уточнение и извлечение персональных данных граждан Российской Федерации ведутся с использованием баз данных, находящихся на территории Российской Федерации (часть 5 статьи 18 Закона). Сервер и база данных Оператора размещены в дата-центре на территории России.</p>
+<p>4.4. Оператор вправе поручить обработку персональных данных другим лицам на основании договора (часть 3 статьи 6 Закона). Такие лица обязаны соблюдать конфиденциальность и принимать меры защиты, предусмотренные статьёй 19 Закона. Обработку по поручению Оператора ведут:</p>
+<ul>
+  <li>ООО «Яндекс.Облако» - размещение сервера и базы данных;</li>
+  <li>сервис amoCRM - учёт заявок и работа менеджеров с клиентами;</li>
+  <li>мессенджер МАХ - доставка сообщений Чат-бота;</li>
+  <li>операторы связи и сервисы телефонии - звонки и сообщения клиентам;</li>
+  <li>банки и платёжные сервисы - приём оплаты.</li>
+</ul>
+<p>4.5. Оператор не осуществляет трансграничную передачу персональных данных.</p>
+<p>4.6. Оператор не распространяет персональные данные (не раскрывает их неопределённому кругу лиц) без отдельного согласия субъекта на распространение (статья 10.1 Закона).</p>
+<p>4.7. Оператор предоставляет персональные данные государственным органам только в случаях, прямо предусмотренных законодательством Российской Федерации.</p>
+<p>4.8. Обработка прекращается, а данные уничтожаются: при достижении цели обработки или истечении срока - в течение 30 дней; при отзыве согласия - в течение 30 дней, если у Оператора нет иного законного основания продолжать обработку; при выявлении неправомерной обработки - обработка прекращается в течение 3 рабочих дней, данные уничтожаются в течение 10 рабочих дней.</p>
+<p>4.9. Если субъект требует прекратить обработку его персональных данных, Оператор прекращает её в течение 10 рабочих дней с даты получения требования (часть 5.1 статьи 21 Закона). Срок может быть продлён не более чем на 5 рабочих дней с направлением субъекту мотивированного уведомления.</p>
+<p>4.10. При утечке персональных данных Оператор уведомляет Роскомнадзор в течение 24 часов с момента её выявления и сообщает результаты расследования в течение 72 часов (часть 3.1 статьи 21 Закона).</p>
+</section>
+
+<section class="pl-sec" id="r5">
+<h2>5. Память браузера и внешние сервисы на Сайте</h2>
+<p>5.1. Сайт не использует рекламные счётчики и файлы cookie рекламных систем.</p>
+<p>5.2. Сайт хранит в памяти браузера посетителя (localStorage и sessionStorage) случайный номер для подсчёта посещений, отметку о том, что посещение уже учтено, и копию последних заявок, отправленных с этого устройства. Эти сведения остаются на устройстве посетителя, Оператор к ним доступа не имеет, их можно удалить в настройках браузера.</p>
+<p>5.3. На страницах Сайта подключены внешние сервисы: шрифты Google Fonts, видеоплеер Rutube, ссылки на ВКонтакте, МАХ, Telegram и WhatsApp. При загрузке страницы или переходе по ссылке браузер посетителя обращается к этим сервисам напрямую, и они получают технические данные (например, IP-адрес) по своим правилам. Данные из заявок Оператор этим сервисам не передаёт.</p>
+<p>5.4. Если человек сам пишет Оператору в Telegram, WhatsApp или ВКонтакте, переписка идёт через эти сервисы на условиях их пользовательских соглашений.</p>
+</section>
+
+<section class="pl-sec" id="r6">
+<h2>6. Права субъекта персональных данных</h2>
+<p>6.1. Субъект персональных данных вправе:</p>
+<ul>
+  <li>получить сведения об обработке своих персональных данных: какие данные обрабатываются, с какой целью, на каком основании, как долго и кому они передаются (часть 7 статьи 14 Закона);</li>
+  <li>потребовать уточнить, заблокировать или уничтожить свои данные, если они неполные, устаревшие, неточные, получены незаконно или не нужны для заявленной цели;</li>
+  <li>отозвать согласие на обработку персональных данных;</li>
+  <li>потребовать прекратить обработку своих персональных данных;</li>
+  <li>обжаловать действия или бездействие Оператора в Роскомнадзоре или в суде;</li>
+  <li>защищать свои права и законные интересы иными способами, предусмотренными законом.</li>
+</ul>
+</section>
+
+<section class="pl-sec" id="r7">
+<h2>7. Обязанности Оператора</h2>
+<ul>
+  <li>обрабатывать персональные данные только законно и для заявленных целей;</li>
+  <li>по запросу субъекта предоставлять сведения об обработке его данных или мотивированный отказ в течение 10 рабочих дней; срок может быть продлён не более чем на 5 рабочих дней с уведомлением субъекта;</li>
+  <li>уточнять, блокировать и уничтожать персональные данные в случаях и сроки, установленные Законом;</li>
+  <li>принимать правовые, организационные и технические меры для защиты персональных данных;</li>
+  <li>отвечать на запросы Роскомнадзора в сроки, установленные Законом.</li>
+</ul>
+</section>
+
+<section class="pl-sec" id="r8">
+<h2>8. Меры по защите персональных данных</h2>
+<p>8.1. Оператор принимает меры, предусмотренные статьями 18.1 и 19 Закона, в том числе:</p>
+<ul>
+  <li>организацию обработки персональных данных осуществляет лично Оператор;</li>
+  <li>утверждена и опубликована настоящая Политика;</li>
+  <li>доступ к персональным данным есть только у работников, которым он нужен для выполнения обязанностей, по личным учётным записям и паролям;</li>
+  <li>работники, имеющие доступ к персональным данным, знакомятся с настоящей Политикой и требованиями Закона;</li>
+  <li>данные передаются между браузером и сервером по защищённому протоколу HTTPS;</li>
+  <li>сервер защищён от несанкционированного доступа, приём заявок ограничен по частоте для защиты от автоматической рассылки;</li>
+  <li>Оператор контролирует соблюдение Закона и настоящей Политики и оценивает вред, который может быть причинён субъектам при нарушении Закона.</li>
+</ul>
+</section>
+
+<section class="pl-sec" id="r9">
+<h2>9. Как обратиться к Оператору</h2>
+<p>9.1. Запросы, требования и отзыв согласия направляются:</p>
+<ul>
+  <li>на электронную почту <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>;</li>
+  <li>письмом по адресу: г. Нижний Новгород, ул. Белинского, д. 36, офис 4.</li>
+</ul>
+<p>9.2. Чтобы Оператор мог убедиться, что обращение отправил сам субъект, в нём нужно указать фамилию, имя, отчество и номер телефона или другие сведения, по которым можно найти заявку или договор. Для получения сведений об обработке своих данных запрос дополнительно должен содержать номер основного документа, удостоверяющего личность, дату его выдачи и выдавший орган, а также подпись субъекта или его представителя (часть 3 статьи 14 Закона).</p>
+</section>
+
+<section class="pl-sec" id="r10">
+<h2>10. Заключительные положения</h2>
+<p>10.1. Оператор вправе изменять Политику. Новая редакция вступает в силу с момента её публикации на Сайте, если в самой редакции не указано иное.</p>
+<p>10.2. Вопросы, не урегулированные Политикой, регулируются законодательством Российской Федерации.</p>
+</section>
+<p class="pl-red">Редакция от 18 сентября 2026 г.</p>
+      </article>
+
+      <aside class="pl-sum" aria-label="Коротко о главном">
+        <div class="pl-card">
+          <p class="pl-sum-h">Коротко о главном</p>
+          <dl>
+        <dt>Кто обрабатывает</dt><dd>ИП Киричок Сергей Васильевич, ИНН 910314959705</dd>
+        <dt>Что берём из заявки</dt><dd>Имя, телефон, город, формат посещения и сколько будет детей и взрослых</dd>
+        <dt>Зачем</dt><dd>Ответить на заявку, позвонить и оформить посещение</dd>
+        <dt>Где хранится</dt><dd>На сервере в России. За границу данные не передаём</dd>
+        <dt>Как долго</dt><dd>Не дольше 3 лет с последнего обращения</dd>
+        <dt>Удалить данные</dt><dd>Напишите на <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a></dd>
+          </dl>
+          <p class="pl-sum-note">Это выжимка для удобства. Условия - в полном тексте документа.</p>
+          <p class="pl-sum-link"><a href="soglasie-crimea.html">Текст согласия на обработку данных →</a></p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="pl-foot">
+      <p><a href="soglasie-crimea.html">Согласие на обработку персональных данных</a><span class="dot">·</span><a href="crimea.html">Вернуться на главную страницу</a></p>
+      <p>© 2019-2026 Министерство новогодних дел<span class="dot">·</span>ИП Киричок Сергей Васильевич<span class="dot">·</span>ИНН 910314959705</p>
+    </footer>
+  </div>
+</main>
+
+<script>
+/* шапка темнеет при прокрутке (как на promokody.html) */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){ nav.classList.toggle('solid', window.scrollY > 24); }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* оглавление подсвечивает раздел, который сейчас читают */
+(function(){
+  var links = document.querySelectorAll('.pl-toc a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var byId = {};
+  for (var i = 0; i < links.length; i++) byId[links[i].getAttribute('href').slice(1)] = links[i];
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      for (var k in byId) byId[k].classList.remove('on');
+      var a = byId[e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, {rootMargin:'-20% 0px -70% 0px'});
+  for (var id in byId){ var s = document.getElementById(id); if (s) io.observe(s); }
+})();
+</script>
+</body>
+</html>

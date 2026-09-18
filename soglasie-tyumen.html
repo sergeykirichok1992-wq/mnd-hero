@@ -1,0 +1,389 @@
+<!doctype html>
+<!-- СОБРАНО СКРИПТОМ sayt-nn/instrumenty/politika.py (основной репозиторий МНД AI).
+     Руками не править: правка текста - в скрипте, потом запуск, и он перепишет
+     все восемь страниц (политика и согласие на четыре города). -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Согласие на обработку персональных данных - Министерство Новогодних Дел, Тюмень</title>
+<meta name="theme-color" content="#04070F">
+<meta name="description" content="Согласие на обработку персональных данных при отправке заявки на сайте Министерства Новогодних Дел в Тюмени.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+:root{
+  --ink:#04070F; --ink2:#080D1B; --line:#18223B;
+  --text:#DCE4F3; --dim:#8695B3; --faint:#5A6784;
+  --gold:#E3B34E; --moon:#7FA8D9;
+  color-scheme:dark;
+}
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- шапка (та же, что на v2.html и promokody.html) ---------- */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  padding-top:max(16px, env(safe-area-inset-top));
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(4,7,15,.82);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026). Здесь она ссылка «На главную». */
+.navbtn{
+  border:1px solid var(--gold); color:var(--gold); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none; margin-left:auto;
+}
+.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- поле страницы: ночное небо (рецепт promokody.html) ----------
+   overflow у .oz НЕ hidden, как на promokody: иначе у колонок не работает
+   position:sticky. Отблески и так обрезает своя коробка .oz-glow. */
+.oz{
+  position:relative; isolation:isolate; min-height:100vh;
+  padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.oz-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:42%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:ozDrift1 38s ease-in-out infinite alternate}
+.oz-glow i:nth-child(2){right:-20vw; top:24%; width:70vw; height:44%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:ozDrift2 45s ease-in-out infinite alternate}
+.oz-glow i:nth-child(3){left:50%; bottom:-8%; width:78vw; height:40%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:ozDrift3 33s ease-in-out infinite alternate}
+@keyframes ozDrift1{from{transform:translate3d(0,0,0) scale(1);    opacity:.9}
+                    to  {transform:translate3d(4%,3%,0) scale(1.08); opacity:1}}
+@keyframes ozDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
+                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.86}}
+@keyframes ozDrift3{from{transform:translate3d(0,0,0) scale(1);    opacity:.84}
+                    to  {transform:translate3d(5%,-4%,0) scale(1.1); opacity:1}}
+@media (prefers-reduced-motion:reduce){ .oz-glow i{animation:none} }
+.oz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Контейнер - по общему правилу сайта: широкий, почти во весь экран
+   → ai-clone/feedback/shirokaya-verstka-sayta.md. */
+.oz-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1462px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,47.6px);
+}
+@media (max-width:767px){ .oz-cont{width:100%; padding-inline:20px} }
+
+/* ---------- заголовок (как на promokody.html) ---------- */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.oz-q{color:#F0C97A}
+.pl-meta{
+  margin:0 auto; text-align:center; text-wrap:balance;
+  font-size:max(14px, clamp(14px,1.05vw,17px)); line-height:1.5; color:#B9C8F5;
+}
+.pl-meta span{color:var(--dim)}
+
+/* ---------- три колонки: оглавление | документ | коротко ----------
+   Документ - лист шириной с удобную строку, по бокам колонки держат
+   ширину экрана (правило широкой вёрстки). До 1280 px «коротко» встаёт
+   над документом, до 1024 px оглавление убирается совсем. */
+.pl-grid{
+  display:grid; align-items:start;
+  grid-template-columns:minmax(210px,290px) minmax(0,1fr) minmax(240px,330px);
+  grid-template-areas:"toc doc sum";
+  gap:clamp(22px,2.6vw,52px); margin-top:clamp(28px,3.4vw,56px);
+}
+.pl-toc{grid-area:toc; position:sticky; top:84px; max-height:calc(100vh - 104px); overflow:auto}
+.pl-doc{grid-area:doc}
+.pl-sum{grid-area:sum; position:sticky; top:84px}
+@media (max-width:1279px){
+  .pl-grid{grid-template-columns:minmax(200px,260px) minmax(0,1fr);
+    grid-template-areas:"toc sum" "toc doc"}
+  .pl-sum{position:static}
+}
+@media (max-width:1023px){
+  .pl-grid{grid-template-columns:minmax(0,1fr); grid-template-areas:"sum" "doc"}
+  .pl-toc{display:none}
+}
+
+/* оглавление */
+.pl-toc-h, .pl-sum-h{
+  margin:0 0 12px; font:600 12px/1.2 "Golos Text",sans-serif;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold);
+}
+.pl-toc ol{margin:0; padding:0; list-style:none; border-left:1px solid rgba(146,167,214,.18)}
+.pl-toc a{
+  display:block; padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent;
+  font-size:14px; line-height:1.35; color:var(--dim); text-decoration:none;
+  transition:color .2s, border-color .2s;
+}
+.pl-toc a:hover, .pl-toc a:focus-visible{color:#fff}
+.pl-toc a.on{color:#F0C97A; border-left-color:var(--gold)}
+
+/* карточки (рецепт .pk-card с promokody.html) */
+.pl-card{
+  position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.4vw,40px);
+  border-radius:clamp(18px,1.6vw,26px);
+  background:linear-gradient(180deg, rgba(20,28,84,.62), rgba(10,15,52,.62));
+  border:1px solid rgba(146,167,214,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 24px 60px -34px rgba(0,0,0,.8);
+}
+.pl-sum .pl-card{border-color:rgba(227,179,78,.42);
+  background:linear-gradient(180deg, rgba(58,44,20,.55), rgba(16,16,44,.62))}
+.pl-sum dl{margin:0}
+.pl-sum dt{margin:0; font-size:13px; line-height:1.3; color:var(--dim)}
+.pl-sum dd{margin:3px 0 0; font-size:15px; line-height:1.4; color:#fff; overflow-wrap:anywhere}
+.pl-sum dd a{color:#EBD3A0}
+.pl-sum dd + dt{margin-top:14px}
+.pl-sum-note{margin:16px 0 0; font-size:13px; line-height:1.45; color:var(--dim)}
+.pl-sum-link{margin:14px 0 0; font-size:15px}
+.pl-sum-link a, .pl-foot a{color:#EBD3A0}
+
+/* сам документ */
+.pl-doc{font-size:max(15px, clamp(15px,1.05vw,17px)); line-height:1.6; color:#C9D6EE}
+.pl-doc p, .pl-doc li, .pl-doc dd{max-width:68ch}
+.pl-doc p{margin:0}
+.pl-doc p + p, .pl-doc ul + p, .pl-doc .pl-cel + p, .pl-doc p + ul{margin-top:.75em}
+.pl-doc b{color:#fff; font-weight:600}
+.pl-doc a{color:#EBD3A0; overflow-wrap:anywhere}
+.pl-doc a:hover{color:#FFD189}
+.nw, a[href^="tel:"]{white-space:nowrap}
+.pl-intro{margin-bottom:1.6em !important; color:#DCE4F3}
+.pl-sec{scroll-margin-top:88px}
+.pl-sec + .pl-sec{margin-top:1.9em; padding-top:1.7em; border-top:1px solid rgba(146,167,214,.14)}
+.pl-sec h2{
+  margin:0 0 .8em;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(18px,1.45vw,24px); line-height:1.2; text-transform:uppercase; color:#fff;
+}
+.pl-doc ul{margin:0; padding:0; list-style:none}
+.pl-doc li{position:relative; padding-left:1.35em}
+.pl-doc li + li{margin-top:.45em}
+.pl-doc li::before{
+  content:''; position:absolute; left:.2em; top:.66em; width:.42em; height:.42em;
+  border-radius:50%; background:var(--gold); box-shadow:0 0 10px rgba(227,179,78,.55);
+}
+.pl-cel{
+  margin-top:1em; padding:.9em 1.1em 1em;
+  border-left:2px solid rgba(227,179,78,.55); border-radius:0 12px 12px 0;
+  background:rgba(255,255,255,.035);
+}
+.pl-cel-h{color:#fff; font-weight:600}
+.pl-cel-h span{color:#F0C97A}
+.pl-cel dl{
+  display:grid; grid-template-columns:minmax(120px,max-content) minmax(0,1fr);
+  gap:.45em 1.2em; margin:.7em 0 0;
+}
+.pl-cel dt{color:var(--dim); font-size:.92em; line-height:1.55}
+.pl-cel dd{margin:0}
+@media (max-width:640px){
+  .pl-cel{padding:.8em .9em .9em}
+  .pl-cel dl{grid-template-columns:minmax(0,1fr); gap:.1em}
+  .pl-cel dd + dt{margin-top:.55em}
+}
+.pl-red{margin-top:1.8em !important; color:var(--dim); font-style:italic}
+
+/* подвал страницы */
+.pl-foot{
+  margin:clamp(28px,3vw,48px) auto 0; text-align:center;
+  font-size:14px; line-height:1.6; color:var(--faint);
+}
+.pl-foot p{margin:0}
+.pl-foot p + p{margin-top:6px}
+.pl-foot .dot{padding:0 .45em; color:#4F5C86}
+
+/* печать: чёрный текст на белом, без неба, шапки и колонок */
+@media print{
+  body, .oz{background:#fff !important; color:#000}
+  .nav, .oz-glow, .oz-grain, .pl-toc, .pl-sum, .pl-foot{display:none !important}
+  .oz{padding:0; min-height:0}
+  .oz-cont{width:100%; padding:0}
+  .oz-t, .oz-q, .pl-meta, .pl-meta span{color:#000}
+  .pl-grid{display:block; margin-top:12px}
+  .pl-card{background:none; border:0; box-shadow:none; padding:0}
+  .pl-doc, .pl-doc b, .pl-sec h2, .pl-cel-h, .pl-cel-h span, .pl-cel dt, .pl-doc a, .pl-intro, .pl-red{color:#000}
+  .pl-doc p, .pl-doc li, .pl-doc dd{max-width:none}
+  .pl-cel{background:none; border-left-color:#999}
+  .pl-doc li::before{background:#000; box-shadow:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="https://mnd-tumen.ru/">МНД<span>·</span>Тюмень</a>
+  <a class="navbtn" href="https://mnd-tumen.ru/">На главную</a>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="oz-grain" aria-hidden="true"></div>
+
+  <div class="oz-cont">
+    <h1 class="oz-t">Согласие<br><span class="oz-q">на обработку персональных данных</span></h1>
+    <p class="pl-meta">Текст согласия, которое даётся при отправке заявки<br><span>Министерство Новогодних Дел · Тюмень · редакция от 18 сентября 2026 г.</span></p>
+
+    <div class="pl-grid">
+      <nav class="pl-toc" aria-label="Содержание">
+        <p class="pl-toc-h">Содержание</p>
+        <ol>
+      <li><a href="#s1">1. Кому я даю согласие</a></li>
+      <li><a href="#s2">2. Какие данные</a></li>
+      <li><a href="#s3">3. Для чего</a></li>
+      <li><a href="#s4">4. Что Оператор может делать с данными</a></li>
+      <li><a href="#s5">5. Кто ещё может обрабатывать данные по поручению Оператора</a></li>
+      <li><a href="#s6">6. Срок действия и отзыв согласия</a></li>
+      <li><a href="#s7">7. Подтверждения</a></li>
+        </ol>
+      </nav>
+
+      <article class="pl-doc pl-card">
+<p class="pl-intro">Отправляя заявку на сайтах <span class="nw">mnd-nn.ru</span>, <span class="nw">mnd-kazan.ru</span>, <span class="nw">mnd-tumen.ru</span>, <span class="nw">mnd-crimea.ru</span>, <span class="nw">slots.ministrynewyear.ru</span> (далее - Сайт) или начиная переписку с чат-ботом МНД в мессенджере МАХ (далее - Чат-бот), я свободно, своей волей и в своём интересе даю согласие на обработку моих персональных данных на условиях, указанных ниже.</p>
+<section class="pl-sec" id="s1">
+<h2>1. Кому я даю согласие</h2>
+<p>Оператор: индивидуальный предприниматель Киричок Сергей Васильевич, ИНН 910314959705, ОГРНИП 319911200114762, адрес для обращений: г. Нижний Новгород, ул. Белинского, д. 36, офис 4, электронная почта: <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a> (далее - Оператор).</p>
+</section>
+
+<section class="pl-sec" id="s2">
+<h2>2. Какие данные</h2>
+<ul>
+  <li>имя;</li>
+  <li>номер телефона;</li>
+  <li>город;</li>
+  <li>формат посещения (индивидуально или группой), количество детей и взрослых;</li>
+  <li>ответы на вопросы анкеты на Сайте;</li>
+  <li>промокод, если он указан;</li>
+  <li>адрес страницы Сайта, с которой отправлена заявка, и метки рекламной кампании в нём;</li>
+  <li>при переписке в Чат-боте - идентификатор и имя профиля в МАХ, текст сообщений.</li>
+</ul>
+</section>
+
+<section class="pl-sec" id="s3">
+<h2>3. Для чего</h2>
+<p>Для обработки моей заявки и связи со мной по ней: звонка, сообщений в мессенджере МАХ и других мессенджерах, консультации по программе, датам и ценам, бронирования посещения мероприятия. Согласие не даётся на получение рекламных рассылок.</p>
+</section>
+
+<section class="pl-sec" id="s4">
+<h2>4. Что Оператор может делать с данными</h2>
+<p>Сбор, запись, систематизация, накопление, хранение, уточнение (обновление, изменение), извлечение, использование, передача (предоставление, доступ) лицам, указанным в пункте 5, блокирование, удаление, уничтожение. Обработка ведётся с использованием средств автоматизации и без них.</p>
+</section>
+
+<section class="pl-sec" id="s5">
+<h2>5. Кто ещё может обрабатывать данные по поручению Оператора</h2>
+<ul>
+  <li>ООО «Яндекс.Облако» - размещение сервера и базы данных;</li>
+  <li>сервис amoCRM - учёт заявок и работа менеджеров;</li>
+  <li>мессенджер МАХ - доставка сообщений Чат-бота;</li>
+  <li>операторы связи и сервисы телефонии - звонки и сообщения.</li>
+</ul>
+<p>Данные хранятся в базе данных на территории Российской Федерации. Трансграничная передача и распространение данных (раскрытие неопределённому кругу лиц) не осуществляются.</p>
+</section>
+
+<section class="pl-sec" id="s6">
+<h2>6. Срок действия и отзыв согласия</h2>
+<p>Согласие действует до достижения целей обработки, но не дольше 3 (трёх) лет с даты моего последнего обращения к Оператору.</p>
+<p>Я могу отозвать согласие в любой момент, написав на <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a> или письмом по адресу: г. Нижний Новгород, ул. Белинского, д. 36, офис 4. После получения отзыва Оператор прекращает обработку и уничтожает данные в течение 30 дней, если у него нет иного законного основания продолжать обработку (например, заключённого со мной договора).</p>
+</section>
+
+<section class="pl-sec" id="s7">
+<h2>7. Подтверждения</h2>
+<ul>
+  <li>Я ознакомлен(а) с <a href="politika-tyumen.html">Политикой Оператора в отношении обработки персональных данных</a>, опубликованной на Сайте.</li>
+  <li>Если я указываю данные другого человека, я подтверждаю, что получил(а) его согласие на их передачу Оператору.</li>
+  <li>Согласие дано в электронной форме: нажатием кнопки отправки формы на Сайте или началом переписки с Чат-ботом.</li>
+</ul>
+</section>
+<p class="pl-red">Редакция от 18 сентября 2026 г.</p>
+      </article>
+
+      <aside class="pl-sum" aria-label="Коротко о главном">
+        <div class="pl-card">
+          <p class="pl-sum-h">Коротко о главном</p>
+          <dl>
+        <dt>Когда даётся</dt><dd>Когда вы нажимаете кнопку отправки заявки на сайте или пишете чат-боту МНД в МАХ</dd>
+        <dt>Кому</dt><dd>ИП Киричок Сергей Васильевич, ИНН 910314959705</dd>
+        <dt>Для чего</dt><dd>Чтобы связаться с вами по заявке. Не для рекламных рассылок</dd>
+        <dt>Срок</dt><dd>Не дольше 3 лет с последнего обращения</dd>
+        <dt>Отозвать</dt><dd>Напишите на <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a></dd>
+          </dl>
+          <p class="pl-sum-note">Это выжимка для удобства. Условия - в полном тексте документа.</p>
+          <p class="pl-sum-link"><a href="politika-tyumen.html">Политика конфиденциальности →</a></p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="pl-foot">
+      <p><a href="politika-tyumen.html">Политика конфиденциальности</a><span class="dot">·</span><a href="https://mnd-tumen.ru/">Вернуться на главную страницу</a></p>
+      <p>© 2019-2026 Министерство новогодних дел<span class="dot">·</span>ИП Киричок Сергей Васильевич<span class="dot">·</span>ИНН 910314959705</p>
+    </footer>
+  </div>
+</main>
+
+<script>
+/* шапка темнеет при прокрутке (как на promokody.html) */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){ nav.classList.toggle('solid', window.scrollY > 24); }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* оглавление подсвечивает раздел, который сейчас читают */
+(function(){
+  var links = document.querySelectorAll('.pl-toc a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var byId = {};
+  for (var i = 0; i < links.length; i++) byId[links[i].getAttribute('href').slice(1)] = links[i];
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      for (var k in byId) byId[k].classList.remove('on');
+      var a = byId[e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, {rootMargin:'-20% 0px -70% 0px'});
+  for (var id in byId){ var s = document.getElementById(id); if (s) io.observe(s); }
+})();
+</script>
+</body>
+</html>
