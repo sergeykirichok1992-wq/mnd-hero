@@ -9579,11 +9579,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      Фото не открываются: под курсором кадр чуть растёт внутри рамки, как
      на экране «пульт» у Тюмени.
 
-     Мозаика ровная без обрезки: три колонки, в каждой одно вертикальное
-     фото 3:4 и одно горизонтальное 1000:592, в средней наоборот. Сумма
-     высот в колонках одинаковая, поэтому низ ровный на любой ширине. На
-     телефоне та же шахматка на боку: три ряда «вертикальное + горизонтальное»
-     одной высоты (ширины делит flex-grow по пропорции кадра). Фото собирает
+     Мозаика «крылья» (19.09.2026, вторая просьба: «в два раза меньше, не
+     такой квадратной, акцент на горизонтальных»): по краям фасад и беседки
+     во всю высоту, в середине дом с телегой и полоска из трёх интерьеров.
+     Низкая широкая полоса ~4:1, края ровные на любой ширине. На планшете
+     два ряда «горизонтальное-вертикальное-горизонтальное» и наоборот, на
+     телефоне фасад во всю ширину, три интерьера, пара. Фото собирает
      sayt-nn/instrumenty/ploshchadka_crimea.py в ploshchadka/.
 
      Стыки. Сверху на экран ложится золотая дуга «Где, когда» (у .dk z-index
@@ -9711,12 +9712,24 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .np-pl:nth-child(5)::before{display:block}
 }
 
-/* ---------- мозаика ---------- */
-.np-mz{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--np-gap);
-  margin-top:clamp(24px,2.6vw,48px)}
-.np-col{display:flex; flex-direction:column; align-items:stretch; gap:var(--np-gap); min-width:0}
+/* ---------- мозаика «крылья» ----------
+   Шесть плоских фото в одной сетке, раскладку задают области (areas).
+   Высоту рядов дают только плитки с aspect-ratio; у растянутых плиток
+   пропорция снята (auto) — иначе плитка с пропорцией не тянется (ведёт
+   себя как align-self:start) и нижний край разъезжается.
+
+   Телефон (до 599 px): фасад во всю ширину, под ним три интерьера, ниже
+   дом с телегой и беседки. На шести колонках «2 колонки + зазор» — ровно
+   треть ширины за вычетом зазоров, «3 + 2 зазора» — ровно половина, поэтому
+   все кадры в своих пропорциях, без обрезки. */
+.np-mz{display:grid; gap:var(--np-gap); margin-top:clamp(24px,2.6vw,48px);
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-template-areas:"wl wl wl wl wl wl" "va va vc vc vb vb" "mid mid mid wr wr wr"}
+.np-wl{grid-area:wl} .np-wr{grid-area:wr} .np-mid{grid-area:mid}
+.np-va{grid-area:va} .np-vc{grid-area:vc} .np-vb{grid-area:vb}
 .np-ph{
   position:relative; margin:0; overflow:hidden; border-radius:var(--np-r);
+  isolation:isolate;                  /* Safari: скругление держится, пока кадр растёт под курсором */
   background:#101A5C;
   box-shadow:0 18px 38px -20px rgba(2,5,22,.9);
 }
@@ -9725,11 +9738,35 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .np-ph img{position:absolute; inset:0; display:block; width:100%; height:100%;
   object-fit:cover; border-radius:inherit;
   transition:transform .7s cubic-bezier(.2,.7,.2,1)}
+/* где кадр режется (крылья по бокам, середина сверху-снизу) — что беречь:
+   у фасада башню с арочным окном справа, у дома телегу внизу */
+.np-wl img{object-position:60% 50%}
+.np-mid img{object-position:50% 62%}
 /* волосяная кромка поверх фото (тенью, не рамкой) */
 .np-ph::after{content:''; position:absolute; inset:0; z-index:1; border-radius:inherit; pointer-events:none;
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.11), inset 0 1px 0 rgba(255,255,255,.08)}
 @media (hover:hover) and (pointer:fine){
   .np-ph:hover img{transform:scale(1.045)}
+}
+/* Планшет (600-1023): два ряда — фасад | зал с рогами | беседки и
+   столовая | дом с телегой | лестница. Ряды задают вертикальные 3:4,
+   горизонтальные растянуты; доли колонок подобраны под 1000:592 и 3:4,
+   поэтому горизонтальные почти не режутся (до 1 %). */
+@media (min-width:600px){
+  .np-mz{grid-template-columns:minmax(0,1.294fr) minmax(0,.88fr) minmax(0,1fr) minmax(0,.88fr) minmax(0,1.294fr);
+    grid-template-areas:"wl wl vc wr wr" "va mid mid mid vb"}
+  .np-wl,.np-wr,.np-mid{aspect-ratio:auto}
+}
+/* Компьютер (от 1024): крылья. Ряд 1 задаёт середина 2:1, ряд 2 — интерьеры
+   3:4, крылья растянуты на оба ряда. При окне 1440 мозаика 1267x308
+   (была 1267x810): крылья 458x308 (срез по бокам ~12 %), дом 325x162
+   (срез сверху-снизу ~15 %), интерьеры 100x133 без обрезки.
+   4.6fr — ручка: больше — крылья шире и режутся меньше, но интерьеры
+   мельче и полоса ниже (4.25fr: срез крыльев 18 %, 5fr: ~5 %). */
+@media (min-width:1024px){
+  .np-mz{grid-template-columns:minmax(0,4.6fr) repeat(3,minmax(0,1fr)) minmax(0,4.6fr);
+    grid-template-areas:"wl mid mid mid wr" "wl va vc vb wr"}
+  .np-mid{aspect-ratio:2/1}
 }
 
 /* ---------- телефон (до 767 px) ---------- */
@@ -9742,17 +9779,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .np-pl{flex-basis:50%; flex-direction:row; align-items:center; gap:10px; padding:0 8px; text-align:left}
   .np-pl::before{display:none}
   .np-cap{font-size:15.5px}
-  /* шахматка на боку: ряд = вертикальное + горизонтальное одной высоты.
-     flex-grow равен пропорции кадра, поэтому высоты в ряду совпадают;
-     выравнивание по верху, иначе растяжка спорила бы с aspect-ratio.
-     Первым рядом идёт фасад (средняя колонка), у третьего ряда фото
-     меняются местами — выходит зигзаг. */
-  .np-mz{grid-template-columns:1fr; gap:8px; --np-gap:8px}
-  .np-col{flex-direction:row; align-items:flex-start}
-  .np-col:nth-child(2){order:-1}
-  .np-col:nth-child(3){flex-direction:row-reverse}
-  .np-v{flex:.75 1 0}
-  .np-h{flex:1.6892 1 0}
+  .np-mz{--np-gap:8px}
 }
 @media (min-width:768px){
   .np-t{font-size:clamp(28px, calc(2.9vw + 6px), 56px)}
@@ -9792,10 +9819,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   transition:opacity .8s ease var(--np-w,0s), transform .9s cubic-bezier(.2,.7,.2,1) var(--np-w,0s)}
 .np.rv .np-lead{--np-w:.1s}
 .np.rv .np-plus{--np-w:.16s}
-@media (min-width:768px){
-  .np.rv .np-col:nth-child(2) .np-ph{--np-w:.1s}
-  .np.rv .np-col:nth-child(3) .np-ph{--np-w:.2s}
-}
+/* мозаика всплывает слева направо: крыло, середина, крыло */
+.np.rv .np-mid,.np.rv .np-va,.np.rv .np-vc,.np.rv .np-vb{--np-w:.1s}
+.np.rv .np-wr{--np-w:.2s}
 
 /* вне окна движение стоит */
 .np-off .np-glow i,.np-off .np-stars i{animation-play-state:paused}
@@ -9826,18 +9852,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </ul>
 
     <div class="np-mz">
-      <div class="np-col">
-        <figure class="np-ph np-v"><img src="ploshchadka/cr-v2.webp?v=1" srcset="ploshchadka/cr-v2-480.webp?v=1 480w, ploshchadka/cr-v2.webp?v=1 900w" sizes="(max-width:767px) 30vw, (max-width:1560px) 30vw, 460px" width="900" height="1200" alt="Деревянная лестница на второй этаж дома" loading="lazy" decoding="async" draggable="false"></figure>
-        <figure class="np-ph np-h"><img src="ploshchadka/cr-h1.webp?v=1" srcset="ploshchadka/cr-h1-560.webp?v=1 560w, ploshchadka/cr-h1.webp?v=1 1000w" sizes="(max-width:767px) 64vw, (max-width:1560px) 30vw, 460px" width="1000" height="592" alt="Деревянный дом площадки, перед ним старинная телега с цветами" loading="lazy" decoding="async" draggable="false"></figure>
-      </div>
-      <div class="np-col">
-        <figure class="np-ph np-h"><img src="ploshchadka/cr-h2.webp?v=1" srcset="ploshchadka/cr-h2-560.webp?v=1 560w, ploshchadka/cr-h2.webp?v=1 1000w" sizes="(max-width:767px) 64vw, (max-width:1560px) 30vw, 460px" width="1000" height="592" alt="Фасад деревянного дома с резным балконом и сосной у входа" loading="lazy" decoding="async" draggable="false"></figure>
-        <figure class="np-ph np-v"><img src="ploshchadka/cr-v1.webp?v=1" srcset="ploshchadka/cr-v1-480.webp?v=1 480w, ploshchadka/cr-v1.webp?v=1 900w" sizes="(max-width:767px) 30vw, (max-width:1560px) 30vw, 460px" width="900" height="1200" alt="Просторный зал с деревянным потолком и оленьими рогами на стене" loading="lazy" decoding="async" draggable="false"></figure>
-      </div>
-      <div class="np-col">
-        <figure class="np-ph np-v"><img src="ploshchadka/cr-v3.webp?v=1" srcset="ploshchadka/cr-v3-480.webp?v=1 480w, ploshchadka/cr-v3.webp?v=1 900w" sizes="(max-width:767px) 30vw, (max-width:1560px) 30vw, 460px" width="900" height="1200" alt="Зал со столами, деревянным потолком и большими окнами" loading="lazy" decoding="async" draggable="false"></figure>
-        <figure class="np-ph np-h"><img src="ploshchadka/cr-h3.webp?v=1" srcset="ploshchadka/cr-h3-560.webp?v=1 560w, ploshchadka/cr-h3.webp?v=1 1000w" sizes="(max-width:767px) 64vw, (max-width:1560px) 30vw, 460px" width="1000" height="592" alt="Беседки с соломенными крышами у пруда на территории площадки" loading="lazy" decoding="async" draggable="false"></figure>
-      </div>
+      <figure class="np-ph np-h np-wl"><img src="ploshchadka/cr-h2.webp?v=1" srcset="ploshchadka/cr-h2-560.webp?v=1 560w, ploshchadka/cr-h2.webp?v=1 1000w" sizes="(max-width:599px) 92vw, (max-width:1023px) 40vw, (max-width:1470px) 33vw, 500px" width="1000" height="592" alt="Фасад деревянного дома с резным балконом и сосной у входа" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="np-ph np-h np-mid"><img src="ploshchadka/cr-h1.webp?v=1" srcset="ploshchadka/cr-h1-560.webp?v=1 560w, ploshchadka/cr-h1.webp?v=1 1000w" sizes="(max-width:599px) 46vw, (max-width:1023px) 50vw, (max-width:1470px) 23vw, 360px" width="1000" height="592" alt="Деревянный дом площадки, перед ним старинная телега с цветами" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="np-ph np-v np-va"><img src="ploshchadka/cr-v3.webp?v=1" srcset="ploshchadka/cr-v3-480.webp?v=1 480w, ploshchadka/cr-v3.webp?v=1 900w" sizes="(max-width:599px) 30vw, (max-width:1023px) 23vw, 110px" width="900" height="1200" alt="Зал со столами, деревянным потолком и большими окнами" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="np-ph np-v np-vc"><img src="ploshchadka/cr-v1.webp?v=1" srcset="ploshchadka/cr-v1-480.webp?v=1 480w, ploshchadka/cr-v1.webp?v=1 900w" sizes="(max-width:599px) 30vw, (max-width:1023px) 23vw, 110px" width="900" height="1200" alt="Просторный зал с деревянным потолком и оленьими рогами на стене" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="np-ph np-v np-vb"><img src="ploshchadka/cr-v2.webp?v=1" srcset="ploshchadka/cr-v2-480.webp?v=1 480w, ploshchadka/cr-v2.webp?v=1 900w" sizes="(max-width:599px) 30vw, (max-width:1023px) 23vw, 110px" width="900" height="1200" alt="Деревянная лестница на второй этаж дома" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="np-ph np-h np-wr"><img src="ploshchadka/cr-h3.webp?v=1" srcset="ploshchadka/cr-h3-560.webp?v=1 560w, ploshchadka/cr-h3.webp?v=1 1000w" sizes="(max-width:599px) 46vw, (max-width:1023px) 40vw, (max-width:1470px) 33vw, 500px" width="1000" height="592" alt="Беседки с соломенными крышами у пруда на территории площадки" loading="lazy" decoding="async" draggable="false"></figure>
     </div>
   </div>
 </section>
