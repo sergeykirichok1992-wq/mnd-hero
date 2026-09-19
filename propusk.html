@@ -1,0 +1,1933 @@
+<!doctype html>
+<!--
+  ПОЧЁТНЫЙ ПРОПУСК - страница-генератор для родителей.
+  Родитель загружает фото ребёнка, выбирает, что попадёт в кружок (как при
+  выборе аватарки в МАХ и Телеграме), пишет имя, выбирает мальчик/девочка,
+  дату и время экскурсии и получает картинку 1080x1920, которую сохраняет
+  себе на телефон или компьютер.
+
+  Всё собирается в браузере на холсте (canvas). Фото и имя никуда не уходят:
+  ни на сервер, ни в localStorage, метрик на странице нет (вебвизор записывает
+  ввод в поля, а здесь в полях имя ребёнка).
+
+  План и все принятые решения - в основном репозитории «МНД AI»:
+  plans/2026-09-19-propusk.md.
+  Шаблон и шрифт лежат рядом: propusk/shablon.webp, propusk/charis-bold.woff2
+  (Charis SIL Bold, лицензия OFL - propusk/OFL.txt). Шаблон поменяли -
+  пересчитать числа в объекте PASS в начале скрипта, больше нигде.
+
+  Одна страница на все домены: mnd-nn.ru, mnd-kazan.ru, mnd-tumen.ru.
+  В меню не стоит, поисковикам закрыта (noindex).
+-->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Почётный пропуск - Министерство Новогодних Дел</title>
+<meta name="description" content="Сделайте именной пропуск на экскурсию в Министерство Новогодних Дел: фото ребёнка, имя, дата и время. Картинка собирается прямо в браузере.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04070F">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Министерство Новогодних Дел">
+<meta property="og:title" content="Почётный пропуск - Министерство Новогодних Дел">
+<meta property="og:description" content="Именной пропуск на экскурсию с фото ребёнка: загрузите фото, напишите имя, выберите дату и время.">
+<meta property="og:image" content="https://mnd-nn.ru/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<!-- Шрифт пропуска грузим заранее: на холсте он появится только после загрузки,
+     а человек может нажать «Сгенерировать» уже через минуту после входа -->
+<link rel="preload" href="propusk/charis-bold.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Шрифты - только файлы из этого репозитория. Google Fonts и любые чужие
+   адреса на этой странице не подключаем: сюда родитель приносит фото ребёнка,
+   и страница не должна никуда ходить, кроме своего сервера. */
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+/* Текст страницы - Roboto из того же файла, что у экранов-копий старого сайта.
+   Своё имя, чтобы не спорить с системным Roboto на Android: там свои
+   начертания, и строки поехали бы по ширине. Файл только обычный (400),
+   поэтому жирное на странице набираем Blogger Sans, а не «синтетикой». */
+@font-face{
+  font-family:"Propusk Text"; font-style:normal; font-weight:400; font-display:swap;
+  src:url(cr-roboto.woff) format("woff");
+}
+/* Шрифт картинки пропуска - Charis SIL Bold, урезанный до латиницы и
+   кириллицы. Имя «Propusk Serif» - то же, что зашито внутри файла: «Charis»
+   и «SIL» по лицензии OFL нельзя ставить на изменённую версию шрифта. */
+@font-face{
+  font-family:"Propusk Serif"; font-style:normal; font-weight:700; font-display:block;
+  src:url(propusk/charis-bold.woff2) format("woff2");
+}
+
+:root{
+  --ink:#04070F; --line:#18223B;
+  --text:#DCE4F3; --dim:#8695B3; --faint:#5A6784;
+  --gold:#E3B34E; --gold-l:#EBD3A0;
+  --txt:"Propusk Text","Helvetica Neue",Arial,sans-serif;
+  --head:"Blogger Sans","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%; text-size-adjust:100%}
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:var(--txt); font-size:16px; line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+[hidden]{display:none !important}
+.vh{position:absolute !important; width:1px; height:1px; margin:-1px; padding:0; border:0;
+  overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap}
+
+/* ---------- шапка (та же, что на promokody.html) ----------
+   Отличие одно: padding-top с вырезом iPhone стоит ПОСЛЕ сокращённого padding.
+   На остальных страницах он идёт раньше и перебивается, а сюда чаще всего
+   приходят с телефона, из МАХ и Телеграма. Без стекла (backdrop-filter):
+   ниже на странице двигают фото пальцем, и каждый лишний кадр размытия
+   заметен как подтормаживание. */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:30;
+  display:flex; align-items:center; gap:26px;
+  padding:16px max(30px, env(safe-area-inset-right)) 16px max(30px, env(safe-area-inset-left));
+  padding-top:max(16px, env(safe-area-inset-top));
+  transition:background .35s ease, border-color .35s ease;
+  border-bottom:1px solid transparent;
+}
+/* непрозрачная: размытия под шапкой нет, и сквозь .96 просвечивал текст формы */
+.nav.solid{background:#04070F; border-bottom-color:var(--line)}
+/* Надпись шапки на остальных страницах - Unbounded из Google Fonts. Здесь
+   чужих шрифтов нет, поэтому та же надпись набрана Blogger Sans */
+.brand{
+  font-family:var(--head); font-weight:700; font-size:14px;
+  letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026), как на promokody.html */
+.navbtn{
+  margin-left:auto;
+  border:1px solid var(--gold); color:var(--gold); background:transparent;
+  border-radius:2px; padding:9px 18px; font:400 13.5px/1 var(--txt);
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none;
+}
+.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px; padding-top:max(14px, env(safe-area-inset-top))}
+  .brand{font-size:12px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- ПОЛЕ СТРАНИЦЫ: НОЧНОЕ НЕБО ----------
+   Рецепт promokody.html: синяя ночь, пятна синего, пурпурного, лилового и
+   тёплое золото, зерно поверх. Без filter:blur - мягкость дают ступени
+   радиального градиента: размытие на большой площади сажает прокрутку на
+   телефоне, а здесь ещё и фото двигают пальцем.
+   Пятна «дышат» медленно (33-45 с) и на пару процентов: рядом с формой
+   движение не должно ловиться боковым зрением. */
+.oz{
+  /* overflow:hidden здесь НЕ ставить (на promokody.html он есть): он делает
+     .oz прокручиваемым контейнером, и липкая панель пропуска справа перестаёт
+     липнуть. Пятна и так обрезает .oz-glow. */
+  position:relative; isolation:isolate; min-height:100vh;
+  padding:clamp(92px,9vw,150px) 0 clamp(64px,7vw,116px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+.oz-glow{position:absolute; top:0; left:0; right:0; bottom:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.oz-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:42%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:ozDrift1 38s ease-in-out infinite alternate}
+.oz-glow i:nth-child(2){right:-20vw; top:18%; width:70vw; height:44%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:ozDrift2 45s ease-in-out infinite alternate}
+/* лиловое пятно сверх promokody: тот самый «перелив» из любимого фона */
+.oz-glow i:nth-child(3){left:-14vw; top:52%; width:62vw; height:34%;
+  background:radial-gradient(closest-side, rgba(176,106,224,.22) 0%, rgba(176,106,224,.13) 32%, rgba(176,106,224,.04) 64%, rgba(176,106,224,0) 100%);
+  animation:ozDrift3 41s ease-in-out infinite alternate-reverse}
+.oz-glow i:nth-child(4){left:50%; bottom:-8%; width:78vw; height:34%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.18) 0%, rgba(227,179,78,.11) 32%, rgba(227,179,78,.035) 64%, rgba(227,179,78,0) 100%);
+  animation:ozDrift3 33s ease-in-out infinite alternate}
+@keyframes ozDrift1{from{transform:translate3d(0,0,0) scale(1);    opacity:.9}
+                    to  {transform:translate3d(4%,3%,0) scale(1.08); opacity:1}}
+@keyframes ozDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
+                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.86}}
+@keyframes ozDrift3{from{transform:translate3d(0,0,0) scale(1);    opacity:.84}
+                    to  {transform:translate3d(5%,-4%,0) scale(1.1); opacity:1}}
+.oz-grain{position:absolute; top:0; left:0; right:0; bottom:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Контейнер - по общему правилу сайта: широкий, почти во весь экран
+   → ai-clone/feedback/shirokaya-verstka-sayta.md. Форма и картинка внутри
+   своей ширины не тянутся: поле ввода на 1500 px читать невозможно. */
+.pp-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1720px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,56px);
+}
+@media (max-width:767px){ .pp-cont{width:100%} }
+
+/* ---------- заголовок ---------- */
+.pp-head{text-align:center}
+.pp-eyebrow{margin:0 0 clamp(10px,1.1vw,16px); font-size:12px; letter-spacing:.24em;
+  text-transform:uppercase; color:#8FA3C8}
+.pp-t{
+  margin:0 auto;
+  font-family:var(--head); font-weight:700;
+  font-size:clamp(32px,4.4vw,64px); line-height:1.04; letter-spacing:.005em;
+  text-transform:uppercase; color:#fff;
+}
+/* «пропуск» - золотом: сначала плоский цвет как запас, потом градиент по
+   буквам там, где браузер умеет резать фон по тексту (как .bk-t b на v2.html) */
+.pp-t b{font-weight:700; color:#E3B34E}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .pp-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F1D695 38%,#E3B34E 62%,#C9922F 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
+.pp-lead{max-width:60ch; margin:clamp(14px,1.4vw,22px) auto 0; text-wrap:balance;
+  font-size:max(15px, clamp(15px,1.2vw,19px)); line-height:1.5; color:#B9C8F5}
+/* Про приватность - отдельной заметной плашкой, а не мелким шрифтом внизу:
+   первое, о чём думает родитель, когда у него просят фото ребёнка */
+.pp-safe{
+  display:inline-flex; align-items:center; gap:10px; max-width:100%;
+  margin:clamp(16px,1.6vw,24px) auto 0; padding:10px 18px 10px 14px; border-radius:999px;
+  background:rgba(227,179,78,.09); box-shadow:inset 0 0 0 1px rgba(227,179,78,.38);
+  font-size:15px; line-height:1.35; color:var(--gold-l); text-align:left;
+}
+.pp-safe svg{flex:0 0 auto; width:22px; height:22px; color:var(--gold)}
+@media (max-width:520px){ .pp-safe{border-radius:18px; font-size:14.5px} }
+
+/* ---------- раскладка: форма + пропуск ----------
+   Телефон: одна колонка, пропуск появляется под кнопкой «Сгенерировать».
+   Компьютер: слева форма, справа липкая панель с пропуском - человек видит
+   результат, не прокручивая страницу вниз. */
+.pp-grid{display:grid; grid-template-columns:minmax(0,1fr); gap:28px;
+  margin-top:clamp(26px,3.2vw,52px)}
+/* Нижние границы колонок не случайны: свободное место сетка делит между
+   колонками поровну, и при «minmax(0,…)» на 1024 px форме доставалось
+   350 px, а картинке 500. Форма важнее - ей 460 минимум. */
+/* Вторая колонка ровно шириной с картинку (та же формула, что у .pv-frame
+   ниже). Была 280..500 при картинке 343 - между формой и пропуском
+   оставалась дыра ~150 px, и пара съезжала влево от центра. */
+@media (min-width:1024px){
+  .pp-grid{grid-template-columns:minmax(460px,620px) min(500px, max(240px, calc((100vh - 290px) * 9 / 16)));
+    justify-content:center; align-items:start; gap:clamp(40px,5vw,96px)}
+}
+/* планшет и телефон: одна колонка, бланк по центру и не шире 680 -
+   поле имени на 720 px читается хуже */
+@media (max-width:1023px){
+  .pp-card{width:100%; max-width:680px; margin-inline:auto}
+}
+
+/* ---------- бланк формы: материал пятого экрана (.bk-card) ----------
+   backdrop-filter не ставим: за бланком дышат пятна, и матовое стекло
+   пересчитывалось бы каждый кадр (замер 04.09.2026 на пятом экране). */
+.pp-card{
+  position:relative; min-width:0; scroll-margin-top:84px;   /* «Сделать ещё один» не прячет верх бланка под шапку */
+  padding:clamp(20px,3vw,40px) clamp(16px,3vw,40px) clamp(26px,3vw,40px);
+  border-radius:clamp(20px,2vw,28px);
+  background:linear-gradient(180deg, rgba(9,16,50,.9) 0%, rgba(7,11,36,.95) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(227,179,78,.3),
+    inset 0 1px 0 rgba(255,238,190,.2),
+    0 50px 110px -40px rgba(0,0,0,.9),
+    0 0 180px -50px rgba(108,43,217,.5);
+}
+
+/* ---------- шаг формы ---------- */
+.st{scroll-margin-top:88px}
+.st + .st{margin-top:26px; padding-top:26px; border-top:1px solid rgba(146,167,214,.14)}
+.st-h{display:flex; align-items:center; gap:12px; margin:0 0 6px;
+  font-family:var(--head); font-weight:700; font-size:clamp(18px,1.4vw,21px); line-height:1.15;
+  letter-spacing:.02em; text-transform:uppercase; color:#fff}
+.st-h:focus{outline:0}
+/* номер шага: пустое золотое кольцо, заполненный шаг - золотой кружок.
+   Так видно, что осталось сделать, не читая подписей */
+.st-n{flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center;
+  width:30px; height:30px; border-radius:50%; font-size:15px; letter-spacing:0; color:var(--gold);
+  box-shadow:inset 0 0 0 1.5px rgba(227,179,78,.7);
+  transition:background .25s ease, color .25s ease}
+.st.ok .st-n{background:linear-gradient(180deg,#FDE68A,#F59E0B); color:#451A03; box-shadow:none}
+.st-sub{margin:0 0 16px 42px; font-size:14.5px; line-height:1.4; color:var(--dim)}
+
+/* ---------- поля (окно заявки v2.html, .zs-*) ---------- */
+/* Кегль поля не опускаем ниже 16px: на iOS поле с мелким шрифтом заставляет
+   Safari зумить всю страницу, как только в него ставят курсор */
+.zs-inp{
+  width:100%; padding:clamp(12.32px,1.2vw,15.3px) 20px; border-radius:999px;
+  border:1px solid rgba(146,167,214,.26); background:rgba(255,255,255,.05); color:#fff;
+  font-family:var(--txt); font-weight:400;
+  font-size:max(16px, clamp(14.08px,1.15vw,17px)); line-height:1.2; letter-spacing:.02em;
+  transition:border-color .2s ease, background .2s ease, box-shadow .25s ease;
+}
+.zs-inp::placeholder{color:rgba(200,214,238,.38)}
+.zs-inp:focus{outline:0; border-color:rgba(227,179,78,.7); background:rgba(255,255,255,.08);
+  box-shadow:0 0 0 3px rgba(227,179,78,.16), 0 0 28px -6px rgba(227,179,78,.5)}
+.zs-inp.bad{border-color:rgba(255,120,120,.75); box-shadow:0 0 0 3px rgba(255,120,120,.14)}
+.st .zs-inp{margin-top:10px}
+
+/* плитки «мальчик / девочка». Подсветку ставит скрипт классом .on - так на
+   всём сайте, и так работает в браузерах без :has() */
+.zs-seg{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
+.zs-opt{
+  position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; min-height:66px; padding:12px 10px; border-radius:16px; cursor:pointer;
+  border:1px solid rgba(146,167,214,.24); background:rgba(255,255,255,.04);
+  font-family:var(--txt); font-size:16px; line-height:1.15;
+  color:#C9D6EE; text-align:center; -webkit-tap-highlight-color:transparent;
+  transition:border-color .2s ease, background .2s ease, color .2s ease, box-shadow .25s ease;
+}
+.zs-opt input,.chip input{position:absolute; opacity:0; width:1px; height:1px; margin:0; pointer-events:none}
+.zs-opt em{font-style:normal; font-size:12.5px; letter-spacing:.01em; color:#7F91B4; transition:color .2s ease}
+@media (hover:hover){
+  .zs-opt:hover,.chip:hover{border-color:rgba(227,179,78,.4); background:rgba(255,255,255,.07)}
+}
+/* Выбранное - ОДИН язык на всю форму: плитки, часы, минуты и день календаря
+   (правило .cal-d ниже). Ровная заливка золотом сайта, без градиента,
+   свечения и бортика: всё это есть у кнопки «Сгенерировать», и выбранный день
+   читался как третий вид кнопки. Прежняя кайма с мутной заливкой читалась
+   как погашенное. */
+.zs-opt.on,.chip.on{
+  border-color:#E3B34E; color:#04070F; background:#E3B34E; box-shadow:none;
+}
+.zs-opt.on em{color:rgba(4,7,15,.72)}
+@media (hover:hover){ .zs-opt.on:hover,.chip.on:hover{border-color:#E3B34E; background:#E3B34E} }
+.zs-opt:has(input:focus-visible),.chip:has(input:focus-visible){outline:2px solid rgba(227,179,78,.85); outline-offset:2px}
+.zs-seg.bad .zs-opt,.tm.bad .chip,.cal.bad .cal-d:not([aria-disabled]){border-color:rgba(255,120,120,.55)}
+
+.zs-err{margin:10px 4px 0; font-family:var(--txt);
+  font-size:14px; line-height:1.35; color:#FF9C9C; text-align:left}
+.zs-hint{margin:8px 4px 0; font-family:var(--txt);
+  font-size:13.5px; line-height:1.4; color:#8FA3C8}
+.zs-hint b{font-weight:400; color:var(--gold-l)}
+
+/* ---------- шаг 1: фото ---------- */
+/* пустое состояние - круг с пунктиром, как рамка из точек на самом пропуске */
+.ph-drop{
+  position:relative; display:flex; align-items:center; justify-content:center;
+  width:min(100%,260px); margin:6px auto 0; border-radius:50%; cursor:pointer;
+  border:2px dashed rgba(255,218,119,.55);
+  background:radial-gradient(circle at 50% 38%, rgba(47,49,146,.45), rgba(255,255,255,.03) 72%);
+  color:#C9D6EE; text-align:center; -webkit-tap-highlight-color:transparent;
+  transition:border-color .2s ease, background .2s ease, box-shadow .25s ease;
+}
+.ph-drop::before{content:''; display:block; padding-top:100%}
+.ph-drop-in{position:absolute; top:50%; left:50%; width:78%; transform:translate(-50%,-50%);
+  display:flex; flex-direction:column; align-items:center; gap:8px}
+.ph-drop svg{width:44px; height:44px; color:var(--gold)}
+.ph-drop b{font-family:var(--head); font-weight:700; font-size:18px; letter-spacing:.03em;
+  text-transform:uppercase; color:#fff}
+.ph-drop small{font-size:13.5px; line-height:1.35; color:var(--dim)}
+@media (hover:hover){ .ph-drop:hover{border-color:rgba(255,218,119,.9); background:radial-gradient(circle at 50% 38%, rgba(47,49,146,.6), rgba(255,255,255,.05) 72%)} }
+.ph-drop.drag{border-style:solid; border-color:#FFDA77; box-shadow:0 0 40px -6px rgba(227,179,78,.6)}
+#phFile:focus-visible + #phEmpty .ph-drop{outline:2px solid rgba(227,179,78,.9); outline-offset:4px}
+
+.ph-drop.bad{border-color:rgba(255,120,120,.8)}
+#errPhoto{text-align:center}
+
+/* Готовый кружок на странице - просто картинка. Никаких touch-action и
+   перехвата колеса: свайп по нему листает страницу, как по любому месту.
+   Кадр меняется только в окне на весь экран (решение 19.09.2026). */
+.cr{margin-top:6px; display:flex; flex-direction:column; align-items:center}
+.cr-pic{position:relative; display:block; width:clamp(200px,58vw,240px); aspect-ratio:1/1; margin:6px auto 0;
+  /* фон как у пропуска (PASS.bg): прозрачные места PNG в кружке и в пропуске одного цвета */
+  padding:0; border:0; border-radius:50%; overflow:hidden; cursor:pointer; background:#0B1030;
+  box-shadow:0 0 0 2px rgba(227,179,78,.85), 0 18px 40px -20px rgba(0,0,0,.9);
+  -webkit-tap-highlight-color:transparent}
+.cr-pic canvas{position:absolute; top:0; left:0; width:100%; height:100%; display:block}
+.cr-pic:focus{outline:0}
+.cr-pic:focus-visible{outline:2px solid rgba(255,238,190,.95); outline-offset:5px}
+.cr-pic.drop{box-shadow:0 0 0 3px #FFDA77, 0 0 40px -6px rgba(227,179,78,.6)}
+.cr-more{display:flex; flex-wrap:wrap; justify-content:center; gap:4px 18px; margin-top:10px}
+
+/* Окно кадра на весь экран, как в Телеграме. На странице кадрировщик мешал:
+   палец по фото двигал кадр вместо прокрутки, колесо мыши гасило готовый
+   пропуск. Здесь страница под окном закрыта, и жесты можно забирать все. */
+.crm{position:fixed; inset:0; z-index:100; overflow-y:auto; overscroll-behavior:contain;
+  background:var(--ink); touch-action:pan-y;
+  padding:max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+          max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left))}
+.crm-in{min-height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0}
+.crm-h{margin:0 0 16px; max-width:28ch; text-align:center; font-family:var(--head); font-weight:700;
+  font-size:20px; line-height:1.2; letter-spacing:.03em; text-transform:uppercase; color:#fff}
+.crm-h:focus{outline:0}
+.crm-ok{margin-top:18px}
+.crm .lnk{margin-top:6px}
+
+/* Кадрировщик: квадратное окно, круг в центре, всё вне круга затемнено.
+   touch-action:none - палец двигает фото, два пальца приближают его,
+   а не весь сайт. */
+.cr-win{
+  --crw:min(calc(100vw - 32px), calc(100vh - 250px), 560px);
+  --crw:min(calc(100vw - 32px), calc(100dvh - 250px), 560px);
+  position:relative; flex:0 0 auto; width:max(220px, var(--crw)); margin:0 auto; border-radius:20px; overflow:hidden;
+  background:#070B1E; cursor:grab; touch-action:none;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
+  box-shadow:inset 0 0 0 1px rgba(146,167,214,.2);
+}
+.cr-win::before{content:''; display:block; padding-top:100%}
+.cr-win.drag{cursor:grabbing}
+.cr-win:focus{outline:0}
+.cr-win:focus-visible{outline:2px solid rgba(227,179,78,.9); outline-offset:3px}
+.cr-win.drop{box-shadow:inset 0 0 0 2px #FFDA77}
+.cr-win canvas{position:absolute; top:0; left:0; width:100%; height:100%; display:block}
+.cr-zoom{display:flex; align-items:center; gap:12px; width:min(100%,420px); margin:16px auto 0; color:#8FA3C8}
+.cr-zoom svg{flex:0 0 auto; width:18px; height:18px}
+/* ползунок приближения: своя дорожка и золотая ручка, системный на тёмном
+   почти не виден. Ручка 26 px - в неё попадает палец */
+.cr-range{flex:1 1 auto; min-width:0; height:32px; margin:0; background:none; cursor:pointer;
+  -webkit-appearance:none; appearance:none}
+.cr-range:focus{outline:0}
+.cr-range::-webkit-slider-runnable-track{height:4px; border-radius:4px; background:rgba(146,167,214,.3)}
+.cr-range::-moz-range-track{height:4px; border-radius:4px; background:rgba(146,167,214,.3)}
+.cr-range::-webkit-slider-thumb{-webkit-appearance:none; appearance:none; width:26px; height:26px; margin-top:-11px;
+  border-radius:50%; border:0; background:linear-gradient(180deg,#FDE68A,#F59E0B);
+  box-shadow:0 0 0 1px rgba(180,83,9,.4), 0 4px 10px rgba(0,0,0,.45)}
+.cr-range::-moz-range-thumb{width:26px; height:26px; border-radius:50%; border:0;
+  background:linear-gradient(180deg,#FDE68A,#F59E0B); box-shadow:0 0 0 1px rgba(180,83,9,.4), 0 4px 10px rgba(0,0,0,.45)}
+.cr-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px rgba(255,238,190,.9)}
+.cr-range:focus-visible::-moz-range-thumb{box-shadow:0 0 0 3px rgba(255,238,190,.9)}
+.cr-help{width:min(100%,420px); margin:8px auto 0; text-align:center; font-size:13.5px; line-height:1.4; color:#8FA3C8}
+
+/* текстовая ссылка-действие («Заменить фото», «Сделать ещё один пропуск»):
+   не кнопка по стандарту, а ссылка - действие второстепенное */
+.lnk{display:inline-block; padding:8px 4px; border:0; background:none; cursor:pointer;
+  font:400 15px/1.3 var(--txt); color:var(--gold-l); text-decoration:underline;
+  text-decoration-color:rgba(235,211,160,.45); text-underline-offset:4px;
+  -webkit-tap-highlight-color:transparent}
+.lnk:hover{color:#fff; text-decoration-color:currentColor}
+.lnk:focus-visible{outline:2px solid rgba(227,179,78,.85); outline-offset:2px; border-radius:4px}
+
+/* ---------- шаг 4: календарь ----------
+   На сайте календаря нет нигде, материал ячеек взят с плиток .zs-opt.
+   Системный input date не берём: на телефонах он разный, и в нём нельзя
+   погасить дни вне сезона. */
+.cal{width:min(100%,440px); margin:12px auto 0}
+.cal-hint{width:min(100%,440px); margin:0 auto; text-align:center}
+.cal-top{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px}
+.cal-m{margin:0; font-family:var(--head); font-weight:700; font-size:19px; letter-spacing:.03em;
+  text-transform:uppercase; color:#fff}
+.cal-arr{flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center;
+  width:44px; height:44px; padding:0; border-radius:50%; cursor:pointer;
+  border:1px solid rgba(146,167,214,.26); background:rgba(255,255,255,.04); color:#C9D6EE;
+  -webkit-tap-highlight-color:transparent; transition:border-color .2s ease, background .2s ease, opacity .2s ease}
+.cal-arr svg{width:18px; height:18px}
+@media (hover:hover){ .cal-arr:not([disabled]):hover{border-color:rgba(227,179,78,.5); background:rgba(255,255,255,.08)} }
+.cal-arr:focus-visible{outline:2px solid rgba(227,179,78,.85); outline-offset:2px}
+.cal-arr[disabled]{opacity:.22; cursor:default}
+.cal-g{width:100%; border-collapse:separate; border-spacing:4px; table-layout:fixed; margin:0 -4px; width:calc(100% + 8px)}
+.cal-g th{padding:2px 0 4px; font-size:12px; font-weight:400; letter-spacing:.08em; text-transform:uppercase; color:#7F91B4}
+.cal-g th.we{color:#B79A62}
+.cal-g td{padding:0}
+.cal-d{display:block; width:100%; height:clamp(40px,11vw,48px); padding:0; border-radius:12px; cursor:pointer;
+  border:1px solid rgba(146,167,214,.24); background:rgba(255,255,255,.04); color:#DCE4F3;
+  font:400 16px/1 var(--txt); -webkit-tap-highlight-color:transparent;
+  transition:border-color .2s ease, background .2s ease, color .2s ease, box-shadow .25s ease}
+@media (hover:hover){ .cal-d:not([aria-disabled]):not([aria-pressed="true"]):hover{border-color:rgba(227,179,78,.45); background:rgba(255,255,255,.08)} }
+.cal-d:focus-visible{outline:2px solid rgba(227,179,78,.9); outline-offset:1px}
+/* дни вне сезона бледные и неактивные, но в фокус с клавиатуры попадают:
+   стрелками по сетке нужно проходить через них, а не спотыкаться */
+.cal-d[aria-disabled="true"]{border-color:transparent; background:none; color:rgba(201,214,238,.22); cursor:default}
+/* выбранный день - тем же языком «выбрано», что плитки и фишки времени
+   (см. .zs-opt.on): ровное золото сайта, тёмная цифра, без свечения */
+.cal-d[aria-pressed="true"]{color:#04070F;
+  border-color:#E3B34E; background:#E3B34E; box-shadow:none}
+.cal-sel{min-height:1.4em; margin:10px 4px 0; text-align:center; font-size:15px; color:var(--gold-l)}
+
+/* ---------- шаг 5: время ---------- */
+.tm-lab{margin:14px 4px 8px; font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:#7F91B4}
+.tm{display:grid; gap:6px}
+.tm-h{grid-template-columns:repeat(6,minmax(0,1fr))}
+.tm-m{grid-template-columns:repeat(4,minmax(0,1fr))}
+.chip{position:relative; display:flex; align-items:center; justify-content:center;
+  min-height:46px; padding:0 4px; border-radius:12px; cursor:pointer;
+  border:1px solid rgba(146,167,214,.24); background:rgba(255,255,255,.04); color:#C9D6EE;
+  font:400 16px/1 var(--txt); -webkit-tap-highlight-color:transparent;
+  transition:border-color .2s ease, background .2s ease, color .2s ease, box-shadow .25s ease}
+.tm-out{margin:16px 0 0; text-align:center; font-family:var(--head); font-weight:700;
+  font-size:clamp(40px,4vw,52px); line-height:1; letter-spacing:.02em; color:#FFDA77}
+.tm-out.empty{color:rgba(201,214,238,.25)}
+
+/* ---------- «Сгенерировать» ---------- */
+.pp-send{margin-top:30px; padding-top:28px; border-top:1px solid rgba(146,167,214,.14);
+  display:flex; flex-direction:column; align-items:center; text-align:center}
+.pp-send .zs-err{text-align:center}
+/* плашка встроенного браузера: тон подсказки, а не ошибки */
+.pp-inapp{display:flex; align-items:flex-start; gap:10px; margin:0 0 22px; padding:12px 16px 12px 12px;
+  border-radius:16px; background:rgba(146,167,214,.08); box-shadow:inset 0 0 0 1px rgba(146,167,214,.3);
+  font-size:14.5px; line-height:1.45; color:#C9D6EE}
+.pp-inapp svg{flex:0 0 auto; width:20px; height:20px; margin-top:1px; color:#8FA3C8}
+/* Ширина кнопок как во всех формах сайта (.bk-send/.oz-send на v2.html,
+   просьба Серёги 10.09.2026): на телефоне и планшете почти во всю ширину,
+   но не больше 480, от 768 px - по длине надписи. Сам стандарт кнопки
+   не трогаем, только ширину. */
+.pp-send .zs-btn,.pv-act .zs-btn,.crm-ok{width:min(100%,480px)}
+@media (min-width:768px){ .pp-send .zs-btn,.pv-act .zs-btn,.crm-ok{width:auto} }
+
+/* ---------- панель пропуска ---------- */
+.pv{min-width:0; scroll-margin-top:76px}
+@media (min-width:1024px){
+  .pv{position:sticky; top:88px}
+  /* Липкий элемент сетки не выходит за свою строку. Строка кончается с низом
+     формы, и у самого низа страницы панель выталкивало вверх, под шапку.
+     Запас под формой удлиняет строку, а на столько же меньше отступ .oz -
+     внешне низ страницы не меняется. */
+  .pp-card{margin-bottom:120px}
+  .oz{padding-bottom:0}
+}
+/* на телефоне до первой сборки панели нет: шаблон-заглушка под кнопкой
+   читался бы как уже готовый пропуск */
+@media (max-width:1023px){ .pv:not(.has){display:none} }
+.pv-frame{position:relative; margin:0 auto; border-radius:14px; overflow:hidden;
+  width:min(100%, 420px, calc((100vh - 250px) * 9 / 16));
+  width:min(100%, 420px, calc((100svh - 250px) * 9 / 16));
+  min-width:min(100%, 280px);
+  /* кружок шаблона прозрачный - подложка видна только в нём */
+  background:radial-gradient(circle at 49.2% 21.5%, #25306E 0%, #141A48 12%, #0B1030 26%);
+  box-shadow:0 0 0 1px rgba(227,179,78,.28), 0 40px 90px -40px rgba(0,0,0,.95), 0 0 120px -40px rgba(108,43,217,.55)}
+@media (min-width:1024px){
+  .pv-frame{width:100%; min-width:0}
+}
+.pv-frame img{display:block; width:100%; height:auto}
+.pv-ph{opacity:.4; filter:saturate(.75)}
+.pv.has .pv-ph,.pv.has .pv-cap{display:none}
+.pv-cap{position:absolute; left:49.2%; top:21.5%; width:40%; margin:0; transform:translate(-50%,-50%);
+  text-align:center; font-family:var(--head); font-weight:700; font-size:clamp(14px,1.2vw,17px);
+  line-height:1.2; letter-spacing:.04em; text-transform:uppercase; color:var(--gold-l)}
+/* данные поменяли после сборки - картинку гасим и закрываем плашкой, чтобы
+   не скачали пропуск со старым именем или датой (и долгим нажатием тоже) */
+.pv-stale{position:absolute; top:0; left:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center;
+  padding:24px; background:rgba(4,7,15,.74); text-align:center}
+.pv-stale p{margin:0; max-width:24ch; font-family:var(--head); font-weight:700; font-size:19px; line-height:1.25;
+  text-transform:uppercase; letter-spacing:.02em; color:#fff}
+.pv-act{display:flex; flex-direction:column; align-items:center; margin-top:22px; text-align:center}
+.pv-hint{max-width:46ch; margin:14px auto 0; font-size:13.5px; line-height:1.45; color:#8FA3C8}
+.pv-act .lnk{margin-top:8px}
+/* скачивание во встроенном браузере могло не сработать - подсказку про долгое
+   нажатие показываем крупно, это теперь главный путь сохранить картинку */
+.pv-hint.big{max-width:40ch; padding:12px 16px; border-radius:16px; font-size:16px; line-height:1.45;
+  color:#fff; background:rgba(227,179,78,.1); box-shadow:inset 0 0 0 1px rgba(227,179,78,.45)}
+/* пропуск устарел - «Скачать» гаснет заметно сильнее обычного [disabled] */
+.pv.stale .zs-btn--ghost{opacity:.35}
+.mx{color:#C4A5FF}
+
+/* ---------- СТАНДАРТ КНОПОК «ЗВЁЗДНОЙ СМЕНЫ» ----------
+   Дословно из v2.html (sayt-nn/standart-knopok.md). Здесь два вида:
+   «Сгенерировать» - обычная (золотая), «Скачать» - прозрачная, решено
+   с Серёгой 19.09.2026. Третьего вида не заводить.
+
+     1. Обычная   <button class="zs-btn"><span class="zs-t">Текст</span></button>
+        золотая заливка, главное действие экрана.
+     2. Прозрачная <button class="zs-btn zs-btn--ghost"><span class="zs-t">Текст</span></button>
+        то же золото, но только обводкой — второстепенное действие рядом
+        с обычной или там, где золотая заливка перетянет внимание.
+
+   ШИРИНУ НЕ ЗАДАЁМ — она обычная, по длине надписи.
+   Текст обязан лежать в <span class="zs-t"> — поверх него рисуются глянец
+   и бегущий блик, без обёртки надпись окажется под ними.
+   Что менять, если размер не нравится: только переменные ниже. */
+:root{
+  --zs-btn-h:64px;       /* высота, одна на все кнопки сайта */
+  --zs-btn-fs:17px;      /* кегль надписи */
+}
+@media (max-width:640px){
+  /* На телефоне кнопка выше: палец попадает в неё не целясь, и на маленьком
+     экране она читается как главное действие. */
+  :root{ --zs-btn-h:70px; --zs-btn-fs:16px }
+}
+.zs-btn{
+  position:relative; isolation:isolate; overflow:hidden;
+  display:inline-flex; align-items:center; justify-content:center; gap:.55em;
+  box-sizing:border-box;
+  max-width:100%; min-height:var(--zs-btn-h);
+  border:0; cursor:pointer; text-decoration:none; white-space:nowrap;
+  padding:12px clamp(20px,2vw,28.9px);
+  border-radius:999px;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:var(--zs-btn-fs); line-height:1.1; letter-spacing:.03em;
+  text-transform:uppercase; text-align:center; color:#451A03;
+  background:linear-gradient(180deg, #FDE68A 0%, #FCD34D 52%, #F59E0B 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55),          /* фаска сверху */
+    inset 0 0 0 1px rgba(180,83,9,.32),           /* кромка: держит форму на белом */
+    0 0 0 1px rgba(251,191,36,.5),                /* светлое кольцо по краю */
+    0 4px 0 #B45309,                              /* бортик: кнопка стоит на толщине */
+    0 10px 15px -3px rgba(0,0,0,.5),              /* тень на подложку */
+    0 0 30px 4px rgba(245,158,11,.34);            /* золото светит вокруг */
+  transition:transform .15s ease, box-shadow .3s ease, filter .3s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+/* глянец: мягкий свет сверху во всю ширину. Без вставной «капсулы» — у неё
+   был виден собственный край, и кнопка читалась как две склеенные половины */
+.zs-btn::before{
+  content:''; position:absolute; z-index:1; inset:0; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,.3) 0%, rgba(255,255,255,.08) 38%, rgba(255,255,255,0) 62%);
+}
+/* бегущий блик: раз в семь секунд по кнопке проходит полоса света.
+   Двигаем transform, а не background-position — иначе браузер перерисовывает
+   градиент каждый кадр и на телефоне это видно как подтормаживание */
+.zs-btn::after{
+  content:''; position:absolute; z-index:2; top:-60%; bottom:-60%; left:-45%;
+  width:34%; pointer-events:none;
+  background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.7) 45%,
+    rgba(255,255,255,.95) 50%, rgba(255,255,255,.7) 55%, rgba(255,255,255,0));
+  animation:zsSheen 7s ease-in-out infinite;
+}
+@keyframes zsSheen{
+  0%,58%  {transform:translate3d(-40%,0,0) rotate(18deg)}
+  86%,100%{transform:translate3d(430%,0,0) rotate(18deg)}
+}
+/* текст обязан лежать поверх глянца, поэтому он завёрнут в .zs-t */
+.zs-btn > .zs-t{position:relative; z-index:3}
+.zs-btn:hover{
+  filter:brightness(1.03);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.55), inset 0 0 0 1px rgba(180,83,9,.32),
+    0 0 0 1px rgba(251,191,36,.5), 0 4px 0 #B45309,
+    0 12px 18px -3px rgba(0,0,0,.5),
+    0 0 44px 8px rgba(245,158,11,.6);
+}
+/* нажатие: кнопка съезжает на толщину бортика, бортик становится вдвое ниже */
+.zs-btn:active{
+  transform:translateY(2px); filter:brightness(.99);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.4), inset 0 0 0 1px rgba(180,83,9,.32),
+    0 0 0 1px rgba(251,191,36,.5), 0 2px 0 #B45309,
+    0 6px 10px -3px rgba(0,0,0,.45),
+    0 0 26px 4px rgba(245,158,11,.4);
+}
+.zs-btn:focus-visible{outline:3px solid rgba(255,238,190,.9); outline-offset:3px}
+.zs-btn[disabled]{cursor:default; filter:grayscale(.3) brightness(.94); opacity:.8; transform:none}
+.zs-btn[disabled]::after{animation:none; opacity:0}
+/* ---------- ВИД 2: прозрачная ----------
+   Та же пилюля того же размера, только без заливки: золото уходит в обводку
+   и в надпись. Обводку держит внутренняя тень, а не border, — иначе кнопка
+   стала бы на два пикселя шире соседней. Глянец и бегущий блик выключены. */
+.zs-btn--ghost{
+  color:#EBD3A0;
+  background:none;
+  box-shadow:
+    inset 0 0 0 2px rgba(227,179,78,.7),
+    0 10px 24px -18px rgba(227,179,78,.5);
+}
+.zs-btn--ghost::before,.zs-btn--ghost::after{display:none}
+.zs-btn--ghost:hover{
+  color:#fff; transform:translateY(-1px); filter:none;
+  background:rgba(227,179,78,.1);
+  box-shadow:
+    inset 0 0 0 2px rgba(227,179,78,1),
+    0 16px 34px -18px rgba(227,179,78,.75);
+}
+.zs-btn--ghost:active{
+  transform:translateY(1px); background:rgba(227,179,78,.16);
+  box-shadow:inset 0 0 0 2px rgba(227,179,78,.9);
+}
+/* На узком экране длинная надпись переносится, а не вылезает за край:
+   max-width:100% не даёт кнопке стать шире места, а nowrap выдавил бы текст */
+@media (max-width:640px){
+  .zs-btn{white-space:normal}
+}
+
+/* Быстрый двойной тап по дням, минутам и кнопкам на iPhone увеличивал
+   страницу. manipulation оставляет прокрутку и щипок, а двойной тап
+   больше не зумит. Кадр .cr-win сюда не входит - там свой touch-action:none. */
+.cal-arr,.cal-d,.chip,.zs-opt,.zs-btn,.lnk,.ph-drop,.cr-pic{touch-action:manipulation}
+
+/* ---------- кто просил меньше движения ---------- */
+@media (prefers-reduced-motion:reduce){
+  /* :nth-child(n) - не украшение: у каждого пятна своя анимация в правиле
+     с :nth-child(1..4), и простое «.oz-glow i» его не перебивает */
+  .oz-glow i:nth-child(n){animation:none}
+  .zs-btn{transition:none}
+  .zs-btn::after{animation:none; opacity:0}
+  .zs-opt,.zs-inp,.chip,.cal-d,.cal-arr,.st-n,.ph-drop{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="/" data-pp-home>МНД<span>·</span>Звёздная смена</a>
+  <a class="navbtn" href="/" data-pp-home>На главную</a>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+  <div class="oz-grain" aria-hidden="true"></div>
+
+  <div class="pp-cont">
+    <header class="pp-head">
+      <p class="pp-eyebrow">Министерство Новогодних Дел</p>
+      <h1 class="pp-t">Почётный <b>пропуск</b></h1>
+      <p class="pp-lead">Именной пропуск на экскурсию-шоу с&nbsp;фотографией ребёнка. Загрузите фото,
+        напишите имя, выберите дату и&nbsp;время - и&nbsp;сохраните готовую картинку.</p>
+      <p class="pp-safe">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/><circle cx="12" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+        <span>Фото никуда не отправляется: пропуск собирается прямо на вашем <span id="device">телефоне</span></span>
+      </p>
+    </header>
+
+    <div class="pp-grid">
+      <form class="pp-card" id="form" novalidate autocomplete="off">
+        <!-- Встроенный браузер МАХ, Телеграма, ВК: скачивание файла там часто
+             молча не срабатывает. Плашку показывает скрипт (INAPP), спокойную,
+             не красную - это совет, а не ошибка -->
+        <p class="pp-inapp" id="inapp" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.2"/><circle cx="12" cy="7.9" r="1" fill="currentColor" stroke="none"/></svg>
+          <span>Если картинка не сохранится, откройте эту страницу в&nbsp;обычном браузере: меню ⋮ или ··· вверху справа → «Открыть в&nbsp;браузере»</span>
+        </p>
+
+        <!-- 1. ФОТО -->
+        <section class="st" id="stPhoto" aria-labelledby="hPhoto">
+          <h2 class="st-h" id="hPhoto" tabindex="-1"><span class="st-n" aria-hidden="true">1</span>Фото ребёнка</h2>
+          <p class="st-sub" id="phSub">В&nbsp;кружок попадёт та часть фото, которую вы выберете</p>
+
+          <!-- Поле файла вне #phEmpty: тот прячется целиком (display:none), а
+               «Заменить фото» нажимает это поле скриптом - старый Safari на
+               iPhone не открывает выбор файла у поля внутри скрытого блока -->
+          <input type="file" id="phFile" class="vh" accept="image/*" aria-describedby="phSub errPhoto errPhotoOpen">
+          <div id="phEmpty">
+            <label class="ph-drop" id="phDrop" for="phFile">
+              <span class="ph-drop-in">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 8.5a2 2 0 0 1 2-2h2.2l1.5-2.2h5.6l1.5 2.2h2.2a2 2 0 0 1 2 2v9.2a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.8" r="3.8"/></svg>
+                <b>Выберите фото</b>
+                <small id="phDropSub">Нажмите, чтобы открыть галерею</small>
+              </span>
+            </label>
+          </div>
+
+          <!-- Готовый кружок. Нажатие открывает окно кадра на весь экран -->
+          <div class="cr" id="cr" hidden>
+            <button type="button" class="cr-pic" id="crPic" aria-label="Фото в кружке. Изменить кружок">
+              <canvas id="crPicCv" aria-hidden="true"></canvas>
+            </button>
+            <div class="cr-more">
+              <button type="button" class="lnk" id="crEdit">Изменить кружок</button>
+              <button type="button" class="lnk" id="phAgain">Заменить фото</button>
+            </div>
+          </div>
+
+          <p class="zs-err" id="errPhoto" role="alert" hidden>Выберите фото</p>
+          <p class="zs-err" id="errPhotoOpen" role="alert" hidden>Не получилось открыть это фото. Выберите другое или сделайте снимок экрана с&nbsp;этим фото и&nbsp;загрузите его</p>
+        </section>
+
+        <!-- 2. ИМЯ -->
+        <section class="st" id="stName" aria-labelledby="hName">
+          <h2 class="st-h" id="hName"><span class="st-n" aria-hidden="true">2</span><label for="nm">Имя и&nbsp;фамилия</label></h2>
+          <input class="zs-inp" id="nm" name="nm" type="text" maxlength="60"
+                 autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false"
+                 enterkeyhint="done" placeholder="Например, Маша Иванова"
+                 aria-describedby="nmHint nmMax errName">
+          <p class="zs-hint" id="nmHint">Так и&nbsp;будет написано на&nbsp;пропуске</p>
+          <p class="zs-hint" id="nmMax" hidden>Не больше 60 знаков</p>
+          <p class="zs-err" id="errName" role="alert" hidden>Напишите имя и&nbsp;фамилию</p>
+        </section>
+
+        <!-- 3. МАЛЬЧИК / ДЕВОЧКА -->
+        <section class="st" id="stSex" aria-labelledby="hSex">
+          <h2 class="st-h" id="hSex"><span class="st-n" aria-hidden="true">3</span>Мальчик или девочка</h2>
+          <div class="zs-seg" id="sexSeg" role="radiogroup" aria-labelledby="hSex" aria-describedby="sexGuess errSex">
+            <label class="zs-opt"><input type="radio" name="sex" value="m">Мальчик<em>«Приглашен»</em></label>
+            <label class="zs-opt"><input type="radio" name="sex" value="f">Девочка<em>«Приглашена»</em></label>
+          </div>
+          <p class="zs-hint" id="sexGuess" hidden>Выбрали по имени - проверьте</p>
+          <p class="zs-err" id="errSex" role="alert" hidden>Выберите: мальчик или девочка</p>
+        </section>
+
+        <!-- 4. ДАТА -->
+        <section class="st" id="stDate" aria-labelledby="hDate">
+          <h2 class="st-h" id="hDate"><span class="st-n" aria-hidden="true">4</span>Дата экскурсии</h2>
+          <!-- подсказка над сеткой: сначала человек узнаёт, какие дни живые -->
+          <p class="zs-hint cal-hint" id="calHint"></p>
+          <div class="cal" id="cal">
+            <div class="cal-top">
+              <button type="button" class="cal-arr" id="calPrev" aria-label="Предыдущий месяц">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+              </button>
+              <p class="cal-m" id="calM" aria-live="polite"></p>
+              <button type="button" class="cal-arr" id="calNext" aria-label="Следующий месяц">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+            <table class="cal-g" role="grid" aria-labelledby="calM" aria-describedby="calHint errDate">
+              <thead><tr>
+                <th scope="col" abbr="понедельник">Пн</th><th scope="col" abbr="вторник">Вт</th>
+                <th scope="col" abbr="среда">Ср</th><th scope="col" abbr="четверг">Чт</th>
+                <th scope="col" abbr="пятница">Пт</th><th scope="col" abbr="суббота" class="we">Сб</th>
+                <th scope="col" abbr="воскресенье" class="we">Вс</th>
+              </tr></thead>
+              <tbody id="calB"></tbody>
+            </table>
+          </div>
+          <p class="cal-sel" id="calSel" aria-live="polite"></p>
+          <p class="zs-err" id="errDate" role="alert" hidden>Выберите дату</p>
+        </section>
+
+        <!-- 5. ВРЕМЯ -->
+        <section class="st" id="stTime" aria-labelledby="hTime">
+          <h2 class="st-h" id="hTime"><span class="st-n" aria-hidden="true">5</span>Время</h2>
+          <p class="tm-lab" id="hHour">Часы</p>
+          <div class="tm tm-h" id="tmH" role="radiogroup" aria-labelledby="hTime hHour"></div>
+          <p class="tm-lab" id="hMin">Минуты</p>
+          <div class="tm tm-m" id="tmM" role="radiogroup" aria-labelledby="hTime hMin"></div>
+          <p class="tm-out empty" id="tmOut" aria-live="polite"><span class="vh">Выбрано время: </span><span id="tmOutT">--:--</span></p>
+          <p class="zs-err" id="errTime" role="alert" hidden>Выберите время</p>
+        </section>
+
+        <div class="pp-send">
+          <button class="zs-btn" type="button" id="go"><span class="zs-t">Сгенерировать</span></button>
+          <p class="zs-err" id="errGo" role="alert" hidden></p>
+          <p class="vh" id="goStatus" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <aside class="pv" id="pv" aria-labelledby="pvH">
+        <h2 class="vh" id="pvH">Готовый пропуск</h2>
+        <div class="pv-frame">
+          <img class="pv-ph" src="propusk/shablon.webp" width="1080" height="1920" alt="" decoding="async">
+          <p class="pv-cap" aria-hidden="true">Здесь появится пропуск</p>
+          <img class="pv-img" id="pvImg" width="1080" height="1920" alt="" hidden>
+          <div class="pv-stale" id="pvStale" hidden><p>Вы изменили данные - нажмите «Сгенерировать» ещё раз</p></div>
+        </div>
+        <div class="pv-act" id="pvAct" hidden>
+          <p class="zs-err" id="fontWarn" role="alert" hidden>Шрифт пропуска не&nbsp;загрузился - проверьте интернет и&nbsp;нажмите «Сгенерировать» ещё раз</p>
+          <button class="zs-btn zs-btn--ghost" type="button" id="dl"><span class="zs-t">Скачать</span></button>
+          <p class="pv-hint" id="dlHint">Не скачивается? Нажмите на&nbsp;картинку и&nbsp;подержите - <span id="dlHintAct">«Сохранить изображение»</span>. Во&nbsp;встроенном браузере <span class="mx">МАХ</span> или Телеграма иногда нужно открыть страницу в&nbsp;обычном браузере</p>
+          <button type="button" class="lnk" id="again">Сделать ещё один пропуск</button>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- Окно кадра на весь экран, как в Телеграме. Вне формы: ползунок не должен
+     считаться правкой формы, а само окно открывается поверх всей страницы -->
+<div class="crm" id="crm" role="dialog" aria-modal="true" aria-labelledby="crmH" hidden>
+  <div class="crm-in">
+    <h2 class="crm-h" id="crmH">Выберите, что попадёт в&nbsp;кружок</h2>
+    <div class="cr-win" id="crWin" tabindex="0" role="group"
+         aria-roledescription="кадрирование" aria-label="Кадр фото: стрелки двигают фото, плюс и минус приближают"
+         aria-describedby="crHelp">
+      <canvas id="crCv" aria-hidden="true"></canvas>
+    </div>
+    <div class="cr-zoom">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20M8 10.5h5"/></svg>
+      <input class="cr-range" id="crZoom" type="range" min="1" max="5" step="0.01" value="1" aria-label="Приближение фото">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20M8 10.5h5M10.5 8v5"/></svg>
+    </div>
+    <p class="cr-help" id="crHelp">Двигайте фото пальцем, приближайте двумя пальцами или ползунком</p>
+    <button class="zs-btn crm-ok" type="button" id="crOk"><span class="zs-t">Готово</span></button>
+    <button type="button" class="lnk" id="crOther">Выбрать другое фото</button>
+  </div>
+</div>
+
+<script>
+/* ==================== ПОЧЁТНЫЙ ПРОПУСК ====================
+   Всё, что ниже, работает только в браузере. Сетевых запросов с фото или
+   именем нет и быть не должно: картинку собирает холст, файл отдаётся
+   человеку прямо из памяти страницы. */
+(function(){
+'use strict';
+
+/* ---------- ШАБЛОН ----------
+   Шаблон поменяли - пересчитать эти числа (замер: plans/2026-09-19-propusk.md,
+   фаза 1). Все координаты в пикселях картинки 1080x1920. */
+var PASS = {
+  template: 'propusk/shablon.webp',
+  W: 1080, H: 1920,
+  bg: '#0B1030',                      // под фото: если края кружка полупрозрачные, видно тёмное, а не чёрное
+  font: '"Propusk Serif", Georgia, "Times New Roman", serif',
+  // кружок: центр дырки по серому диску макета, фото кладём на 3 px шире
+  // дырки, чтобы под карамельной рамкой не осталось щели
+  circle: { cx: 531, cy: 412, rHole: 237.5, rPhoto: 240.5 },
+  // абзац в рамке: кегль подобран под ширину строк макета (Charis шире Charter)
+  para: { cx: 540, baseline: 1171, size: 42.2, line: 52.25, color: '#FFFFFF',
+          m: ['Приглашен самим министром', 'новогодних дел на встречу с', 'настоящим Дедом Морозом'],
+          f: ['Приглашена самим министром', 'новогодних дел на встречу с', 'настоящим Дедом Морозом'] },
+  // белая линия под имя (для справки: имя и дата стоят по её центру)
+  line: { x1: 300, x2: 789, y: 1421 },
+  // имя: золото рамки, подгонка кегля по ширине; не влезло и на минимуме - две строки.
+  // maxW 520 - чуть шире линии бланка (489 px, x 300..789): при 600 длинное имя
+  // висело за её концами и подходило к фонарю справа (x от 834)
+  name: { cx: 544.5, baseline: 1406, maxW: 520, max: 60, min: 34, two: 44, color: '#FFDA77' },
+  // дата: ниже 1464 не опускать - там начинается росчерк подписи Деда Мороза
+  date: { cx: 544.5, baseline: 1464, maxW: 560, size: 36, min: 28, color: '#FFFFFF' }
+};
+
+/* ---------- СЕЗОН ----------
+   Даты экскурсий по business/cities/<город>/schedule.md. Месяцы календаря
+   строятся от from до to сами. */
+var SEASON = { from: '2026-11-27', to: '2027-01-10', off: ['2026-12-31', '2027-01-01', '2027-01-02'] };
+// Сеансы в городах разные (у Казани :00 и :30), поэтому шаг 15 минут
+var HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+var MINUTES = ['00', '15', '30', '45'];
+
+var CROP_D = 0.86;   // диаметр круга кадрировщика в долях окна
+var ZMAX = 5;        // максимум приближения от «фото ровно закрывает круг»
+var WORK_MAX = 2048; // длинная сторона рабочей копии: 12 Мп с айфона в памяти держать нельзя
+
+var MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+var MONTHS_GEN = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+var WEEKDAYS = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+
+var $ = function(id){ return document.getElementById(id); };
+var mq = function(q){ return window.matchMedia ? window.matchMedia(q).matches : false; };
+var COARSE = mq('(pointer:coarse)');
+var ANDROID = /Android/i.test(navigator.userAgent || '');
+// Встроенный браузер МАХ, Телеграма, ВК, ОК или любой Android WebView («; wv)»).
+// Родители часто открывают ссылку прямо из чата, а там скачивание blob-файла
+// может молча не сработать - таким показываем плашку и другой путь «Скачать».
+var INAPP = /Telegram|TelegramBot|MAX\/|OneMe|VKClient|VKAndroidApp|OKApp|; wv\)/i.test(navigator.userAgent || '');
+var reduced = function(){ return mq('(prefers-reduced-motion:reduce)'); };
+var scrollOpt = function(){ return { behavior: reduced() ? 'auto' : 'smooth', block: 'start' }; };
+
+/* ---------- состояние ----------
+   Кадр храним в долях диаметра круга, а не в пикселях окна: окно на телефоне
+   300 px, на компьютере 420, в пропуске круг 481 px - доли одинаковы везде,
+   и в пропуск попадает ровно то, что было в круге. */
+var S = {
+  levels: null,              // рабочая копия фото и её уменьшенные копии
+  crop: { z: 1, x: 0, y: 0 }, // z - приближение (1 = фото ровно закрывает круг), x/y - сдвиг центра фото
+  sex: null, sexTouched: false,
+  date: null,                // {y, m, d}, m с нуля
+  hh: null, mm: null,
+  result: null               // {file, url, fname}
+};
+
+/* ==================== ФОТО В КРУГ ====================
+   ОДНА функция и для кадрировщика, и для итоговой картинки. Круг диаметром D
+   с центром (cx, cy); фото кладётся так, что его короткая сторона при z=1
+   ровно равна D. Размер берём от первой (самой крупной) копии, а рисуем
+   ближайшей подходящей по размеру: сильное уменьшение за один шаг даёт
+   «лесенку» на волосах и мелких деталях. */
+function drawPhoto(ctx, levels, crop, cx, cy, D){
+  var src0 = levels[0];
+  var k = crop.z * D / Math.min(src0.width, src0.height);
+  var w = src0.width * k, h = src0.height * k;
+  var src = src0;
+  for (var i = levels.length - 1; i >= 0; i--){
+    if (levels[i].width >= w){ src = levels[i]; break; }
+  }
+  ctx.imageSmoothingEnabled = true;
+  if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(src, cx + crop.x * D - w / 2, cy + crop.y * D - h / 2, w, h);
+}
+
+// Круг всегда закрыт фото: центр фото не уходит дальше, чем позволяет его запас
+function clampCrop(c){
+  var s = S.levels[0], m = Math.min(s.width, s.height);
+  c.z = Math.min(ZMAX, Math.max(1, c.z));
+  var hx = Math.max(0, (c.z * s.width / m - 1) / 2);
+  var hy = Math.max(0, (c.z * s.height / m - 1) / 2);
+  c.x = Math.min(hx, Math.max(-hx, c.x));
+  c.y = Math.min(hy, Math.max(-hy, c.y));
+  return c;
+}
+function sameCrop(a, b){ return Math.abs(a.z - b.z) < 1e-6 && Math.abs(a.x - b.x) < 1e-6 && Math.abs(a.y - b.y) < 1e-6; }
+function setCrop(c){
+  var before = { z: S.crop.z, x: S.crop.x, y: S.crop.y };
+  S.crop = clampCrop(c);
+  // Пропуск здесь устаревшим не помечаем: кадр правят в окне, и решает
+  // «Готово» (closeCrop) - открыть и закрыть окно без правок ничего не гасит
+  if (!sameCrop(before, S.crop)){ syncZoom(); paint(); }
+}
+// Приближение вокруг точки (px, py) в долях диаметра от центра круга:
+// точка фото под пальцем или курсором остаётся на месте
+function zoomAt(k, px, py){
+  var c = S.crop;
+  var z2 = Math.min(ZMAX, Math.max(1, c.z * k));
+  var kk = z2 / c.z;
+  setCrop({ z: z2, x: px - (px - c.x) * kk, y: py - (py - c.y) * kk });
+}
+function panBy(dx, dy){ setCrop({ z: S.crop.z, x: S.crop.x + dx, y: S.crop.y + dy }); }
+
+/* ---------- кадрировщик ---------- */
+var crWin = $('crWin'), crCv = $('crCv'), crZoom = $('crZoom');
+var crCtx = crCv.getContext('2d');
+var raf = 0;
+function paint(){ if (!raf) raf = requestAnimationFrame(draw); }
+function draw(){
+  raf = 0;
+  var size = crCv.width;
+  if (!size) return;
+  crCtx.fillStyle = '#070B1E';
+  crCtx.fillRect(0, 0, size, size);
+  if (!S.levels) return;
+  var D = size * CROP_D, c = size / 2;
+  drawPhoto(crCtx, S.levels, S.crop, c, c, D);
+  // всё вне круга затемнено, как в Телеграме: видно, что обрежется
+  crCtx.beginPath();
+  crCtx.rect(0, 0, size, size);
+  crCtx.arc(c, c, D / 2, 0, Math.PI * 2);
+  crCtx.fillStyle = 'rgba(4,7,20,.66)';
+  crCtx.fill('evenodd');
+  crCtx.beginPath();
+  crCtx.arc(c, c, D / 2, 0, Math.PI * 2);
+  crCtx.lineWidth = Math.max(1.5, size / 300);
+  crCtx.strokeStyle = 'rgba(255,255,255,.85)';
+  crCtx.stroke();
+}
+function fitCanvas(){
+  var css = crWin.clientWidth;
+  if (!css) return;
+  var dpr = Math.min(window.devicePixelRatio || 1, 3);
+  var px = Math.round(css * dpr);
+  if (crCv.width !== px){ crCv.width = px; crCv.height = px; }
+  draw();
+}
+if (window.ResizeObserver) new ResizeObserver(fitCanvas).observe(crWin);
+else window.addEventListener('resize', fitCanvas);
+
+function syncZoom(){ crZoom.value = S.crop.z.toFixed(2); }
+crZoom.addEventListener('input', function(){
+  if (!S.levels) return;
+  zoomAt(parseFloat(crZoom.value) / S.crop.z, 0, 0);
+});
+
+// точка экрана -> доли диаметра от центра круга
+function toCircle(clientX, clientY){
+  var r = crWin.getBoundingClientRect();
+  var D = r.width * CROP_D;
+  return { x: (clientX - r.left - r.width / 2) / D, y: (clientY - r.top - r.height / 2) / D, D: D };
+}
+
+// Пальцы и мышь. Один палец двигает, два - приближают вокруг середины между
+// ними. Захват указателя (setPointerCapture), чтобы палец, съехавший за окно,
+// продолжал двигать фото, а не страницу.
+var pts = new Map();
+crWin.addEventListener('pointerdown', function(e){
+  if (!S.levels) return;
+  if (e.pointerType === 'mouse' && e.button !== 0) return;
+  try { crWin.setPointerCapture(e.pointerId); } catch(_){}
+  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  crWin.classList.add('drag');
+  // focus() здесь не зовём: фокус уже в окне с открытия, а вызов из касания
+  // зажигал золотую рамку, которая нужна только тем, кто ходит клавиатурой
+  e.preventDefault();
+});
+crWin.addEventListener('pointermove', function(e){
+  if (!pts.has(e.pointerId)) return;
+  e.preventDefault();
+  var list = Array.from(pts.values());
+  var before = list.map(function(p){ return { x: p.x, y: p.y }; });
+  pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  var after = Array.from(pts.values());
+  var D = crWin.getBoundingClientRect().width * CROP_D;
+  if (after.length === 1){
+    panBy((after[0].x - before[0].x) / D, (after[0].y - before[0].y) / D);
+    return;
+  }
+  var a0 = before[0], b0 = before[1], a1 = after[0], b1 = after[1];
+  var d0 = Math.hypot(b0.x - a0.x, b0.y - a0.y), d1 = Math.hypot(b1.x - a1.x, b1.y - a1.y);
+  var m0 = { x: (a0.x + b0.x) / 2, y: (a0.y + b0.y) / 2 }, m1 = { x: (a1.x + b1.x) / 2, y: (a1.y + b1.y) / 2 };
+  panBy((m1.x - m0.x) / D, (m1.y - m0.y) / D);
+  if (d0 > 4){
+    var p = toCircle(m1.x, m1.y);
+    zoomAt(d1 / d0, p.x, p.y);
+  }
+});
+function pointerEnd(e){
+  pts.delete(e.pointerId);
+  if (!pts.size) crWin.classList.remove('drag');
+}
+crWin.addEventListener('pointerup', pointerEnd);
+crWin.addEventListener('pointercancel', pointerEnd);
+crWin.addEventListener('lostpointercapture', pointerEnd);
+var crm = $('crm');
+// Safari: на iPhone щипок по-старому зумит страницу даже поверх touch-action:none,
+// на Mac щипок тачпада приходит только жестом gesture* (не колесом). Жест над
+// окном гасим всегда, а приближаем им только на Mac: на iPhone тот же щипок
+// уже пришёл пальцами (pts), и фото приблизилось бы дважды.
+var gz = 0;
+crm.addEventListener('gesturestart', function(e){ e.preventDefault(); gz = S.crop.z; });
+crm.addEventListener('gesturechange', function(e){
+  e.preventDefault();
+  if (!S.levels || pts.size || !gz || !e.scale) return;
+  var p = e.clientX != null ? toCircle(e.clientX, e.clientY) : { x: 0, y: 0 };
+  zoomAt(gz * e.scale / S.crop.z, p.x, p.y);
+});
+crm.addEventListener('gestureend', function(e){ e.preventDefault(); gz = 0; });
+
+// Колесо и щипок тачпада (колесо с ctrlKey) приближают. Над кадром - вокруг
+// курсора, в остальном окне - вокруг центра. Страница под окном закрыта,
+// так что колесо ей не нужно; исключение - низкое окно браузера, где само
+// окно кадра прокручивается, - там колесо вне кадра оставляем прокрутке.
+crm.addEventListener('wheel', function(e){
+  if (!S.levels) return;
+  var inWin = crWin.contains(e.target);
+  if (!inWin && !e.ctrlKey && crm.scrollHeight > crm.clientHeight + 1) return;
+  e.preventDefault();
+  var unit = e.deltaMode === 1 ? 16 : (e.deltaMode === 2 ? 400 : 1);
+  // щипок на тачпаде приходит как колесо с ctrlKey и мелкими шагами
+  var k = Math.exp(-e.deltaY * unit * (e.ctrlKey ? 0.01 : 0.0016));
+  var p = inWin ? toCircle(e.clientX, e.clientY) : { x: 0, y: 0 };
+  zoomAt(k, p.x, p.y);
+}, { passive: false });
+
+crWin.addEventListener('keydown', function(e){
+  if (!S.levels) return;
+  var st = e.shiftKey ? 0.1 : 0.025;
+  switch (e.key){
+    case 'ArrowLeft': panBy(-st, 0); break;
+    case 'ArrowRight': panBy(st, 0); break;
+    case 'ArrowUp': panBy(0, -st); break;
+    case 'ArrowDown': panBy(0, st); break;
+    case '+': case '=': zoomAt(1.12, 0, 0); break;
+    case '-': case '_': zoomAt(1 / 1.12, 0, 0); break;
+    default: return;
+  }
+  e.preventDefault();
+});
+
+/* ---------- готовый кружок на странице ----------
+   Та же drawPhoto с тем же кадром, круг во весь холст - ровно то, что было
+   в круге окна и что попадёт в пропуск. */
+var crPic = $('crPic'), crPicCv = $('crPicCv');
+function paintPic(){
+  var css = crPic.clientWidth;
+  if (!css || !S.levels) return;
+  var px = Math.round(css * Math.min(window.devicePixelRatio || 1, 3));
+  if (crPicCv.width !== px){ crPicCv.width = px; crPicCv.height = px; }
+  var x = crPicCv.getContext('2d');
+  x.clearRect(0, 0, px, px);
+  x.save();
+  x.beginPath(); x.arc(px / 2, px / 2, px / 2, 0, Math.PI * 2); x.clip();
+  drawPhoto(x, S.levels, S.crop, px / 2, px / 2, px);
+  x.restore();
+}
+if (window.ResizeObserver) new ResizeObserver(paintPic).observe(crPic);
+else window.addEventListener('resize', paintPic);
+
+/* ---------- окно кадра на весь экран ---------- */
+var crOpen = false, openCropAt = null, openLevels = null, lockY = 0, popSkip = 0;
+var pageParts = [$('nav'), document.querySelector('main')];
+function lockPage(on){
+  var b = document.body.style;
+  if (on){
+    // iPhone не слушает overflow:hidden на body - прокрутка под окном
+    // останавливается надёжно только так: body фиксируем на текущем месте
+    lockY = window.scrollY || window.pageYOffset || 0;
+    b.position = 'fixed'; b.top = -lockY + 'px'; b.left = '0'; b.right = '0'; b.width = '100%';
+  } else {
+    b.position = ''; b.top = ''; b.left = ''; b.right = ''; b.width = '';
+    window.scrollTo(0, lockY);
+  }
+  // для читалок экрана страница под окном скрыта, фокус держит ловушка Tab ниже
+  pageParts.forEach(function(el){ if (el) { if (on) el.setAttribute('aria-hidden', 'true'); else el.removeAttribute('aria-hidden'); } });
+}
+function openCrop(){
+  if (!S.levels) return;
+  if (crOpen){ fitCanvas(); syncZoom(); return; }
+  crOpen = true;
+  openCropAt = { z: S.crop.z, x: S.crop.x, y: S.crop.y };
+  openLevels = S.levels;
+  // «Назад» на Android закрывает окно, а не уводит со страницы. Запись
+  // истории - до фиксации body: браузер запоминает прокрутку текущей записи
+  // и при возврате ставит её, а на фиксированном body она уже 0
+  try { history.pushState({ ppCrop: 1 }, ''); } catch(_){}
+  lockPage(true);
+  crm.hidden = false;
+  crm.scrollTop = 0;
+  syncZoom();
+  fitCanvas();
+  try { crWin.focus({ preventScroll: true, focusVisible: false }); } catch(_){ crWin.focus(); }
+}
+// Закрыть = «Готово». fromPop - закрыли системной кнопкой «назад», запись
+// истории уже снята; иначе снимаем свою запись сами, и только свою.
+function closeCrop(fromPop){
+  if (!crOpen) return;
+  crOpen = false;
+  pts.clear(); crWin.classList.remove('drag'); gz = 0;
+  crm.hidden = true;
+  lockPage(false);
+  paintPic();
+  // пропуск устарел, только если кадр правда поменялся (новое фото
+  // уже пометило его само в openPhoto)
+  if (S.levels === openLevels && !sameCrop(openCropAt, S.crop)) markStale();
+  openCropAt = null; openLevels = null;
+  if (!fromPop && history.state && history.state.ppCrop){
+    popSkip++;
+    try { history.back(); } catch(_){ popSkip--; }
+  }
+  try { crPic.focus({ preventScroll: true, focusVisible: false }); } catch(_){ crPic.focus(); }
+}
+window.addEventListener('popstate', function(){
+  // своя запись снята кнопкой «Готово»: браузер мог вернуть прокрутку
+  // по-своему - ставим ту, что была под окном
+  if (popSkip){ popSkip--; if (!crOpen) window.scrollTo(0, lockY); return; }
+  if (crOpen) closeCrop(true);
+});
+$('crOk').addEventListener('click', function(){ closeCrop(false); });
+$('crOther').addEventListener('click', function(){ phFile.click(); });
+crPic.addEventListener('click', openCrop);
+$('crEdit').addEventListener('click', openCrop);
+crm.addEventListener('keydown', function(e){
+  if (e.key === 'Escape'){ e.preventDefault(); closeCrop(false); return; }
+  if (e.key !== 'Tab') return;
+  // Tab ходит только по окну: страница под ним закрыта
+  var f = [crWin, crZoom, $('crOk'), $('crOther')];
+  var i = f.indexOf(document.activeElement);
+  var n = e.shiftKey ? (i <= 0 ? f.length - 1 : i - 1) : (i < 0 || i >= f.length - 1 ? 0 : i + 1);
+  e.preventDefault();
+  f[n].focus();
+});
+
+/* ---------- загрузка фото ---------- */
+var phFile = $('phFile'), phEmpty = $('phEmpty'), phDrop = $('phDrop'), cr = $('cr');
+
+// Холсты фото, из которых сейчас идёт сборка пропуска. Их не очищаем, даже
+// если фото заменили: иначе в пропуск попал бы пустой кружок. Отпустим после сборки.
+var buildLevels = null;
+function zeroLevels(lv){
+  // холсты отпускаем явно: Safari на iPhone держит их память до сборки мусора,
+  // а у него общий потолок на все холсты страницы
+  lv.forEach(function(c){ c.width = 0; c.height = 0; });
+}
+function freeLevels(){
+  if (!S.levels) return;
+  if (S.levels !== buildLevels) zeroLevels(S.levels);
+  S.levels = null;
+}
+function decodeFile(file){
+  // createImageBitmap декодирует вне основного потока и сам поворачивает фото
+  // по EXIF; где его нет или он не понял настройки - обычная картинка <img>,
+  // современные браузеры тоже поворачивают её сами
+  var viaImg = function(){
+    return new Promise(function(res, rej){
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function(){ res({ src: img, w: img.naturalWidth, h: img.naturalHeight, done: function(){ URL.revokeObjectURL(url); } }); };
+      img.onerror = function(){ URL.revokeObjectURL(url); rej(new Error('img')); };
+      img.src = url;
+    });
+  };
+  if (!window.createImageBitmap) return viaImg();
+  return createImageBitmap(file, { imageOrientation: 'from-image' }).then(function(bmp){
+    return { src: bmp, w: bmp.width, h: bmp.height, done: function(){ if (bmp.close) bmp.close(); } };
+  }, viaImg);
+}
+function makeLevels(d){
+  var k = Math.min(1, WORK_MAX / Math.max(d.w, d.h));
+  var c0 = document.createElement('canvas');
+  c0.width = Math.max(1, Math.round(d.w * k));
+  c0.height = Math.max(1, Math.round(d.h * k));
+  var x = c0.getContext('2d');
+  x.imageSmoothingEnabled = true;
+  if ('imageSmoothingQuality' in x) x.imageSmoothingQuality = 'high';
+  x.drawImage(d.src, 0, 0, c0.width, c0.height);
+  var levels = [c0];
+  // уменьшенные вдвое копии для кадрировщика и итогового кружка
+  while (levels[levels.length - 1].width > 320 && levels[levels.length - 1].height > 320){
+    var p = levels[levels.length - 1], c = document.createElement('canvas');
+    c.width = Math.max(1, Math.round(p.width / 2)); c.height = Math.max(1, Math.round(p.height / 2));
+    var cx = c.getContext('2d');
+    cx.imageSmoothingEnabled = true;
+    if ('imageSmoothingQuality' in cx) cx.imageSmoothingQuality = 'high';
+    cx.drawImage(p, 0, 0, c.width, c.height);
+    levels.push(c);
+  }
+  return levels;
+}
+var loading = 0;
+function openPhoto(file){
+  if (!file) return;
+  var ticket = ++loading;
+  $('errPhotoOpen').hidden = true;
+  if (file.type && !/^image\//i.test(file.type)){ photoFailed(); return; }
+  decodeFile(file).then(function(d){
+    try {
+      if (ticket !== loading) return;
+      if (!d.w || !d.h) throw new Error('empty');
+      var levels = makeLevels(d);
+      freeLevels();
+      S.levels = levels;
+      // лица на детских фото обычно в верхней половине кадра: у вертикального
+      // фото круг сначала чуть выше середины, дальше человек поправит сам
+      var s = levels[0], m = Math.min(s.width, s.height);
+      var hy = (s.height / m - 1) / 2;
+      S.crop = clampCrop({ z: 1, x: 0, y: hy * 0.3 });
+      syncZoom();
+      phEmpty.hidden = true; cr.hidden = false;
+      phFile.tabIndex = -1;
+      $('errPhoto').hidden = true; phDrop.classList.remove('bad');
+      markStale();
+      updateSteps();
+      // сразу после выбора фото - окно кадра; если оно уже открыто
+      // («Выбрать другое фото»), просто показываем в нём новое фото
+      openCrop();
+      paintPic();
+    } finally { d.done(); }
+  }).catch(function(){ if (ticket === loading) photoFailed(); });
+}
+function photoFailed(){ $('errPhotoOpen').hidden = false; }
+
+phFile.addEventListener('change', function(){
+  var f = phFile.files && phFile.files[0];
+  phFile.value = ''; // тот же файл второй раз тоже должен сработать
+  openPhoto(f);
+});
+$('phAgain').addEventListener('click', function(){ phFile.click(); });
+
+// Перетаскивание файла на компьютере. Бросили мимо круга - тоже берём фото:
+// иначе браузер откроет картинку вместо страницы, и всё введённое пропадёт.
+function hasFiles(e){ var t = e.dataTransfer && e.dataTransfer.types; return t && Array.prototype.indexOf.call(t, 'Files') >= 0; }
+var dragDepth = 0;
+function dropBox(){ return !S.levels ? phDrop : (crOpen ? crWin : crPic); }
+function dropOff(){ dragDepth = 0; phDrop.classList.remove('drag'); crWin.classList.remove('drop'); crPic.classList.remove('drop'); }
+window.addEventListener('dragenter', function(e){ if (!hasFiles(e)) return; dragDepth++; dropBox().classList.add(S.levels ? 'drop' : 'drag'); });
+window.addEventListener('dragleave', function(e){ if (!hasFiles(e)) return; if (--dragDepth <= 0) dropOff(); });
+window.addEventListener('dragover', function(e){ if (hasFiles(e)) e.preventDefault(); });
+window.addEventListener('drop', function(e){
+  if (!hasFiles(e)) return;
+  e.preventDefault();
+  dropOff();
+  openPhoto(e.dataTransfer.files[0]);
+});
+
+/* ==================== ИМЯ ==================== */
+var nm = $('nm');
+// Лишние пробелы убираем; слово, набранное целиком строчными, - с заглавной.
+// Слова, где заглавные уже есть, не трогаем: «ДиКаприо» человек написал сам.
+// Дефисы по краям и пробелы вокруг дефиса убираем: имя, обрезанное лимитом
+// поля, иначе заканчивалось бы висящим дефисом («Константинопольская-»).
+function tidyName(s){
+  return String(s || '').replace(/\s+/g, ' ')
+    .replace(/\s*-[\s-]*/g, '-')          // «Анна - - Мария», «Анна--Мария» -> «Анна-Мария»
+    .replace(/^[-\s]+|[-\s]+$/g, '')
+    .split(' ').map(function(w){
+    if (!w || w !== w.toLowerCase() || w === w.toUpperCase()) return w;
+    return w.split('-').map(function(p){ return p ? p.charAt(0).toUpperCase() + p.slice(1) : p; }).join('-');
+  }).join(' ');
+}
+nm.addEventListener('blur', function(){
+  var t = tidyName(nm.value);
+  if (t !== nm.value){ nm.value = t; onForm(); }
+});
+// Поле молча не даёт печатать дальше лимита - у края говорим почему
+nm.addEventListener('input', function(){
+  $('nmMax').hidden = nm.value.length < +nm.maxLength - 5;
+});
+nm.addEventListener('keydown', function(e){
+  // «Готово» на клавиатуре телефона прячет клавиатуру, а не отправляет форму
+  if (e.key === 'Enter'){ e.preventDefault(); nm.blur(); }
+});
+$('form').addEventListener('submit', function(e){ e.preventDefault(); });
+
+/* ==================== МАЛЬЧИК / ДЕВОЧКА ====================
+   Угадываем по имени, только когда уверены, и только пока человек сам не
+   нажал переключатель. Не уверены - ничего не выбираем. */
+var MALE_A = ('никита илья кузьма фома савва лука данила миша ваня петя дима коля вова сережа леша паша '
+  + 'костя гоша боря гриша митя федя степа тема лева сема валера витя гена леня олежа тима вася '
+  + 'андрюша алеша антоша даня дема ерема жора кеша рома сева тимоша тоша филя илюша ильюша егорка '
+  + 'никитка мишутка ванюша петруша юра яша толя сеня веня кирюша миха фима кузя ося игореша '
+  + 'артемка максимка тимурка матвейка данилка '
+  + 'муса иса хамза мустафа яхья зия гайса шота гога').split(' ');
+// мужские на -ь: без списка «-ь» не угадываем, там и Игорь, и Любовь
+var MALE_SOFT = ('игорь лазарь камиль рамиль наиль адиль шамиль джамиль халиль фазиль эмиль '
+  + 'рафаэль габриэль мигель василь').split(' ');
+var AMBIG = 'саша саня женя валя слава шура стася'.split(' ');
+// женские имена без -а/-я на конце, в том числе татарские: страница открывается и в Казани
+var FEM_CONS = ('любовь нинель эстер кармен рахиль ассоль мирьям мариам агнес ирен николь изабель мишель '
+  + 'лейсан ляйсан гульназ гульнур ильсияр чулпан гульшат айгуль гузель гульсум энже алсу айсылу нурсылу '
+  + 'гульчачак бибинур дильбар адель рут юдифь суламифь '
+  // казахские и татарские, в том числе с татарскими буквами (Тюмень, Казань)
+  + 'айгерим аружан томирис айназ ильсеяр ильсояр гузәл гүзәл гүзель айлин мерьем асель '
+  + 'карин жаклин эвелин мадлен ингрид астрид жасмин').split(' ');
+// татарские и казахские буквы (ә ө ү җ ң һ) оставляем: без них «Гүзәл» стала бы «гзл»
+function norm(w){ return w.toLowerCase().replace(/ё/g, 'е').replace(/[^а-яәөүҗңһ-]/g, ''); }
+function bySurname(w){
+  if (/(ова|ева|ина|ына|ская|цкая|ая)$/.test(w)) return 'f';
+  if (/(ов|ев|ин|ын|ский|цкий|ой|ый)$/.test(w)) return 'm';
+  return null;
+}
+function guessSex(full){
+  var words = tidyName(full).split(' ').map(norm);
+  var first = words[0], rest = words.slice(1).filter(Boolean);
+  if (!first || first.length < 2) return null;         // латиница или одна буква - не угадываем
+  var fromName = null;
+  if (MALE_A.indexOf(first) >= 0 || MALE_SOFT.indexOf(first) >= 0) fromName = 'm';
+  else if (AMBIG.indexOf(first) >= 0) fromName = null;  // Саша, Женя, Валя - только по фамилии
+  // Гуль-/Гөл-/Гүл- («цветок») в татарских и казахских именах - женские: Гөлназ, Гүлнар.
+  // Просто «гул-» не берём: там и мужское Гулям
+  else if (FEM_CONS.indexOf(first) >= 0 || /^(гуль|гөл|гүл)/.test(first)) fromName = 'f';
+  else if (/ка$/.test(first)) fromName = null;        // Ника и незнакомые «-ка» - не угадать (Егорка есть в списке)
+  else if (/[аяә]$/.test(first)) fromName = 'f';        // -ә у татарских женских: Әминә, Нәфисә
+  else if (/ь$/.test(first)) fromName = null;         // Игорь и Любовь
+  else if (/[бвгджзйклмнпрстфхцчшщңҗһ]$/.test(first)) fromName = 'm';
+  var fromSur = null;
+  for (var i = 0; i < rest.length && !fromSur; i++) fromSur = bySurname(rest[i]);
+  if (fromName && fromSur && fromName !== fromSur) return null;   // имя и фамилия спорят - не уверены
+  return fromName || fromSur;
+}
+var sexSeg = $('sexSeg');
+function syncOn(box){
+  var labs = box.querySelectorAll('label');
+  for (var i = 0; i < labs.length; i++){
+    var inp = labs[i].querySelector('input');
+    labs[i].classList.toggle('on', !!(inp && inp.checked));
+  }
+}
+function setSex(v){
+  var r = sexSeg.querySelectorAll('input');
+  for (var i = 0; i < r.length; i++) r[i].checked = (r[i].value === v);
+  S.sex = v;
+  syncOn(sexSeg);
+}
+// Первое слово имени, при котором выбрали вручную. Поменялось - это уже
+// другой ребёнок, и ручной выбор для прошлого имени к нему не относится
+// (после «Игорь Ким» -> «Маша Ким» иначе оставался бы мальчик).
+// null - выбрали раньше, чем написали имя: запомним имя, когда поле отпустят.
+var sexFirst = null;
+function firstWord(){ return norm(tidyName(nm.value).split(' ')[0] || ''); }
+function resetSexTouch(){
+  var was = S.sex;
+  S.sexTouched = false; sexFirst = null;
+  autoSex();
+  if (S.sex !== was) onForm();   // род поменялся - готовый пропуск уже не тот
+}
+nm.addEventListener('blur', function(){
+  if (S.sexTouched && sexFirst === null && firstWord()) sexFirst = firstWord();
+});
+sexSeg.addEventListener('change', function(e){
+  if (!e.target || e.target.name !== 'sex') return;
+  S.sexTouched = true;
+  sexFirst = firstWord() || null;
+  S.sex = e.target.value;
+  $('sexGuess').hidden = true;
+  syncOn(sexSeg);
+});
+function autoSex(){
+  if (S.sexTouched && sexFirst !== null && firstWord() !== sexFirst){ S.sexTouched = false; sexFirst = null; }
+  if (S.sexTouched) return;
+  var g = guessSex(nm.value);
+  if (g !== S.sex) setSex(g);
+  $('sexGuess').hidden = !g;
+}
+
+/* ==================== КАЛЕНДАРЬ ====================
+   Даты - только через new Date(год, месяц, день) и сравнение чисел
+   год-месяц-день. Никаких toISOString: он считает в UTC, и в Тюмени (UTC+5)
+   выбранное 18 декабря превратилось бы в 17-е. */
+function parseYMD(s){ var p = s.split('-').map(Number); return { y: p[0], m: p[1] - 1, d: p[2] }; }
+function key(y, m, d){ return y * 10000 + (m + 1) * 100 + d; }
+var F = parseYMD(SEASON.from), T = parseYMD(SEASON.to);
+var FROM_K = key(F.y, F.m, F.d), TO_K = key(T.y, T.m, T.d);
+var OFF = SEASON.off.map(function(s){ var p = parseYMD(s); return key(p.y, p.m, p.d); });
+function available(y, m, d){ var k = key(y, m, d); return k >= FROM_K && k <= TO_K && OFF.indexOf(k) < 0; }
+var MIN_M = F.y * 12 + F.m, MAX_M = T.y * 12 + T.m;
+var now = new Date(), nowM = now.getFullYear() * 12 + now.getMonth();
+// Открываем декабрь: в ноябре живых дней только четыре (27-30), и календарь,
+// открытый на ноябре, выглядит почти пустым. Сегодня уже внутри сезона после
+// ноября - открываем текущий месяц. До сезона, в ноябре и после сезона - декабрь.
+var DEC_M = F.m === 10 ? Math.min(MAX_M, MIN_M + 1) : MIN_M;
+var view = (nowM > DEC_M && nowM <= MAX_M) ? nowM : DEC_M;
+var calFocus = null;
+var calB = $('calB'), calPrev = $('calPrev'), calNext = $('calNext');
+
+function daysIn(y, m){ return new Date(y, m + 1, 0).getDate(); }
+function renderCal(focusAfter){
+  var y = Math.floor(view / 12), m = view % 12;
+  $('calM').textContent = MONTHS[m] + ' ' + y;
+  calPrev.disabled = view <= MIN_M;
+  calNext.disabled = view >= MAX_M;
+  var lead = (new Date(y, m, 1).getDay() + 6) % 7, days = daysIn(y, m);
+  // в сетке в фокус с Tab попадает один день: выбранный, иначе тот, где была
+  // клавиатура, иначе первый доступный
+  var tabD = null;
+  if (S.date && S.date.y === y && S.date.m === m) tabD = S.date.d;
+  else if (calFocus && calFocus.y === y && calFocus.m === m) tabD = calFocus.d;
+  else { for (var t = 1; t <= days; t++) if (available(y, m, t)){ tabD = t; break; } }
+  if (!tabD) tabD = 1;
+  var frag = document.createDocumentFragment(), tr = null;
+  var cells = Math.ceil((lead + days) / 7) * 7;
+  for (var i = 0; i < cells; i++){
+    if (i % 7 === 0){ tr = document.createElement('tr'); frag.appendChild(tr); }
+    var td = document.createElement('td');
+    tr.appendChild(td);
+    var d = i - lead + 1;
+    if (d < 1 || d > days) continue;
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'cal-d'; b.textContent = d;
+    b.setAttribute('data-k', key(y, m, d));
+    var ok = available(y, m, d);
+    b.setAttribute('aria-label', d + ' ' + MONTHS_GEN[m] + ' ' + y + (ok ? '' : ', экскурсий нет'));
+    if (ok){
+      var sel = !!(S.date && S.date.y === y && S.date.m === m && S.date.d === d);
+      b.setAttribute('aria-pressed', sel ? 'true' : 'false');
+      if (sel) td.setAttribute('aria-selected', 'true');
+    } else b.setAttribute('aria-disabled', 'true');
+    b.tabIndex = d === tabD ? 0 : -1;
+    td.appendChild(b);
+  }
+  calB.textContent = '';
+  calB.appendChild(frag);
+  if (focusAfter){
+    var f = calB.querySelector('[tabindex="0"]');
+    if (f) f.focus();
+  }
+}
+function fromKey(k){ return { y: Math.floor(k / 10000), m: Math.floor(k / 100) % 100 - 1, d: k % 100 }; }
+function moveFocus(dt){
+  var y = dt.getFullYear(), m = dt.getMonth(), d = dt.getDate(), mi = y * 12 + m;
+  if (mi < MIN_M || mi > MAX_M) return;
+  calFocus = { y: y, m: m, d: d };
+  if (mi !== view){ view = mi; renderCal(false); }
+  var bs = calB.querySelectorAll('.cal-d'), target = null;
+  for (var i = 0; i < bs.length; i++){
+    var hit = +bs[i].getAttribute('data-k') === key(y, m, d);
+    bs[i].tabIndex = hit ? 0 : -1;
+    if (hit) target = bs[i];
+  }
+  if (target) target.focus();
+}
+calB.addEventListener('keydown', function(e){
+  var b = e.target.closest ? e.target.closest('.cal-d') : null;
+  if (!b) return;
+  var c = fromKey(+b.getAttribute('data-k')), wd = (new Date(c.y, c.m, c.d).getDay() + 6) % 7, nd;
+  switch (e.key){
+    case 'ArrowLeft': nd = new Date(c.y, c.m, c.d - 1); break;
+    case 'ArrowRight': nd = new Date(c.y, c.m, c.d + 1); break;
+    case 'ArrowUp': nd = new Date(c.y, c.m, c.d - 7); break;
+    case 'ArrowDown': nd = new Date(c.y, c.m, c.d + 7); break;
+    case 'Home': nd = new Date(c.y, c.m, c.d - wd); break;
+    case 'End': nd = new Date(c.y, c.m, c.d + 6 - wd); break;
+    case 'PageUp': nd = new Date(c.y, c.m - 1, Math.min(c.d, daysIn(c.y, c.m - 1))); break;
+    case 'PageDown': nd = new Date(c.y, c.m + 1, Math.min(c.d, daysIn(c.y, c.m + 1))); break;
+    default: return;
+  }
+  e.preventDefault();
+  moveFocus(nd);
+});
+calB.addEventListener('click', function(e){
+  var b = e.target.closest ? e.target.closest('.cal-d') : null;
+  if (!b || b.getAttribute('aria-disabled') === 'true') return;
+  var c = fromKey(+b.getAttribute('data-k'));
+  S.date = c; calFocus = c;
+  renderCal(true);
+  $('errDate').hidden = true; $('cal').classList.remove('bad');
+  showDate();
+  markStale(); updateSteps();
+});
+function stepMonth(dir){
+  view = Math.min(MAX_M, Math.max(MIN_M, view + dir));
+  calFocus = null;
+  renderCal(false);
+  // стрелка, на которой стоял фокус, погасла на краю сезона - переводим фокус на соседнюю
+  var me = dir < 0 ? calPrev : calNext, other = dir < 0 ? calNext : calPrev;
+  if (me.disabled && document.activeElement !== other) other.focus();
+}
+calPrev.addEventListener('click', function(){ stepMonth(-1); });
+calNext.addEventListener('click', function(){ stepMonth(1); });
+function showDate(){
+  var d = S.date;
+  $('calSel').textContent = d ? 'Выбрано: ' + WEEKDAYS[new Date(d.y, d.m, d.d).getDay()] + ', ' + d.d + ' ' + MONTHS_GEN[d.m] + ' ' + d.y : '';
+}
+// подпись под календарём собирается из того же SEASON, чтобы не разошлась с сеткой
+(function(){
+  var offs = SEASON.off.map(parseYMD), parts = [], i = 0;
+  while (i < offs.length){
+    var mo = offs[i].m, ds = [];
+    while (i < offs.length && offs[i].m === mo){ ds.push(offs[i].d); i++; }
+    parts.push((ds.length > 1 ? ds.slice(0, -1).join(', ') + ' и\u00A0' + ds[ds.length - 1] : ds[0]) + ' ' + MONTHS_GEN[mo]);
+  }
+  $('calHint').textContent = 'Экскурсии идут с\u00A0' + F.d + ' ' + MONTHS_GEN[F.m] + ' по ' + T.d + ' ' + MONTHS_GEN[T.m]
+    + (parts.length ? ', кроме ' + parts.join(', ') : '');
+})();
+
+/* ==================== ВРЕМЯ ==================== */
+var tmH = $('tmH'), tmM = $('tmM');
+function chips(box, name, values, label){
+  values.forEach(function(v){
+    var l = document.createElement('label'); l.className = 'chip';
+    var inp = document.createElement('input'); inp.type = 'radio'; inp.name = name; inp.value = String(v);
+    inp.setAttribute('aria-label', label(v));
+    var s = document.createElement('span'); s.setAttribute('aria-hidden', 'true');
+    s.textContent = name === 'mm' ? ':' + v : String(v);
+    l.appendChild(inp); l.appendChild(s); box.appendChild(l);
+  });
+}
+chips(tmH, 'hh', HOURS, function(v){ return v + ' ч'; });
+chips(tmM, 'mm', MINUTES, function(v){ return v + ' мин'; });
+function onTime(e){
+  if (!e.target || (e.target.name !== 'hh' && e.target.name !== 'mm')) return;
+  if (e.target.name === 'hh') S.hh = +e.target.value; else S.mm = e.target.value;
+  syncOn(tmH); syncOn(tmM);
+  var out = $('tmOut');
+  $('tmOutT').textContent = (S.hh == null ? '--' : S.hh) + ':' + (S.mm == null ? '--' : S.mm);
+  out.classList.toggle('empty', S.hh == null || S.mm == null);
+  if (S.hh != null && S.mm != null){ $('errTime').hidden = true; tmH.classList.remove('bad'); tmM.classList.remove('bad'); }
+}
+tmH.addEventListener('change', onTime);
+tmM.addEventListener('change', onTime);
+
+/* ==================== ШАГИ, ОШИБКИ, «УСТАРЕЛО» ==================== */
+function nameOk(){ var t = tidyName(nm.value); return /[A-Za-zА-Яа-яЁё]/.test(t); }
+function stepsState(){
+  return {
+    stPhoto: !!S.levels,
+    stName: nameOk(),
+    stSex: !!S.sex,
+    stDate: !!S.date,
+    stTime: S.hh != null && S.mm != null
+  };
+}
+function updateSteps(){
+  var st = stepsState();
+  for (var id in st) $(id).classList.toggle('ok', st[id]);
+}
+function onForm(){
+  autoSex();
+  if (nameOk()){ $('errName').hidden = true; nm.classList.remove('bad'); }
+  if (S.sex){ $('errSex').hidden = true; sexSeg.classList.remove('bad'); }
+  markStale();
+  updateSteps();
+}
+$('form').addEventListener('input', function(e){ if (e.target !== crZoom) onForm(); });
+$('form').addEventListener('change', function(e){ if (e.target !== crZoom && e.target !== phFile) onForm(); });
+
+var pv = $('pv'), dl = $('dl');
+// Номер версии формы. Растёт при любой правке, даже пока пропуска ещё нет:
+// так сборка, запущенная раньше правки, узнаёт, что её картинка уже устарела.
+var formVer = 0;
+function markStale(){
+  formVer++;
+  if (!S.result || pv.classList.contains('stale')) return;
+  pv.classList.add('stale');
+  $('pvStale').hidden = false;
+  $('goStatus').textContent = '';
+  dl.disabled = true;
+}
+
+/* ==================== СБОРКА ПРОПУСКА ==================== */
+var tplPromise = null;
+function loadTemplate(){
+  if (!tplPromise){
+    tplPromise = new Promise(function(res, rej){
+      var img = new Image();
+      img.onload = function(){ res(img); };
+      img.onerror = function(){ tplPromise = null; rej(new Error('template')); };
+      img.src = PASS.template;
+    });
+  }
+  return tplPromise;
+}
+loadTemplate().catch(function(){});   // заранее: к нажатию шаблон уже в памяти
+
+// Шрифт на холсте рисуется, только если уже загружен. Не дождались за 3 с -
+// рисуем запасным Georgia: пропуск важнее точного шрифта.
+function fontReady(){
+  if (!document.fonts || !document.fonts.load) return Promise.resolve(false);
+  return Promise.race([
+    document.fonts.load('700 48px "Propusk Serif"').then(function(l){ return l.length > 0; }, function(){ return false; }),
+    new Promise(function(r){ setTimeout(function(){ r(false); }, 3000); })
+  ]);
+}
+fontReady();
+// Первая попытка не удалась (обрыв связи, таймаут) - браузер сам второй раз
+// не попросит файл шрифта. Загружаем его заново вручную, один раз на сборку.
+function fontRetry(){
+  if (typeof FontFace !== 'function' || !document.fonts || !document.fonts.add) return Promise.resolve(false);
+  var ff;
+  try { ff = new FontFace('Propusk Serif', 'url(propusk/charis-bold.woff2)', { weight: '700', style: 'normal' }); }
+  catch(_){ return Promise.resolve(false); }
+  return Promise.race([
+    ff.load().then(function(f){ document.fonts.add(f); return true; }, function(){ return false; }),
+    new Promise(function(r){ setTimeout(function(){ r(false); }, 5000); })
+  ]);
+}
+function fontEnsure(){
+  return fontReady().then(function(ok){ return ok || fontRetry(); });
+}
+
+function fontPx(s){ return '700 ' + s + 'px ' + PASS.font; }
+// самый крупный кегль из [min..max] с шагом 0,5, при котором строка влезает в maxW
+function fitSize(ctx, text, max, min, maxW){
+  for (var s = max; s >= min; s -= 0.5){
+    ctx.font = fontPx(s);
+    if (ctx.measureText(text).width <= maxW) return s;
+  }
+  return null;
+}
+function drawName(ctx, name){
+  var n = PASS.name;
+  ctx.fillStyle = n.color;
+  var s = fitSize(ctx, name, n.max, n.min, n.maxW);
+  if (s){ ctx.font = fontPx(s); ctx.fillText(name, n.cx, n.baseline); return; }
+  var w = name.split(' ');
+  if (w.length < 2){
+    // одно очень длинное слово: браузер сам чуть сожмёт буквы до ширины
+    ctx.font = fontPx(n.min); ctx.fillText(name, n.cx, n.baseline, n.maxW); return;
+  }
+  // Две строки над линией: разрез там, где длинная из двух строк короче всего
+  ctx.font = fontPx(n.min);
+  var best = null;
+  for (var i = 1; i < w.length; i++){
+    var a = w.slice(0, i).join(' '), b = w.slice(i).join(' ');
+    var m = Math.max(ctx.measureText(a).width, ctx.measureText(b).width);
+    if (!best || m < best.m) best = { a: a, b: b, m: m };
+  }
+  var s2 = Math.min(fitSize(ctx, best.a, n.two, n.min, n.maxW) || n.min, fitSize(ctx, best.b, n.two, n.min, n.maxW) || n.min);
+  ctx.font = fontPx(s2);
+  ctx.fillText(best.b, n.cx, n.baseline, n.maxW);
+  ctx.fillText(best.a, n.cx, n.baseline - Math.round(s2 * 1.16), n.maxW);
+}
+function dateText(snap){
+  var d = snap.date;
+  return d.d + ' ' + MONTHS_GEN[d.m] + ' ' + d.y + ' в ' + snap.hh + ':' + snap.mm;
+}
+// Рисуем только из снимка формы, сделанного в момент нажатия: сборка ждёт
+// шрифт до нескольких секунд, и правка за это время не должна попасть
+// в картинку наполовину (имя старое, а род уже новый).
+function renderPass(tpl, snap){
+  var name = snap.name;
+  var cv = document.createElement('canvas');
+  cv.width = PASS.W; cv.height = PASS.H;
+  var ctx = cv.getContext('2d');
+  ctx.fillStyle = PASS.bg;
+  ctx.fillRect(0, 0, PASS.W, PASS.H);
+  // фото - кругом под шаблоном, той же функцией, что в кадрировщике
+  var c = PASS.circle;
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(c.cx, c.cy, c.rPhoto, 0, Math.PI * 2);
+  ctx.clip();
+  drawPhoto(ctx, snap.levels, snap.crop, c.cx, c.cy, c.rPhoto * 2);
+  ctx.restore();
+  ctx.drawImage(tpl, 0, 0, PASS.W, PASS.H);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  var p = PASS.para;
+  ctx.fillStyle = p.color;
+  ctx.font = fontPx(p.size);
+  (snap.sex === 'f' ? p.f : p.m).forEach(function(t, i){ ctx.fillText(t, p.cx, p.baseline + i * p.line); });
+
+  drawName(ctx, name);
+
+  var dd = PASS.date, dt = dateText(snap);
+  var ds = fitSize(ctx, dt, dd.size, dd.min, dd.maxW);
+  ctx.fillStyle = dd.color;
+  ctx.font = fontPx(ds || dd.min);
+  if (ds) ctx.fillText(dt, dd.cx, dd.baseline); else ctx.fillText(dt, dd.cx, dd.baseline, dd.maxW);
+  return cv;
+}
+function safeFileName(name){
+  var s = ('Пропуск МНД - ' + name).replace(/[\/\\:*?"<>|\x00-\x1F\x7F]+/g, '').replace(/\s+/g, ' ').trim();
+  return (s || 'Пропуск МНД') + '.jpg';
+}
+
+function validate(){
+  var bad = [];
+  if (!S.levels){ $('errPhoto').hidden = false; phDrop.classList.add('bad'); bad.push(['stPhoto', phFile]); }
+  if (!nameOk()){ $('errName').hidden = false; nm.classList.add('bad'); bad.push(['stName', nm]); }
+  if (!S.sex){ $('errSex').hidden = false; sexSeg.classList.add('bad'); bad.push(['stSex', sexSeg.querySelector('input')]); }
+  if (!S.date){ $('errDate').hidden = false; $('cal').classList.add('bad'); bad.push(['stDate', calB.querySelector('[tabindex="0"]')]); }
+  if (S.hh == null || S.mm == null){
+    $('errTime').hidden = false;
+    if (S.hh == null) tmH.classList.add('bad');
+    if (S.mm == null) tmM.classList.add('bad');
+    bad.push(['stTime', (S.hh == null ? tmH : tmM).querySelector('input')]);
+  }
+  return bad;
+}
+
+var go = $('go'), busy = false;
+go.addEventListener('click', function(){
+  if (busy) return;
+  $('errGo').hidden = true;
+  var t = tidyName(nm.value);
+  if (t !== nm.value) nm.value = t;
+  var bad = validate();
+  if (bad.length){
+    var first = bad[0];
+    if (first[1]) try { first[1].focus({ preventScroll: true }); } catch(_){}
+    $(first[0]).scrollIntoView(scrollOpt());
+    return;
+  }
+  busy = true; go.disabled = true;
+  // Снимок всех полей на момент нажатия. Кадр - копия объекта, фото - те же
+  // холсты: freeLevels не очищает их, пока идёт сборка (см. buildLevels).
+  var snap = {
+    name: t, sex: S.sex,
+    date: { y: S.date.y, m: S.date.m, d: S.date.d },
+    hh: S.hh, mm: S.mm,
+    levels: S.levels,
+    crop: { z: S.crop.z, x: S.crop.x, y: S.crop.y },
+    ver: formVer
+  };
+  buildLevels = snap.levels;
+  var fontOk = true;
+  Promise.all([loadTemplate(), fontEnsure()]).then(function(r){
+    fontOk = r[1];
+    var cv = renderPass(r[0], snap);
+    return new Promise(function(res, rej){
+      cv.toBlob(function(b){
+        cv.width = 0; cv.height = 0;   // память холста отпускаем сразу, файл уже готов
+        b ? res(b) : rej(new Error('toBlob'));
+      }, 'image/jpeg', 0.92);
+    });
+  }).then(function(blob){
+    showResult(blob, snap.name, snap.ver !== formVer, fontOk);
+  }).catch(function(err){
+    var e = $('errGo');
+    e.textContent = err && err.message === 'template'
+      ? 'Не получилось загрузить шаблон пропуска. Проверьте интернет и\u00A0нажмите ещё раз'
+      : 'Не получилось собрать пропуск. Обновите страницу и\u00A0попробуйте ещё раз';
+    e.hidden = false;
+  }).then(function(){
+    busy = false; go.disabled = false;
+    // фото заменили во время сборки - старые холсты теперь можно отпустить
+    var old = buildLevels; buildLevels = null;
+    if (old && old !== S.levels) zeroLevels(old);
+  });
+});
+
+function showResult(blob, name, stale, fontOk){
+  var fname = safeFileName(name);
+  var file;
+  try { file = new File([blob], fname, { type: 'image/jpeg', lastModified: Date.now() }); }
+  catch(_){ file = null; }
+  if (S.result) URL.revokeObjectURL(S.result.url);
+  var url = URL.createObjectURL(blob);
+  S.result = { file: file, url: url, fname: fname };
+  var img = $('pvImg');
+  img.src = url;
+  // В <img> кладём data:-адрес того же файла. Долгое нажатие во встроенных
+  // браузерах сохраняет картинку по её адресу: data: они прочитать могут,
+  // blob: - нет. Файл для «Скачать» и «Поделиться» остаётся тем же Blob.
+  // Пока читается (доли секунды) показываем по blob:, чтобы не мигало.
+  var mine = S.result;
+  try {
+    var fr = new FileReader();
+    fr.onload = function(){ if (S.result === mine && typeof fr.result === 'string') img.src = fr.result; };
+    fr.readAsDataURL(blob);
+  } catch(_){}
+  img.alt = 'Почётный пропуск: ' + name;
+  img.hidden = false;
+  pv.classList.add('has');
+  $('pvAct').hidden = false;
+  $('fontWarn').hidden = fontOk !== false;
+  // Пока собиралось, форму поправили: картинка по старым данным, скачивать
+  // её нельзя - сразу показываем с пометкой «нажмите ещё раз»
+  pv.classList.toggle('stale', !!stale);
+  $('pvStale').hidden = !stale;
+  dl.disabled = !!stale;
+  $('goStatus').textContent = stale ? 'Вы изменили данные - нажмите «Сгенерировать» ещё раз'
+    : 'Пропуск готов. Кнопка «Скачать» под картинкой';
+  // на телефоне пропуск под кнопкой - показываем его, на компьютере он и так
+  // виден в панели справа
+  if (!mq('(min-width:1024px)')) requestAnimationFrame(function(){ pv.scrollIntoView(scrollOpt()); });
+}
+
+/* «Скачать». Файл собран заранее, в момент «Сгенерировать»: iPhone разрешает
+   открыть меню «Поделиться» только прямо в обработчике нажатия, без ожиданий.
+   На iPhone в этом меню есть «Сохранить изображение» - картинка ляжет в Фото,
+   а обычное скачивание унесло бы её в «Файлы». На Android в системном меню
+   сохранения нет, там обычное скачивание - картинка появится в галерее. */
+// Меню «Поделиться» открыто: двойной тап на iPhone вызывает share() второй
+// раз, тот падает InvalidStateError и уводил в обычное скачивание - в «Файлы»
+var sharing = false;
+dl.addEventListener('click', function(){
+  var r = S.result;
+  if (!r || pv.classList.contains('stale') || sharing) return;
+  // Во встроенном браузере «Поделиться» - самый надёжный путь, и на Android
+  // тоже: обычное скачивание там часто молча не работает
+  if ((INAPP || (COARSE && !ANDROID)) && r.file && navigator.canShare && navigator.share){
+    var can = false;
+    try { can = navigator.canShare({ files: [r.file] }); } catch(_){}
+    if (can){
+      sharing = true;
+      var p;
+      try { p = navigator.share({ files: [r.file] }); }
+      catch(e){ p = Promise.reject(e); }
+      Promise.resolve(p).then(function(){ sharing = false; }, function(e){
+        sharing = false;
+        // закрыл меню сам или меню уже открыто - молчим
+        if (e && (e.name === 'AbortError' || e.name === 'InvalidStateError')) return;
+        download(r);
+        if (INAPP) $('dlHint').classList.add('big');
+      });
+      return;
+    }
+  }
+  download(r);
+  // Скачивание во встроенном браузере могло пройти впустую, и узнать об этом
+  // нельзя - сразу крупно показываем долгое нажатие и «открыть в браузере»
+  if (INAPP){ $('dlHint').classList.add('big'); }
+});
+function download(r){
+  var a = document.createElement('a');
+  a.href = r.url; a.download = r.fname; a.rel = 'noopener';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function(){ a.remove(); }, 1000);
+  // адрес картинки не освобождаем: он же показывает пропуск на странице,
+  // освободим при следующей сборке
+}
+$('again').addEventListener('click', function(){
+  resetSexTouch();
+  $('form').scrollIntoView(scrollOpt());
+  try { $('hPhoto').focus({ preventScroll: true }); } catch(_){}
+});
+
+/* ---------- тексты под устройство ---------- */
+if (!COARSE){
+  $('device').textContent = mq('(pointer:fine)') ? 'компьютере' : 'устройстве';
+  $('phDropSub').textContent = 'Нажмите или перетащите файл сюда';
+  // про стрелки и плюс-минус знает читалка экрана (aria-label окна кадра),
+  // видимая подсказка - короткая
+  $('crHelp').textContent = 'Двигайте фото мышью, приближайте колесом или ползунком';
+  $('dlHint').textContent = 'Не скачивается? Нажмите на\u00A0картинку правой кнопкой мыши - «Сохранить изображение как»';
+} else {
+  // название пункта в меню долгого нажатия разное: на iPhone «Сохранить в Фото»,
+  // на Android «Скачать изображение»
+  $('dlHintAct').textContent = ANDROID ? '«Скачать изображение»' : '«Сохранить в\u00A0Фото»';
+}
+
+if (INAPP){
+  $('inapp').hidden = false;
+  $('dlHint').textContent = 'Если картинка не скачалась, нажмите на\u00A0неё и\u00A0подержите - '
+    + (ANDROID ? '«Скачать изображение»' : '«Сохранить в\u00A0Фото»')
+    + '. Или откройте страницу в\u00A0обычном браузере: меню ⋮ или ··· вверху справа → «Открыть в\u00A0браузере»';
+}
+
+renderCal(false);
+updateSteps();
+})();
+
+/* ==================== ШАПКА (как на otzyvy.html) ==================== */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){
+    if (window.scrollY > 24) nav.classList.add('solid');
+    else nav.classList.remove('solid');
+  }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* ==================== «НА ГЛАВНУЮ» ====================
+   "/" ведёт на главную домена: mnd-nn.ru - Нижний, mnd-kazan.ru - Казань,
+   mnd-tumen.ru - Тюмень. Пришёл со страницы города без своего домена
+   (Крым живёт на mnd-nn.ru/crimea.html) - возвращаем туда, откуда пришёл. */
+(function(){
+  try {
+    var r = document.referrer ? new URL(document.referrer) : null;
+    if (!r || r.host !== location.host || /propusk\.html$/.test(r.pathname)) return;
+    var home = r.origin + r.pathname;
+    var links = document.querySelectorAll('[data-pp-home]');
+    for (var i = 0; i < links.length; i++) links[i].href = home;
+  } catch(_){}
+})();
+</script>
+</body>
+</html>
