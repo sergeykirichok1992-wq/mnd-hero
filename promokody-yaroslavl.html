@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<!-- СОБРАНО СКРИПТОМ sayt-nn/instrumenty/promokody_partner.py из нашей promokody.html
+     (основной репозиторий МНД AI). Правила промокодов ПАРТНЁРА по франшизе
+     (Ярославль): условия те же, что у нас. Руками не править - запустить скрипт. -->
+<script>
+/* Страница партнёра живёт на его домене. Этот же файл виден на наших адресах
+   и на GitHub Pages - оттуда сразу уводим на mnd-yar.ru (как yaroslavl.html).
+   Свой компьютер (файл, localhost) не трогаем - там страницу проверяют. */
+(function(){
+  var h = location.hostname;
+  if (h === 'mnd-yar.ru' || h === '' || h === 'localhost' || h === '127.0.0.1') return;
+  location.replace('https://mnd-yar.ru/promokody-yaroslavl.html' + location.search + location.hash);
+})();
+</script>
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Правила промокодов для групп - Министерство Новогодних Дел, Ярославль</title>
+<meta name="theme-color" content="#04070F">
+<meta name="description" content="Как получить и применить промокод Министерства Новогодних Дел: скидка 5% для группы, бонусы тому, кто поделился промокодом, и все условия.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Министерство Новогодних Дел">
+<meta property="og:title" content="Правила промокодов для групп - Министерство Новогодних Дел, Ярославль">
+<meta property="og:description" content="Скидка 5% для группы, бонусы тому, кто поделился промокодом, и все условия.">
+<meta property="og:image" content="https://mnd-yar.ru/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://mnd-yar.ru/promokody-yaroslavl.html">
+<link rel="canonical" href="https://mnd-yar.ru/promokody-yaroslavl.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600;700&display=swap">
+<style>
+/* ==================== ПРАВИЛА ПРОМОКОДОВ (ПАРТНЁР, ЯРОСЛАВЛЬ) ====================
+   Собрано из нашей promokody.html скриптом promokody_partner.py. Условия те же,
+   что у нас (решение Серёги 21.09.2026). Ссылка на страницу - в подвале
+   yaroslavl.html и в ответе про промокоды. «На главную» ведёт на "/" -
+   на mnd-yar.ru это Ярославль. */
+:root{
+  --ink:#04070F; --ink2:#080D1B; --line:#18223B;
+  --text:#DCE4F3; --dim:#8695B3; --faint:#5A6784;
+  --gold:#E3B34E; --moon:#7FA8D9;
+  color-scheme:dark;
+}
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+/* Окно отзыва открыто - страница под ним не прокручивается. Полосу прокрутки
+   компенсируем отступом, иначе вся страница дёрнется вправо на её ширину. */
+html.oz-lock{overflow:hidden}
+html.oz-lock body{padding-right:var(--oz-sbw,0px)}
+
+/* ---------- шапка (та же, что на v2.html) ---------- */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  padding-top:max(16px, env(safe-area-inset-top));
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(4,7,15,.82);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+.navlinks{display:flex; gap:24px; margin-left:auto; font-size:14px; color:var(--dim)}
+.navlinks a{color:inherit; text-decoration:none; transition:color .2s}
+.navlinks a:hover,.navlinks a:focus-visible{color:#fff}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026). На v2.html там «Выбрать город»,
+   здесь - возврат на главную. Тут она ссылка, поэтому добавлены inline-flex
+   и снято подчёркивание; всё остальное - как на главной. */
+.navbtn{
+  border:1px solid var(--gold); color:var(--gold); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none;
+}
+.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
+@media(max-width:880px){ .navlinks{display:none} }
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+
+/* ---------- ПОЛЕ СТРАНИЦЫ: НОЧНОЕ НЕБО ----------
+   Тот же рецепт, что у экранов с видео и с Дедом Морозом на v2.html: синяя
+   ночь, три размытых пятна (синее, лиловое, золотое), зерно поверх. Без
+   filter:blur - он на большой площади сажает прокрутку на телефоне.
+
+   ПОЛЕ ТЁМНОЕ, ПОТОМУ ЧТО СКРИНЫ БЕЛЫЕ. Скриншот ВКонтакте - белый лист;
+   на белом поле карточки растворились бы и пришлось бы обводить каждую
+   рамкой, на ночном небе они сами читаются как светящиеся листы. */
+.oz{
+  position:relative; isolation:isolate; overflow:hidden; min-height:100vh;
+  padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.oz-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:42%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:ozDrift1 38s ease-in-out infinite alternate}
+.oz-glow i:nth-child(2){right:-20vw; top:24%; width:70vw; height:44%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:ozDrift2 45s ease-in-out infinite alternate}
+.oz-glow i:nth-child(3){left:50%; bottom:-8%; width:78vw; height:40%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:ozDrift3 33s ease-in-out infinite alternate}
+@keyframes ozDrift1{from{transform:translate3d(0,0,0) scale(1);    opacity:.9}
+                    to  {transform:translate3d(4%,3%,0) scale(1.08); opacity:1}}
+@keyframes ozDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
+                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.86}}
+@keyframes ozDrift3{from{transform:translate3d(0,0,0) scale(1);    opacity:.84}
+                    to  {transform:translate3d(5%,-4%,0) scale(1.1); opacity:1}}
+.oz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Контейнер - по общему правилу сайта: широкий, почти во весь экран
+   → ai-clone/feedback/shirokaya-verstka-sayta.md. Потолок 1462 px - тот же,
+   что на v2.html после понижения 05.09.2026. */
+.oz-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1462px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,47.6px);
+}
+@media (max-width:767px){ .oz-cont{width:100%; padding-inline:20px} }
+
+/* ---------- заголовок ----------
+   Двухцветный по стилю сайта: белое утверждение и золотая его суть.
+   Кегль и семейство - как у заголовков тёмных экранов v2.html. */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.oz-q{color:#F0C97A}
+.oz-lead{
+  max-width:760px; margin:0 auto clamp(8px,.8vw,14px);
+  text-align:center; text-wrap:balance;
+  font-size:max(14px, clamp(15px,1.25vw,20px)); line-height:1.45; color:#B9C8F5;
+}
+/* Подсказка про щелчок. Она обязательна: без неё карточка выглядит картинкой,
+   и человек уходит со страницы, так и не прочитав ни одного отзыва. */
+.oz-hint{
+  margin:0 auto; text-align:center; color:var(--dim);
+  font-size:max(13px, clamp(13px,1vw,15px));
+}
+.oz-hint b{color:#EBD3A0; font-weight:600}
+
+
+/* ---------- карточки правил ----------
+   Сетка из широких карточек во всю ширину контейнера (правило широкой вёрстки),
+   абзацы внутри не шире 60ch. */
+.pk-grid{
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(14px,1.6vw,26px); margin:clamp(28px,3.4vw,56px) auto 0;
+}
+@media (max-width:900px){ .pk-grid{grid-template-columns:1fr} }
+.pk-card{
+  position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.4vw,40px);
+  border-radius:clamp(18px,1.6vw,26px);
+  background:linear-gradient(180deg, rgba(20,28,84,.62), rgba(10,15,52,.62));
+  border:1px solid rgba(146,167,214,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 24px 60px -34px rgba(0,0,0,.8);
+}
+.pk-card--wide{grid-column:1 / -1}
+.pk-card--gold{border-color:rgba(227,179,78,.42);
+  background:linear-gradient(180deg, rgba(58,44,20,.55), rgba(16,16,44,.62))}
+.pk-h{
+  margin:0 0 clamp(10px,1vw,16px);
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(19px,1.7vw,28px); line-height:1.15; text-transform:uppercase; color:#fff;
+}
+.pk-h b{color:#F0C97A; font-weight:700}
+.pk-card p, .pk-card li{
+  max-width:60ch; font-size:max(15px, clamp(15px,1.12vw,18px)); line-height:1.5; color:#C9D6EE;
+}
+.pk-card p{margin:0}
+.pk-card p + p{margin-top:.7em}
+.pk-card ul{margin:0; padding:0; list-style:none}
+.pk-card li{position:relative; padding-left:1.35em}
+.pk-card li + li{margin-top:.55em}
+.pk-card li::before{
+  content:''; position:absolute; left:.2em; top:.62em; width:.46em; height:.46em;
+  border-radius:50%; background:var(--gold); box-shadow:0 0 12px rgba(227,179,78,.6);
+}
+.pk-card b{color:#fff; font-weight:600}
+.pk-big{
+  display:block; margin:0 0 .25em;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(38px,4.2vw,68px); line-height:1; color:#F0C97A;
+}
+.pk-note{margin-top:clamp(12px,1.2vw,18px) !important; color:var(--dim) !important}
+/* ссылок в шапке нет, кнопку прижимаем вправо сами (на otzyvy.html это делает .navlinks) */
+.nav .navbtn{margin-left:auto}
+.pk-back{margin:clamp(28px,3vw,48px) auto 0; text-align:center}
+.pk-back a{color:#EBD3A0; font-size:max(15px, clamp(15px,1.1vw,18px))}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="/" data-pk-home>МНД<span>·</span>Ярославль</a>
+  <a class="navbtn" href="/" data-pk-home>На главную</a>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="oz-grain" aria-hidden="true"></div>
+
+  <div class="oz-cont">
+    <h1 class="oz-t">Правила промокодов<br><span class="oz-q">для групп</span></h1>
+    <p class="oz-lead">Сезон 2026-2027. Личный промокод - это 6 цифр, которые мы выдаём
+      организатору группы. Поделитесь им с другими классами: группа, которая придёт
+      по Вашему промокоду, получит скидку, а Вы - бонусы.</p>
+
+    <div class="pk-grid">
+
+      <section class="pk-card">
+        <h2 class="pk-h">Как получить <b>свой промокод</b></h2>
+        <ul>
+          <li>Когда Вы обсуждаете поездку с классом, мы автоматически пришлём промокод Вам в переписку.</li>
+          <li>Если Вы общаетесь с менеджером по телефону, он продиктует Вам промокод.</li>
+        </ul>
+        <p class="pk-note">Один номер телефона - один промокод. Он выдаётся один раз и действует
+          весь сезон. Прошлогодние промокоды не действуют.</p>
+      </section>
+
+      <section class="pk-card pk-card--gold">
+        <h2 class="pk-h">Что получит группа, <b>пришедшая по промокоду</b></h2>
+        <span class="pk-big">5%</span>
+        <p>Скидка на всю стоимость группы, включая предоплату. Скидка учитывается
+          при окончательном расчёте.</p>
+      </section>
+
+      <section class="pk-card">
+        <h2 class="pk-h">Как <b>применить</b> промокод</h2>
+        <ul>
+          <li>Назовите промокод менеджеру или укажите его в заявке на сайте.</li>
+          <li>Сделать это нужно <b>до внесения предоплаты</b>. После предоплаты промокод не действует.</li>
+          <li>К одной группе применяется только один промокод.</li>
+          <li>Промокоды действуют только для организованных групп (класс от 20 детей).
+            Для индивидуального посещения (семьёй, с друзьями) промокоды не действуют.</li>
+        </ul>
+      </section>
+
+      <section class="pk-card pk-card--gold">
+        <h2 class="pk-h">Что получит тот, <b>кто поделился промокодом</b></h2>
+        <ul>
+          <li><b>Скидку 5% на свою группу.</b> Она даётся один раз, сколько бы групп ни пришло
+            по Вашему промокоду, при условии, что хотя бы одна из них внесла предоплату
+            до Вашего окончательного расчёта.</li>
+          <li><b>1000&nbsp;₽ лично Вам</b> за каждую группу от 20 платных детей, которая пришла
+            по Вашему промокоду. Выплата - после посещения мероприятия группой. Для получения
+            выплаты необходимо обратиться к своему менеджеру.</li>
+          <li>По одному промокоду может прийти сколько угодно групп.</li>
+        </ul>
+      </section>
+
+      <section class="pk-card pk-card--wide">
+        <h2 class="pk-h"><b>Важно</b></h2>
+        <ul>
+          <li>Скидки не суммируются: действует одна скидка 5% - льготная или по промокоду.</li>
+          <li>Свой промокод к своей группе применить нельзя. На Вашу вторую группу он даёт
+            скидку 5%, но без 1000&nbsp;₽.</li>
+          <li>Мы вправе отключить промокод, если его используют не по правилам (например,
+            для своей же группы через другой номер телефона).</li>
+        </ul>
+      </section>
+
+    </div>
+
+    <p class="pk-back"><a href="/" data-pk-home>Вернуться на главную страницу</a></p>
+  </div>
+</main>
+
+<script>
+/* ==================== ШАПКА (как на otzyvy.html) ==================== */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){
+    if (window.scrollY > 24) nav.classList.add('solid');
+    else nav.classList.remove('solid');
+  }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* ==================== «НА ГЛАВНУЮ» ====================
+   "/" ведёт на главную домена партнёра. Пришли с другой страницы этого же
+   сайта - возвращаем туда, откуда пришли. */
+(function(){
+  try {
+    var r = document.referrer ? new URL(document.referrer) : null;
+    if (!r || r.host !== location.host || /promokody-yaroslavl\.html$/.test(r.pathname)) return;
+    var home = r.origin + r.pathname;
+    var links = document.querySelectorAll('[data-pk-home]');
+    for (var i = 0; i < links.length; i++) links[i].href = home;
+  } catch(_){}
+})();
+</script>
+</body>
+</html>
