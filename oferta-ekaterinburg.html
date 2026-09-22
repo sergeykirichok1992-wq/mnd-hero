@@ -1,0 +1,473 @@
+<!doctype html>
+<!-- СОБРАНО СКРИПТОМ sayt-nn/instrumenty/oferta_partner.py (основной репозиторий МНД AI).
+     Оферта ПАРТНЁРА по франшизе (Екатеринбург, ИП Астахова Ксения Витальевна). Руками не править:
+     правка текста - в скрипте, потом запуск. Оформление - из politika.py. -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<script>
+/* Оферта партнёра живёт на его домене. Этот же файл виден на наших адресах
+   и на GitHub Pages - оттуда сразу уводим на mnd-ekb.ru (как ekaterinburg.html).
+   Свой компьютер (файл, localhost) не трогаем - там страницу проверяют. */
+(function(){
+  var h = location.hostname;
+  if (h === 'mnd-ekb.ru' || h === '' || h === 'localhost' || h === '127.0.0.1') return;
+  location.replace('https://mnd-ekb.ru/oferta-ekaterinburg.html' + location.search + location.hash);
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Публичная оферта - Министерство Новогодних Дел, Екатеринбург</title>
+<meta name="theme-color" content="#FFFFFF">
+<meta name="description" content="Условия бронирования даты посещения Министерства Новогодних Дел в Екатеринбурге для организованной группы: предоплата, сроки, перенос и возврат.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* СВЕТЛАЯ СТРАНИЦА (просьба Серёги 18.09.2026 «сделай на белом фоне»).
+   Палитра - со светлого экрана заявки v2.html (.sv «По цене сентября»):
+   синий #001B71 для заголовков, золото на два тона гуще сайтового
+   (#E3B34E на белом не читается), голубой бланк #ECF2FE → #DCE7F9. */
+:root{
+  --navy:#001B71; --text:#22305A; --dim:#5A6A93; --faint:#7A88AB;
+  --gold:#C9861F; --gold-t:#8A6111; --line:rgba(0,27,113,.12);
+  color-scheme:light;
+}
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; background:#fff; color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- шапка: раскладка как на v2.html, цвета светлые ----------
+   Вверху прозрачная (под ней и так белое), при прокрутке - белое стекло. */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  padding-top:max(16px, env(safe-area-inset-top));
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(255,255,255,.86);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:var(--navy); text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026). Здесь она ссылка «На главную». */
+.navbtn{
+  border:1px solid #A96D0D; color:var(--gold-t); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none; margin-left:auto;
+}
+.navbtn:hover,.navbtn:focus-visible{background:#A96D0D; color:#fff}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- поле страницы: белое, с еле заметными отблесками ----------
+   Отблески - рецепт .sv-glow (голубые по бокам, тёплый внизу), без анимации.
+   overflow у .oz НЕ hidden: иначе у колонок не работает position:sticky,
+   отблески обрезает своя коробка .oz-glow. */
+.oz{
+  position:relative; isolation:isolate; min-height:100vh; background:#fff;
+  padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%}
+.oz-glow i:nth-child(1){left:-16vw; top:-6%; width:62vw; height:40%;
+  background:radial-gradient(closest-side, rgba(198,219,255,.5) 0%, rgba(198,219,255,.26) 40%, rgba(198,219,255,0) 100%)}
+.oz-glow i:nth-child(2){right:-18vw; top:22%; width:58vw; height:44%;
+  background:radial-gradient(closest-side, rgba(214,224,255,.42) 0%, rgba(214,224,255,.2) 40%, rgba(214,224,255,0) 100%)}
+.oz-glow i:nth-child(3){left:50%; bottom:-14%; width:74vw; height:36%; margin-left:-37vw;
+  background:radial-gradient(closest-side, rgba(255,232,186,.4) 0%, rgba(255,232,186,.18) 40%, rgba(255,232,186,0) 100%)}
+
+/* Контейнер - по общему правилу сайта: широкий, почти во весь экран
+   → ai-clone/feedback/shirokaya-verstka-sayta.md. */
+.oz-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1462px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,47.6px);
+}
+@media (max-width:767px){ .oz-cont{width:100%; padding-inline:20px} }
+
+/* ---------- заголовок: как .sv-t на v2.html ---------- */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:var(--navy);
+}
+.oz-q{color:#A96D0D}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .oz-q{background:linear-gradient(180deg,#B0700F 0%,#9E650B 45%,#8A5607 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
+.pl-meta{
+  margin:0 auto; text-align:center; text-wrap:balance;
+  font-size:max(14px, clamp(14px,1.05vw,17px)); line-height:1.5; color:#3F4F76;
+}
+.pl-meta span{color:var(--dim)}
+
+/* ---------- три колонки: оглавление | документ | коротко ----------
+   Документ - лист шириной с удобную строку, по бокам колонки держат
+   ширину экрана (правило широкой вёрстки). До 1280 px «коротко» встаёт
+   над документом, до 1024 px оглавление убирается совсем. */
+.pl-grid{
+  display:grid; align-items:start;
+  grid-template-columns:minmax(210px,290px) minmax(0,1fr) minmax(240px,330px);
+  grid-template-areas:"toc doc sum";
+  gap:clamp(22px,2.6vw,52px); margin-top:clamp(28px,3.4vw,56px);
+}
+.pl-toc{grid-area:toc; position:sticky; top:84px; max-height:calc(100vh - 104px); overflow:auto}
+.pl-doc{grid-area:doc}
+.pl-sum{grid-area:sum; position:sticky; top:84px}
+@media (max-width:1279px){
+  .pl-grid{grid-template-columns:minmax(200px,260px) minmax(0,1fr);
+    grid-template-areas:"toc sum" "toc doc"}
+  .pl-sum{position:static}
+}
+@media (max-width:1023px){
+  .pl-grid{grid-template-columns:minmax(0,1fr); grid-template-areas:"sum" "doc"}
+  .pl-toc{display:none}
+}
+
+/* оглавление */
+.pl-toc-h, .pl-sum-h{
+  margin:0 0 12px; font:600 12px/1.2 "Golos Text",sans-serif;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold-t);
+}
+.pl-toc ol{margin:0; padding:0; list-style:none; border-left:1px solid var(--line)}
+.pl-toc a{
+  display:block; padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent;
+  font-size:14px; line-height:1.35; color:var(--dim); text-decoration:none;
+  transition:color .2s, border-color .2s;
+}
+.pl-toc a:hover, .pl-toc a:focus-visible{color:var(--navy)}
+.pl-toc a.on{color:var(--gold-t); border-left-color:var(--gold)}
+
+/* Документ - белый лист с тонкой рамкой и тенью (как бланк .sv-card, только
+   белый: длинный текст на голубом читать тяжелее). «Коротко» - голубой
+   бланк .sv-card, чтобы выжимка читалась отдельным предметом. */
+.pl-card{
+  position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.4vw,40px);
+  border-radius:clamp(18px,1.6vw,26px); background:#fff;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.12),
+    0 30px 60px -38px rgba(0,27,113,.32),
+    0 4px 14px -8px rgba(0,27,113,.12);
+}
+.pl-sum .pl-card{
+  background:linear-gradient(180deg,#ECF2FE 0%,#DCE7F9 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.16),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 30px 60px -34px rgba(0,27,113,.42),
+    0 4px 14px -6px rgba(0,27,113,.16);
+}
+.pl-sum dl{margin:0}
+.pl-sum dt{margin:0; font-size:13px; line-height:1.3; color:var(--dim)}
+.pl-sum dd{margin:3px 0 0; font-size:15px; line-height:1.4; color:#0B1B3F; overflow-wrap:anywhere}
+.pl-sum dd + dt{margin-top:14px}
+.pl-sum-note{margin:16px 0 0; font-size:13px; line-height:1.45; color:var(--dim)}
+.pl-sum-link{margin:14px 0 0; font-size:15px}
+.pl-sum a, .pl-foot a{color:var(--gold-t)}
+.pl-sum a:hover, .pl-foot a:hover{color:#A96D0D}
+
+/* сам документ */
+.pl-doc{font-size:max(15px, clamp(15px,1.05vw,17px)); line-height:1.6; color:var(--text)}
+.pl-doc p, .pl-doc li, .pl-doc dd{max-width:68ch}
+.pl-doc p{margin:0}
+.pl-doc p + p, .pl-doc ul + p, .pl-doc .pl-cel + p, .pl-doc p + ul{margin-top:.75em}
+.pl-doc b{color:var(--navy); font-weight:600}
+.pl-doc a{color:var(--gold-t); overflow-wrap:anywhere}
+.pl-doc a:hover{color:#A96D0D}
+.nw, a[href^="tel:"]{white-space:nowrap}
+.pl-intro{margin-bottom:1.6em !important; color:#0B1B3F}
+.pl-sec{scroll-margin-top:88px}
+.pl-sec + .pl-sec{margin-top:1.9em; padding-top:1.7em; border-top:1px solid var(--line)}
+.pl-sec h2{
+  margin:0 0 .8em;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(18px,1.45vw,24px); line-height:1.2; text-transform:uppercase; color:var(--navy);
+}
+.pl-doc ul{margin:0; padding:0; list-style:none}
+.pl-doc li{position:relative; padding-left:1.35em}
+.pl-doc li + li{margin-top:.45em}
+.pl-doc li::before{
+  content:''; position:absolute; left:.2em; top:.66em; width:.42em; height:.42em;
+  border-radius:50%; background:var(--gold);
+}
+.pl-cel{
+  margin-top:1em; padding:.9em 1.1em 1em;
+  border-left:2px solid var(--gold); border-radius:0 12px 12px 0;
+  background:#F3F7FE;
+}
+.pl-cel-h{color:var(--navy); font-weight:600}
+.pl-cel-h span{color:var(--gold-t)}
+.pl-cel dl{
+  display:grid; grid-template-columns:minmax(120px,max-content) minmax(0,1fr);
+  gap:.45em 1.2em; margin:.7em 0 0;
+}
+.pl-cel dt{color:var(--dim); font-size:.92em; line-height:1.55}
+.pl-cel dd{margin:0}
+@media (max-width:640px){
+  .pl-cel{padding:.8em .9em .9em}
+  .pl-cel dl{grid-template-columns:minmax(0,1fr); gap:.1em}
+  .pl-cel dd + dt{margin-top:.55em}
+}
+.pl-red{margin-top:1.8em !important; color:var(--dim); font-style:italic}
+
+/* подвал страницы */
+.pl-foot{
+  margin:clamp(28px,3vw,48px) auto 0; text-align:center;
+  font-size:14px; line-height:1.6; color:var(--faint);
+}
+.pl-foot p{margin:0}
+.pl-foot p + p{margin-top:6px}
+.pl-foot .dot{padding:0 .45em; color:#B4BED6}
+
+/* печать: чёрный текст на белом, без шапки и колонок */
+@media print{
+  .nav, .oz-glow, .pl-toc, .pl-sum, .pl-foot{display:none !important}
+  .oz{padding:0; min-height:0}
+  .oz-cont{width:100%; padding:0}
+  .oz-t, .pl-meta, .pl-meta span{color:#000}
+  .oz-q{background:none; color:#000; -webkit-text-fill-color:#000}
+  .pl-grid{display:block; margin-top:12px}
+  .pl-card{box-shadow:none; padding:0}
+  .pl-doc, .pl-doc b, .pl-sec h2, .pl-cel-h, .pl-cel-h span, .pl-cel dt, .pl-doc a, .pl-intro, .pl-red{color:#000}
+  .pl-doc p, .pl-doc li, .pl-doc dd{max-width:none}
+  .pl-cel{background:none; border-left-color:#999}
+  .pl-doc li::before{background:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <span class="brand">МНД<span>·</span>Екатеринбург</span>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <div class="oz-cont">
+    <h1 class="oz-t">Публичная<br><span class="oz-q">оферта</span></h1>
+    <p class="pl-meta">на бронирование даты и времени посещения организованной группой<br><span>Министерство Новогодних Дел · Екатеринбург · редакция от 22 сентября 2026 г.</span></p>
+
+    <div class="pl-grid">
+      <nav class="pl-toc" aria-label="Содержание">
+        <p class="pl-toc-h">Содержание</p>
+        <ol>
+      <li><a href="#r1">1. Термины</a></li>
+      <li><a href="#r2">2. Предмет</a></li>
+      <li><a href="#r3">3. Как заключается договор</a></li>
+      <li><a href="#r4">4. Цена и расчёт</a></li>
+      <li><a href="#promo">5. Промокоды</a></li>
+      <li><a href="#r6">6. Отказ, перенос и возврат Предоплаты</a></li>
+      <li><a href="#r7">7. Персональные данные</a></li>
+      <li><a href="#r8">8. Изменение оферты</a></li>
+      <li><a href="#r9">9. Вопросы и претензии</a></li>
+      <li><a href="#r10">10. Реквизиты Исполнителя</a></li>
+        </ol>
+      </nav>
+
+      <article class="pl-doc pl-card">
+<p class="pl-intro">Пожалуйста, прочитайте оферту до оплаты. Если что-то непонятно, спросите до оплаты: по телефону <a href="tel:+79675559726">+7 (967) 555-97-26</a> или по почте <a href="mailto:new.year.ekb@yandex.ru">new.year.ekb@yandex.ru</a>.</p>
+<section class="pl-sec" id="r1">
+<h2>1. Термины</h2>
+<p>1.1. <b>Исполнитель</b> - индивидуальный предприниматель Астахова Ксения Витальевна, ИНН 910217105151, ОГРНИП 326910000054637. Реквизиты - в разделе 10.</p>
+<p>1.2. <b>Заказчик</b> - гражданин старше 18 лет, который собирает Организованную группу и принимает оферту. Оферта не предназначена для организаций и индивидуальных предпринимателей (школ, детских садов, турагентств): с ними заключается отдельный договор.</p>
+<p>1.3. <b>Мероприятие</b> - новогодняя экскурсионно-развлекательная программа «Министерство Новогодних Дел» в Екатеринбурге. Описание программы, возраст участников, продолжительность и адрес площадки указаны на Сайте.</p>
+<p>1.4. <b>Сайт</b> - сайт Исполнителя <a class="nw" href="https://mnd-ekb.ru/">mnd-ekb.ru</a>.</p>
+<p>1.5. <b>Организованная группа</b> - не менее 20 (двадцати) детей и сопровождающие их взрослые, которые вместе посещают Мероприятие. Состав группы определяет Заказчик: это может быть школьный класс, несколько семей или любые другие дети, и Заказчик вправе менять состав до Мероприятия. Исполнитель оказывает услугу Заказчику и не вступает в договор со школой или другой организацией, от которой пришли дети. Наибольший размер группы зависит от времени посещения, его сообщает менеджер.</p>
+<p>1.6. <b>Сообщение о бронировании</b> - сообщение, которое Исполнитель присылает Заказчику до оплаты (в мессенджер, по SMS или на почту). В нём указаны: адрес площадки, дата и время, цена детского и взрослого билета, бонусы для группы, сумма Предоплаты и ссылка на оплату.</p>
+<p>1.7. <b>Основной договор</b> - договор на посещение Мероприятия Организованной группой. Его форму Исполнитель присылает Заказчику по просьбе до внесения Предоплаты.</p>
+<p>1.8. <b>Предоплата</b> - 5 000 (пять тысяч) рублей за Организованную группу, которые Заказчик вносит, чтобы забронировать дату и время. При заключении Основного договора Предоплата засчитывается в его стоимость.</p>
+<p>1.9. <b>Период бронирования</b> - 14 (четырнадцать) календарных дней со дня внесения Предоплаты, но не дольше чем до конца дня, который наступает за 3 (три) дня до даты Мероприятия.</p>
+</section>
+
+<section class="pl-sec" id="r2">
+<h2>2. Предмет</h2>
+<p>2.1. По этой оферте Исполнитель бронирует для Заказчика дату и время посещения Мероприятия, а Заказчик вносит Предоплату и в Период бронирования заключает и оплачивает Основной договор.</p>
+<p>2.2. Исполнитель на весь Период бронирования:</p>
+<ul>
+  <li>закрепляет за Заказчиком выбранные дату и время и не продаёт их другим группам;</li>
+  <li>сохраняет цены билетов из Сообщения о бронировании, даже если цены на Сайте за это время вырастут.</li>
+</ul>
+<p>2.3. Заказчик в Период бронирования:</p>
+<ul>
+  <li>сообщает Исполнителю данные для расчёта (пункт 4.2);</li>
+  <li>заключает Основной договор и оплачивает его полную стоимость по ссылке, которую пришлёт Исполнитель. Ссылка действует 1 (одни) сутки.</li>
+</ul>
+</section>
+
+<section class="pl-sec" id="r3">
+<h2>3. Как заключается договор</h2>
+<p>3.1. Договор по этой оферте заключается, когда Заказчик вносит Предоплату: по ссылке из Сообщения о бронировании или наличными в офисе Исполнителя в Ярославле. Это принятие оферты (пункт 3 статьи 438 Гражданского кодекса РФ). Договор считается заключённым в момент оплаты.</p>
+<p>3.2. Внеся Предоплату, Заказчик подтверждает, что прочитал оферту и Сообщение о бронировании.</p>
+<p>3.3. Если до Мероприятия осталось 3 (три) дня или меньше, бронирование с Предоплатой не проводится: стоимость оплачивается сразу полностью по Основному договору.</p>
+<p>3.4. На каждую оплату и на каждый возврат Исполнитель выдаёт кассовый чек.</p>
+</section>
+
+<section class="pl-sec" id="r4">
+<h2>4. Цена и расчёт</h2>
+<p>4.1. Цены билетов, количество бесплатных сопровождающих взрослых и бонусы для группы указаны в Сообщении о бронировании. Основной договор заключается не меньше чем на 20 (двадцать) детей.</p>
+<p>4.2. Не позднее последнего дня Периода бронирования Заказчик сообщает менеджеру:</p>
+<ul>
+  <li>количество детей (не меньше 20);</li>
+  <li>количество сопровождающих взрослых: бесплатных и платных;</li>
+  <li>количество участников со льготой;</li>
+  <li>согласованную с менеджером скидку, если есть (промокод называется раньше - до внесения Предоплаты, пункт 5.3);</li>
+  <li>сколько билетов оставить в резерве (до 4 (четырёх)).</li>
+</ul>
+<p>Имена, фамилии и другие сведения о детях Исполнитель у Заказчика не запрашивает.</p>
+<p>4.3. Скидка для льготных категорий действует по правилам, опубликованным на Сайте на день внесения Предоплаты. Промокоды - по разделу 5. Скидки не суммируются (пункт 5.5).</p>
+<p>4.4. Стоимость Основного договора уменьшается на сумму Предоплаты.</p>
+</section>
+
+<section class="pl-sec" id="promo">
+<h2>5. Промокоды</h2>
+<p>5.1. <b>Промокод</b> - 6 (шесть) цифр, которые Исполнитель выдаёт организатору Организованной группы: автоматически в переписке, когда организатор обсуждает поездку с классом, или через менеджера по телефону. Один номер телефона - один промокод. Промокод выдаётся один раз и действует весь сезон 2026-2027. Промокоды прошлых сезонов не действуют.</p>
+<p>5.2. Промокоды действуют только для Организованных групп. Для индивидуального посещения (семьёй, с друзьями) они не применяются.</p>
+<p>5.3. <b>Группа, пришедшая по промокоду.</b> Заказчик называет промокод менеджеру или указывает его в заявке на Сайте до внесения Предоплаты. После внесения Предоплаты промокод не применяется. К одной группе применяется один промокод. Группа получает скидку 5% на всю стоимость Основного договора, включая Предоплату; скидка учитывается при окончательном расчёте.</p>
+<p>5.4. <b>Владелец промокода</b> (тот, кому Исполнитель выдал промокод) получает:</p>
+<ul>
+  <li>скидку 5% на свою Организованную группу - один раз, сколько бы групп ни пришло по его промокоду, при условии, что хотя бы одна из них внесла Предоплату до окончательного расчёта группы владельца;</li>
+  <li>1 000 (одну тысячу) рублей за каждую группу от 20 (двадцати) платных детей, которая пришла по его промокоду. Выплата - после посещения Мероприятия этой группой. Для получения выплаты нужно обратиться к своему менеджеру.</li>
+</ul>
+<p>По одному промокоду может прийти сколько угодно групп.</p>
+<p>5.5. Скидки не суммируются: к группе применяется одна скидка 5% - льготная или по промокоду.</p>
+<p>5.6. Свой промокод к своей группе не применяется. Ко второй группе того же владельца он применяется со скидкой 5%, но без выплаты 1 000 рублей.</p>
+<p>5.7. Если промокод использован с нарушением этих правил (например, для своей же группы через другой номер телефона), скидка по нему не применяется, выплата по такой группе не производится, а Исполнитель вправе отключить промокод.</p>
+<p>5.8. Эти же правила простыми словами опубликованы на странице <a href="promokody-ekaterinburg.html">«Правила промокодов»</a>.</p>
+</section>
+
+<section class="pl-sec" id="r6">
+<h2>6. Отказ, перенос и возврат Предоплаты</h2>
+<p>6.1. <b>Пять дней, чтобы передумать.</b> Если Заказчик откажется от бронирования в течение 5 (пяти) календарных дней со дня внесения Предоплаты, она возвращается полностью.</p>
+<p>6.2. Если Заказчик откажется от бронирования позже или не заключит и не оплатит Основной договор в Период бронирования, бронирование снимается, дата и время освобождаются, а Предоплата не возвращается.</p>
+<p>6.3. Если Исполнитель сам отменит или перенесёт забронированные дату и время, сменит площадку или откажется заключить Основной договор по ценам из Сообщения о бронировании, Предоплата возвращается полностью. Вместо этого Заказчик может выбрать другую свободную дату, тогда Предоплата и цены из Сообщения о бронировании переносятся на неё.</p>
+<p>6.4. До конца Периода бронирования Заказчик может сохранить Предоплату:</p>
+<ul>
+  <li>перенести бронирование на другую дату и время, если они свободны. Исполнитель не гарантирует, что свободна любая дата. После переноса действуют цены, актуальные в день переноса для тарифа новой даты. Период бронирования при переносе не продлевается;</li>
+  <li>передать бронирование другой Организованной группе, сообщив менеджеру контакты нового организатора.</li>
+</ul>
+<p>6.5. Об отказе или переносе Заказчик сообщает письмом на <a href="mailto:new.year.ekb@yandex.ru">new.year.ekb@yandex.ru</a> или сообщением менеджеру в той переписке, куда пришло Сообщение о бронировании. День отказа - день, когда отправлено сообщение.</p>
+<p>6.6. Деньги возвращаются в течение 10 (десяти) календарных дней со дня сообщения тем же способом, которым была оплата.</p>
+<p>6.7. Отказ, перенос и возврат после заключения Основного договора - по его условиям.</p>
+</section>
+
+<section class="pl-sec" id="r7">
+<h2>7. Персональные данные</h2>
+<p>7.1. Исполнитель обрабатывает данные Заказчика (имя, телефон, переписку, сведения об оплате), чтобы заключить и исполнить договор, по Политике обработки персональных данных. Для этой цели согласие не требуется (пункт 5 части 1 статьи 6 Федерального закона № 152-ФЗ). Согласие на рассылки и другие цели оформляется отдельно.</p>
+<p>7.2. Если для льготы или организации посещения понадобятся сведения о ребёнке, их сообщает родитель или иной законный представитель ребёнка.</p>
+</section>
+
+<section class="pl-sec" id="r8">
+<h2>8. Изменение оферты</h2>
+<p>8.1. Исполнитель может изменить оферту, опубликовав новую редакцию на Сайте. Бронирования, оплаченные раньше, действуют на условиях редакции, которая была опубликована в день оплаты.</p>
+</section>
+
+<section class="pl-sec" id="r9">
+<h2>9. Вопросы и претензии</h2>
+<p>9.1. Вопросы и претензии принимаются по почте <a href="mailto:new.year.ekb@yandex.ru">new.year.ekb@yandex.ru</a> и по адресу офиса из раздела 10. Исполнитель отвечает в течение 10 (десяти) календарных дней.</p>
+<p>9.2. К договору применяется право Российской Федерации.</p>
+</section>
+
+<section class="pl-sec" id="r10">
+<h2>10. Реквизиты Исполнителя</h2>
+<div class="pl-cel">
+  <p class="pl-cel-h">Индивидуальный предприниматель Астахова Ксения Витальевна</p>
+  <dl>
+    <dt>ИНН</dt><dd>910217105151</dd>
+    <dt>ОГРНИП</dt><dd>326910000054637</dd>
+    <dt>Расчётный счёт</dt><dd>40802810200010024950</dd>
+    <dt>Адрес для писем</dt><dd>г. Ярославль, пр-т Октября, д. 68, 3 этаж, офис 3</dd>
+    <dt>Телефон</dt><dd><a href="tel:+79675559726">+7 (967) 555-97-26</a></dd>
+    <dt>Почта</dt><dd><a href="mailto:new.year.ekb@yandex.ru">new.year.ekb@yandex.ru</a></dd>
+    <dt>Сайт</dt><dd>mnd-yar.ru</dd>
+  </dl>
+</div>
+<div class="pl-cel">
+  <p class="pl-cel-h">Площадка</p>
+  <dl>
+    <dt>Екатеринбург</dt><dd>СНТ «Коллективный сад «Метрострой» № 85</dd>
+  </dl>
+</div>
+</section>
+<p class="pl-red">Редакция от 22 сентября 2026 г.</p>
+      </article>
+
+      <aside class="pl-sum" aria-label="Коротко о главном">
+        <div class="pl-card">
+          <p class="pl-sum-h">Коротко о главном</p>
+          <dl>
+        <dt>Предоплата</dt><dd>5 000 ₽ за группу. Входит в стоимость посещения</dd>
+        <dt>Что она даёт</dt><dd>Дата, время и цена закреплены за вами на 14 дней</dd>
+        <dt>Передумали</dt><dd>В первые 5 дней возвращаем предоплату полностью</dd>
+        <dt>Отказ позже</dt><dd>Предоплата не возвращается, дата освобождается</dd>
+        <dt>Промокод</dt><dd>Назовите до внесения предоплаты: скидка 5% на всю группу. Правила - раздел 5</dd>
+        <dt>Перенос</dt><dd>На свободную дату, по цене этой даты на день переноса</dd>
+        <dt>Если отменили мы</dt><dd>Возвращаем предоплату полностью или переносим с сохранением цены</dd>
+        <dt>Как отказаться</dt><dd>Написать менеджеру или на <a href="mailto:new.year.ekb@yandex.ru">new.year.ekb@yandex.ru</a></dd>
+          </dl>
+          <p class="pl-sum-note">Это выжимка для удобства. Условия - в полном тексте оферты.</p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="pl-foot">
+      <p>© 2026 Министерство новогодних дел<span class="dot">·</span>ИП Астахова Ксения Витальевна<span class="dot">·</span>ИНН 910217105151</p>
+    </footer>
+  </div>
+</main>
+
+<script>
+/* шапка темнеет при прокрутке (как на promokody.html) */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){ nav.classList.toggle('solid', window.scrollY > 24); }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* оглавление подсвечивает раздел, который сейчас читают */
+(function(){
+  var links = document.querySelectorAll('.pl-toc a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var byId = {};
+  for (var i = 0; i < links.length; i++) byId[links[i].getAttribute('href').slice(1)] = links[i];
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      for (var k in byId) byId[k].classList.remove('on');
+      var a = byId[e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, {rootMargin:'-20% 0px -70% 0px'});
+  for (var id in byId){ var s = document.getElementById(id); if (s) io.observe(s); }
+})();
+</script>
+</body>
+</html>
