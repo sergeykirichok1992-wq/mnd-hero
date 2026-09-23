@@ -233,6 +233,24 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   to{transform:translate(var(--toy-dx), calc(-1 * var(--toy-dy))) rotate(4deg)} }
 html.touch #tyToys{display:none}
 @media (prefers-reduced-motion:reduce){ .ty-toy{animation:none} }
+/* СТАВРОПОЛЬ (24.09.2026): шесть летающих предметов по референсу Серёги
+   («сайт ставропроль/1 экран/референс летающие предметы.png»): капсулы с Петром I
+   и с леденцом сверху, паровозик и лошадка по бокам, мишка и ключ снизу. Места
+   и ширина — в процентах коробки #tyToys (она повторяет коробку логотипа), сняты
+   с референса и напечатаны скриптом sayt-nn/instrumenty/predmety_stavropol.py —
+   поменялся референс, перезапустить его и переписать эти шесть строк.
+   Ход — те же tyToyL/tyToyR, что у тюменских игрушек, но у каждого свой срок
+   и сдвиг фазы, чтобы не качались хором; капсулы крупные — ход мягче. */
+#tyToys .st-kaps-petr{left:3.81%; top:0.00%; width:29.65%}
+#tyToys .st-kaps-led{left:61.19%; top:-0.01%; width:29.65%}
+#tyToys .ty-train{left:4.62%; top:34.06%; width:7.92%}
+#tyToys .ty-horse{left:85.15%; top:35.87%; width:9.64%}
+#tyToys .st-mishka{left:14.48%; top:88.88%; width:6.30%}
+#tyToys .st-klyuch{left:72.94%; top:90.06%; width:8.52%}
+#tyToys .st-kaps-petr{--toy-dx:4%; --toy-dy:5%; animation-duration:3.8s; animation-delay:-1.3s}
+#tyToys .st-kaps-led{--toy-dx:4%; --toy-dy:5%; animation-name:tyToyR; animation-duration:4.3s; animation-delay:-3.1s}
+#tyToys .st-mishka{--toy-dx:12%; --toy-dy:14%; animation-duration:2.9s; animation-delay:-0.7s}
+#tyToys .st-klyuch{--toy-dx:12%; --toy-dy:14%; animation-name:tyToyR; animation-duration:3.3s; animation-delay:-2.2s}
 /* ТЮМЕНЬ (17.09.2026): первый экран на ТЕЛЕФОНЕ по референсу Серёги («сайт тюмень/1 экран моб»).
    Ролик ty-hero-mob.mp4 с вшитым логотипом, поверх паровозик и лошадка (плавают, как на
    компьютере) и текст картинкой вместо столбца «город, адрес, даты» (#sideR).
@@ -9582,7 +9600,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <div id="glow"></div>
     <canvas id="smokeBack"></canvas>
     <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Капсула времени. Снова в Ставрополе! Совсем новая программа!">
-    <div id="tyToys" aria-hidden="true"><img class="ty-toy ty-train" alt=""><img class="ty-toy ty-horse" alt=""></div>
+    <div id="tyToys" aria-hidden="true"><img class="ty-toy st-kaps-petr" data-src="st-kaps-petr.webp" alt=""><img class="ty-toy st-kaps-led" data-src="st-kaps-ledenec.webp" alt=""><img class="ty-toy ty-train" data-src="st-toy-parovoz.webp" alt=""><img class="ty-toy ty-horse" data-src="st-toy-loshadka.webp" alt=""><img class="ty-toy st-mishka" data-src="st-toy-mishka.webp" alt=""><img class="ty-toy st-klyuch" data-src="st-toy-klyuch.webp" alt=""></div>
     <div class="tym" id="tymIgry" aria-hidden="true"><div class="tym-kadr"><img class="ty-toy tym-train" alt=""><img class="ty-toy tym-horse" alt=""></div></div>
     <canvas id="logoFx"></canvas>
     <canvas id="smokeFront"></canvas>
@@ -14675,7 +14693,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   var vBlur = 0, BLUR_VW = 0.32;   // Тюмень: размытие фона под логотипом, в vw (6 px на окне 1920)
   if(VCANVAS) document.body.classList.add('vcanvas'); else cvV.style.display='none';
   var tyToys=document.getElementById('tyToys');
-  if(!BAKED){ tyToys.children[0].src='ty-toy-train.webp'; tyToys.children[1].src='ty-toy-horse.webp'; }   // ТЮМЕНЬ: игрушки у логотипа
+  if(!BAKED){ [].forEach.call(tyToys.querySelectorAll('img[data-src]'), function(im){ im.src=im.getAttribute('data-src'); }); }   // СТАВРОПОЛЬ: шесть летающих предметов у логотипа, файлы качаем только на компьютере
   if(BAKED){   // ТЮМЕНЬ (17.09.2026): на телефоне игрушки и текст лежат поверх ролика, файлы качаем только здесь
     var tymI=document.getElementById('tymIgry').getElementsByTagName('img');
     tymI[0].src='ty-toy-train.webp'; tymI[1].src='ty-toy-horse.webp';
