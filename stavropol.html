@@ -402,6 +402,40 @@ html.touch #sideR{display:none}
   margin-left:auto; width:clamp(112px,11.2vw,163.2px);
   background:linear-gradient(90deg,rgba(227,179,78,0),rgba(227,179,78,.85));
 }
+/* СТАВРОПОЛЬ (23.09.2026, просьба Серёги): «ВЫ ГОТОВЫ?» крупно на животе Деда Мороза
+   на первом кадре. Шрифт, серебро и блик — как у города (.city). Место и кегль считает
+   скрипт «ВЫ ГОТОВЫ?» (перед скриптом первого экрана) в долях кадра ролика, поэтому
+   надпись стоит на животе на любой пропорции окна. Когда сверху выезжает логотип,
+   надпись по той же кривой уезжает вниз и тает у нижнего края, как под снег (маска).
+   Только компьютер: на телефоне другой первый экран, Деда Мороза там нет. */
+.st-gotov{
+  position:absolute; inset:0; z-index:6; pointer-events:none; overflow:hidden;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 86%,transparent 97%);
+          mask-image:linear-gradient(to bottom,#000 0,#000 86%,transparent 97%);
+  animation:stGotovIn .85s ease-out both;
+}
+@keyframes stGotovIn{from{opacity:0}}
+html.touch .st-gotov{display:none}
+.st-gotov-sh{
+  position:absolute; left:46.2%; top:80%; transform:translate(-50%,-50%); will-change:transform;
+  /* тёмный ореол: серебро идёт по низу бороды и по поясу, без него буквы сливаются */
+  filter:drop-shadow(0 .03em .12em rgba(3,7,26,.9)) drop-shadow(0 0 .45em rgba(3,7,26,.55));
+}
+.st-gotov-t{
+  display:block; white-space:nowrap;
+  font-family:"Prata",Georgia,serif; line-height:1.14; font-size:88px;
+  padding-top:.22em; margin-top:-.22em;   /* краткая над «Й», как у .city */
+  text-transform:uppercase; letter-spacing:.045em;
+  background:
+    linear-gradient(102deg, rgba(255,255,255,0) 36%, rgba(255,255,255,.95) 49%, rgba(255,255,255,0) 62%),
+    linear-gradient(172deg,#FFFFFF 0%,#E4EDFA 40%,#A9BBD4 72%,#F2F7FF 100%);
+  background-size:250% 100%, 100% 100%;
+  background-repeat:no-repeat;
+  -webkit-background-clip:text; background-clip:text;
+  color:transparent; -webkit-text-fill-color:transparent;
+  animation:sheenSilver 9s linear 1.2s infinite;
+}
+@media (prefers-reduced-motion:reduce){ .st-gotov-t{animation:none} }
 .facts{list-style:none; margin:0; padding:0}
 .facts li{
   font-family:"Golos Text",Arial,sans-serif;
@@ -9571,6 +9605,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <li>Детям 4+</li>
       </ul>
     </div>
+    <!-- СТАВРОПОЛЬ (23.09.2026): «ВЫ ГОТОВЫ?» на животе Деда Мороза, уезжает вниз под снег,
+         пока сверху выезжает логотип. Стили .st-gotov, скрипт «ВЫ ГОТОВЫ?» ниже. -->
+    <div class="st-gotov" id="stGotov"><div class="st-gotov-sh"><span class="st-gotov-t">Вы готовы?</span></div></div>
     <div class="tym tym--tekst"><img class="tym-tekst" id="tymTekst" alt="Ставрополь. Весь декабрь и январские каникулы. Ул. Росгипрозем, 291"></div>
     <div class="hint" id="hint">Крути вниз<i></i></div>
   </div>
@@ -14563,6 +14600,42 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </div>
 
 <script>
+/* ==================== СТАВРОПОЛЬ: «ВЫ ГОТОВЫ?» НА ЖИВОТЕ ДЕДА МОРОЗА ====================
+   23.09.2026, просьба Серёги. Место и кегль — в долях кадра ty-hero.mp4 (2560x1440), кадр
+   лежит на сцене как object-fit:cover: по центру, лишнее за краем. Живот на первом кадре:
+   пряжка пояса x 0,462 / y 0,850, конец бороды y 0,814 — центр надписи ставим на 0,80.
+   На очень широких окнах живот уходит к нижнему краю — там надпись не ниже 80 % экрана.
+   stGotovStep(fall) зовёт скрипт первого экрана каждый кадр: fall — та же кривая, по которой
+   сверху едет логотип (0 до начала спуска, 1 когда сел). Надпись уезжает на 38vh вниз
+   и тает в маске у нижнего края. Поменять место — BX/BY, размер — FS (доля ширины кадра). */
+(function(){
+  'use strict';
+  var box=document.getElementById('stGotov');
+  if(!box) return;
+  var sh=box.firstElementChild, tx=sh.firstElementChild;
+  var VW=2560, VH=1440, BX=0.462, BY=0.80, FS=0.05, TOPMAX=0.80, UEZD_VH=38;
+  function place(){
+    var W=box.clientWidth, H=box.clientHeight;
+    if(!W || !H) return;
+    var k=Math.max(W/VW, H/VH), dw=VW*k, dh=VH*k;
+    sh.style.left=((W-dw)/2 + BX*dw).toFixed(1)+'px';
+    sh.style.top=Math.min((H-dh)/2 + BY*dh, TOPMAX*H).toFixed(1)+'px';
+    /* не шире 88 % окна: на узком высоком окне кадр сильно увеличен, и живот шире экрана */
+    tx.style.fontSize=Math.min(FS*dw, 0.88*W/7.9).toFixed(1)+'px';
+  }
+  place();
+  window.addEventListener('resize', place);
+  var last=-1;
+  window.stGotovStep=function(fall){
+    var dy=Math.round(fall*UEZD_VH*100)/100;
+    if(dy===last) return;
+    last=dy;
+    sh.style.transform='translate(-50%,-50%) translateY('+dy+'vh)';
+  };
+})();
+</script>
+
+<script>
 (function(){
   var v=document.getElementById('v'), hero=document.getElementById('hero');
   var logo=document.getElementById('logo'), glow=document.getElementById('glow');
@@ -15158,6 +15231,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     logo.style.transform='translate(-50%, calc('+(-50+float).toFixed(3)+'%'+dySgn+Math.abs(dyVh).toFixed(3)+'vh)) scale('
       +(1.055-0.055*fall+grow+breath).toFixed(4)+')';
     tyToys.style.opacity=lp; tyToys.style.transform=logo.style.transform;   // ТЮМЕНЬ: игрушки едут с логотипом
+    if(window.stGotovStep) stGotovStep(fall);   // СТАВРОПОЛЬ: «ВЫ ГОТОВЫ?» уезжает вниз, пока выезжает логотип
 
     if(!BAKED) glow.style.opacity = ez(p,0.56-LEAD,0.66-LEAD)*(1-0.74*ez(p,0.73-LEAD,0.88-LEAD));
 
