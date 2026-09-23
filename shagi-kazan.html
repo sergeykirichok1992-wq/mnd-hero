@@ -131,7 +131,7 @@ body{
 .sh-lead b{color:#fff; font-weight:600}
 
 /* ---------- карта шагов ----------
-   На компьютере четыре в ряд, на планшете два, на телефоне столбиком
+   На компьютере три в ряд (десятый, «Праздник!», один по центру), на планшете два, на телефоне столбиком
    (значок слева, текст справа). Шаги связаны пунктирной золотой нитью
    от значка к значку; отрезок от «Готово» до «Вы здесь» - сплошной:
    этот путь уже пройден. */
@@ -141,7 +141,7 @@ body{
   --gx:clamp(14px,1.4vw,24px);   /* зазор между карточками в ряду */
   --gy:clamp(30px,2.6vw,42px);   /* и между рядами: в нём сидят плашки */
   list-style:none; margin:clamp(44px,4.6vw,76px) 0 0; padding:0;
-  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:var(--gy) var(--gx);
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:var(--gy) var(--gx);
 }
 .sh-st{
   position:relative;
@@ -160,7 +160,11 @@ body{
   border-top:2px dashed rgba(233,195,108,.42);
 }
 .sh-st:last-child::after{display:none}
-@media (min-width:1100px){ .sh-st:nth-child(4n)::after{display:none} }
+@media (min-width:1100px){
+  .sh-st:nth-child(3n)::after{display:none}
+  /* шагов десять: «Праздник!» встаёт один в последний ряд - по центру, как финиш */
+  .sh-st:last-child:nth-child(3n+1){grid-column:2}
+}
 .sh-st.is-done::after{border-top-style:solid; border-top-color:rgba(240,201,122,.9)}
 
 .sh-ic{
@@ -238,13 +242,15 @@ body{
 
 .sh-more{margin:clamp(34px,3.4vw,56px) auto 0; text-align:center; max-width:62ch;
   font-size:max(14.5px, clamp(14.5px,1vw,16px)); line-height:1.55; color:var(--dim)}
-.sh-more a{color:#EBD3A0; text-decoration:none; border-bottom:1px solid rgba(235,211,160,.35)}
+.sh-more a{color:#EBD3A0; text-decoration:none; border-bottom:1px solid rgba(235,211,160,.35); white-space:nowrap}
 .sh-more a:hover,.sh-more a:focus-visible{border-bottom-color:#EBD3A0}
 
 /* планшет: два в ряд */
 @media (max-width:1099px){
   .sh-map{grid-template-columns:repeat(2,minmax(0,1fr))}
   .sh-st:nth-child(2n)::after{display:none}
+  /* нечётное число шагов: последний встаёт один - по центру, шириной как соседи */
+  .sh-st:last-child:nth-child(odd){grid-column:1 / -1; justify-self:center; width:calc(50% - var(--gx) / 2)}
 }
 /* телефон: столбиком, значок слева; нить идёт вниз от значка к значку */
 @media (max-width:640px){
@@ -798,28 +804,38 @@ body{
         <p class="sh-p"><b>При предоплате в сентябре - 30 дней.</b> Без спешки уточните, сколько детей пойдёт (мало ли, кто-то добавится или отпадёт), и соберите деньги в классе.</p>
       </li>
       <li class="sh-st has-when">
-        <span class="sh-icrow"><span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M13.5 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9z"/><path d="M13.5 3.5V9H19"/><path d="M8.5 13h6M8.5 16.4h3.6"/></svg><b class="sh-n" aria-hidden="true">4</b></span><span class="sh-when">на 13-й день<br> или раньше</span></span>
-        <h2 class="sh-h"><span class="sh-sr">Шаг 4. </span>Заключаем договор</h2>
+        <span class="sh-icrow"><span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 16.6V11a6 6 0 0 1 12 0v5.6l1.6 2.1H4.4z"/><path d="M10 20.6a2 2 0 0 0 4 0"/><path d="M12 3.2V5"/></svg><b class="sh-n" aria-hidden="true">4</b></span><span class="sh-when">на 12-й день</span></span>
+        <h2 class="sh-h"><span class="sh-sr">Шаг 4. </span>Напоминание о расчёте</h2>
+        <p class="sh-p">Вам придёт напоминание об окончательном расчёте, и мы свяжемся с Вами, чтобы уточнить количество детей и другие детали Вашего заказа. Готовы раньше? Напишите нам сами: оплатить можно и досрочно.</p>
+      </li>
+      <li class="sh-st has-when">
+        <span class="sh-icrow"><span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M13.5 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9z"/><path d="M13.5 3.5V9H19"/><path d="M8.5 13h6M8.5 16.4h3.6"/></svg><b class="sh-n" aria-hidden="true">5</b></span><span class="sh-when">на 13-й день<br> или раньше</span></span>
+        <h2 class="sh-h"><span class="sh-sr">Шаг 5. </span>Заключаем договор</h2>
         <p class="sh-p">Перед полным расчётом заключаем договор на то количество детей, которое получилось. Подписать его можно у нас в офисе или дистанционно, если Вы из другого города.</p>
       </li>
       <li class="sh-st">
-        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 3.5h12v17l-2.4-1.6-2.4 1.6-2.4-1.6-2.4 1.6L6 20.5z"/><path d="M9 8.3h6M9 11.8h6M9 15.3h3.5"/></svg><b class="sh-n" aria-hidden="true">5</b></span>
-        <h2 class="sh-h"><span class="sh-sr">Шаг 5. </span>Полный расчёт</h2>
+        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 3.5h12v17l-2.4-1.6-2.4 1.6-2.4-1.6-2.4 1.6L6 20.5z"/><path d="M9 8.3h6M9 11.8h6M9 15.3h3.5"/></svg><b class="sh-n" aria-hidden="true">6</b></span>
+        <h2 class="sh-h"><span class="sh-sr">Шаг 6. </span>Полный расчёт</h2>
         <p class="sh-p">В те же 14 (или 30) дней, но не позже чем за 3 дня до праздника, оплачиваете оставшуюся сумму. Предоплата в неё уже засчитана. Тоже официально, с чеком.</p>
       </li>
       <li class="sh-st">
-        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M3.6 9.1V7.4a1.8 1.8 0 0 1 1.8-1.8h13.2a1.8 1.8 0 0 1 1.8 1.8v1.7a2.9 2.9 0 0 0 0 5.8v1.7a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8v-1.7a2.9 2.9 0 0 0 0-5.8Z"/><path d="M12 9.4v5.2M9.4 12h5.2"/></svg><b class="sh-n" aria-hidden="true">6</b></span>
-        <h2 class="sh-h"><span class="sh-sr">Шаг 6. </span>Резерв на случай болезни</h2>
+        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M3.6 9.1V7.4a1.8 1.8 0 0 1 1.8-1.8h13.2a1.8 1.8 0 0 1 1.8 1.8v1.7a2.9 2.9 0 0 0 0 5.8v1.7a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8v-1.7a2.9 2.9 0 0 0 0-5.8Z"/><path d="M12 9.4v5.2M9.4 12h5.2"/></svg><b class="sh-n" aria-hidden="true">7</b></span>
+        <h2 class="sh-h"><span class="sh-sr">Шаг 7. </span>Резерв на случай болезни</h2>
         <p class="sh-p">Можно оставить 2-3 билета в резерве по цене Вашей группы и докупить их за 3 дня до праздника, если группа пойдёт полным составом. Так Вы ничем не рискуете.</p>
       </li>
       <li class="sh-st">
-        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><circle cx="9.5" cy="8" r="3.3"/><path d="M3.5 19.5a6 6 0 0 1 12 0"/><path d="M18.5 8.3v5.4M15.8 11h5.4"/></svg><b class="sh-n" aria-hidden="true">7</b></span>
-        <h2 class="sh-h"><span class="sh-sr">Шаг 7. </span>Кто-то захотел с Вами</h2>
+        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><circle cx="9.5" cy="8" r="3.3"/><path d="M3.5 19.5a6 6 0 0 1 12 0"/><path d="M18.5 8.3v5.4M15.8 11h5.4"/></svg><b class="sh-n" aria-hidden="true">8</b></span>
+        <h2 class="sh-h"><span class="sh-sr">Шаг 8. </span>Кто-то захотел с Вами</h2>
         <p class="sh-p">Если ближе к празднику кто-то захочет присоединиться, он купит билет по цене Вашей группы. Никто не добавился - ничего делать не нужно.</p>
       </li>
+      <li class="sh-st has-when">
+        <span class="sh-icrow"><span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M4 5.6A2.6 2.6 0 0 1 6.6 3h10.8A2.6 2.6 0 0 1 20 5.6v7.8a2.6 2.6 0 0 1-2.6 2.6H10.2L5.6 20v-4A1.6 1.6 0 0 1 4 14.4z"/><path d="M12 7.6v.1M12 10.2v3.2"/></svg><b class="sh-n" aria-hidden="true">9</b></span><span class="sh-when">за 2 дня<br> до праздника</span></span>
+        <h2 class="sh-h"><span class="sh-sr">Шаг 9. </span>Сообщение с памяткой</h2>
+        <p class="sh-p">Вам придёт сообщение с напоминанием и полной организационной информацией (контакты куратора, парковка, как проехать, как одеть детей и так далее).</p>
+      </li>
       <li class="sh-st">
-        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="m12 2.8 3.7 5.3h-2.1l4.1 5.6h-2.4l3.9 5.3H4.8l3.9-5.3H6.3l4.1-5.6H8.3z"/><path d="M12 19v2.3"/></svg><b class="sh-n" aria-hidden="true">8</b></span>
-        <h2 class="sh-h"><span class="sh-sr">Шаг 8. </span>Праздник!</h2>
+        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="m12 2.8 3.7 5.3h-2.1l4.1 5.6h-2.4l3.9 5.3H4.8l3.9-5.3H6.3l4.1-5.6H8.3z"/><path d="M12 19v2.3"/></svg><b class="sh-n" aria-hidden="true">10</b></span>
+        <h2 class="sh-h"><span class="sh-sr">Шаг 10. </span>Праздник!</h2>
         <p class="sh-p">Остаётся только приехать и радоваться вместе с детьми. Ждём Вас!</p>
       </li>
     </ol>
