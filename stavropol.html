@@ -6,7 +6,7 @@
      (Серёга: «скопируй сайт Тюмени»): у Ставрополя, как у Тюмени, «Тайное
      Министерство», снег и пульт, а не «Звёздная смена». Отличается только
      городское - город и адрес в шапке и на первом экране, логотип и подпись
-     на телефоне (st-logo-kapsula.webp, st-mob-tekst.webp), экран «Где, когда и для
+     на телефоне (st-logo-kapsula.webp; на телефоне свой ролик st-hero-mob.mp4), экран «Где, когда и для
      кого», надзаголовки, цены (своя сетка, взрослый от 600), ответы на вопросы
      (вместимость, адрес, трансфер), подвал, порядок городов в формах.
      Пока черновик под noindex на https://mnd-nn.ru/stavropol.html,
@@ -39,8 +39,12 @@
 <link rel="canonical" href="https://mnd-stavropol.ru/">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preload" as="image" href="ty-poster.webp" fetchpriority="high" media="(min-width: 820px)">
-<link rel="preload" as="image" href="ty-poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
-<link rel="preload" as="image" href="st-mob-tekst.webp?v=1" media="(max-width: 819px)">
+<link rel="preload" as="image" href="st-poster-mob.webp" fetchpriority="high" media="(max-width: 819px), (hover: none) and (pointer: coarse)">
+<link rel="preload" as="image" href="st-mob-podpis.webp?v=1" media="(max-width: 819px), (hover: none) and (pointer: coarse)">
+<link rel="preload" as="image" href="st-mob-kap1.webp" media="(max-width: 819px), (hover: none) and (pointer: coarse)">
+<link rel="preload" as="image" href="st-mob-kap2.webp" media="(max-width: 819px), (hover: none) and (pointer: coarse)">
+<link rel="preload" as="image" href="st-mob-kap3.webp" media="(max-width: 819px), (hover: none) and (pointer: coarse)">
+<link rel="preload" as="image" href="st-mob-kap4.webp" media="(max-width: 819px), (hover: none) and (pointer: coarse)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="cr-bloggersans.woff2" crossorigin>
@@ -251,51 +255,83 @@ html.touch #tyToys{display:none}
 #tyToys .st-kaps-led{--toy-dx:4%; --toy-dy:5%; animation-name:tyToyR; animation-duration:4.3s; animation-delay:-3.1s}
 #tyToys .st-mishka{--toy-dx:12%; --toy-dy:14%; animation-duration:2.9s; animation-delay:-0.7s}
 #tyToys .st-klyuch{--toy-dx:12%; --toy-dy:14%; animation-name:tyToyR; animation-duration:3.3s; animation-delay:-2.2s}
-/* ТЮМЕНЬ (17.09.2026): первый экран на ТЕЛЕФОНЕ по референсу Серёги («сайт тюмень/1 экран моб»).
-   Ролик ty-hero-mob.mp4 с вшитым логотипом, поверх паровозик и лошадка (плавают, как на
-   компьютере) и текст картинкой вместо столбца «город, адрес, даты» (#sideR).
-   Места — в долях КАДРА РОЛИКА, сняты с референса (fon_tyumen_mob.py --zamer). Кадр 9:16
-   лежит на сцене как object-fit:cover у #v: по центру, лишнее за краем. Поэтому обёртки —
-   контейнеры размеров (cqw/cqh = сцена); без этих единиц браузер берёт vw/vh — сцена и есть окно.
-   Обёрток две: игрушки на слое логотипа (7: под снегом, лучами и кулисами), текст — на слое
-   прежнего столбца (11). Одна не годится: контейнер размеров сам себе отдельный слой. */
+/* СТАВРОПОЛЬ (24.09.2026): первый экран на ТЕЛЕФОНЕ — свой ролик и референс Серёги
+   («сайт ставропроль /1 экран»: «ВИДЕО ДЛЯ МОБ.mp4» и папка «моб»). Ролик st-hero-mob.mp4 —
+   логотип «Капсула времени», оживлённый в Kling; поверх четыре капсулы по углам (плавают,
+   как предметы на компьютере) и подпись картинкой вместо столбца «город, адрес, даты» (#sideR).
+   Файлы и числа ниже печатает sayt-nn/instrumenty/fon_stavropol_mob.py — поменялся
+   референс, снять места заново (--zamer) и переписать эти строки. До 24.09 здесь были
+   тюменский ролик, паровозик с лошадкой и подпись с адресом.
+   КАПСУЛЫ ПОВЕРХ КУЛИС (просьба Серёги): обёртка #tymIgry на слое 25, кулисы на 20.
+   Шапка (30) стоит вне сцены и остаётся выше. Подпись — на слое прежнего столбца (11).
+   Слой 25, а не 21, — с запасом: правило .curtain общее и приезжает из Нижнего
+   через sinhron.py молча — поднимут там кулисы, капсулы не должны уйти под них.
+   Обёртки — контейнеры размеров (cqw/cqh = сцена), контейнер сам себе отдельный слой,
+   поэтому их две. Первые строки правил в vw/vh — для браузеров без единиц контейнера.
+   КАК СЧИТАЮТСЯ МЕСТА. Кадр 9:16 лежит на сцене как object-fit:cover у #v. По ВЫСОТЕ — от
+   кадра (там логотип): центр = 50cqh + (доля − 0,5) × высота кадра, высота кадра =
+   max(100cqh, 177.778cqw). По ГОРИЗОНТАЛИ и место, и размер — от ширины экрана: на вытянутом
+   телефоне кадр шире экрана и срезан по бокам, от кадра нижние капсулы ушли бы за край
+   (у Серёги они в 5 % от края кадра), а так раскладка сжимается к середине целиком
+   и капсулы не наезжают на подпись. На экране 9:16 оба счёта совпадают с референсом.
+   Верхние капсулы не выше 62 px — под шапкой (на телефоне она 60 px). Подпись и нижние
+   капсулы поднимаются вместе, если подпись ушла бы под сугроб второго экрана.
+   СЦЕНА НА ТЕЛЕФОНЕ = ВИДИМОЕ ОКНО (100svh). Скрипт делает #hero высотой 100svh, а сама
+   .stage была 100vh — в Safari и Chrome это высота окна БЕЗ панелей браузера. При первом
+   открытии, пока панели видны, кадр ролика ложился по большой высоте и опускался, а подпись
+   считалась от видимой — на iPhone (390x664 при сцене 760) подпись заезжала на облако,
+   на iPhone SE — на табличку «Капсула времени». Проверка 24.09.2026, моделью svh/lvh.
+   СВЯЗЬ С НИЖНИМ: 8.3vw = (подъём сугроба 25 % − прозрачные 11 %) × 2016/3400 из правила
+   .cr-snow до 760 px. Поменяют там подъём — sinhron.py перенесёт его молча, а это число
+   останется старым: пересчитать, иначе подпись уйдёт под снег.
+   Экран шире 19:25 (до 760 px шириной — шире 7:10): кадр срезан сверху и снизу так, что
+   места под логотипом нет — подпись легла бы на облако и табличку «Капсула времени»,
+   капсулы на леденцы. Там капсул и подписи нет (города и дат на первом экране тогда тоже:
+   шапка прячет адрес до 880 px — окна редкие, решили не городить). Пороги
+   сняты перебором размеров: подпись касается низа «портала» с 0,735-0,75 на экранах
+   шире 760 px и с 0,685-0,69 уже (там сугроб выше). 3/4 не годится: условие включает
+   границу, и iPad 768x1024 (ровно 0,75) потерял бы подпись, а 1024x1366 (0,7496) нет.
+   Все iPad в портрете (744x1133 … 1024x1366) остаются с капсулами и подписью.
+   Экран шире, чем выше (телефон или планшет боком) — столбец города, как в Нижнем. */
 .tym{display:none; z-index:7; pointer-events:none; container-type:size;
   --toy-dur:2.4s; --toy-dx:16%; --toy-dy:20%}
 .tym--tekst{z-index:11}
+.tym.st-mk{z-index:25; --toy-dx:4%; --toy-dy:5%}
 html.touch .tym{display:block}
 html.touch #sideR{display:none}
-.tym-kadr{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-  width:max(100vw, 56.25vh); height:max(100vh, 177.778vw);
-  width:max(100cqw, 56.25cqh); height:max(100cqh, 177.778cqw)}
-/* По горизонтали игрушки считаются от ШИРИНЫ ЭКРАНА (центр паровозика на 22,2 %, лошадки
-   на 77,39 %), а не от кадра: на экране 9:16 это одно и то же, а на вытянутом телефоне кадр
-   шире экрана, края срезаны, и от кадра игрушки уехали бы под кулисы. Высота и размер — от кадра. */
-.tym-train{top:15.38%; width:14.385%; margin-left:-7.1925%;
-  left:calc(50% - 27.8vw); left:calc(50% - 27.8cqw)}
-.tym-horse{top:15.864%; width:14.132%; margin-left:-7.066%;
-  left:calc(50% + 27.39vw); left:calc(50% + 27.39cqw);
-  animation-name:tyToyR; animation-delay:calc(var(--toy-dur) * -0.5)}
-/* Текст: верх на 74,159 % кадра, ширина 60,885 % ширины кадра, по центру. На почти
-   квадратном экране низ кадра уходит за край — тогда текст поднимается ровно настолько,
-   чтобы встать над сугробом второго экрана (до 760 px сугроб закрывает 8,3vw снизу,
-   шире — меньше 28 px). Высота текста = 0,27038 его ширины.
-   СВЯЗЬ С НИЖНИМ: 8.3vw = (подъём сугроба 25 % − прозрачные 11 %) × 2016/3400 из правила
-   .cr-snow до 760 px. Поменяют там подъём — sinhron.py перенесёт его молча, а это число
-   останется старым: пересчитать тем же способом, иначе адрес уйдёт под снег.
-   Экран шире, чем выше (телефон или планшет боком): от кадра видна одна середина,
-   текст лёг бы на надпись в ролике — там столбец города, как в Нижнем и Казани. */
-.tym-tekst{position:absolute; left:50%; transform:translateX(-50%); height:auto;
-  width:max(60.885vw, 34.248vh);
-  width:max(60.885cqw, 34.248cqh);
-  top:calc(50vh + max(24.159vh, 42.949vw));
-  top:min(calc(50cqh + max(24.159cqh, 42.949cqw)), calc(100svh - max(16.462cqw, 9.26cqh) - 8.3vw - 12px))}
+html.touch .stage{height:100vh; height:100svh}
+/* капсулы проявляются, когда картинка загрузилась (класс ставит скрипт), а не выскакивают */
+#tymIgry .ty-toy{opacity:0; transition:opacity .5s ease}
+#tymIgry .ty-toy.st-est{opacity:1}
+.st-mk1{width:19.7093vw; left:8.6133vw; top:max(62px, calc(50vh - 0.3366 * max(100vh, 177.778vw) - 12.4178vw));
+  width:19.7093cqw; left:8.6133cqw; top:max(62px, calc(50cqh - 0.3366 * max(100cqh, 177.778cqw) - 12.4178cqw))}
+.st-mk2{width:18.8043vw; left:71.3856vw; top:max(62px, calc(50vh - 0.323 * max(100vh, 177.778vw) - 12.4943vw));
+  width:18.8043cqw; left:71.3856cqw; top:max(62px, calc(50cqh - 0.323 * max(100cqh, 177.778cqw) - 12.4943cqw))}
+.st-mk3{width:16.5239vw; left:5.363vw; top:min(calc(50vh + 0.3092 * max(100vh, 177.778vw) - 12.3432vw), calc(100vh - 8.3vw - 12px - 0.023 * max(100vh, 177.778vw) - 12.3432vw - 8.1538vw));
+  width:16.5239cqw; left:5.363cqw; top:min(calc(50cqh + 0.3092 * max(100cqh, 177.778cqw) - 12.3432cqw), calc(100svh - 8.3vw - 12px - 0.023 * max(100cqh, 177.778cqw) - 12.3432cqw - 8.1538cqw))}
+.st-mk4{width:17.3965vw; left:77.0737vw; top:min(calc(50vh + 0.3085 * max(100vh, 177.778vw) - 11.1116vw), calc(100vh - 8.3vw - 12px - 0.0237 * max(100vh, 177.778vw) - 11.1116vw - 8.1538vw));
+  width:17.3965cqw; left:77.0737cqw; top:min(calc(50cqh + 0.3085 * max(100cqh, 177.778cqw) - 11.1116cqw), calc(100svh - 8.3vw - 12px - 0.0237 * max(100cqh, 177.778cqw) - 11.1116cqw - 8.1538cqw))}
+.tym-tekst{position:absolute; height:auto;
+  width:60.4134vw; left:19.8904vw; top:min(calc(50vh + 0.3322 * max(100vh, 177.778vw) - 8.1538vw), calc(100vh - 8.3vw - 12px - 8.1538vw - 8.1538vw));
+  width:60.4134cqw; left:19.8904cqw; top:min(calc(50cqh + 0.3322 * max(100cqh, 177.778cqw) - 8.1538cqw), calc(100svh - 8.3vw - 12px - 8.1538cqw - 8.1538cqw))}
 @media (min-width:761px){   /* тут сугроб уже компьютерный, низкий (общее правило .cr-snow) */
-  .tym-tekst{top:min(calc(50cqh + max(24.159cqh, 42.949cqw)), calc(100svh - max(16.462cqw, 9.26cqh) - 40px))}
+  .st-mk3{top:min(calc(50cqh + 0.3092 * max(100cqh, 177.778cqw) - 12.3432cqw), calc(100svh - 40px - 0.023 * max(100cqh, 177.778cqw) - 12.3432cqw - 8.1538cqw))}
+  .st-mk4{top:min(calc(50cqh + 0.3085 * max(100cqh, 177.778cqw) - 11.1116cqw), calc(100svh - 40px - 0.0237 * max(100cqh, 177.778cqw) - 11.1116cqw - 8.1538cqw))}
+  .tym-tekst{top:min(calc(50cqh + 0.3322 * max(100cqh, 177.778cqw) - 8.1538cqw), calc(100svh - 40px - 8.1538cqw - 8.1538cqw))}
 }
-@media (min-aspect-ratio:1/1){
-  html.touch .tym--tekst{display:none}
-  html.touch #sideR{display:block}
-}
+/* ход капсул — те же tyToyL/R, что у предметов на компьютере: левые уходят влево-вверх,
+   правые вправо-вверх (от подписи, не на неё), у каждой свой срок и сдвиг фазы */
+.st-mk1{animation-duration:3.8s; animation-delay:-1.3s}
+.st-mk2{animation-name:tyToyR; animation-duration:4.3s; animation-delay:-3.1s}
+.st-mk3{animation-duration:4.1s; animation-delay:-2.4s}
+.st-mk4{animation-name:tyToyR; animation-duration:3.6s; animation-delay:-0.6s}
+/* «Уменьшить движение» в настройках телефона. Общее правило .ty-toy{animation:none} стоит
+   выше, а строки с animation-name тут и у #tyToys (капсула с леденцом, ключ) возвращали имя
+   анимации — капсула один раз проплывала и прыгала назад. */
+@media (prefers-reduced-motion:reduce){ #tymIgry .ty-toy, #tyToys .ty-toy{animation:none} }
+@media (min-aspect-ratio:19/25){ html.touch .tym{display:none} }
+@media (max-width:760px) and (min-aspect-ratio:7/10){ html.touch .tym{display:none} }
+@media (min-aspect-ratio:1/1){ html.touch #sideR{display:block} }
 #snowFront{z-index:11; pointer-events:none; width:100%; height:100%; display:block}
 @media (max-aspect-ratio:1/1){
   :root{ --logo-w:min(98vw, 106vh); --logo-top:47%; }
@@ -9578,7 +9614,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <canvas id="smokeBack"></canvas>
     <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Капсула времени. Снова в Ставрополе! Совсем новая программа!">
     <div id="tyToys" aria-hidden="true"><img class="ty-toy st-kaps-petr" data-src="st-kaps-petr.webp" alt=""><img class="ty-toy st-kaps-led" data-src="st-kaps-ledenec.webp" alt=""><img class="ty-toy ty-train" data-src="st-toy-parovoz.webp" alt=""><img class="ty-toy ty-horse" data-src="st-toy-loshadka.webp" alt=""><img class="ty-toy st-mishka" data-src="st-toy-mishka.webp" alt=""><img class="ty-toy st-klyuch" data-src="st-toy-klyuch.webp" alt=""></div>
-    <div class="tym" id="tymIgry" aria-hidden="true"><div class="tym-kadr"><img class="ty-toy tym-train" alt=""><img class="ty-toy tym-horse" alt=""></div></div>
+    <div class="tym st-mk" id="tymIgry" aria-hidden="true"><img class="ty-toy st-mk1" data-src="st-mob-kap1.webp" alt=""><img class="ty-toy st-mk2" data-src="st-mob-kap2.webp" alt=""><img class="ty-toy st-mk3" data-src="st-mob-kap3.webp" alt=""><img class="ty-toy st-mk4" data-src="st-mob-kap4.webp" alt=""></div>
     <canvas id="logoFx"></canvas>
     <canvas id="smokeFront"></canvas>
     <canvas id="logoLight"></canvas>
@@ -9600,7 +9636,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <li>Детям 4+</li>
       </ul>
     </div>
-    <div class="tym tym--tekst"><img class="tym-tekst" id="tymTekst" alt="Ставрополь. Весь декабрь и январские каникулы. Ул. Росгипрозем, 291"></div>
+    <div class="tym tym--tekst"><img class="tym-tekst" id="tymTekst" alt="Снова в Ставрополе! Весь декабрь и январские каникулы. Совсем новая программа!"></div>
     <div class="hint" id="hint">Крути вниз<i></i></div>
   </div>
 </section>
@@ -14623,7 +14659,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   // autoplay нужен только телефону. На десктопе ролик ведёт прокрутка, поэтому снимаем сразу —
   // до того, как у видео появится источник, так что ничего само не поедет.
   if(!TOUCH){ v.autoplay = false; v.removeAttribute('autoplay'); }
-  poster.src = TOUCH ? 'ty-poster-mob.webp' : 'ty-poster.webp';   // Тюмень: постер = кадр 0 ty-hero-mob.mp4 / ty-hero.mp4
+  poster.src = TOUCH ? 'st-poster-mob.webp' : 'ty-poster.webp';   // постер = кадр 0 ролика: на телефоне свой, ставропольский st-hero-mob.mp4, на компьютере тюменский ty-hero.mp4
 
   // канва-двойник ролика: только на компьютере, см. комментарий к #vpaint
   var cvV=document.getElementById('vpaint'), ctxV=cvV.getContext('2d');
@@ -14632,10 +14668,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   if(VCANVAS) document.body.classList.add('vcanvas'); else cvV.style.display='none';
   var tyToys=document.getElementById('tyToys');
   if(!BAKED){ [].forEach.call(tyToys.querySelectorAll('img[data-src]'), function(im){ im.src=im.getAttribute('data-src'); }); }   // СТАВРОПОЛЬ: шесть летающих предметов у логотипа, файлы качаем только на компьютере
-  if(BAKED){   // ТЮМЕНЬ (17.09.2026): на телефоне игрушки и текст лежат поверх ролика, файлы качаем только здесь
-    var tymI=document.getElementById('tymIgry').getElementsByTagName('img');
-    tymI[0].src='ty-toy-train.webp'; tymI[1].src='ty-toy-horse.webp';
-    document.getElementById('tymTekst').src='st-mob-tekst.webp?v=1';
+  if(BAKED){   // СТАВРОПОЛЬ (24.09.2026): на телефоне четыре капсулы и подпись лежат поверх ролика, файлы качаем только здесь
+    var stEst=function(){ this.classList.add('st-est'); };
+    [].forEach.call(document.getElementById('tymIgry').querySelectorAll('img[data-src]'), function(im){
+      im.onload=stEst; im.src=im.getAttribute('data-src'); if(im.complete && im.naturalWidth) stEst.call(im);
+    });
+    document.getElementById('tymTekst').src='st-mob-podpis.webp?v=1';
   }
   // СТАВРОПОЛЬ: логотип «Капсула времени» (макет Серёги 23.09.2026), в Нижнем logo.webp.
   // Два файла: 2000 и 1200 px. Если файл больше чем вдвое шире логотипа на экране, Chrome рисует
@@ -15015,7 +15053,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     // На телефоне перемотки прокруткой нет — ролик просто играет,
     // и там файл по ссылке лучше: Safari умеет докачивать его кусками.
     // На десктопе качаем целиком в память: перемотка идёт без рывков.
-    if(TOUCH){ v.loop = true; start('ty-hero-mob.mp4'); return; }   // вертикальный ролик, крутится петлёй (Тюмень: вперёд-назад, fon_tyumen_mob.py)
+    if(TOUCH){ v.loop = true; start('st-hero-mob.mp4'); return; }   // вертикальный ролик, крутится петлёй (Ставрополь: вперёд-назад, fon_stavropol_mob.py)
     if(!window.fetch || !window.ReadableStream){ start('ty-hero.mp4'); return; }
 
     say('Загружаем ролик… <b>0\u00a0%</b>', true);
