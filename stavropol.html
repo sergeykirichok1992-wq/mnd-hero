@@ -2549,24 +2549,36 @@ html.touch .curtain{opacity:1}
   position:relative; box-sizing:border-box; width:45.5%; margin:0 3%;
   display:flex; flex-direction:column; justify-content:center;
   padding:10px 10px 11px; border-radius:14px;
-  background:linear-gradient(160deg, rgba(22,96,76,.74) 0%, rgba(8,50,40,.80) 100%);
+  /* ночной индиго с переливом (24.09.2026, просьба Серёги «отдели цветом,
+     сделай не зелёными»): сапфировый отблеск слева вверху, пурпурный справа
+     внизу, еле заметная диагональ света. Выбран из трёх вариантов (лиловое
+     стекло, индиго, бордо) двумя судьями по снимкам: лиловое выходило самым
+     громким пятном экрана, бордо на зелёном читалось как табличка-предупреждение.
+     Заливка почти плотная — зелень фона сквозь неё не проходит. Белый текст
+     к самому светлому месту ~11:1, золото ~8:1. */
+  background:
+    linear-gradient(118deg, rgba(200,180,255,0) 36%, rgba(200,180,255,.08) 50%, rgba(200,180,255,0) 64%),
+    radial-gradient(120% 110% at 100% 100%, rgba(150,86,230,.36) 0%, rgba(150,86,230,0) 62%),
+    radial-gradient(90% 90% at 0% 0%, rgba(86,118,240,.22) 0%, rgba(86,118,240,0) 58%),
+    linear-gradient(155deg, rgba(26,34,112,.94) 0%, rgba(16,18,70,.95) 52%, rgba(30,17,80,.96) 100%);
   box-shadow:
-    inset 0 0 0 1px rgba(255,214,150,.45),
-    inset 0 1px 0 rgba(255,255,255,.08),
-    0 0 22px -2px rgba(255,190,100,.22),
+    inset 0 0 0 1px rgba(255,214,150,.46),
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 -10px 18px -12px rgba(150,110,255,.28),
+    0 0 24px -4px rgba(130,96,255,.32),
     0 18px 36px -20px rgba(0,0,0,.85);
   font-family:"Blogger Sans Medium","Blogger Sans",Arial,sans-serif; font-weight:500;
-  font-size:13px; line-height:1.36; text-align:center; color:rgba(255,255,255,.94);
+  font-size:13px; line-height:1.36; text-align:center; color:rgba(255,255,255,.95);
   text-wrap:balance; text-shadow:0 1px 10px rgba(0,0,0,.35);
 }
 .st-kv-note--1{margin-right:0}
 .st-kv-note--2{margin-left:0}
-.st-kv-note b{font-weight:inherit; color:#FFC46B}
+.st-kv-note b{font-weight:inherit; color:#FFC872}
 /* узелок, где нить входит в плашку: x 97 и 735 из 810 */
 .st-kv-knot{
   position:absolute; z-index:4; top:0; width:7px; height:7px; margin:-3.5px 0 0 -3.5px;
   border-radius:50%; background:#FFE3A6; pointer-events:none;
-  box-shadow:0 0 0 2px rgba(4,36,30,.8), 0 0 8px 2px rgba(255,190,100,.6);
+  box-shadow:0 0 0 2px rgba(16,14,62,.9), 0 0 8px 2px rgba(255,190,100,.6);
 }
 .st-kv-knot--1{left:11.975%}
 .st-kv-knot--2{left:90.741%}
@@ -10695,7 +10707,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <p class="tm-f tm-f--l tm-f3"><span class="tm-ic st-kv-n" aria-hidden="true">3</span>К машине времени подключены <b>главные капсулы</b>, хранящие в&nbsp;себе исторические события, сделавшие Новый год таким, каким мы его знаем!</p>
           </div>
           <div class="tm-col tm-col--r">
-          <p class="tm-f tm-f--r tm-f5"><span class="tm-ic st-kv-n" aria-hidden="true">4</span><b>Пётр&nbsp;I</b> своим указом сделал Новый год 1&nbsp;января в&nbsp;1699 году. А&nbsp;при <b>Александре&nbsp;I</b> начали наряжать новогодние ёлки…</p>
+          <p class="tm-f tm-f--r tm-f5"><span class="tm-ic st-kv-n" aria-hidden="true">4</span><b>Пётр&nbsp;I</b> своим указом в&nbsp;1699 году сделал Новый год 1&nbsp;января, и&nbsp;впервые его так встретили в&nbsp;1700 году. А&nbsp;при <b>Александре&nbsp;I</b> начали наряжать новогодние ёлки…</p>
           <p class="tm-f tm-f--r tm-f6"><span class="tm-ic st-kv-n" aria-hidden="true">5</span>Представьте, что будет, если <b>капсулы с&nbsp;этими событиями пропадут</b>! Новый год просто может не&nbsp;настать. Да и&nbsp;леденцы уже готовить будет незачем…</p>
           <p class="tm-f tm-f--r tm-f8"><span class="tm-ic st-kv-n" aria-hidden="true">6</span>Детей ждёт <b>захватывающее приключение</b> с&nbsp;расследованием главного новогоднего преступления в&nbsp;рамках большой экскурсии с&nbsp;<b>карамельным мастер-классом</b>!</p>
           </div>
