@@ -212,7 +212,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
   opacity:0; will-change:transform,opacity;
 }
 /* ТЮМЕНЬ (15.09.2026): паровозик и лошадка по макету Серёги. Коробка #tyToys — копия коробки
-   логотипа (та же ширина, пропорция картинки ty-logo.webp 1689x1174), скрипт каждый кадр даёт
+   логотипа (та же ширина, пропорция логотипа — у Ставрополя st-logo-kapsula.webp 3485/2600), скрипт каждый кадр даёт
    ей тот же transform и opacity, что логотипу: игрушки спускаются, садятся и растут вместе с ним.
    Места и размеры — в долях логотипа, сняты с макета поиском по совпадению. Лежат поверх логотипа.
    Плавают: паровозик влево-вверх, лошадка вправо-вверх и обратно; ход и срок — --toy-*. */
@@ -299,6 +299,17 @@ html.touch #sideR{display:none}
 #snowFront{z-index:11; pointer-events:none; width:100%; height:100%; display:block}
 @media (max-aspect-ratio:1/1){
   :root{ --logo-w:min(98vw, 106vh); --logo-top:47%; }
+}
+/* СТАВРОПОЛЬ (24.09.2026): «Капсула времени» на 7 % выше тюменского логотипа, и на окнах
+   шире 16:9 (1920x937, 1536x730, 1366x657 — обычное окно браузера с панелями) часы
+   заезжали под шапку (она кончается на 67 px), даты шапки ложились на циферблат.
+   Поэтому: ширина не больше 108vh, а центр опускается ровно настолько, чтобы видимый
+   верх часов был не выше 75 px. 0.369 — расстояние от центра до видимого верха часов
+   в ширинах логотипа при посадке (половина высоты 1/1.34 с наездом x1.08, минус
+   прозрачная полоска над кольцом). На 1600x1000 и 1920x1080 ничего не меняется. */
+:root{ --logo-w:min(max(57.42vw, 102.08vh), 108vh); --logo-top:max(48%, calc(75px + var(--logo-w) * .369)); }
+@media (max-aspect-ratio:1/1){
+  :root{ --logo-w:min(98vw, 106vh); --logo-top:max(47%, calc(75px + var(--logo-w) * .369)); }
 }
 
 
@@ -14699,7 +14710,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     tymI[0].src='ty-toy-train.webp'; tymI[1].src='ty-toy-horse.webp';
     document.getElementById('tymTekst').src='st-mob-tekst.webp?v=1';
   }
-  if(!BAKED) logo.src = 'st-logo-kapsula.webp';   // СТАВРОПОЛЬ: логотип «Капсула времени» (макет Серёги 23.09.2026), в Нижнем logo.webp   // на телефоне логотип уже в ролике — файл не качаем
+  // СТАВРОПОЛЬ: логотип «Капсула времени» (макет Серёги 23.09.2026), в Нижнем logo.webp.
+  // Два файла: 2000 и 1200 px. Если файл больше чем вдвое шире логотипа на экране, Chrome рисует
+  // с уменьшенной размытой копии (замер 24.09.2026 на 1366x768: заметно мыльнее тюменского).
+  // Считаем ширину логотипа в точках экрана по тем же правилам, что --logo-w в стилях,
+  // с наездом x1.08; растянули окно — переходим на большой файл, обратно не мельчим.
+  function stLogoFile(){
+    var iw=innerWidth, ih=innerHeight, w = iw<=ih ? Math.min(.98*iw, 1.06*ih) : Math.min(Math.max(.5742*iw, 1.0208*ih), 1.08*ih);
+    return w*1.08*(window.devicePixelRatio||1) >= 1000 ? 'st-logo-kapsula.webp' : 'st-logo-kapsula-1200.webp';
+  }
+  if(!BAKED){
+    logo.src = stLogoFile();
+    window.addEventListener('resize', function(){ if(stLogoFile()==='st-logo-kapsula.webp' && logo.src.indexOf('-1200')>0) logo.src='st-logo-kapsula.webp'; });
+  }   // на телефоне логотип уже в ролике — файл не качаем
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
   var DPR=Math.min(2, window.devicePixelRatio||1);
   var LW=2, LH=2;
