@@ -44,7 +44,7 @@ body{
 
 /* ---------- шапка (та же, что на promokody.html) ---------- */
 .nav{
-  position:fixed; inset:0 0 auto 0; z-index:30;
+  position:fixed; inset:0 0 auto 0; z-index:40;   /* выше стрелки на шве (30) */
   display:flex; align-items:center; gap:26px; padding:16px 30px;
   transition:background .35s ease, border-color .35s ease, padding .35s ease;
   border-bottom:1px solid transparent;
@@ -80,7 +80,7 @@ body{
 /* ---------- ночное небо (рецепт .oz с promokody.html) ---------- */
 .sh{
   position:relative; z-index:1; isolation:isolate; overflow:hidden;
-  padding:clamp(104px,10vw,168px) 0 clamp(120px,11vw,220px);
+  padding:clamp(104px,10vw,168px) 0 clamp(150px,14vw,260px);   /* низ - место под стрелку на шве */
   background:
     radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
     linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
@@ -280,6 +280,36 @@ body{
 @media (prefers-reduced-motion:reduce){
   .sh-glow i,.sh-st.is-here .sh-tag::before{animation:none}
 }
+
+/* ---------- золотая стрелка к вопросам ----------
+   Фирменная извилистая стрелка из блока «Это далеко не всё» на странице
+   города (.pgs-more-arr): тот же рисунок, перелив и поведение - рисуется,
+   когда доехала до экрана, потом покачивается. Просьба Серёги 23.09.2026:
+   направляющая от синего экрана к белому, чтобы листали к ответам.
+   Стоит на шве: начинается под строкой про оферту, кончается на снегу.
+   Поэтому живёт не внутри .sh (там overflow:hidden срезал бы низ), а в
+   прослойке нулевой высоты между экранами, слоем 30 - над сугробом экрана
+   вопросов (29). Шапка поднята до 40. Низ перелива темнее, чем на сайте:
+   там стрелка вся на тёмном, здесь хвост лежит на белом снегу. */
+.sh-arr{position:relative; z-index:30; height:0; --ah:clamp(130px,13vw,220px)}
+.sh-arr a{
+  /* 86 % высоты над швом: голова петли на синем, хвост на снегу у заголовка */
+  position:absolute; left:50%; top:calc(var(--ah) * -.86);
+  margin-left:calc(var(--ah) * 160 / 300 / -2); display:block; line-height:0;
+}
+.sh-arr svg{
+  height:var(--ah); width:calc(var(--ah) * 160 / 300); overflow:visible;
+  filter:drop-shadow(0 0 6px rgba(243,214,140,.45)) drop-shadow(0 2px 3px rgba(0,0,40,.6));
+  animation:shBob 1.8s ease-in-out 2.2s infinite alternate;
+}
+.sh-arr path{fill:none; stroke:url(#shArrGold); stroke-width:7.5; stroke-linecap:round; stroke-linejoin:round}
+@keyframes shBob{ from{transform:translateY(0)} to{transform:translateY(7px)} }
+/* класс `wait` ставит скрипт: без него стрелка просто видна сразу */
+.sh-arr.wait .sh-arr-line,.sh-arr.wait .sh-arr-head{stroke-dasharray:1 1; stroke-dashoffset:1}
+.sh-arr.go .sh-arr-line{animation:shDraw 1.5s cubic-bezier(.45,.05,.3,1) .15s forwards}
+.sh-arr.go .sh-arr-head{animation:shDraw .35s ease-out 1.6s forwards}
+@keyframes shDraw{ to{stroke-dashoffset:0} }
+@media (prefers-reduced-motion:reduce){ .sh-arr svg{animation:none} }
 
 /* ---------- общие классы, на которых стоит экран вопросов ----------
    Копия из v2.html (каркас .cr и сугроб .cr-snow): экран вырезан со страницы
@@ -845,6 +875,25 @@ body{
   </div>
 </section>
 
+<!-- Золотая стрелка на шве синего и белого: ведёт от шагов к ответам.
+     Щелчок по ней уводит к вопросам; для читалки она не нужна - ссылка
+     «Ответы - чуть ниже» стоит в тексте над ней. -->
+<div class="sh-arr">
+  <a href="#faq" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 160 300" focusable="false">
+    <defs>
+      <linearGradient id="shArrGold" x1="0" y1="0" x2="0.35" y2="1">
+        <stop offset="0" stop-color="#FFF3CF"/>
+        <stop offset=".3" stop-color="#F3D68C"/>
+        <stop offset=".62" stop-color="#D3A244"/>
+        <stop offset="1" stop-color="#B98A2E"/>
+      </linearGradient>
+    </defs>
+    <path class="sh-arr-line" pathLength="1"
+          d="M84 6C40 22 34 70 70 86C112 102 124 56 94 48C62 40 44 86 62 124C80 162 116 176 104 214C94 246 80 250 80 286"/>
+    <path class="sh-arr-head" pathLength="1" d="M61 266L80 289L99 266"/>
+  </svg></a>
+</div>
+
 <!-- Цену взрослого билета в ответах считает скрипт цен города. Он ищет
      секцию #prices и без неё молча выходит - отсюда пустая заглушка. -->
 <div id="prices" hidden></div>
@@ -1268,6 +1317,19 @@ body{
   }
   kadr();
   window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* ==================== СТРЕЛКА НА ШВЕ ====================
+   Рисуется, когда доехала до экрана (как .pgs-more-arr на странице города).
+   Следим за самим рисунком: у прослойки .sh-arr высота нулевая. */
+(function(){
+  var a = document.querySelector('.sh-arr');
+  if (!a || !('IntersectionObserver' in window)) return;
+  if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+  a.classList.add('wait');
+  new IntersectionObserver(function(es, o){
+    if (es[0].isIntersecting){ a.classList.add('go'); o.disconnect(); }
+  }, {threshold:.35}).observe(a.querySelector('svg'));
 })();
 </script>
 
