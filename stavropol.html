@@ -9602,7 +9602,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     </div>
     <!-- СТАВРОПОЛЬ (23.09.2026): «ВЫ ГОТОВЫ?» на животе Деда Мороза, уезжает вниз под снег,
          пока сверху выезжает логотип. Стили .st-gotov, скрипт «ВЫ ГОТОВЫ?» ниже. -->
-    <div class="st-gotov" id="stGotov" aria-hidden="true" hidden><div class="st-gotov-sh"><span class="st-gotov-halo">Вы готовы?</span><span class="st-gotov-t">Вы готовы?</span></div></div>
+    <div class="st-gotov" id="stGotov" aria-hidden="true" hidden><div class="st-gotov-sh"><span class="st-gotov-halo">Вы готовы?</span><span class="st-gotov-t">Вы готовы?</span></div><div class="st-sugrob"></div></div>
     <div class="tym tym--tekst"><img class="tym-tekst" id="tymTekst" alt="Ставрополь. Весь декабрь и январские каникулы. Ул. Росгипрозем, 291"></div>
     <div class="hint" id="hint">Крути вниз<i></i></div>
   </div>
@@ -14606,13 +14606,24 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    другой первый экран, а в окне выше, чем шире, блок города встаёт на пояс (.side). */
 .st-gotov{
   position:absolute; inset:0; z-index:6; pointer-events:none; overflow:hidden;
-  -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 90%,transparent 97%);
-          mask-image:linear-gradient(to bottom,#000 0,#000 90%,transparent 97%);
   animation:stGotovIn .85s ease-out both;
 }
+/* Сугроб, под который уходит надпись (24.09.2026: растворение поверх огней деревни
+   читалось призраком, а не «под сугроб»). Тот же снимок снега, что на стыке с вторым
+   экраном (.cr-snow): верхние 11 % картинки прозрачны, 11-18 % — гребни, ниже белый.
+   Высота полосы — гребни плюс 5vh белого; поднимается снизу, когда сверху показывается
+   логотип, и остаётся — потом его накрывает такой же сугроб второго экрана. */
+.st-sugrob{
+  position:absolute; left:0; right:0; bottom:0;
+  height:calc(100vw * 1050 / 3400 * .18 + 5vh);
+  background:url(snow-1500.webp) center top/100% auto no-repeat;
+  transform:translateY(100%); will-change:transform;
+}
+@media (min-width:900px){ .st-sugrob{background-image:url(snow-2400.webp)} }
 @keyframes stGotovIn{from{opacity:0}}
 html.touch .st-gotov{display:none}
-@media (max-aspect-ratio:1/1){ .st-gotov{display:none} }
+/* то же условие, при котором блок города (.side) встаёт по центру, на пояс: и при загрузке, и если окно сузили потом */
+@media (max-aspect-ratio:1/1), (max-width:820px){ .st-gotov{display:none} }
 .st-gotov-sh{
   position:absolute; left:46.2%; top:80%; transform:translate(-50%,-50%); will-change:transform;
   font-family:"Prata",Georgia,serif; font-size:88px; line-height:1.14; white-space:nowrap;
@@ -14643,11 +14654,14 @@ html.touch .st-gotov{display:none}
 /* СТАВРОПОЛЬ: «ВЫ ГОТОВЫ?» — место, показ и уезд.
    Место и кегль — в долях кадра ty-hero.mp4 (2560x1440), кадр лежит на сцене как
    object-fit:cover. Живот на первом кадре: пряжка пояса x 0,462 / y 0,850, конец бороды
-   y 0,814 — центр надписи на 0,80. Ограничения: не ниже 80 % окна (на очень широких
+   y 0,814 — центр надписи на 0,80. Ограничения: не ниже 85 % окна (на очень широких
    окнах живот у нижнего края), не на подсказку «Крути вниз», не шире расстояния от центра
    до ближнего края окна. stGotovStep(fall) зовёт скрипт первого экрана каждый кадр:
    fall — та же кривая, по которой едет логотип (0 до начала спуска, 1 когда сел).
-   Надпись уезжает на 38vh вниз и тает в маске у нижнего края. Место — BX/BY, размер — FS. */
+   Надпись трогается, когда сверху показывается логотип, с мягким разгоном (у кривой
+   логотипа рывок в начале, у него он за краем экрана, а у надписи был бы на виду),
+   снизу к этому моменту поднимается сугроб .st-sugrob, и надпись уходит за него
+   на 38vh вниз. Место — BX/BY, размер — FS. */
 (function(){
   'use strict';
   window.stGotovStep = function(){};
@@ -14656,7 +14670,7 @@ html.touch .st-gotov{display:none}
   // то же условие, что у первого экрана (TOUCH): на телефоне надписи нет, работу не делаем
   if(window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 820) return;
   var sh=box.firstElementChild;
-  var VW=2560, VH=1440, BX=0.462, BY=0.80, FS=0.05, TOPMAX=0.80, UEZD_VH=38,
+  var VW=2560, VH=1440, BX=0.462, BY=0.80, FS=0.05, TOPMAX=0.85, UEZD_VH=38,
       EM_W=7.9,    /* ширина «ВЫ ГОТОВЫ?» в кеглях (замер Prata) */
       HINT=84;     /* низ окна под подсказкой «Крути вниз» */
   function place(){
@@ -14673,15 +14687,24 @@ html.touch .st-gotov{display:none}
   catch(e){ fontOk=true; }
   setTimeout(function(){ fontOk=true; }, 2500);   // шрифт не пришёл — показываем запасным
   window.addEventListener('resize', place);
+  var snow=box.querySelector('.st-sugrob');
+  function cl(x){ return x<0 ? 0 : x>1 ? 1 : x; }
   window.stGotovStep=function(fall){
     if(!shown){
       if(!fontOk) return;
       shown=true; box.hidden=false; place();
     }
-    var dy=Math.round(fall*UEZD_VH*100)/100;
-    if(dy===last) return;
-    last=dy;
+    // доля спуска логотипа dp из его кривой fall = 1-(1-dp)^2.6; логотип виден с dp≈0,04
+    var dp=1-Math.pow(1-cl(fall), 1/2.6);
+    var u=cl((dp-0.04)/0.36);                     // 0 — показался логотип, 1 — надпись ушла
+    var sn=cl(u/0.45); sn=sn*sn*(3-2*sn);         // сугроб встал к середине пути надписи
+    var dy=Math.round(Math.pow(u,1.8)*UEZD_VH*100)/100;
+    var key=dy+'|'+Math.round(sn*1000);
+    if(key===last) return;
+    last=key;
     sh.style.transform='translate(-50%,-50%) translateY('+dy+'vh)';
+    sh.style.visibility = u>=1 ? 'hidden' : '';   // ушла совсем — блик не перерисовываем
+    snow.style.transform='translateY('+((1-sn)*100).toFixed(2)+'%)';
   };
 })();
 </script>
