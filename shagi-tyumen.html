@@ -196,6 +196,19 @@ body{
 .sh-p b{color:#F0C97A; font-weight:600}
 .sh-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap}
 
+/* пометка времени рядом со значком (у договора «на 13-й день или раньше»).
+   Значок и пометка стоят парой по центру карточки, поэтому значок уезжает
+   влево: нить от прошлого шага просто уходит под него (значок выше слоем).
+   Заголовок остаётся на одной высоте с соседями - пометка ниже значка. */
+.sh-icrow{display:flex; align-items:center; gap:clamp(8px,.7vw,12px)}
+.sh-when{
+  position:relative; z-index:3; text-align:left; white-space:nowrap;
+  padding:7px 11px 8px; border-radius:12px;
+  background:linear-gradient(180deg,#FDE68A,#F5B324); color:#3A2402;
+  font:700 clamp(12.5px,.88vw,14px)/1.2 "Golos Text",Arial,sans-serif;
+  box-shadow:0 0 0 3px rgba(18,14,68,.85), 0 8px 22px rgba(245,179,36,.35);
+}
+
 /* плашка на верхней кромке карточки */
 .sh-tag{
   position:absolute; z-index:4; top:0; left:50%; transform:translate(-50%,-50%);
@@ -241,6 +254,11 @@ body{
     text-align:left; padding:var(--pt) 18px 22px 16px;
   }
   .sh-ic{grid-row:1 / span 2}
+  /* пометка времени - строкой над заголовком, в колонке текста */
+  .sh-icrow{display:contents}
+  .sh-st.has-when .sh-ic{grid-row:1 / span 3}
+  .sh-when{grid-column:2; justify-self:start; margin:2px 0 6px; padding:5px 11px; border-radius:999px}
+  .sh-when br{display:none}
   .sh-h{margin:4px 0 6px}
   .sh-p{max-width:none}
   .sh-st::after,.sh-st:nth-child(2n)::after{
@@ -779,8 +797,8 @@ body{
         <h2 class="sh-h"><span class="sh-sr">Шаг 3. </span>14 дней на сборы</h2>
         <p class="sh-p"><b>При предоплате в сентябре - 30 дней.</b> Без спешки уточните, сколько детей пойдёт (мало ли, кто-то добавится или отпадёт), и соберите деньги в классе.</p>
       </li>
-      <li class="sh-st">
-        <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M13.5 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9z"/><path d="M13.5 3.5V9H19"/><path d="M8.5 13h6M8.5 16.4h3.6"/></svg><b class="sh-n" aria-hidden="true">4</b></span>
+      <li class="sh-st has-when">
+        <span class="sh-icrow"><span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M13.5 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9z"/><path d="M13.5 3.5V9H19"/><path d="M8.5 13h6M8.5 16.4h3.6"/></svg><b class="sh-n" aria-hidden="true">4</b></span><span class="sh-when">на 13-й день<br> или раньше</span></span>
         <h2 class="sh-h"><span class="sh-sr">Шаг 4. </span>Заключаем договор</h2>
         <p class="sh-p">Перед полным расчётом заключаем договор на то количество детей, которое получилось. Подписать его можно у нас в офисе или дистанционно, если Вы из другого города.</p>
       </li>
