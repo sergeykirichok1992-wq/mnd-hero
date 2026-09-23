@@ -5,7 +5,7 @@
 # не может быть разным у разных городов.
 #
 # Ничего не запрещаем сознательно. Черновые страницы репозитория
-# (index, quiz, karta, kosmos, programma-varianty, kazan-test, propusk)
+# (index, quiz, karta, kosmos, programma-varianty, propusk)
 # закрыты своим тегом <meta name="robots" content="noindex">, а запрет
 # здесь как раз помешал бы роботу этот noindex увидеть - и адрес мог бы
 # попасть в поиск вслепую. На боевых доменах эти страницы вдобавок

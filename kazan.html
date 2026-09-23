@@ -9406,33 +9406,222 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      Шапка Деда Мороза заходит на экран с картой, снизу секция кончается
      золотой дугой уже на ночном небе пятого экрана.
      Текст письма — живая разметка, не картинка. -->
+<style>
+/* ==================== ЭКРАН 4 НА ТЕЛЕФОНЕ: ЖИВОЙ БЛОК ====================
+   23.09.2026, по референсу Серёги (обкатано на kazan-test.html). До 1279 px
+   вместо картинки-карточки .dkm (v2-info.webp / kz-info.webp, в ней текст
+   был нарисован): белое поле под дугой с золотой кромкой, на вершине дуги
+   девочка с леденцом, под ней ОДНА тёмная плашка - окно с мелькающими фото,
+   заголовок живым текстом, семь пунктов (значок в золотом круге, под ним
+   подпись; две колонки, седьмой во всю ширину, от 720 px 4 + 3). Материя
+   плашки и кругов - полоса «Новая площадка» из crimea.html (.np-plus, .np-ic).
+   Плашкой стала сама сцена .dk-scene: заголовок из неё не выносим, он же
+   служит широкому экрану. Стили общие для всех городов, а подписи пунктов
+   (адрес, даты, продолжительность) у каждого города свои - они в разметке
+   ul.dkp. Стили картинки .dkm выше остались, но элемента больше нет. */
+.dkp,.dkp-glow,.dkp-win,.dkp-girl{display:none}
+@media (max-width:1279px){
+  .dk{padding-bottom:clamp(56px,15vw,96px)}
+  /* поле светлое: белое, как было у холма до теста; кромка и свечение дуги
+     прежние - на белом дугу видно только по ним */
+  .dk::after{box-shadow:none; animation:none}
+  /* Свечение дуги - отдельным слоем только на верх секции. Тенью самого
+     поля оно размывалось во все стороны и протекало под нижнюю кромку
+     тёплой полосой на форму брони. У этого слоя низ внутри секции и срезан:
+     вверх светит, вниз нет. Кадры dkArc - прежние, белого холма. */
+  .dk::before{
+    content:''; position:absolute; left:0; right:0; top:0; z-index:2; pointer-events:none;
+    height:calc(420 * var(--m) / 1080);
+    border-radius:50% 50% 0 0 /
+      calc(128 * var(--m) / 1080) calc(128 * var(--m) / 1080) 0 0;
+    clip-path:inset(-200px -60px 0 -60px);
+    box-shadow:0 calc(-8 * var(--m) / 1080) calc(84 * var(--m) / 1080) rgba(255,183,92,.78);
+    animation:dkArc 6s ease-in-out infinite;
+  }
+  /* еле заметные отблески по белому - рецепт страницы оферты (.oz-glow):
+     голубые по бокам, тёплый внизу; без движения */
+  .dkp-glow{display:block; position:absolute; inset:0; z-index:3; pointer-events:none; overflow:hidden;
+    border-radius:50% 50% 0 0 /
+      calc(128 * var(--m) / 1080) calc(128 * var(--m) / 1080) 0 0}
+  .dkp-glow i{position:absolute; display:block; border-radius:50%}
+  .dkp-glow i:nth-child(1){left:-40%; top:6%; width:110%; height:40%;
+    background:radial-gradient(closest-side, rgba(198,219,255,.55) 0%, rgba(198,219,255,.28) 40%, rgba(198,219,255,0) 100%)}
+  .dkp-glow i:nth-child(2){right:-44%; top:34%; width:110%; height:40%;
+    background:radial-gradient(closest-side, rgba(214,224,255,.5) 0%, rgba(214,224,255,.24) 40%, rgba(214,224,255,0) 100%)}
+  .dkp-glow i:nth-child(3){left:-5%; bottom:-10%; width:110%; height:30%;
+    background:radial-gradient(closest-side, rgba(255,232,186,.45) 0%, rgba(255,232,186,.2) 40%, rgba(255,232,186,0) 100%)}
+  .dkp-glow i:nth-child(4){display:none}
+
+  /* ---------- девочка с леденцом ----------
+     Стоит на вершине дуги: голова и плечи - на экране с картой, как на
+     референсе (60 % роста выше дуги). Картинка срезана по поясу, и этот
+     срез уходит под верхний край плашки на 6 px - будто она стоит за ней.
+     Ширина --g одна на всё: рост, подъём и зазор до плашки считаются от неё. */
+  .dk{--g:clamp(150px,42vw,236px)}
+  .dkp-girl{
+    display:block; position:relative; z-index:6; pointer-events:none;
+    width:var(--g); height:auto; aspect-ratio:578/598;
+    margin:calc(var(--g) * -.62) auto -6px;
+    /* фигура в файле смещена вправо (леденец торчит влево): ставим по оси
+       плашки саму девочку, а не рамку картинки */
+    transform:translateX(-4.2%);
+  }
+  /* от 768 px карта раскладывается иначе: подпись «Екатеринбург» опускается
+     к середине и девочка на прежней высоте закрыла бы её на 77-94 px (замер
+     23.09.2026). Здесь она поднимается над дугой только на 9 % своей ширины */
+  @media (min-width:768px){
+    .dkp-girl{margin-top:calc(var(--g) * -.09)}
+  }
+
+  /* ---------- плашка: окно с фото, заголовок, значки ----------
+     Одна плашка на всё - это сама сцена. Поля --pad одни со всех сторон,
+     скругление окна с фото = скругление плашки минус поле: углы идут
+     ровно, концентрично. */
+  .dk-scene{
+    --pad:clamp(12px,3.4vw,16px);
+    display:flex; flex-direction:column;
+    width:calc(100% - 32px); max-width:760px; margin:0 auto;
+    padding:var(--pad); border-radius:calc(var(--pad) + 16px);
+    pointer-events:auto;
+    /* на белом поле прозрачная лиловая подложка выцветала бы - плашка плотная:
+       ночная синь с фиолетовым переливом, как на тёмных экранах сайта */
+    background:
+      radial-gradient(90% 40% at 12% 0%, rgba(108,43,217,.42), rgba(108,43,217,0) 70%),
+      radial-gradient(80% 40% at 100% 100%, rgba(47,49,146,.6), rgba(47,49,146,0) 70%),
+      linear-gradient(160deg,#2A1E78 0%,#17125A 50%,#0C0C3E 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,214,150,.22), inset 0 1px 0 rgba(255,255,255,.08),
+               0 30px 50px -28px rgba(0,27,113,.6), 0 8px 18px -10px rgba(0,27,113,.3);
+  }
+  /* окно с фото: 16:9. Кадры 800x574 - по бокам не режется ничего,
+     сверху и снизу по 11 %. У первого кадра (i1) внизу вшита надпись из
+     макета - его прижимаем к верху, режется только низ с надписью */
+  .dkp-win{
+    display:block; position:relative; flex:none; aspect-ratio:16/9;
+    border-radius:16px; overflow:hidden; isolation:isolate; background:#1B1560;
+  }
+  .dkp-win img{position:absolute; inset:0; display:block; width:100%; height:100%;
+    object-fit:cover; opacity:0}                    /* смена кадров резкая, как на боевых */
+  .dkp-win img.on{opacity:1}
+  /* у первого кадра (i1) вшиты куски старой карточки: золотая рамка по верху
+     и светлые скруглённые уголки, внизу надпись. Кадр чуть крупнее окна и
+     сдвинут: за краем остаются по 24 px исходника сверху и с боков, видны
+     строки 24-447 из 574 - надпись начинается с 497. Сам i1.webp не трогаем,
+     его же показывают окна старых карточек */
+  .dkp-win img:first-child{inset:-5.7% auto auto -3.2%; width:106.4%; height:auto}
+  /* тонкая золотая кромка поверх кадра - чтобы фото не «вырезалось» из плашки */
+  .dkp-win::after{content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+    border-radius:inherit; box-shadow:inset 0 0 0 1px rgba(255,214,150,.3)}
+
+  /* заголовок - между фото и значками, цвета тёмных экранов: белый + золото */
+  .dk-t{
+    position:relative; width:auto; height:auto; overflow:visible; clip-path:none; border:0;
+    margin:clamp(22px,6.2vw,30px) 0 0; padding:0;   /* ровно посередине между фото и значками */
+    font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+    font-size:clamp(21px,6.1vw,30px); line-height:1.1; letter-spacing:-.01em;
+    color:#fff; text-align:center; text-transform:uppercase; white-space:normal; text-wrap:balance;
+    text-shadow:0 2px 14px rgba(0,0,0,.35);
+  }
+  .dk-t b{font-weight:700; color:#F2CD80}
+  @supports ((-webkit-background-clip:text) or (background-clip:text)){
+    .dk-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+      text-shadow:none}
+  }
+  /* список письма на телефоне не нужен вовсе: те же сведения несёт панель */
+  .dk-list{display:none}
+
+  /* ---------- значки: своей подложки нет, лежат прямо на плашке ---------- */
+  .dkp{
+    --ic:clamp(54px,15vw,64px);
+    display:flex; flex-wrap:wrap; justify-content:center;
+    width:auto; list-style:none; margin:0; padding:0;
+  }
+  .dkp *,.dkp *::before,.dkp *::after{box-sizing:border-box}
+  .dkp-i{
+    position:relative; flex:0 0 50%; min-width:0;
+    display:flex; flex-direction:column; align-items:center; gap:12px;
+    padding:20px 10px 18px; text-align:center;
+  }
+  /* нить между колонками - золотая, гаснет к концам */
+  .dkp-i:nth-child(even)::before{content:''; position:absolute; left:0; top:12%; bottom:12%; width:1px;
+    background:linear-gradient(180deg, rgba(255,214,150,0), rgba(255,214,150,.3) 50%, rgba(255,214,150,0))}
+  /* нить между рядами */
+  .dkp-i:nth-child(n+3)::after{content:''; position:absolute; top:0; left:10%; right:10%; height:1px;
+    background:linear-gradient(90deg, rgba(255,214,150,0), rgba(255,214,150,.26) 50%, rgba(255,214,150,0))}
+  .dkp-ic{
+    flex:none; display:grid; place-items:center;
+    width:var(--ic); height:var(--ic); border-radius:50%;
+    background:radial-gradient(circle at 34% 28%, #231B60 0%, #130E42 60%, #0A0828 100%);
+    box-shadow:inset 0 0 0 1.5px rgba(233,195,108,.7), 0 0 0 4px rgba(12,10,48,.55), 0 0 24px rgba(233,195,108,.3);
+  }
+  .dkp-ic svg{width:54%; height:54%; overflow:visible; fill:none; stroke:#F3D48E; stroke-width:1.6;
+    stroke-linecap:round; stroke-linejoin:round;
+    filter:drop-shadow(0 0 2px rgba(243,212,142,.8)) drop-shadow(0 0 6px rgba(233,179,78,.45))}
+  .dkp-cap{
+    font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+    font-size:clamp(15px,4.3vw,18px); line-height:1.28; color:#fff; text-wrap:balance;
+  }
+  /* седьмой пункт один в ряду - во всю ширину, иначе подпись встаёт в четыре строки */
+  .dkp-i:nth-child(7){flex-basis:100%}
+  .dkp-i:nth-child(7) .dkp-cap{max-width:24ch}
+  /* суть строки - жирным и тёплым золотом; жирное из «Blogger Sans»: у «CR Blogger» его нет */
+  .dkp-cap b{font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700; color:#FFD189}
+
+  /* появление: пункты всплывают по очереди. Прячет только класс .rv,
+     его вешает скрипт - без JS всё видно сразу */
+  .dkp.rv .dkp-i{opacity:0; transform:translateY(16px)}
+  .dkp.rv.on .dkp-i{opacity:1; transform:none;
+    transition:opacity .6s ease, transform .7s cubic-bezier(.2,.7,.2,1);
+    transition-delay:calc(var(--i,0) * 80ms)}
+}
+/* планшет: четыре в ряд, во втором ряду три пошире. Не раньше 720 px:
+   уже на 600 «Продолжительность:» не влезает в четверть панели */
+@media (min-width:720px) and (max-width:1279px){
+  .dkp-i{flex-basis:25%}
+  .dkp-i:nth-child(n+5){flex-basis:33.333%}
+  .dkp-i::before{content:''; position:absolute; left:0; top:12%; bottom:12%; width:1px;
+    background:linear-gradient(180deg, rgba(255,214,150,0), rgba(255,214,150,.3) 50%, rgba(255,214,150,0))}
+  .dkp-i:nth-child(1)::before,.dkp-i:nth-child(5)::before{display:none}
+  .dkp-i:nth-child(n+3)::after{display:none}
+  .dkp-i:nth-child(n+5)::after{display:block}
+  .dkp-cap{font-size:17px}
+}
+/* самые частые айфоны (375-430): поля ячейки уже, иначе адрес ломается
+   на три строки и одно слово («Казань,») висит в строке само */
+@media (min-width:375px) and (max-width:439px){
+  .dkp-i{padding-left:6px; padding-right:6px}
+}
+/* узкий телефон: поля ячейки меньше, иначе «Продолжительность:» не влезает */
+@media (max-width:374px){
+  .dkp-i{padding:18px 6px 16px; gap:10px}
+  .dkp-cap{font-size:clamp(13.5px,4.3vw,14.5px)}   /* на 320 «Продолжительность:» иначе вылезает из ячейки */
+}
+@media (prefers-reduced-motion:reduce){
+  .dkp.rv .dkp-i{opacity:1; transform:none; transition:none}
+  .dk::before{animation:none}
+}
+</style>
 <section class="cr dk" id="forwhom" aria-labelledby="dkT">
   <canvas class="dk-sky" id="dkSky" aria-hidden="true"></canvas>
+  <div class="dkp-glow" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <img class="dk-bg" src="v2-snow.webp"
        srcset="v2-snow-1400.webp 1400w, v2-snow.webp 2560w"
        sizes="100vw" width="2560" height="1380" loading="lazy" decoding="async" alt="">
-  <!-- ТЕЛЕФОН: весь экран одной картинкой. В окне рамки лежит кадр из макета,
-       остальные кадры доносит скрипт и щёлкает их, пока экран в поле зрения.
-       На широком экране блок скрыт (.dkm объявлен только в медиа до 1279 px). -->
-  <div class="dkm" aria-hidden="true">
-    <div class="dkm-hold">
-      <div class="dkm-win" id="dkmWin">
-        <img class="on" src="info/i1.webp" width="800" height="574" alt="" loading="lazy" decoding="async">
-      </div>
-      <!-- ТОЛЬКО КАЗАНЬ, 14.09.2026: своя карточка kz-info.webp — в нижегородской
-           нарисован адрес Ольгино. Плашки в ней — картинка Серёги «орг инфа.png»,
-           собирает sayt-nn/instrumenty/info_kazan.py. Холст и окно те же. -->
-      <img class="dkm-pic" src="kz-info.webp?v=1" width="904" height="1492"
-           loading="lazy" decoding="async" alt="">
-    </div>
-  </div>
+  <!-- ТЕЛЕФОН (23.09.2026): девочка с леденцом стоит на дуге над плашкой.
+       На широком экране её нет (.dkp-girl объявлена только в медиа до 1279 px). -->
+  <img class="dkp-girl" src="dk-devochka.webp" width="578" height="598" loading="lazy" decoding="async" alt="">
   <div class="dk-scene">
     <img class="dk-art" src="v2-ded.webp"
          srcset="v2-ded-1200.webp 1200w, v2-ded.webp 2257w"
          sizes="(max-width:1279px) 100vw, 79vw"
          width="2257" height="1391" loading="lazy" decoding="async"
          alt="Дед Мороз с посохом стоит рядом с большим письмом в новогодней рамке">
-    <h2 class="dk-t" id="dkT">Где, когда и для кого</h2>
+    <!-- ТЕЛЕФОН: окно с мелькающими кадрами - первым в плашке. Остальные кадры
+         подгружает и перещёлкивает скрипт окна (#dkmWin), как было в картинке -->
+    <div class="dkp-win" id="dkmWin" aria-hidden="true">
+      <img class="on" src="info/i1.webp" width="800" height="574" alt="" loading="lazy" decoding="async">
+    </div>
+    <h2 class="dk-t" id="dkT">Где, когда <b>и&nbsp;для&nbsp;кого</b></h2>
     <ul class="dk-list">
       <li><span class="dk-ico" aria-hidden="true">🐣</span>Для детей от 4 до 11 лет</li>
       <li><span class="dk-ico" aria-hidden="true">📍</span>Казань, Утренняя 8А</li>
@@ -9441,12 +9630,40 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <li><span class="dk-ico" aria-hidden="true">⏳</span>Продолжительность: 1 час 20 минут</li>
       <li><span class="dk-ico" aria-hidden="true">🎁</span>Спецусловия для групп от 20 детей</li>
     </ul>
+    <!-- ТЕЛЕФОН: плашка из семи пунктов. Подписи - городские, свои у каждой
+         страницы; жирным выделена суть строки. На широком экране её нет. -->
+    <ul class="dkp">
+      <li class="dkp-i"><span class="dkp-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="4.9" r="2.5"/><path d="M5.2 8.6 9 11.2h6l3.8-2.6"/><path d="M9 11.2v4.4L7.6 21M15 11.2v4.4l1.4 5.4M9 15.6h6"/></svg></span><span class="dkp-cap">Для детей <b>от&nbsp;4 до&nbsp;11&nbsp;лет</b></span></li>
+      <li class="dkp-i"><span class="dkp-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 21.4s-6.6-6.1-6.6-11.3a6.6 6.6 0 0 1 13.2 0c0 5.2-6.6 11.3-6.6 11.3z"/><circle cx="12" cy="10.1" r="2.4"/></svg></span><span class="dkp-cap"><b>Казань</b>, Утренняя&nbsp;8А, р-н&nbsp;Дербышки</span></li>
+      <li class="dkp-i"><span class="dkp-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="3.5" y="5" width="17" height="15.5" rx="2.4"/><path d="M3.5 9.8h17M8 3v4M16 3v4"/><path d="M7.6 13.5h.01M12 13.5h.01M16.4 13.5h.01M7.6 17h.01M12 17h.01M16.4 17h.01"/></svg></span><span class="dkp-cap"><b>С&nbsp;27&nbsp;ноября по&nbsp;10&nbsp;января</b> (каждый день)</span></li>
+      <li class="dkp-i"><span class="dkp-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8.7"/><path d="M12 6.9V12l3.4 2.3"/></svg></span><span class="dkp-cap"><b>С&nbsp;09:00 до&nbsp;21:30</b></span></li>
+      <li class="dkp-i"><span class="dkp-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6.2 3h11.6M6.2 21h11.6"/><path d="M7.6 3c0 4.4 4.4 6.2 4.4 9s-4.4 4.6-4.4 9M16.4 3c0 4.4-4.4 6.2-4.4 9s4.4 4.6 4.4 9"/><path d="M9.2 19.4c.9-.9 1.8-1.3 2.8-1.3s1.9.4 2.8 1.3"/></svg></span><span class="dkp-cap">Продолжительность: <b>1&nbsp;час 20&nbsp;минут</b></span></li>
+      <li class="dkp-i"><span class="dkp-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="8.6" cy="7.6" r="2.7"/><circle cx="16.4" cy="8.8" r="2.2"/><path d="M3.2 19.6c.5-3.6 2.7-5.6 5.4-5.6s4.9 2 5.4 5.6"/><path d="M14.2 14.6c.7-.4 1.4-.6 2.2-.6 2.3 0 3.9 1.8 4.4 5"/></svg></span><span class="dkp-cap">Организованная группа&nbsp;- <b>от&nbsp;20&nbsp;детей</b></span></li>
+      <li class="dkp-i"><span class="dkp-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="3.5" y="8.6" width="17" height="4.2" rx="1"/><path d="M5 12.8v7.7h14v-7.7M12 8.6v11.9"/><path d="M12 8.6C10.8 5 6.4 3.9 6 6.3c-.3 1.8 3 2.3 6 2.3zM12 8.6c1.2-3.6 5.6-4.7 6-2.3.3 1.8-3 2.3-6 2.3z"/></svg></span><span class="dkp-cap">Значительные <b>бонусы и&nbsp;спецусловия</b> для&nbsp;групп</span></li>
+    </ul>
     <!-- кнопка осталась только для телефона: на широком экране её в макете нет.
          Она общая для всего сайта (.zs-btn) и открывает общее окно заявки:
          всё, что для этого нужно, — атрибут data-zs с меткой места. -->
     <div class="dk-cta"><button class="zs-btn zs-btn--lg" type="button" data-zs="4-й экран"><span class="zs-t">Оставить заявку</span></button></div>
   </div>
 </section>
+
+<script>
+/* Экран 4, телефон: пункты плашки «Где, когда и для кого» всплывают по очереди,
+   когда панель доехала. Одноразово, наблюдатель отключается. */
+(function(){
+  var ul = document.querySelector('#forwhom .dkp');
+  if (!ul || !('IntersectionObserver' in window)) return;
+  for (var i = 0; i < ul.children.length; i++) ul.children[i].style.setProperty('--i', i);
+  ul.classList.add('rv');
+  var io = new IntersectionObserver(function(es){
+    if (!es[0].isIntersecting) return;
+    io.disconnect();
+    ul.classList.add('on');
+  }, {rootMargin: '0px 0px -12% 0px'});
+  io.observe(ul);
+})();
+</script>
 
 <!-- ==================== ЭКРАН 5: бронь по стартовым ценам ====================
      Большое окно заявки поверх ночного неба. Поля и кнопка — из единого блока
