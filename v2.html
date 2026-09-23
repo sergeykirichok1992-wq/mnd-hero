@@ -87,7 +87,17 @@ body{
   background:rgba(139,92,246,.24);
   box-shadow:inset 0 0 0 1.5px rgba(167,139,250,.9);
 }
-.nav .zs-btn{--zs-btn-h:34px; --zs-btn-fs:12px; padding:6px 16px; letter-spacing:.06em; margin-left:auto}
+.nav .zs-btn{--zs-btn-h:34px; --zs-btn-fs:12px; padding:6px 16px; letter-spacing:.06em}
+/* Телефон в шапке (23.09.2026, просьба Серёги). Ссылка, а не кнопка: тем же
+   тонким шрифтом, что адрес, но белее — номер ищут глазами. Он уводит
+   кнопку МАХ вправо (margin-left:auto), поэтому оба стоят парой у края. */
+.navtel{
+  margin-left:auto; font:400 15px/1.2 "Golos Text",sans-serif;
+  color:rgba(255,255,255,.92); letter-spacing:.02em; white-space:nowrap;
+  text-decoration:none; text-shadow:0 1px 8px rgba(0,0,0,.65);
+  transition:color .2s ease;
+}
+.navtel:hover,.navtel:focus-visible{color:#FFE7BC}
 /* Адрес и даты в шапке. 14.09.2026 Серёга: «чтобы нормально было видно» —
    вместо бледной метки в пунктирной рамке светлый текст обычного кегля,
    тонкая черта отделяет его от «МНД 2026-2027», тень держит его на светлых
@@ -112,6 +122,10 @@ body{
   .nav.solid{padding:10px 16px}
   .brand{font-size:11px; letter-spacing:.07em}
   .nav .zs-btn{--zs-btn-h:32px; --zs-btn-fs:11px; padding:5px 12px}
+  /* номер, «МНД 2026-2027» и кнопка втроём в ширину телефона не влезают:
+     надпись уступает место номеру */
+  .brand{display:none}
+  .navtel{font-size:14px; letter-spacing:0; margin-left:0}
 }
 
 /* ---------- первый экран ---------- */
@@ -6674,6 +6688,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14.5px,1.12vw,17.4px);
   line-height:1.5; color:#3F4F76}
 .gb-lead b{font-weight:600; color:#1B2C57}
+.gb-tel{font-weight:600; color:#1B2C57; white-space:nowrap; text-decoration:none; border-bottom:1px solid rgba(27,44,87,.35)}
+.gb-tel:hover,.gb-tel:focus-visible{border-bottom-color:currentColor}
 
 /* ---------- список бонусов ----------
    Строки разделены пунктиром, а не пустотой: пунктир - примета этого сайта
@@ -9294,6 +9310,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <header class="nav" id="nav">
   <div class="brand">МНД 2026-2027</div>
   <span class="navinfo">Нижний Новгород, Ольгино, 62<b>·</b><i>27 ноября - 10 января</i></span>
+  <a class="navtel" href="tel:+79994447569">+7 (999) 444-75-69</a>
   <a class="zs-btn zs-btn--ghost zs-btn--ghost-purple" href="https://max.ru/id910314959705_biz" target="_blank" rel="noopener">
     <span class="zs-t">Написать в МАХ</span></a>
 </header>
@@ -11669,7 +11686,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <div class="gb-text">
         <h2 class="gb-t" id="gbT"><span class="gb-blue">Условия и бонусы</span><br><span class="gb-red">для групп</span><br><span class="gb-sub">(от 20 детей)</span></h2>
         <p class="gb-lead">Мы всегда можем предложить альтернативные условия под ваш бюджет:
-          по количеству детей и не только. Всё обсуждаемо&nbsp;- звоните!</p>
+          по количеству детей и не только. Всё обсуждаемо&nbsp;- звоните: <a class="gb-tel" href="tel:+79994447569">+7&nbsp;(999)&nbsp;444-75-69</a></p>
 
         <!-- role="list" не лишний: Safari у списка со снятыми маркерами
              отбирает роль списка, и голос перестаёт объявлять «список, 5 пунктов». -->
