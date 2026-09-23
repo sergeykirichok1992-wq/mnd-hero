@@ -9206,8 +9206,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    седьмой пункт во всю ширину; от 720 px четыре в ряд (4 + 3). Материя
    панели и кругов - полоса «Новая площадка» из crimea.html (.np-plus, .np-ic).
    19.09.2026, третий заход: первый был целиком ночным, второй - ночное поле
-   со светлой панелью и фото; Серёга выбрал «как в первом, но фон светлый». */
-.dkp,.dkp-glow{display:none}
+   со светлой панелью и фото; Серёга выбрал «как в первом, но фон светлый».
+   23.09.2026, четвёртый заход (по референсу Серёги): на дуге стоит девочка
+   с леденцом, под ней ОДНА плашка - окно с мелькающими фото, заголовок,
+   значки. Плашкой стала сама сцена .dk-scene: заголовок из неё не выносим,
+   он же служит широкому экрану. */
+.dkp,.dkp-glow,.dkp-win,.dkp-girl{display:none}
 @media (max-width:1279px){
   .dk{padding-bottom:clamp(56px,15vw,96px)}
   /* поле светлое: белое, как было у холма до теста; кромка и свечение дуги
@@ -9240,39 +9244,81 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     background:radial-gradient(closest-side, rgba(255,232,186,.45) 0%, rgba(255,232,186,.2) 40%, rgba(255,232,186,0) 100%)}
   .dkp-glow i:nth-child(4){display:none}
 
-  /* заголовок - живой текст, цвета светлых экранов (синий + густое золото, как на оферте) */
+  /* ---------- девочка с леденцом ----------
+     Стоит на вершине дуги: голова и плечи - на экране с картой, как на
+     референсе (60 % роста выше дуги). Картинка срезана по поясу, и этот
+     срез уходит под верхний край плашки на 6 px - будто она стоит за ней.
+     Ширина --g одна на всё: рост, подъём и зазор до плашки считаются от неё. */
+  .dk{--g:clamp(150px,42vw,236px)}
+  .dkp-girl{
+    display:block; position:relative; z-index:6; pointer-events:none;
+    width:var(--g); height:auto; aspect-ratio:578/598;
+    margin:calc(var(--g) * -.62) auto -6px;
+  }
+  /* от 768 px карта раскладывается иначе: подпись «Екатеринбург» опускается
+     к середине и девочка на прежней высоте закрыла бы её на 77-94 px (замер
+     23.09.2026). Здесь она поднимается над дугой только на 9 % своей ширины */
+  @media (min-width:768px){
+    .dkp-girl{margin-top:calc(var(--g) * -.09)}
+  }
+
+  /* ---------- плашка: окно с фото, заголовок, значки ----------
+     Одна плашка на всё - это сама сцена. Поля --pad одни со всех сторон,
+     скругление окна с фото = скругление плашки минус поле: углы идут
+     ровно, концентрично. */
+  .dk-scene{
+    --pad:clamp(12px,3.4vw,16px);
+    display:flex; flex-direction:column;
+    width:calc(100% - 32px); max-width:760px; margin:0 auto;
+    padding:var(--pad); border-radius:calc(var(--pad) + 16px);
+    pointer-events:auto;
+    /* на белом поле прозрачная лиловая подложка выцветала бы - плашка плотная:
+       ночная синь с фиолетовым переливом, как на тёмных экранах сайта */
+    background:
+      radial-gradient(90% 40% at 12% 0%, rgba(108,43,217,.42), rgba(108,43,217,0) 70%),
+      radial-gradient(80% 40% at 100% 100%, rgba(47,49,146,.6), rgba(47,49,146,0) 70%),
+      linear-gradient(160deg,#2A1E78 0%,#17125A 50%,#0C0C3E 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,214,150,.22), inset 0 1px 0 rgba(255,255,255,.08),
+               0 30px 50px -28px rgba(0,27,113,.6), 0 8px 18px -10px rgba(0,27,113,.3);
+  }
+  /* окно с фото: 16:9. Кадры 800x574 - по бокам не режется ничего,
+     сверху и снизу по 11 %. У первого кадра (i1) внизу вшита надпись из
+     макета - его прижимаем к верху, режется только низ с надписью */
+  .dkp-win{
+    display:block; position:relative; flex:none; aspect-ratio:16/9;
+    border-radius:16px; overflow:hidden; isolation:isolate; background:#1B1560;
+  }
+  .dkp-win img{position:absolute; inset:0; display:block; width:100%; height:100%;
+    object-fit:cover; opacity:0}                    /* смена кадров резкая, как на боевых */
+  .dkp-win img.on{opacity:1}
+  .dkp-win img:first-child{object-position:50% 0}
+  /* тонкая золотая кромка поверх кадра - чтобы фото не «вырезалось» из плашки */
+  .dkp-win::after{content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+    border-radius:inherit; box-shadow:inset 0 0 0 1px rgba(255,214,150,.3)}
+
+  /* заголовок - между фото и значками, цвета тёмных экранов: белый + золото */
   .dk-t{
     position:relative; width:auto; height:auto; overflow:visible; clip-path:none; border:0;
-    margin:max(54px, calc(160 * var(--m) / 1080)) 16px 0; padding:0 6px;
+    margin:clamp(20px,5.6vw,28px) 0 clamp(6px,2vw,10px); padding:0;
     font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-    font-size:clamp(25.3px,7.245vw,34.5px); line-height:1.1; letter-spacing:-.02em;
-    color:#001B71; text-align:center; text-transform:uppercase; white-space:normal;
-    text-shadow:none;
+    font-size:clamp(21px,6.1vw,30px); line-height:1.1; letter-spacing:-.01em;
+    color:#fff; text-align:center; text-transform:uppercase; white-space:normal; text-wrap:balance;
+    text-shadow:0 2px 14px rgba(0,0,0,.35);
   }
-  .dk-t b{display:block; font-weight:700; color:#A96D0D}
+  .dk-t b{font-weight:700; color:#F2CD80}
   @supports ((-webkit-background-clip:text) or (background-clip:text)){
-    .dk-t b{background:linear-gradient(180deg,#B0700F 0%,#9E650B 45%,#8A5607 100%);
+    .dk-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
       -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
-      text-shadow:none; padding-top:.22em; margin-top:-.22em}
+      text-shadow:none}
   }
   /* список письма на телефоне не нужен вовсе: те же сведения несёт панель */
   .dk-list{display:none}
 
-  /* ---------- панель ---------- */
+  /* ---------- значки: своей подложки нет, лежат прямо на плашке ---------- */
   .dkp{
     --ic:clamp(54px,15vw,64px);
     display:flex; flex-wrap:wrap; justify-content:center;
-    width:calc(100% - 32px); max-width:760px;
-    list-style:none; margin:clamp(24px,7vw,40px) auto 0; padding:6px 4px;
-    border-radius:24px; pointer-events:auto;
-    /* на белом поле прозрачная лиловая подложка выцветала бы - панель плотная:
-       ночная синь с фиолетовым переливом, как на тёмных экранах сайта */
-    background:
-      radial-gradient(90% 55% at 12% 0%, rgba(108,43,217,.42), rgba(108,43,217,0) 70%),
-      radial-gradient(80% 50% at 100% 100%, rgba(47,49,146,.6), rgba(47,49,146,0) 70%),
-      linear-gradient(160deg,#2A1E78 0%,#17125A 50%,#0C0C3E 100%);
-    box-shadow:inset 0 0 0 1px rgba(255,214,150,.22), inset 0 1px 0 rgba(255,255,255,.08),
-               0 30px 50px -28px rgba(0,27,113,.6), 0 8px 18px -10px rgba(0,27,113,.3);
+    width:auto; list-style:none; margin:0; padding:0;
   }
   .dkp *,.dkp *::before,.dkp *::after{box-sizing:border-box}
   .dkp-i{
@@ -9315,7 +9361,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* планшет: четыре в ряд, во втором ряду три пошире. Не раньше 720 px:
    уже на 600 «Продолжительность:» не влезает в четверть панели */
 @media (min-width:720px) and (max-width:1279px){
-  .dkp{padding:10px 8px}
   .dkp-i{flex-basis:25%}
   .dkp-i:nth-child(n+5){flex-basis:33.333%}
   .dkp-i::before{content:''; position:absolute; left:0; top:12%; bottom:12%; width:1px;
@@ -9341,12 +9386,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <img class="dk-bg" src="v2-snow.webp"
        srcset="v2-snow-1400.webp 1400w, v2-snow.webp 2560w"
        sizes="100vw" width="2560" height="1380" loading="lazy" decoding="async" alt="">
+  <!-- ТЕСТ, 23.09.2026: девочка с леденцом стоит на дуге над плашкой (только телефон) -->
+  <img class="dkp-girl" src="dk-devochka.webp" width="578" height="598" loading="lazy" decoding="async" alt="">
   <div class="dk-scene">
     <img class="dk-art" src="v2-ded.webp"
          srcset="v2-ded-1200.webp 1200w, v2-ded.webp 2257w"
          sizes="(max-width:1279px) 100vw, 79vw"
          width="2257" height="1391" loading="lazy" decoding="async"
          alt="Дед Мороз с посохом стоит рядом с большим письмом в новогодней рамке">
+    <!-- ТЕСТ: окно с мелькающими кадрами - первым в плашке. Кадры те же, что
+         в окне картинки kz-info.webp; остальные подгружает и перещёлкивает
+         прежний скрипт окна (#dkmWin) -->
+    <div class="dkp-win" id="dkmWin" aria-hidden="true">
+      <img class="on" src="info/i1.webp" width="800" height="574" alt="" loading="lazy" decoding="async">
+    </div>
     <h2 class="dk-t" id="dkT">Где, когда <b>и&nbsp;для&nbsp;кого</b></h2>
     <ul class="dk-list">
       <li><span class="dk-ico" aria-hidden="true">🐣</span>Для детей от 4 до 11 лет</li>
