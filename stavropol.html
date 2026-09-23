@@ -6,7 +6,7 @@
      (Серёга: «скопируй сайт Тюмени»): у Ставрополя, как у Тюмени, «Тайное
      Министерство», снег и пульт, а не «Звёздная смена». Отличается только
      городское - город и адрес в шапке и на первом экране, логотип и подпись
-     на телефоне (st-logo.webp, st-mob-tekst.webp), экран «Где, когда и для
+     на телефоне (st-logo-kapsula.webp, st-mob-tekst.webp), экран «Где, когда и для
      кого», надзаголовки, цены (своя сетка, взрослый от 600), ответы на вопросы
      (вместимость, адрес, трансфер), подвал, порядок городов в формах.
      Пока черновик под noindex на https://mnd-nn.ru/stavropol.html,
@@ -218,7 +218,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    Плавают: паровозик влево-вверх, лошадка вправо-вверх и обратно; ход и срок — --toy-*. */
 #tyToys{
   z-index:7; inset:auto; pointer-events:none;
-  left:50%; top:var(--logo-top); width:var(--logo-w); aspect-ratio:1689/1174;
+  left:50%; top:var(--logo-top); width:var(--logo-w); aspect-ratio:3485/2600;   /* СТАВРОПОЛЬ: пропорция st-logo-kapsula.webp */
   transform:translate(-50%,-50%) scale(1.085);
   opacity:0; will-change:transform,opacity;
   --toy-dur:2.4s; --toy-dx:16%; --toy-dy:20%;
@@ -9547,7 +9547,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <canvas id="beams" style="z-index:5"></canvas>
     <div id="glow"></div>
     <canvas id="smokeBack"></canvas>
-    <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Самый волшебный ивент 2026. Ставрополь, каждый день с 27 ноября по 10 января">
+    <img id="logo" alt="Экскурсия-шоу в Министерство новогодних дел Деда Мороза. Капсула времени. Снова в Ставрополе! Совсем новая программа!">
     <div id="tyToys" aria-hidden="true"><img class="ty-toy ty-train" alt=""><img class="ty-toy ty-horse" alt=""></div>
     <div class="tym" id="tymIgry" aria-hidden="true"><div class="tym-kadr"><img class="ty-toy tym-train" alt=""><img class="ty-toy tym-horse" alt=""></div></div>
     <canvas id="logoFx"></canvas>
@@ -14608,7 +14608,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     tymI[0].src='ty-toy-train.webp'; tymI[1].src='ty-toy-horse.webp';
     document.getElementById('tymTekst').src='st-mob-tekst.webp?v=1';
   }
-  if(!BAKED) logo.src = 'st-logo.webp';   // ТЮМЕНЬ: свой логотип (15.09.2026), в Нижнем logo.webp   // на телефоне логотип уже в ролике — файл не качаем
+  if(!BAKED) logo.src = 'st-logo-kapsula.webp';   // СТАВРОПОЛЬ: логотип «Капсула времени» (макет Серёги 23.09.2026), в Нижнем logo.webp   // на телефоне логотип уже в ролике — файл не качаем
   var tailP = 0, lastNow = 0, started = false, introT = 0, logoT = 0;
   var DPR=Math.min(2, window.devicePixelRatio||1);
   var LW=2, LH=2;
