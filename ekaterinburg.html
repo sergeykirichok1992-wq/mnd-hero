@@ -9969,14 +9969,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      строку «В ТЮМЕНИ ТАКАЯ ЖЕ ВОЛШЕБНАЯ ПЛОЩАДКА!» из заголовка карусели
      в екатеринбургской копии убрали - две одинаковые мысли подряд.
 
-     ЖДЁТ ПРАВКИ:
-       - ФОТО. Шесть мест в мозаике пока заглушки «фото скоро». Серёга
-         пришлёт свои кадры - собрать их скриптом по образцу
-         sayt-nn/instrumenty/ploshchadka_crimea.py в ploshchadka/ekb-*.webp
-         и заменить <div class="lk-skoro"> на <img>, разметка готова.
-       - ПРЕИМУЩЕСТВА. Семь пунктов взяты крымские, Серёга их подредактирует.
-         По екатеринбургской площадке у нас не подтверждено НИЧЕГО, кроме
-         адреса из оферты партнёра, - пока страница под noindex.
+     ФОТО. Шесть кадров площадки прислал Серёга 23.09.2026, собирает их
+     sayt-nn/instrumenty/ploshchadka_ekb.py. Все горизонтальные, поэтому
+     мозаика тут своя: одинаковые плитки 3:2, три колонки на два ряда.
+     Дом на снимках снят ДО новогодней застройки - про это строка под фото.
+
+     ЖДЁТ ПРАВКИ: ПРЕИМУЩЕСТВА. Семь пунктов взяты крымские, Серёга их
+     подредактирует. По екатеринбургской площадке у нас не подтверждено
+     НИЧЕГО, кроме адреса из оферты партнёра, - пока страница под noindex.
 
      Светлая палитра взята с самой страницы, ничего нового не придумано:
      фон - родня фону карусели (.kr), плашка преимуществ - «голубой лист»
@@ -10073,10 +10073,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   color:#3F4F76; text-wrap:balance;
 }
 
-/* ---------- семь преимуществ ----------
-   «Голубой лист» светлых форм (.sv-card / .pr-box): бумага, лежащая на снегу.
-   На компьютере семь ячеек в ряд с тонкими разделителями, на планшете 4 + 3
-   по центру, на телефоне по две, седьмая по центру (значок слева). */
+/* ---------- четыре преимущества ----------
+   Слова Серёги, 23.09.2026. «Голубой лист» светлых форм (.sv-card / .pr-box):
+   бумага, лежащая на снегу. На компьютере и планшете четыре ячейки в ряд
+   с тонкими разделителями, на телефоне по две (значок слева).
+   Добавишь пятое - вернуть правило разделителя для .lk-pl:nth-child(5). */
 .lk-plus{
   --lk-ic:clamp(52px,3.9vw,72px);
   list-style:none; margin:clamp(28px,3.1vw,54px) 0 0; padding:clamp(20px,1.8vw,32px) clamp(8px,.8vw,14px);
@@ -10097,7 +10098,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* разделитель слева от ячейки - синяя нить, гаснущая к концам */
 .lk-pl::before{content:''; position:absolute; left:0; top:8%; bottom:8%; width:1px;
   background:linear-gradient(180deg, rgba(0,27,113,0), rgba(0,27,113,.17) 50%, rgba(0,27,113,0))}
-.lk-pl:first-child::before,.lk-pl:nth-child(5)::before{display:none}
+.lk-pl:first-child::before{display:none}
 /* золото на светлом - золото кнопок (.gb-ic), значок тёмно-коричневый */
 .lk-ic{
   flex:none; display:grid; place-items:center;
@@ -10111,32 +10112,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
   font-size:clamp(15px,1.1vw,19px); line-height:1.28; color:#1B2C57; text-wrap:balance;
 }
-@media (min-width:1200px){
-  .lk-pl{flex-basis:calc(100% / 7)}
-  .lk-pl:nth-child(5)::before{display:block}
-}
-
 /* ---------- мозаика ----------
-   Раскладка ровно та же, что на крымском экране, чтобы настоящие кадры
-   встали без подгонки: области fs (фасад), zs и zr (залы), bs (двор),
-   ls (узкий вертикальный), dm (общий вид). Высоту рядов дают только плитки
-   с aspect-ratio; у растянутых пропорция снята (auto), иначе плитка ведёт
-   себя как align-self:start и нижний край разъезжается.
-   Телефон (до 767): широкий кадр во всю ширину, два зала 3:4, ряд из трёх. */
+   Все шесть кадров площадки ГОРИЗОНТАЛЬНЫЕ (в Крыму было три горизонтальных
+   и три вертикальных), поэтому раскладка своя и простая: одинаковые плитки
+   3:2, уличные кадры по углам.
+     fs - фасад вечером, dm - дом сбоку, z1…z4 - залы внутри.
+   Телефон (до 767): фасад во всю ширину, четыре зала по два в ряд, дом
+   во всю ширину. От 768: три колонки на два ряда.
+   Кадры режет в общие 3:2 sayt-nn/instrumenty/ploshchadka_ekb.py -
+   меняешь пропорцию здесь, меняй и там. */
 .lk-mz{display:grid; gap:var(--lk-gap); margin-top:clamp(24px,2.6vw,48px);
-  grid-template-columns:minmax(0,1.689fr) minmax(0,.375fr) minmax(0,.375fr) minmax(0,1.689fr);
-  grid-template-areas:"fs fs fs fs" "zs zs zr zr" "dm ls ls bs"}
-.lk-fs{grid-area:fs} .lk-dm{grid-area:dm} .lk-bs{grid-area:bs}
-.lk-zs{grid-area:zs} .lk-zr{grid-area:zr} .lk-ls{grid-area:ls}
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  grid-template-areas:"fs fs" "z1 z2" "z3 z4" "dm dm"}
+.lk-fs{grid-area:fs} .lk-dm{grid-area:dm}
+.lk-z1{grid-area:z1} .lk-z2{grid-area:z2} .lk-z3{grid-area:z3} .lk-z4{grid-area:z4}
 .lk-ph{
   position:relative; margin:0; overflow:hidden; border-radius:var(--lk-r);
   isolation:isolate;                  /* Safari: скругление держится, пока кадр растёт под курсором */
   background:#DCE7F9;                 /* видно, пока фото грузится */
   box-shadow:0 22px 40px -30px rgba(0,27,113,.5), 0 3px 10px -6px rgba(0,27,113,.2);
 }
-.lk-v{aspect-ratio:3/4}
-.lk-h{aspect-ratio:1000/592}
-.lk-ls{aspect-ratio:auto}
+.lk-ph{aspect-ratio:3/2}
 .lk-ph img{position:absolute; inset:0; display:block; width:100%; height:100%;
   object-fit:cover; border-radius:inherit;
   transition:transform .7s cubic-bezier(.2,.7,.2,1)}
@@ -10147,22 +10143,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .lk-ph:hover img{transform:scale(1.045)}
 }
 
-/* ---------- заглушка вместо фото ----------
-   Пока кадров Екатеринбурга нет. Плитка не пустая и не серая «дыра»:
-   та же бумага, что у плашки преимуществ, золотой значок кадра и подпись.
-   Подпись показывается только на крупных плитках - на мелких ей нет места. */
-.lk-skoro{
-  position:absolute; inset:0; display:flex; flex-direction:column;
-  align-items:center; justify-content:center; gap:clamp(6px,.6vw,10px);
-  border-radius:inherit; padding:6px;
-  background:linear-gradient(180deg,#ECF2FE 0%,#DAE6F8 100%);
+/* ---------- строка под фото ----------
+   Просьба Серёги 23.09.2026. Дом на снимках снят ДО новогодней застройки,
+   и эта строка объясняет, что покупатель увидит на самом деле. Стоит
+   под мозаикой, а не над ней: сначала кадры, потом обещание. */
+.lk-posle{
+  margin:clamp(18px,1.8vw,30px) auto 0; max-width:56ch; text-align:center;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:clamp(16px,1.2vw,21px); line-height:1.4; color:#1B2C57; text-wrap:balance;
 }
-.lk-skoro svg{width:clamp(22px,2.2vw,40px); height:auto; flex:none;
-  fill:none; stroke:#C79A3A; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
-.lk-skoro span{display:none;
-  font-family:"CR Blogger",Arial,sans-serif; font-size:clamp(12px,.85vw,15px);
-  line-height:1.2; color:#6B7CA6; text-align:center}
-.lk-fs .lk-skoro span,.lk-dm .lk-skoro span{display:block}
+.lk-posle b{font-family:"Blogger Sans","Golos Text",Arial,sans-serif;
+  font-weight:700; color:#8C1B12}
 
 /* ---------- телефон (до 767 px) ---------- */
 @media (max-width:767px){
@@ -10178,31 +10169,29 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .lk-cap{font-size:13.5px}
   .lk-plus{--lk-ic:36px}
 }
-/* Компьютер и планшет (от 768): один ряд, зеркально -
-   широкий | зал | двор над узким | зал | широкий. Высоту задаёт средняя
-   колонка (двор 1000:592 + зазор + узкий 3:4), доли 3.45 и 1.532 подобраны
-   так, чтобы широкие выходили 1000:592, а залы 3:4 - все кадры целиком. */
+/* Компьютер и планшет (от 768): три колонки на два ряда, уличные кадры
+   по углам - фасад слева сверху, дом справа снизу. */
 @media (min-width:768px){
-  .lk-mz{grid-template-columns:minmax(0,3.45fr) minmax(0,1.532fr) minmax(0,1fr) minmax(0,1.532fr) minmax(0,3.45fr);
-    grid-template-areas:"fs zs bs zr dm" "fs zs ls zr dm"}
-  .lk-fs,.lk-dm,.lk-zs,.lk-zr{aspect-ratio:auto}
-  .lk-ls{aspect-ratio:3/4}
+  .lk-mz{grid-template-columns:repeat(3, minmax(0,1fr));
+    grid-template-areas:"fs z1 z2" "z3 z4 dm"}
 }
 
 /* ---------- появление ----------
    Прячет только класс .rv на секции, его вешает скрипт - без JS всё видно. */
-.lk.rv .lk-t,.lk.rv .lk-lead,.lk.rv .lk-plus,.lk.rv .lk-ph{opacity:0; transform:translate3d(0,24px,0)}
+.lk.rv .lk-t,.lk.rv .lk-lead,.lk.rv .lk-plus,.lk.rv .lk-ph,.lk.rv .lk-posle{opacity:0; transform:translate3d(0,24px,0)}
 .lk.rv .on{opacity:1; transform:none;
   transition:opacity .8s ease var(--lk-w,0s), transform .9s cubic-bezier(.2,.7,.2,1) var(--lk-w,0s)}
 .lk.rv .lk-lead{--lk-w:.1s}
 .lk.rv .lk-plus{--lk-w:.16s}
-.lk.rv .lk-zs,.lk.rv .lk-bs,.lk.rv .lk-ls,.lk.rv .lk-zr{--lk-w:.1s}
-.lk.rv .lk-dm{--lk-w:.2s}
+.lk.rv .lk-z1,.lk.rv .lk-z2{--lk-w:.08s}
+.lk.rv .lk-z3,.lk.rv .lk-z4{--lk-w:.16s}
+.lk.rv .lk-dm{--lk-w:.24s}
+.lk.rv .lk-posle{--lk-w:.1s}
 
 /* вне окна движение стоит */
 .lk-off .lk-glow i{animation-play-state:paused}
 @media (prefers-reduced-motion:reduce){
-  .lk.rv .lk-t,.lk.rv .lk-lead,.lk.rv .lk-plus,.lk.rv .lk-ph{opacity:1; transform:none; transition:none}
+  .lk.rv .lk-t,.lk.rv .lk-lead,.lk.rv .lk-plus,.lk.rv .lk-ph,.lk.rv .lk-posle{opacity:1; transform:none; transition:none}
   .lk .lk-glow i{animation:none}
   .lk-ph img{transition:none}
   .lk-ph:hover img{transform:none}
@@ -10215,26 +10204,26 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     <p class="lk-lead">Новогодняя красота и&nbsp;атмосфера ждут вас в&nbsp;этом сезоне!</p>
 
     <ul class="lk-plus" aria-label="Чем хороша площадка">
+      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M3.2 10.6 12 3.7l8.8 6.9"/><path d="M5.1 10.3V20.4h13.8V10.3"/><path d="M5.1 13.7h13.8M5.1 17.1h13.8"/><path d="M10.2 20.4v-4.1h3.6v4.1"/></svg></span><span class="lk-cap">Настоящая деревянная изба</span></li>
+      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="7" r="2.7"/><path d="M7.2 18.6a4.8 4.8 0 0 1 9.6 0"/><circle cx="5" cy="9.6" r="2"/><path d="M1.9 18.6a3.5 3.5 0 0 1 3.1-3.5"/><circle cx="19" cy="9.6" r="2"/><path d="M22.1 18.6a3.5 3.5 0 0 0-3.1-3.5"/></svg></span><span class="lk-cap">Вмещает полные группы школьников</span></li>
       <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 21 10.4 3M20 21 13.6 3"/><path d="M12 4.8v2M12 9.8v2.6M12 15.6v3.4"/></svg></span><span class="lk-cap">Удобный подъезд</span></li>
-      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="4" y="3" width="16" height="14.5" rx="2.6"/><path d="M4 10.5h16M12 3v7.5"/><path d="M6.8 17.5V20M17.2 17.5V20"/><circle cx="8" cy="14" r=".9"/><circle cx="16" cy="14" r=".9"/></svg></span><span class="lk-cap">Большая парковка для&nbsp;автобусов</span></li>
-      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M8 2.8 11.6 8.6H10l3 5H3l3-5H4.4z"/><path d="M8 13.6v4.4"/><path d="M17 7.6l2.6 4.2h-1.2l2.4 4H13.2l2.4-4h-1.2z"/><path d="M17 15.8V18"/><path d="M2 20.5h20"/></svg></span><span class="lk-cap">Большая территория</span></li>
-      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M5 11V8.6A2.6 2.6 0 0 1 7.6 6h8.8A2.6 2.6 0 0 1 19 8.6V11"/><path d="M3 12a1.8 1.8 0 0 1 3.6 0v2.4h10.8V12a1.8 1.8 0 0 1 3.6 0v6H3z"/><path d="M5.4 18v2.2M18.6 18v2.2"/></svg></span><span class="lk-cap">Много зон ожидания</span></li>
-      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 14a8 8 0 0 1 16 0z"/><path d="M12 6V5M12 14v4.8a1.8 1.8 0 0 1-3.6 0"/><path d="M5.2 2.2v1.6M18.8 2.2v1.6M9 1.2v1.4M15 1.2v1.4"/></svg></span><span class="lk-cap">Большой навес на&nbsp;случай дождя</span></li>
-      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M9 3.5H3.5V9M15 3.5h5.5V9M9 20.5H3.5V15M15 20.5h5.5V15"/><path d="M3.5 3.5l6 6M20.5 3.5l-6 6M3.5 20.5l6-6M20.5 20.5l-6-6"/></svg></span><span class="lk-cap">Огромные залы</span></li>
-      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="14.6" r="6.6"/><path d="M10.2 6.1h3.6v2.1h-3.6z"/><path d="M12 6.1V4.6a1.5 1.5 0 1 1 1.5-1.5"/><path d="M5.7 13.2c2.1 1.5 4.2 1.5 6.3 0s4.2-1.5 6.3 0"/><path d="M8.6 17.6h.01M12 18.4h.01M15.4 17.6h.01"/></svg></span><span class="lk-cap">Большие возможности для&nbsp;украшений</span></li>
+      <li class="lk-pl"><span class="lk-ic" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="4.8" cy="18" r="2.3"/><circle cx="19.2" cy="6" r="2.3"/><path d="M6.5 16.3c2.6-2.4 3-4.2 2-5.9-1.2-2 .8-4.3 3.5-3.6 1.9.5 3.3.9 5.4-.6"/></svg></span><span class="lk-cap">Недалеко от&nbsp;города</span></li>
     </ul>
 
-    <!-- Шесть мест под кадры площадки. Придут фото - заменить каждый
-         <div class="lk-skoro"> на <img src="ploshchadka/ekb-…webp" …>,
-         классы плиток и раскладку не трогать. -->
+    <!-- Шесть кадров площадки. Собирает sayt-nn/instrumenty/ploshchadka_ekb.py
+         из ~/Desktop/сайт ЕКБ/ в ploshchadka/ekb-*.webp, по две ширины.
+         Заменишь кадр с тем же именем - подними ?v= у всех шести. -->
     <div class="lk-mz">
-      <figure class="lk-ph lk-h lk-fs"><div class="lk-skoro"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="6" width="19" height="14" rx="3"/><path d="M8.5 6l1.4-2.2h4.2L15.5 6"/><circle cx="12" cy="13.2" r="3.9"/></svg><span>Фото площадки скоро</span></div></figure>
-      <figure class="lk-ph lk-v lk-zs"><div class="lk-skoro"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="6" width="19" height="14" rx="3"/><path d="M8.5 6l1.4-2.2h4.2L15.5 6"/><circle cx="12" cy="13.2" r="3.9"/></svg><span>Фото площадки скоро</span></div></figure>
-      <figure class="lk-ph lk-h lk-bs"><div class="lk-skoro"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="6" width="19" height="14" rx="3"/><path d="M8.5 6l1.4-2.2h4.2L15.5 6"/><circle cx="12" cy="13.2" r="3.9"/></svg><span>Фото площадки скоро</span></div></figure>
-      <figure class="lk-ph lk-v lk-ls"><div class="lk-skoro"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="6" width="19" height="14" rx="3"/><path d="M8.5 6l1.4-2.2h4.2L15.5 6"/><circle cx="12" cy="13.2" r="3.9"/></svg><span>Фото площадки скоро</span></div></figure>
-      <figure class="lk-ph lk-v lk-zr"><div class="lk-skoro"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="6" width="19" height="14" rx="3"/><path d="M8.5 6l1.4-2.2h4.2L15.5 6"/><circle cx="12" cy="13.2" r="3.9"/></svg><span>Фото площадки скоро</span></div></figure>
-      <figure class="lk-ph lk-h lk-dm"><div class="lk-skoro"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2.5" y="6" width="19" height="14" rx="3"/><path d="M8.5 6l1.4-2.2h4.2L15.5 6"/><circle cx="12" cy="13.2" r="3.9"/></svg><span>Фото площадки скоро</span></div></figure>
+      <figure class="lk-ph lk-fs"><img src="ploshchadka/ekb-fs.webp?v=1" srcset="ploshchadka/ekb-fs-620.webp?v=1 620w, ploshchadka/ekb-fs.webp?v=1 1100w" sizes="(max-width:767px) 92vw, (max-width:1470px) 30vw, 445px" width="1100" height="733" alt="Бревенчатый дом площадки вечером: крыльцо и гирлянды по всему фасаду" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="lk-ph lk-z1"><img src="ploshchadka/ekb-z1.webp?v=1" srcset="ploshchadka/ekb-z1-620.webp?v=1 620w, ploshchadka/ekb-z1.webp?v=1 1100w" sizes="(max-width:767px) 46vw, (max-width:1470px) 30vw, 445px" width="1100" height="733" alt="Зал со столом из цельного спила, камином и большим экраном" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="lk-ph lk-z2"><img src="ploshchadka/ekb-z2.webp?v=1" srcset="ploshchadka/ekb-z2-620.webp?v=1 620w, ploshchadka/ekb-z2.webp?v=1 1100w" sizes="(max-width:767px) 46vw, (max-width:1470px) 30vw, 445px" width="1100" height="733" alt="Зал с деревянной лестницей на второй этаж и камином" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="lk-ph lk-z3"><img src="ploshchadka/ekb-z3.webp?v=1" srcset="ploshchadka/ekb-z3-620.webp?v=1 620w, ploshchadka/ekb-z3.webp?v=1 1100w" sizes="(max-width:767px) 46vw, (max-width:1470px) 30vw, 445px" width="1100" height="733" alt="Просторный зал с окнами и кухней в глубине" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="lk-ph lk-z4"><img src="ploshchadka/ekb-z4.webp?v=1" srcset="ploshchadka/ekb-z4-620.webp?v=1 620w, ploshchadka/ekb-z4.webp?v=1 1100w" sizes="(max-width:767px) 46vw, (max-width:1470px) 30vw, 445px" width="1100" height="733" alt="Зал с мягким диваном, длинным столом из спила и лестницей" loading="lazy" decoding="async" draggable="false"></figure>
+      <figure class="lk-ph lk-dm"><img src="ploshchadka/ekb-dm.webp?v=1" srcset="ploshchadka/ekb-dm-620.webp?v=1 620w, ploshchadka/ekb-dm.webp?v=1 1100w" sizes="(max-width:767px) 92vw, (max-width:1470px) 30vw, 445px" width="1100" height="733" alt="Дом площадки сбоку: бревенчатые стены в гирляндах, вечер" loading="lazy" decoding="async" draggable="false"></figure>
     </div>
+
+    <p class="lk-posle">Представьте, как <b>антуражно</b> будет выглядеть дом
+      после нашей застройки и&nbsp;украшений!</p>
   </div>
 </section>
 <script>
@@ -10250,7 +10239,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }, {rootMargin:'200px 0px'}).observe(s);
 
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var parts = s.querySelectorAll('.lk-t, .lk-lead, .lk-plus, .lk-ph');
+  var parts = s.querySelectorAll('.lk-t, .lk-lead, .lk-plus, .lk-ph, .lk-posle');
   s.classList.add('rv');
   var io = new IntersectionObserver(function(es){
     for (var k = 0; k < es.length; k++){
