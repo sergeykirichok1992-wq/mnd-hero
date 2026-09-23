@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://mnd-nn.ru/</loc>
+    <lastmod>2026-09-18</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://mnd-nn.ru/otzyvy.html</loc>
+    <lastmod>2026-09-17</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mnd-nn.ru/promokody.html</loc>
+    <lastmod>2026-09-18</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mnd-nn.ru/politika-nn.html</loc>
+    <lastmod>2026-09-18</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mnd-nn.ru/soglasie-nn.html</loc>
+    <lastmod>2026-09-18</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mnd-nn.ru/oferta-nn.html</loc>
+    <lastmod>2026-09-18</lastmod>
+    <priority>0.5</priority>
+  </url>
+</urlset>

@@ -1,0 +1,19 @@
+# Файл собирает sayt-nn/instrumenty/seo_baza.py - руками не править.
+#
+# Один файл на все городские домены: на сервере у них общий корень
+# (pereezd-rf/infra/Caddyfile.sites), поэтому robots.txt физически
+# не может быть разным у разных городов.
+#
+# Ничего не запрещаем сознательно. Черновые страницы репозитория
+# (index, quiz, karta, kosmos, programma-varianty, kazan-test, propusk)
+# закрыты своим тегом <meta name="robots" content="noindex">, а запрет
+# здесь как раз помешал бы роботу этот noindex увидеть - и адрес мог бы
+# попасть в поиск вслепую. На боевых доменах эти страницы вдобавок
+# уводит на главную сам Caddy.
+
+User-agent: *
+Disallow:
+
+Sitemap: https://mnd-nn.ru/sitemap-nn.xml
+Sitemap: https://mnd-kazan.ru/sitemap-kazan.xml
+Sitemap: https://mnd-tumen.ru/sitemap-tyumen.xml
