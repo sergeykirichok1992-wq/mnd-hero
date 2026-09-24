@@ -11481,657 +11481,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 </script>
 </section>
 
-<!-- ==================== СТАВРОПОЛЬ: ЭКРАН «КАПСУЛЫ ВРЕМЕНИ» ====================
-     ТОЛЬКО В stavropol.html (24.09.2026, референс Серёги «сайт ставропроль /экран капсулы/
-     референс.png»): сразу после экрана программы «Что же ждёт детей?», перед экраном
-     «Дети вызовут настоящий снег». Для sinhron.py это городская вставка между программой
-     и «снегом»: если он остановится здесь — экран оставлять, у Тюмени его нет.
-
-     Четыре капсулы, которые дети восстанавливают в квесте, решёткой 2x2 «ёлочкой», как
-     на референсе: верхний ряд капсула слева, нижний справа. Капсулы подключены к машине
-     времени: через экран идёт золотая нить (три обводки и искра — как нить на швах сайта),
-     у каждой капсулы светящийся узел; капсулы по очереди «сбоят» — их кусок нити мигает,
-     из узла летят искры. На телефоне нить идёт вертикально сквозь столбик капсул.
-     Нить строит скрипт по замеру капсул (перестраивает при изменении размера).
-
-     Картинки st-kp-*.webp собирает sayt-nn/instrumenty/kapsuly_stavropol.py из «сайт
-     ставропроль /экран капсулы/» (капсулы вырезаны из картинок Серёги без подписей,
-     фон — его «архив»). Слои: секция 26, как программа; «снег» (27) заезжает на наш низ
-     дугой на 3vw — поэтому низ тёмно-синий и нижнее поле с запасом. Все классы kp-. -->
-<style>
-/* ---------- СЕКЦИЯ И ФОН ----------
-   Слой 26, как у программы выше: экран «снег» ниже (27) заезжает на наш низ
-   своей дугой на 3vw, и над дугой должен быть виден наш тёмно-синий низ.
-   Класс `cr` секции не даём: он включил бы чужой множитель `--u`.
-   Верх начинается ровно цветом низа программы (#000B36 + то же зерно .05) —
-   шва нет. Середина — ночь с пурпурным уклоном, поверх неё «тайный архив»
-   Серёги (st-kp-fon), низ снова #000B36: на нём читается золотая дуга. */
-.kp{
-  --kp-gold:#F7C561;
-  /* ширина капсулы: телефон (от 600 px своя, ниже). 24.09.2026 на 15 % меньше
-     прежних clamp(112px,33vw,168px) — Серёга: «капсулы на 15 процентов меньше,
-     будет компактнее». Нить строит скрипт по замеру, её править не нужно. */
-  --kp-cw:clamp(95px,28.05vw,143px);
-  position:relative; z-index:26; overflow:hidden; isolation:isolate;
-  color:#fff; background:#000B36;
-  /* сверху мало: у программы над нами и так большое нижнее поле */
-  padding:clamp(36px,4vw,80px) 0 calc(3vw + clamp(64px,6.4vw,128px));
-  /* Заезжаем на нижнее поле программы на 64 из его 160 макетных единиц
-     (та же формула `--u`, что у .cr): поле держалось под сугроб, которого
-     в Ставрополе под программой нет, и между стрелкой «Листайте сайт
-     до конца» и нашим заголовком зияло ~200 px пустоты. Верх у нас того же
-     цвета, что низ программы, поэтому шва не видно; стрелку не задеваем —
-     от её кончика до нашего верха остаётся ~80 px на 1600 и ~65 на телефоне. */
-  margin-top:calc(-64 * max(1px, (min(94vw, 1462px) - 2*clamp(16px, 3vw, 47.6px)) / 1100));
-}
-/* Телефон: ещё на 27 px выше (Серёга 24.09.2026: «между заголовком и стрелочкой
-   уменьшить отступ процентов на 30»). Было от кончика стрелки до заголовка
-   91 px на 390 и 95 на 360, стало 64 и 68; до нашего верха от стрелки ~30 px. */
-@media (max-width:767px){
-  .kp{margin-top:calc(-64 * max(1px, (min(94vw, 1462px) - 2*clamp(16px, 3vw, 47.6px)) / 1100) - 27px)}
-}
-.kp-bg{
-  position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-  background:linear-gradient(180deg,
-    #000B36 0%, #050D40 7%, #0B0E4B 24%, #130D52 46%, #100C4A 66%, #070C3E 86%, #000B36 100%);
-}
-/* Архив Серёги: кладём «экраном» (screen) — чёрные поля картинки исчезают,
-   остаются полки, свет ламп и вшитые отблески. Края растворены маской,
-   чтобы кадр не читался прямоугольником. */
-.kp-fon{
-  position:absolute; left:50%; top:9%; bottom:5%; width:max(100%,1180px); transform:translateX(-50%);
-  background:url(st-kp-fon.webp) center/cover no-repeat;
-  mix-blend-mode:screen; opacity:.9;
-  -webkit-mask-image:radial-gradient(64% 54% at 50% 50%, #000 34%, rgba(0,0,0,.55) 62%, transparent 100%);
-          mask-image:radial-gradient(64% 54% at 50% 50%, #000 34%, rgba(0,0,0,.55) 62%, transparent 100%);
-}
-.kp-glow{position:absolute; inset:0; overflow:hidden}
-.kp-glow i{position:absolute; display:block; border-radius:50%}
-.kp-glow i:nth-child(1){left:-24%; top:4%; width:70%; height:46%;
-  background:radial-gradient(closest-side, rgba(108,43,217,.34) 0%, rgba(108,43,217,.18) 40%, rgba(108,43,217,.05) 72%, rgba(108,43,217,0) 100%);
-  animation:kpDrift1 38s ease-in-out infinite alternate}
-.kp-glow i:nth-child(2){right:-26%; top:30%; width:74%; height:48%;
-  background:radial-gradient(closest-side, rgba(176,106,224,.26) 0%, rgba(176,106,224,.14) 40%, rgba(176,106,224,.04) 72%, rgba(176,106,224,0) 100%);
-  animation:kpDrift2 46s ease-in-out infinite alternate}
-.kp-glow i:nth-child(3){left:6%; bottom:2%; width:66%; height:40%;
-  background:radial-gradient(closest-side, rgba(47,49,146,.46) 0%, rgba(47,49,146,.26) 40%, rgba(47,49,146,.08) 72%, rgba(47,49,146,0) 100%);
-  animation:kpDrift3 34s ease-in-out infinite alternate}
-@keyframes kpDrift1{from{transform:translate3d(0,0,0) scale(1);     opacity:.85}
-                    to  {transform:translate3d(5%,-3%,0) scale(1.08); opacity:1}}
-@keyframes kpDrift2{from{transform:translate3d(0,0,0) scale(1.05);  opacity:1}
-                    to  {transform:translate3d(-5%,3%,0) scale(1);   opacity:.8}}
-@keyframes kpDrift3{from{transform:translate3d(0,0,0) scale(1);     opacity:.8}
-                    to  {transform:translate3d(4%,-4%,0) scale(1.1); opacity:1}}
-.kp-grain{position:absolute; inset:0; opacity:.05;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
-/* золотая пыль архива: редкие пылинки медленно всплывают и мерцают.
-   Мягким пятном, а не точкой: точка рядом с текстом читалась запятой. */
-.kp-dust i{
-  position:absolute; left:var(--x); top:var(--y); display:block;
-  width:calc(var(--s) * 3); height:calc(var(--s) * 3); border-radius:50%;
-  background:radial-gradient(closest-side, rgba(255,236,190,var(--o)) 0%, rgba(255,214,140,calc(var(--o) * .45)) 45%, rgba(255,214,140,0) 100%);
-  opacity:0;
-  animation:kpMote var(--dur) ease-in-out var(--t) infinite;
-}
-/* в кадрах анимации нет var(): с ним снимок невидимым Chrome зависал */
-@keyframes kpMote{
-  0%  {transform:translate3d(0,0,0);          opacity:0}
-  30% {opacity:1}
-  70% {opacity:1}
-  100%{transform:translate3d(12px,-70px,0);   opacity:0}
-}
-
-/* ---------- КОНТЕЙНЕР И ЗАГОЛОВОК ---------- */
-.kp-wrap{
-  position:relative; z-index:3; box-sizing:border-box;
-  width:min(94vw,1462px); margin:0 auto; padding:0 clamp(16px,3vw,47.6px);
-}
-/* Набор заголовков тёмных экранов: Blogger Sans Bold капсом, главное
-   золотой заливкой, как «КАПСУЛА ВРЕМЕНИ» на экране выше. Двоеточия нет:
-   в капсе оно висит одинокой точкой в конце. */
-.kp-t{
-  margin:0 auto; max-width:30em; text-align:center; color:#fff;
-  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(21px,6vw,28px); line-height:1.12; letter-spacing:-.02em;
-  text-transform:uppercase; text-wrap:balance;
-  text-shadow:0 2px 22px rgba(0,0,0,.5);
-}
-.kp-t b{font-weight:700; color:#E9C36C}
-@supports ((-webkit-background-clip:text) or (background-clip:text)){
-  .kp-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
-    text-shadow:none; padding-top:.22em; margin-top:-.22em;
-    -webkit-box-decoration-break:clone; box-decoration-break:clone}
-}
-
-/* ---------- СЕТЬ: НИТЬ, УЗЛЫ, ИСКРА ----------
-   Нить рисует скрипт по замеру капсул (координаты — пиксели секции), поэтому
-   толщина одна на любом экране. Свечение — три обводки, как у золотой нити
-   на швах сайта (.vl-thread): широкая янтарная, средняя золотая, волосок.
-   Нить лежит ПОД капсулами (слой 2 < 3): у капсулы она уходит за корпус,
-   а узел-огонёк сидит поверх (он внутри карточки капсулы). */
-.kp-net{position:absolute; left:0; top:0; z-index:2; display:block; overflow:visible; pointer-events:none}
-.kp-th{fill:none; stroke-linecap:round; stroke-linejoin:round}
-.kp-th--g2{stroke:url(#kpNetG2); stroke-width:8;   opacity:.11}
-.kp-th--g1{stroke:url(#kpNetG1); stroke-width:3.6; opacity:.22}
-.kp-th--ln{stroke:url(#kpNetGrad); stroke-width:1.6}
-/* искра — хвост кометы: яркий волосок и широкий тёплый ореол вдоль него
-   (второй путь, а не filter: фильтр пересчитывался бы каждый кадр) */
-.kp-spark{fill:none; stroke:#FFF7DA; stroke-width:2.4; stroke-linecap:round; opacity:.95;
-  stroke-dasharray:28 3000; stroke-dashoffset:28}
-.kp-spark--h{stroke:#FFC76A; stroke-width:9; opacity:.28; stroke-dasharray:40 3000}
-@keyframes kpSpark{0%{stroke-dashoffset:28} 70%,100%{stroke-dashoffset:-1000}}
-@keyframes kpSparkH{0%{stroke-dashoffset:34} 70%,100%{stroke-dashoffset:-994}}
-/* разряд у капсулы при сбое: звёздочка-искра вспыхивает в такт миганию нити */
-.kp-zap{opacity:0}
-.kp-zap-g{fill:url(#kpZapGlow)}
-.kp-zap-c{fill:#FFF6DA}
-.kp-zap-c2{fill:#FFD27A}
-@keyframes kpZap{
-  0%,0.9%{opacity:0} 1%{opacity:1} 1.5%{opacity:0} 2.2%{opacity:1} 2.5%{opacity:.2} 2.8%{opacity:1}
-  3.1%{opacity:0} 3.9%{opacity:.9} 4.2%,100%{opacity:0}
-}
-
-/* Сбой: у каждой капсулы свой кусок нити (скрипт кладёт его в .kp-seg--N).
-   Раз в 20 секунд кусок мигает и гаснет — «связь рвётся», — у капсулы
-   сыплются искры, а её тревожная подпись вспыхивает. Капсулы сбоят
-   по очереди 011 → 032 → 040 → 001, по одной, через 5 секунд. */
-.kp-seg--0,.kp-zap--0,.kp-it--1{--kp-gd:2s}
-.kp-seg--1,.kp-zap--1,.kp-it--2{--kp-gd:7s}
-.kp-seg--2,.kp-zap--2,.kp-it--3{--kp-gd:12s}
-.kp-seg--3,.kp-zap--3,.kp-it--4{--kp-gd:17s}
-@keyframes kpSegFlick{
-  0%{opacity:1} 1%{opacity:.15} 1.6%{opacity:.9} 2.2%{opacity:.05} 3.4%{opacity:.05}
-  3.9%{opacity:.7} 4.4%{opacity:.2} 5.4%{opacity:1} 100%{opacity:1}
-}
-
-/* ---------- РЕШЁТКА КАПСУЛ: ТЕЛЕФОН И ПЛАНШЕТ (основа) ----------
-   Одна колонка, капсулы стоят столбиком слева, нить идёт вертикально
-   сквозь них: с крышки в корпус, из подставки к следующей. */
-.kp-grid{
-  list-style:none; margin:clamp(40px,11vw,64px) 0 0; padding:0;
-  display:grid; row-gap:clamp(52px,13vw,76px);
-}
-.kp-it{
-  position:relative; margin:0;
-  display:grid; grid-template-columns:var(--kp-cw) minmax(0,1fr);
-  column-gap:clamp(14px,4vw,32px); align-items:center;
-}
-.kp-cap{position:relative; margin:0; z-index:1}
-.kp-img{
-  position:relative; z-index:1; display:block; width:100%; height:auto;
-  -webkit-user-drag:none; user-select:none;
-}
-/* ореол за капсулой: тихий лиловый свет отделяет тёмный металл от ночи */
-.kp-cap::before{
-  content:''; position:absolute; z-index:0; left:-38%; right:-38%; top:6%; bottom:10%;
-  border-radius:50%; pointer-events:none;
-  background:radial-gradient(closest-side, rgba(130,92,255,.30) 0%, rgba(100,64,230,.14) 50%, rgba(80,50,210,0) 100%);
-}
-/* тёплый свет подставки: продолжает оранжевое свечение, вшитое в картинку */
-.kp-cap::after{
-  content:''; position:absolute; z-index:0; left:-30%; right:-30%; bottom:-4%; height:14%;
-  border-radius:50%; pointer-events:none;
-  background:radial-gradient(closest-side, rgba(255,160,50,.40) 0%, rgba(255,140,40,.14) 55%, rgba(255,140,40,0) 100%);
-  animation:kpPad 5.5s ease-in-out infinite alternate;
-}
-@keyframes kpPad{from{opacity:.55} to{opacity:1}}
-/* при сбое корпус на миг «проседает по питанию» */
-@keyframes kpPower{
-  0%{opacity:1} 1%{opacity:.72} 1.6%{opacity:1} 2.4%{opacity:.6} 3.2%{opacity:.95} 3.8%{opacity:.78} 4.6%{opacity:1} 100%{opacity:1}
-}
-
-/* Узел: где нить входит в капсулу — огонёк с кольцом. Стоит в долях
-   картинки: крышка — верх корпуса, подставка — середина оранжевого свечения.
-   Те же доли берёт скрипт для концов нити (KP_LID, KP_PAD). */
-.kp-node{position:absolute; left:50%; z-index:2; width:0; height:0; pointer-events:none}
-.kp-node--lid{top:.8%}
-.kp-node--pad{top:96%}
-.kp-node::before{            /* мягкий ореол, дышит */
-  content:''; position:absolute; left:-30px; top:-30px; width:60px; height:60px; border-radius:50%;
-  background:radial-gradient(closest-side, rgba(255,205,120,.55) 0%, rgba(255,180,80,.2) 45%, rgba(255,180,80,0) 100%);
-  animation:kpHalo 3.4s ease-in-out infinite alternate;
-}
-.kp-node::after{             /* вспышка-волна, когда по нити приходит искра */
-  content:''; position:absolute; left:-14px; top:-14px; width:28px; height:28px; border-radius:50%;
-  box-shadow:inset 0 0 0 1.5px rgba(255,236,190,.95), 0 0 12px rgba(255,200,110,.8);
-  opacity:0; transform:scale(.4);
-}
-.kp-node i{                  /* сердцевина */
-  position:absolute; left:-5.5px; top:-5.5px; width:11px; height:11px; border-radius:50%;
-  background:radial-gradient(circle, #FFFBEA 0 30%, #FCD34D 58%, #E9A23B 100%);
-  /* гнездо разъёма: тёмный зазор и тонкое золотое кольцо вокруг огня */
-  box-shadow:0 0 0 2.2px rgba(14,10,44,.8), 0 0 0 3.4px rgba(253,230,138,.8),
-             0 0 12px 3px rgba(255,200,100,.7), 0 0 28px 8px rgba(245,158,11,.3);
-}
-@keyframes kpHalo{from{opacity:.55; transform:scale(.9)} to{opacity:1; transform:scale(1.08)}}
-@keyframes kpFlare{
-  0%{opacity:0; transform:scale(.4)} 1.5%{opacity:1; transform:scale(.9)}
-  14%{opacity:0; transform:scale(2.4)} 100%{opacity:0; transform:scale(2.4)}
-}
-/* сбой сердцевины: оранжевые рывки, потом снова ровный огонь */
-@keyframes kpCore{
-  0%{opacity:1; transform:scale(1)} 0.8%{opacity:1; transform:scale(1.7)}
-  1.4%{opacity:.2; transform:scale(.8)} 2%{opacity:1; transform:scale(1.4)} 2.8%{opacity:.1; transform:scale(.7)}
-  3.6%{opacity:.35; transform:scale(.8)} 4.4%{opacity:.9; transform:scale(1.2)} 5.4%{opacity:1; transform:scale(1)} 100%{opacity:1; transform:scale(1)}
-}
-/* искры сбоя: пять крошек разлетаются из узла */
-.kp-node b{
-  position:absolute; left:-1.5px; top:-1.5px; width:3px; height:3px; border-radius:50%;
-  background:#FFF1C8; box-shadow:0 0 6px 1px rgba(255,170,60,.95);
-  opacity:0;
-}
-/* направление — поворотом (rotate), лёт — сдвигом вдоль него: в кадрах
-   анимации нет var() */
-.kp-node b:nth-of-type(1){rotate:-145deg}
-.kp-node b:nth-of-type(2){rotate:-48deg}
-.kp-node b:nth-of-type(3){rotate:12deg}
-.kp-node b:nth-of-type(4){rotate:165deg}
-.kp-node b:nth-of-type(5){rotate:-92deg}
-@keyframes kpBurst{
-  0%,0.6%{opacity:0; transform:translate3d(0,0,0) scale(1)}
-  0.9%{opacity:1}
-  3.2%{opacity:0; transform:translate3d(32px,0,0) scale(.4)}
-  100%{opacity:0; transform:translate3d(32px,0,0) scale(.4)}
-}
-/* на телефоне у капсулы оба узла (нить проходит сквозь), на компьютере
-   один: у верхнего ряда — подставка, у нижнего — крышка */
-
-/* ---------- ТЕКСТ ЗАПИСИ ---------- */
-.kp-tx{position:relative; min-width:0}
-.kp-h{
-  margin:0 0 .5em; font-family:"CR Yeseva",Georgia,serif; font-weight:400;
-  font-size:clamp(21px,6vw,26px); line-height:1.08; letter-spacing:.005em; color:#FFF8EA;
-  text-shadow:0 2px 14px rgba(0,0,0,.5);
-}
-.kp-h span{color:var(--kp-gold)}
-@supports ((-webkit-background-clip:text) or (background-clip:text)){
-  .kp-h span{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
-    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
-    text-shadow:none}
-}
-.kp-p{
-  margin:0; max-width:40ch;
-  font-family:"Blogger Sans Medium","Blogger Sans",Arial,sans-serif; font-weight:500;
-  font-size:15px; line-height:1.45; color:rgba(236,240,255,.92);
-  text-wrap:pretty; text-shadow:0 1px 12px rgba(0,0,0,.45);
-}
-/* Тревожная подпись: золотой курсив с лампочкой. Лампочка мигает вместе
-   со сбоем своей капсулы. */
-.kp-al{
-  position:relative; margin:.95em 0 0; max-width:40ch; padding-left:18px;
-  font-family:"Blogger Sans Medium","Blogger Sans",Arial,sans-serif; font-weight:500;
-  font-style:italic; font-size:14.5px; line-height:1.4; color:#F7C561;
-  text-wrap:pretty; text-shadow:0 1px 10px rgba(0,0,0,.5);
-}
-.kp-al::before{
-  content:''; position:absolute; left:2px; top:.5em; width:7px; height:7px; border-radius:50%;
-  background:#FFB23E; box-shadow:0 0 0 2px rgba(255,178,62,.18), 0 0 10px rgba(255,160,50,.8);
-}
-@keyframes kpAlarm{
-  0%{text-shadow:0 1px 10px rgba(0,0,0,.5)} 1%{text-shadow:0 0 14px rgba(255,170,60,.7)}
-  6%{text-shadow:0 0 14px rgba(255,170,60,.7)} 10%,100%{text-shadow:0 1px 10px rgba(0,0,0,.5)}
-}
-@keyframes kpLamp{
-  0%{opacity:.75} 0.8%{opacity:1} 1.4%{opacity:.15} 2.2%{opacity:1} 3%{opacity:.15} 3.8%{opacity:1}
-  4.6%{opacity:.15} 5.4%{opacity:1} 9%{opacity:1} 12%,100%{opacity:.75}
-}
-
-/* на телефоне колонка текста занимает почти весь экран — пыль не нужна */
-@media (max-width:767px){ .kp-dust{display:none} }
-
-/* ---------- ПЛАНШЕТ ---------- */
-@media (min-width:600px) and (max-width:1023px){
-  .kp{--kp-cw:clamp(150px,22vw,190px)}
-  /* столбик по ширине содержимого и по центру — иначе справа пустое поле */
-  .kp-grid{width:fit-content; max-width:100%; margin-left:auto; margin-right:auto}
-  .kp-p{font-size:17px; max-width:42ch}
-  .kp-al{font-size:15.5px; max-width:42ch}
-  .kp-h{font-size:28px}
-  .kp-t{font-size:clamp(28px,4vw,34px)}
-}
-
-/* ---------- КОМПЬЮТЕР: 2x2 «ёлочкой», как на референсе ----------
-   Верхний ряд — капсула слева, текст справа; нижний — текст слева,
-   капсула справа. Правая колонка чуть ниже левой (--kp-sh). Между рядами
-   идёт нить волной: касается подставок верхних капсул и крышек нижних. */
-@media (min-width:1024px){
-  .kp{
-    --kp-cw:clamp(140px,11.2vw,208px);
-    --kp-sh:clamp(18px,2.4vw,46px);
-    padding-top:clamp(24px,2.6vw,56px);
-  }
-  .kp-t{font-size:clamp(30px,2.75vw,56px); line-height:1.1; letter-spacing:-.025em}
-  .kp-grid{
-    margin-top:clamp(46px,4.6vw,92px);
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    column-gap:clamp(28px,4.4vw,100px); row-gap:clamp(90px,8.4vw,164px);
-  }
-  .kp-it{column-gap:clamp(20px,2.1vw,42px)}
-  .kp-it--2,.kp-it--4{margin-top:var(--kp-sh)}
-  .kp-it--3,.kp-it--4{grid-template-columns:minmax(0,1fr) var(--kp-cw)}
-  .kp-it--3 .kp-cap,.kp-it--4 .kp-cap{order:2}
-  .kp-it--3 .kp-tx,.kp-it--4 .kp-tx{justify-self:end}
-  .kp-it--1 .kp-node--lid,.kp-it--2 .kp-node--lid,
-  .kp-it--3 .kp-node--pad,.kp-it--4 .kp-node--pad{display:none}
-  .kp-tx{margin-top:-4%}
-  .kp-h{font-size:clamp(22px,1.75vw,34px)}
-  .kp-p{font-size:clamp(15px,calc(.62vw + 7.5px),19px); max-width:36ch}
-  .kp-al{font-size:clamp(14px,calc(.5vw + 7.4px),17px); max-width:36ch}
-}
-
-/* Под курсором капсула «подключается»: её кусок нити и ореол разгораются.
-   Кусок нити лежит в общем SVG вне карточки — достаём его через :has(). */
-.kp-th,.kp-cap::before{transition:opacity .45s ease}
-@media (hover:hover) and (pointer:fine){
-  .kp:has(.kp-it--1:hover) .kp-seg--0 .kp-th--g1,
-  .kp:has(.kp-it--2:hover) .kp-seg--1 .kp-th--g1,
-  .kp:has(.kp-it--3:hover) .kp-seg--2 .kp-th--g1,
-  .kp:has(.kp-it--4:hover) .kp-seg--3 .kp-th--g1{opacity:.55}
-  .kp:has(.kp-it--1:hover) .kp-seg--0 .kp-th--g2,
-  .kp:has(.kp-it--2:hover) .kp-seg--1 .kp-th--g2,
-  .kp:has(.kp-it--3:hover) .kp-seg--2 .kp-th--g2,
-  .kp:has(.kp-it--4:hover) .kp-seg--3 .kp-th--g2{opacity:.3}
-  .kp-cap::before{opacity:.8}
-  .kp-it:hover .kp-cap::before{opacity:1}
-}
-
-/* ---------- СИНХРОННОЕ ДВИЖЕНИЕ ----------
-   Искра, вспышки узлов и сбои живут на одних часах: скрипт после каждой
-   перестройки нити снимает и снова ставит .kp--sync, и всё стартует разом
-   (иначе вспышка узла разошлась бы с искрой на время перестройки). */
-.kp--sync .kp-seg{animation:kpSegFlick 20s linear var(--kp-gd) infinite}
-.kp--sync .kp-spark{animation:kpSpark 7s linear infinite}
-.kp--sync .kp-spark--h{animation:kpSparkH 7s linear infinite}
-.kp--sync .kp-zap{animation:kpZap 20s linear var(--kp-gd) infinite}
-.kp--sync .kp-node::after{animation:kpFlare 7s linear var(--kp-t,0s) infinite}
-.kp--sync .kp-img{animation:kpPower 20s linear var(--kp-gd) infinite}
-.kp--sync .kp-node i{animation:kpCore 20s linear var(--kp-gd) infinite}
-.kp--sync .kp-node b{animation:kpBurst 20s cubic-bezier(.2,.7,.3,1) var(--kp-gd) infinite}
-.kp--sync .kp-al{animation:kpAlarm 20s linear var(--kp-gd) infinite}
-.kp--sync .kp-al::before{animation:kpLamp 20s linear var(--kp-gd) infinite}
-
-/* ---------- ПОЯВЛЕНИЕ ----------
-   Прячет только класс .kp--rv (его ставит скрипт) — без скрипта всё видно.
-   Нить прорисовывается от края к краю, узлы загораются, когда она доходит. */
-.kp--rv .kp-t,
-.kp--rv .kp-cap,
-.kp--rv .kp-tx{opacity:0; transform:translate3d(0,22px,0)}
-.kp--rv .kp-t.on,
-.kp--rv .kp-it.on .kp-cap,
-.kp--rv .kp-it.on .kp-tx{opacity:1; transform:none;
-  transition:opacity .8s ease, transform .9s cubic-bezier(.2,.7,.2,1)}
-.kp--rv .kp-it.on .kp-tx{transition-delay:.12s}
-.kp--rv .kp-seg path{stroke-dasharray:1 1; stroke-dashoffset:1}
-.kp--rv .kp-net.on .kp-seg path{animation:kpDraw var(--kp-dd,.5s) linear var(--kp-dl,0s) forwards}
-@keyframes kpDraw{to{stroke-dashoffset:0}}
-.kp--rv .kp-net.done .kp-seg path{stroke-dasharray:none; stroke-dashoffset:0; animation:none}
-.kp--rv .kp-net:not(.done) .kp-spark{visibility:hidden}
-
-/* Экран ушёл из окна — всё движение стоит (класс ставит скрипт). */
-.kp--off *,.kp--off *::before,.kp--off *::after{animation-play-state:paused !important}
-
-@media (prefers-reduced-motion:reduce){
-  .kp *,.kp *::before,.kp *::after{animation:none !important; transition:none !important}
-  .kp-dust,.kp-spark,.kp-zap{display:none}
-  .kp--rv .kp-t,.kp--rv .kp-cap,.kp--rv .kp-tx{opacity:1; transform:none}
-  .kp--rv .kp-seg path{stroke-dasharray:none; stroke-dashoffset:0}
-  .kp-node::after,.kp-node b{opacity:0}
-}
-</style>
-<section class="kp" id="kapsuly" aria-labelledby="kpT">
-  <div class="kp-bg" aria-hidden="true">
-    <div class="kp-fon"></div>
-    <div class="kp-glow"><i></i><i></i><i></i></div>
-    <div class="kp-grain"></div>
-    <div class="kp-dust"><i style="--x:33.4%;--y:20.7%;--s:2px;--o:.38;--dur:13.3s;--t:-4.9s"></i><i style="--x:8.5%;--y:50.6%;--s:2px;--o:.39;--dur:12.3s;--t:-3s"></i><i style="--x:54.8%;--y:13%;--s:3.5px;--o:.41;--dur:10.8s;--t:-6.8s"></i><i style="--x:92.1%;--y:56.5%;--s:3px;--o:.37;--dur:10.8s;--t:-6s"></i><i style="--x:15.5%;--y:43.2%;--s:3.5px;--o:.4;--dur:11.5s;--t:-9.4s"></i><i style="--x:20%;--y:56.9%;--s:2px;--o:.52;--dur:13.4s;--t:-.8s"></i><i style="--x:8.6%;--y:25.3%;--s:3.5px;--o:.54;--dur:11.5s;--t:-6.7s"></i><i style="--x:45.6%;--y:33.2%;--s:2px;--o:.66;--dur:11s;--t:-6.3s"></i><i style="--x:52.4%;--y:81.5%;--s:3px;--o:.48;--dur:16.8s;--t:-2s"></i><i style="--x:42.3%;--y:71.6%;--s:2px;--o:.77;--dur:12.4s;--t:-11.9s"></i><i style="--x:67%;--y:44%;--s:2.5px;--o:.5;--dur:11.8s;--t:-5.9s"></i><i style="--x:77.9%;--y:13.8%;--s:2px;--o:.78;--dur:12.8s;--t:-8.5s"></i><i style="--x:88.7%;--y:76.9%;--s:3.5px;--o:.8;--dur:15.6s;--t:-4.4s"></i><i style="--x:39.3%;--y:64.2%;--s:2px;--o:.77;--dur:11.8s;--t:-7.2s"></i><i style="--x:62.4%;--y:26.3%;--s:2.5px;--o:.41;--dur:11s;--t:-4.3s"></i><i style="--x:84.9%;--y:34.8%;--s:3px;--o:.53;--dur:11.2s;--t:-1.5s"></i><i style="--x:23.5%;--y:84.2%;--s:3px;--o:.79;--dur:14.5s;--t:-5.5s"></i><i style="--x:24.7%;--y:15%;--s:2px;--o:.45;--dur:10.9s;--t:-5.3s"></i></div>
-  </div>
-
-  <!-- Нить сети: пустая, её рисует скрипт ниже по замеру капсул. -->
-  <svg class="kp-net" aria-hidden="true" focusable="false" width="0" height="0"></svg>
-
-  <div class="kp-wrap">
-    <h2 class="kp-t" id="kpT">Дети в&nbsp;ходе квеста восстановят <b>главные капсулы времени</b> с&nbsp;событиями, благодаря которым Новый год стал таким, какой он есть сейчас</h2>
-
-    <ol class="kp-grid">
-      <li class="kp-it kp-it--1">
-        <figure class="kp-cap">
-          <img class="kp-img" src="st-kp-petr.webp" width="295" height="698" loading="lazy" decoding="async"
-               alt="Капсула времени 011 с портретом Петра I">
-          <span class="kp-node kp-node--lid" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
-          <span class="kp-node kp-node--pad" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
-        </figure>
-        <div class="kp-tx">
-          <h3 class="kp-h">Капсула <span>011</span></h3>
-          <p class="kp-p">20&nbsp;декабря 1699&nbsp;года. Пётр&nbsp;I издал именной указ №1736 «О&nbsp;праздновании Нового года»: начало года в&nbsp;России&nbsp;- 1&nbsp;января, а&nbsp;летоисчисление ведётся от&nbsp;Рождества Христова.</p>
-          <p class="kp-al">Эта капсула пропала из&nbsp;Министерства. Нового года 1&nbsp;января не&nbsp;будет…</p>
-        </div>
-      </li>
-      <li class="kp-it kp-it--2">
-        <figure class="kp-cap">
-          <img class="kp-img" src="st-kp-ekaterina.webp" width="298" height="699" loading="lazy" decoding="async"
-               alt="Капсула времени 032 с портретом Екатерины II">
-          <span class="kp-node kp-node--lid" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
-          <span class="kp-node kp-node--pad" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
-        </figure>
-        <div class="kp-tx">
-          <h3 class="kp-h">Капсула <span>032</span></h3>
-          <p class="kp-p">1769&nbsp;год. Екатерина&nbsp;II инициировала обычай праздновать Новый год с&nbsp;застольем и&nbsp;маскарадом, а&nbsp;также дарить друг другу подарки.</p>
-          <p class="kp-al">Если не&nbsp;починить эту капсулу, дети останутся без&nbsp;подарков!</p>
-        </div>
-      </li>
-      <li class="kp-it kp-it--3">
-        <figure class="kp-cap">
-          <img class="kp-img" src="st-kp-nikolay.webp" width="298" height="684" loading="lazy" decoding="async"
-               alt="Капсула времени 040 с портретом Николая I">
-          <span class="kp-node kp-node--lid" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
-          <span class="kp-node kp-node--pad" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
-        </figure>
-        <div class="kp-tx">
-          <h3 class="kp-h">Капсула <span>040</span></h3>
-          <p class="kp-p">1860&nbsp;год. По&nbsp;приказу Николая&nbsp;I впервые в&nbsp;России были установлены городские ёлки в&nbsp;Кремле. Это была идея супруги брата императора&nbsp;- Марии Фёдоровны.</p>
-          <p class="kp-al">Без этой капсулы исчезнут все новогодние ёлки в&nbsp;Министерстве</p>
-        </div>
-      </li>
-      <li class="kp-it kp-it--4">
-        <figure class="kp-cap">
-          <img class="kp-img" src="st-kp-ledenec.webp" width="300" height="697" loading="lazy" decoding="async"
-               alt="Капсула времени 001 с карамельной тростью">
-          <span class="kp-node kp-node--lid" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
-          <span class="kp-node kp-node--pad" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
-        </figure>
-        <div class="kp-tx">
-          <h3 class="kp-h">Капсула <span>001</span></h3>
-          <p class="kp-p">В&nbsp;1847&nbsp;году карамель стала символом Нового года. Тогда Август Имгард первым нарядил новогоднюю ёлку крюкообразными карамельными палочками&nbsp;- тростями.</p>
-          <p class="kp-al">Мастер-класс по&nbsp;карамели не&nbsp;состоится, если не&nbsp;вернуть эту капсулу на&nbsp;место…</p>
-        </div>
-      </li>
-    </ol>
-  </div>
-</section>
-<script>
-/* СТАВРОПОЛЬ: сеть капсул. Нить строится по замеру капсул (перестраивается,
-   когда меняется размер секции: поворот, шрифты догрузились), делится на
-   четыре куска по капсулам — у каждого свой сбой. Искра бежит по всей нити,
-   узел вспыхивает, когда она до него доходит. Появление — когда экран
-   доехал до окна; вне окна всё движение стоит. */
-(function(){
-  var sec = document.getElementById('kapsuly');
-  if (!sec) return;
-  var svg = sec.querySelector('.kp-net');
-  var title = sec.querySelector('.kp-t');
-  var items = [].slice.call(sec.querySelectorAll('.kp-it'));
-  if (!svg || items.length !== 4) return;
-  var LID = .008, PAD = .96;              /* те же доли, что у .kp-node--lid / --pad */
-  var SPARK = 7, TRAVEL = .7 * SPARK;     /* период искры и доля пути — как в kpSpark */
-  var DRAW = 1.9;                         /* сколько секунд прорисовывается нить */
-  var wide = matchMedia('(min-width:1024px)');
-  var still = matchMedia('(prefers-reduced-motion:reduce)').matches;
-
-  /* положение в секции по раскладке, без transform (появление сдвигает) */
-  function off(el){
-    var x = 0, y = 0;
-    while (el && el !== sec){ x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
-    return {x:x, y:y};
-  }
-  function cap(k){
-    var f = items[k].querySelector('.kp-cap'), o = off(f);
-    return {x:o.x + f.offsetWidth / 2, top:o.y, h:f.offsetHeight, el:f};
-  }
-  function P(x, y, o, node){ return {x:x, y:y, o:o, node:node}; }
-  /* кубика с касательными вдоль хода нити: гребни волны плоские */
-  function seg(a, b, vert){
-    if (vert){ var dy = (b.y - a.y) * .5; return [a, {x:a.x, y:a.y + dy}, {x:b.x, y:b.y - dy}, b]; }
-    var dx = (b.x - a.x) * .5; return [a, {x:a.x + dx, y:a.y}, {x:b.x - dx, y:b.y}, b];
-  }
-  function half(c){
-    function m(p, q){ return {x:(p.x + q.x) / 2, y:(p.y + q.y) / 2}; }
-    var ab = m(c[0], c[1]), bc = m(c[1], c[2]), cd = m(c[2], c[3]),
-        abc = m(ab, bc), bcd = m(bc, cd), mid = m(abc, bcd);
-    return [[c[0], ab, abc, mid], [mid, bcd, cd, c[3]]];
-  }
-  function r(n){ return Math.round(n * 10) / 10; }
-  function d(cs){
-    var s = 'M' + r(cs[0][0].x) + ',' + r(cs[0][0].y);
-    cs.forEach(function(c){ s += ' C' + r(c[1].x) + ',' + r(c[1].y) + ' ' + r(c[2].x) + ',' + r(c[2].y) + ' ' + r(c[3].x) + ',' + r(c[3].y); });
-    return s;
-  }
-  var NS = 'http://www.w3.org/2000/svg', probe = document.createElementNS(NS, 'path');
-  function len(cs){ probe.setAttribute('d', d(cs)); return probe.getTotalLength(); }
-
-  function build(){
-    var W = sec.offsetWidth, H = sec.offsetHeight, vert = !wide.matches, pts = [], k, q;
-    if (!W || !H) return;
-    svg.appendChild(probe);               /* мерить длину надёжно только в документе */
-    if (!vert){
-      /* компьютер: волна между рядами — подставки верхних капсул, крышки нижних */
-      var c = [0, 1, 2, 3].map(cap), ns = [
-        P(c[0].x, c[0].top + c[0].h * PAD, 0, c[0].el.querySelector('.kp-node--pad')),
-        P(c[1].x, c[1].top + c[1].h * PAD, 1, c[1].el.querySelector('.kp-node--pad')),
-        P(c[2].x, c[2].top + c[2].h * LID, 2, c[2].el.querySelector('.kp-node--lid')),
-        P(c[3].x, c[3].top + c[3].h * LID, 3, c[3].el.querySelector('.kp-node--lid'))];
-      var mid = (Math.max(ns[0].y, ns[1].y) + Math.min(ns[2].y, ns[3].y)) / 2;
-      ns.sort(function(a, b){ return a.x - b.x; });
-      pts = [P(0, mid, -1)].concat(ns, [P(W, mid, -1)]);
-    } else {
-      /* телефон: вертикально сквозь столбик капсул */
-      var t = off(title).y + title.offsetHeight;
-      for (k = 0; k < 4; k++){
-        q = cap(k);
-        if (!k) pts.push(P(q.x, t + 14, -1));
-        pts.push(P(q.x, q.top + q.h * LID, k, q.el.querySelector('.kp-node--lid')),
-                 P(q.x, q.top + q.h * PAD, k, q.el.querySelector('.kp-node--pad')));
-      }
-      /* хвост уходит до самого низа секции: экран «снег» заезжает на нас
-         дугой с золотой нитью и прячет всё, что ниже дуги, — наша нить
-         обрывается ровно на его нити, как отвод от общей линии */
-      q = pts[pts.length - 1];
-      pts.push(P(q.x, H, -1));
-    }
-
-    /* куски по капсулам: у края — целиком ближней, между двумя — пополам */
-    var full = [], pieces = [], cur = null, i;
-    function put(o, c){
-      if (!cur || cur.o !== o){ cur = {o:o, cs:[]}; pieces.push(cur); }
-      cur.cs.push(c);
-    }
-    for (i = 0; i < pts.length - 1; i++){
-      var A = pts[i], B = pts[i + 1], cc = seg(A, B, vert);
-      full.push(cc);
-      if (A.o < 0) put(B.o, cc);
-      else if (B.o < 0 || A.o === B.o) put(A.o, cc);
-      else { var h = half(cc); put(A.o, h[0]); put(B.o, h[1]); }
-    }
-
-    var L = len(full), acc = 0, zs = {};
-    /* узлы вспыхивают, когда до них доходит искра; у первого узла каждой
-       капсулы запоминаем, где на нити он стоит, — там при сбое бьёт разряд */
-    for (i = 0; i < pts.length; i++){
-      if (i) acc += len([full[i - 1]]);
-      if (pts[i].node) pts[i].node.style.setProperty('--kp-t', (acc / L * 1000 / 1028 * TRAVEL).toFixed(2) + 's');
-      if (pts[i].o >= 0 && !(pts[i].o in zs)) zs[pts[i].o] = acc;
-    }
-    /* разряд: при сбое на нити, чуть не доходя до узла, вспыхивает
-       четырёхлучевая звёздочка — та же, что мерцает на золотой нити шва */
-    probe.setAttribute('d', d(full));
-    var zap = '', STAR = 'M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z';
-    Object.keys(zs).forEach(function(o){
-      var c0 = probe.getPointAtLength(Math.max(20, zs[o] - (vert ? 30 : 46))),
-          c1 = probe.getPointAtLength(Math.max(10, zs[o] - (vert ? 50 : 74)));
-      zap += '<g class="kp-zap kp-zap--' + o + '">' +
-        '<circle class="kp-zap-g" cx="' + r(c0.x) + '" cy="' + r(c0.y) + '" r="13"/>' +
-        '<path class="kp-zap-c" d="' + STAR + '" transform="translate(' + r(c0.x) + ',' + r(c0.y) + ') scale(11)"/>' +
-        '<path class="kp-zap-c kp-zap-c2" d="' + STAR + '" transform="translate(' + r(c1.x) + ',' + r(c1.y) + ') rotate(45) scale(5)"/></g>';
-    });
-    var g0 = vert ? [pts[0].x, pts[0].y, pts[0].x, pts[pts.length - 1].y] : [0, 0, W, 0];
-    function grad(id, col, a){
-      return '<linearGradient id="' + id + '" gradientUnits="userSpaceOnUse" x1="' + r(g0[0]) + '" y1="' + r(g0[1]) + '" x2="' + r(g0[2]) + '" y2="' + r(g0[3]) + '">' +
-        '<stop offset="0" stop-color="' + col[0] + '" stop-opacity="0"/>' +
-        '<stop offset="' + a + '" stop-color="' + col[0] + '" stop-opacity="1"/>' +
-        '<stop offset=".5" stop-color="' + col[1] + '" stop-opacity="1"/>' +
-        '<stop offset="' + (1 - a) + '" stop-color="' + col[2] + '" stop-opacity="1"/>' +
-        '<stop offset="1" stop-color="' + col[2] + '" stop-opacity="' + (vert ? 1 : 0) + '"/></linearGradient>';
-    }
-    var fa = vert ? .05 : .07;
-    var html = '<defs>' + grad('kpNetGrad', ['#FCD34D', '#FDE68A', '#F7C561'], fa) +
-      grad('kpNetG1', ['#FCD34D', '#FCD34D', '#FCD34D'], fa) + grad('kpNetG2', ['#F59E0B', '#F59E0B', '#F59E0B'], fa) +
-      '<radialGradient id="kpZapGlow"><stop offset="0" stop-color="#FFB347" stop-opacity=".85"/><stop offset="1" stop-color="#FF8A2E" stop-opacity="0"/></radialGradient></defs>';
-    acc = 0;
-    pieces.forEach(function(p){
-      var pd = d(p.cs), pl = len(p.cs),
-          st = ' style="--kp-dl:' + (acc / L * DRAW).toFixed(3) + 's;--kp-dd:' + (pl / L * DRAW).toFixed(3) + 's"';
-      acc += pl;
-      html += '<g class="kp-seg kp-seg--' + p.o + '">' +
-        '<path class="kp-th kp-th--g2" pathLength="1" d="' + pd + '"' + st + '/>' +
-        '<path class="kp-th kp-th--g1" pathLength="1" d="' + pd + '"' + st + '/>' +
-        '<path class="kp-th kp-th--ln" pathLength="1" d="' + pd + '"' + st + '/></g>';
-    });
-    html += zap + '<path class="kp-spark kp-spark--h" pathLength="1000" d="' + d(full) + '"/>' +
-      '<path class="kp-spark" pathLength="1000" d="' + d(full) + '"/>';
-    svg.setAttribute('width', W); svg.setAttribute('height', H);
-    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    svg.innerHTML = html;
-    /* искра, вспышки и сбои — на одни часы (см. .kp--sync в стилях) */
-    sec.classList.remove('kp--sync'); void sec.offsetWidth; sec.classList.add('kp--sync');
-  }
-
-  build();
-  var last = '';
-  function again(){
-    var key = sec.offsetWidth + 'x' + sec.offsetHeight + (wide.matches ? 'w' : 'n');
-    if (key !== last){ last = key; build(); }
-  }
-  last = sec.offsetWidth + 'x' + sec.offsetHeight + (wide.matches ? 'w' : 'n');
-  if ('ResizeObserver' in window) new ResizeObserver(again).observe(sec);
-  else addEventListener('resize', again);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
-
-  if (!('IntersectionObserver' in window)) return;
-  /* вне окна движение стоит */
-  new IntersectionObserver(function(es){
-    sec.classList.toggle('kp--off', !es[0].isIntersecting);
-  }, {rootMargin:'120px 0px'}).observe(sec);
-  if (still) return;
-
-  /* появление: заголовок, каждая капсула сама, нить — когда видна решётка */
-  sec.classList.add('kp--rv');
-  var show = new IntersectionObserver(function(es, o){
-    es.forEach(function(e){
-      if (!e.isIntersecting) return;
-      e.target.classList.add('on'); o.unobserve(e.target);
-    });
-  }, {threshold:.18});
-  show.observe(title);
-  items.forEach(function(it){ show.observe(it); });
-  new IntersectionObserver(function(es, o){
-    if (!es[0].isIntersecting) return;
-    o.disconnect();
-    svg.classList.add('on');
-    setTimeout(function(){ svg.classList.add('done'); }, DRAW * 1000 + 300);
-  }, {threshold:.22}).observe(sec.querySelector('.kp-grid'));
-})();
-</script>
-
 <!-- ==================== ТЮМЕНЬ: ЭКРАН «ДЕТИ ВЫЗОВУТ НАСТОЯЩИЙ СНЕГ» ====================
      ТОЛЬКО В tyumen.html (16.09.2026, просьба Серёги): сразу за программой,
      перед леденцами (великанов под ним в тот же день удалили). Видеофон во весь
@@ -12509,6 +11858,710 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      ради синхронизации с Нижним; нить экрана «снег» берёт из них классы
      `.vl-thread*` и `.vl-sp*`. Если `sinhron.py` остановится здесь — экран
      не возвращать. -->
+
+<!-- ==================== СТАВРОПОЛЬ: ЭКРАН «КАПСУЛЫ ВРЕМЕНИ» ====================
+     ТОЛЬКО В stavropol.html (24.09.2026, референс Серёги «сайт ставропроль /экран капсулы/
+     референс.png»). С 24.09.2026 (просьба Серёги) стоит ПОСЛЕ экрана «Дети вызовут
+     настоящий снег», перед светлой формой заявки (11А); до этого был между программой
+     и «снегом». Для sinhron.py это городская вставка между «снегом» и формой: если он
+     остановится здесь — экран оставлять, у Тюмени его нет.
+
+     Четыре капсулы, которые дети восстанавливают в квесте, решёткой 2x2 «ёлочкой», как
+     на референсе: верхний ряд капсула слева, нижний справа. Капсулы подключены к машине
+     времени: через экран идёт золотая нить (три обводки и искра — как нить на швах сайта),
+     у каждой капсулы светящийся узел; капсулы по очереди «сбоят» — их кусок нити мигает,
+     из узла летят искры. На телефоне нить идёт вертикально сквозь столбик капсул.
+     Нить строит скрипт по замеру капсул (перестраивает при изменении размера).
+
+     Картинки st-kp-*.webp собирает sayt-nn/instrumenty/kapsuly_stavropol.py из «сайт
+     ставропроль /экран капсулы/» (капсулы вырезаны из картинок Серёги без подписей,
+     фон — его «архив»). Стыки: сверху мы заезжаем на низ «снега» золотой дугой (тот же
+     приём и та же кривая, что у «снега» над программой), снизу — белый сугроб под светлую
+     форму. Сугроб «снега» при этом спрятан (стиль #sneg .cr-snow ниже): он стоял под
+     светлую форму, а теперь под «снегом» тёмные капсулы. Слой секции 28: выше «снега» (27),
+     ниже светлой формы (29). Все классы kp-. -->
+<style>
+/* ---------- СЕКЦИЯ И ФОН ----------
+   Слой 28: выше «снега» (27) — наша дуга заезжает на его низ, ниже светлой
+   формы (29). Класс `cr` секции не даём: он включил бы чужой множитель `--u`.
+   ФОНА У САМОЙ СЕКЦИИ НЕТ: дуга вырезана маской в слое .kp-bg, а фон секции
+   маска не режет — лёг бы полосой над нитью
+   → schedule-app/lessons/vyrez-maskoy-fon-roditelya-prosvechivaet.md */
+.kp{
+  --kp-gold:#F7C561;
+  /* ширина капсулы: телефон (от 600 px своя, ниже). 24.09.2026 на 15 % меньше
+     прежних clamp(112px,33vw,168px) — Серёга: «капсулы на 15 процентов меньше,
+     будет компактнее». Нить строит скрипт по замеру, её править не нужно. */
+  --kp-cw:clamp(95px,28.05vw,143px);
+  /* Полоса дуги сверху — ТОЛЬКО в vw, как --sn-wave у «снега»: от этой доли
+     посчитано сплющивание звёздочек на нити (scale у .vl-sp). */
+  --kp-wave:3vw;
+  /* сколько сугроба видно над нижней кромкой — числа сугроба «снега» (--sn-drift) */
+  --kp-drift:calc(min(9.2646vw,240px) * .633);
+  position:relative; z-index:28; overflow:hidden; isolation:isolate;
+  color:#fff;
+  margin-top:calc(var(--kp-wave) * -1);
+  padding:calc(var(--kp-wave) + clamp(36px,4vw,80px)) 0 calc(var(--kp-drift) + clamp(44px,5vw,104px));
+}
+@media (max-width:760px){ .kp{--kp-drift:11.27vw} }
+/* Фон ближе к оригиналу Серёги (24.09.2026: «не таким синим, ближе
+   к оригиналу, но с синевой»): почти чёрная ночь с синим отливом вместо
+   прежней сине-пурпурной, библиотека видна в полную силу, пятна тише. */
+.kp-bg{
+  position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  background:linear-gradient(180deg,
+    #050818 0%, #080B22 22%, #0B0D29 48%, #090B23 74%, #060817 100%);
+  /* Дуга: картинка кривой ростом в полосу + сплошная заливка ниже —
+     та же кривая, что у маски .sn-bg. */
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0 L1200,120 L0,120 Z' fill='black'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
+          mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0 L1200,120 L0,120 Z' fill='black'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
+  -webkit-mask-size:100% var(--kp-wave), 100% calc(100% - var(--kp-wave) + 1px);
+          mask-size:100% var(--kp-wave), 100% calc(100% - var(--kp-wave) + 1px);
+  -webkit-mask-position:left top, left bottom;
+          mask-position:left top, left bottom;
+  -webkit-mask-repeat:no-repeat, no-repeat;
+          mask-repeat:no-repeat, no-repeat;
+}
+/* Золотая нить по кромке дуги: общие классы нити «снега» (.vl-thread*, .vl-sp*,
+   градиент #vlThreadGrad объявлен в разметке «снега»), «меньше движения» там же. */
+.kp-wave{
+  position:absolute; left:0; right:0; top:0; z-index:5;
+  width:100%; height:var(--kp-wave); display:block;
+  pointer-events:none; overflow:visible;
+}
+/* Сугроб снизу — числа сугроба «снега» (.sn .cr-snow), он туда и стоял:
+   прижат к нижней кромке, низ доведён до белого под светлую форму. */
+.kp .cr-snow{
+  top:auto; bottom:-2px; z-index:8;
+  aspect-ratio:auto; height:min(9.2646vw,240px);
+  background-position:center top; background-size:100% auto;
+  transform:none;
+}
+.kp .cr-snow::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,0) 62%, #FFFFFF 97%);
+}
+@media (max-width:760px){
+  .kp .cr-snow{height:17.79vw; background-size:192% auto}
+}
+/* Сугроб «снега» прячем: под «снегом» теперь мы, тёмные, и белая полоса
+   легла бы между экранами; сугроб переехал к нам вниз. */
+#sneg .cr-snow{display:none}
+/* Архив Серёги: кладём «экраном» (screen) — чёрные поля картинки исчезают,
+   остаются полки, свет ламп и вшитые отблески. Края растворены маской,
+   чтобы кадр не читался прямоугольником. */
+.kp-fon{
+  position:absolute; left:50%; top:9%; bottom:5%; width:max(100%,1180px); transform:translateX(-50%);
+  background:url(st-kp-fon.webp) center/cover no-repeat;
+  mix-blend-mode:screen; opacity:1;
+  -webkit-mask-image:radial-gradient(70% 58% at 50% 50%, #000 42%, rgba(0,0,0,.6) 68%, transparent 100%);
+          mask-image:radial-gradient(70% 58% at 50% 50%, #000 42%, rgba(0,0,0,.6) 68%, transparent 100%);
+}
+.kp-glow{position:absolute; inset:0; overflow:hidden}
+.kp-glow i{position:absolute; display:block; border-radius:50%}
+.kp-glow i:nth-child(1){left:-24%; top:4%; width:70%; height:46%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.20) 0%, rgba(108,43,217,.10) 40%, rgba(108,43,217,.03) 72%, rgba(108,43,217,0) 100%);
+  animation:kpDrift1 38s ease-in-out infinite alternate}
+.kp-glow i:nth-child(2){right:-26%; top:30%; width:74%; height:48%;
+  background:radial-gradient(closest-side, rgba(176,106,224,.13) 0%, rgba(176,106,224,.07) 40%, rgba(176,106,224,.02) 72%, rgba(176,106,224,0) 100%);
+  animation:kpDrift2 46s ease-in-out infinite alternate}
+.kp-glow i:nth-child(3){left:6%; bottom:2%; width:66%; height:40%;
+  background:radial-gradient(closest-side, rgba(47,64,160,.40) 0%, rgba(47,64,160,.22) 40%, rgba(47,64,160,.07) 72%, rgba(47,49,146,0) 100%);
+  animation:kpDrift3 34s ease-in-out infinite alternate}
+@keyframes kpDrift1{from{transform:translate3d(0,0,0) scale(1);     opacity:.85}
+                    to  {transform:translate3d(5%,-3%,0) scale(1.08); opacity:1}}
+@keyframes kpDrift2{from{transform:translate3d(0,0,0) scale(1.05);  opacity:1}
+                    to  {transform:translate3d(-5%,3%,0) scale(1);   opacity:.8}}
+@keyframes kpDrift3{from{transform:translate3d(0,0,0) scale(1);     opacity:.8}
+                    to  {transform:translate3d(4%,-4%,0) scale(1.1); opacity:1}}
+.kp-grain{position:absolute; inset:0; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+/* золотая пыль архива: редкие пылинки медленно всплывают и мерцают.
+   Мягким пятном, а не точкой: точка рядом с текстом читалась запятой. */
+.kp-dust i{
+  position:absolute; left:var(--x); top:var(--y); display:block;
+  width:calc(var(--s) * 3); height:calc(var(--s) * 3); border-radius:50%;
+  background:radial-gradient(closest-side, rgba(255,236,190,var(--o)) 0%, rgba(255,214,140,calc(var(--o) * .45)) 45%, rgba(255,214,140,0) 100%);
+  opacity:0;
+  animation:kpMote var(--dur) ease-in-out var(--t) infinite;
+}
+/* в кадрах анимации нет var(): с ним снимок невидимым Chrome зависал */
+@keyframes kpMote{
+  0%  {transform:translate3d(0,0,0);          opacity:0}
+  30% {opacity:1}
+  70% {opacity:1}
+  100%{transform:translate3d(12px,-70px,0);   opacity:0}
+}
+
+/* ---------- КОНТЕЙНЕР И ЗАГОЛОВОК ---------- */
+.kp-wrap{
+  position:relative; z-index:3; box-sizing:border-box;
+  width:min(94vw,1462px); margin:0 auto; padding:0 clamp(16px,3vw,47.6px);
+}
+/* Набор заголовков тёмных экранов: Blogger Sans Bold капсом, главное
+   золотой заливкой, как «КАПСУЛА ВРЕМЕНИ» на экране выше. Двоеточия нет:
+   в капсе оно висит одинокой точкой в конце. */
+.kp-t{
+  margin:0 auto; max-width:30em; text-align:center; color:#fff;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(21px,6vw,28px); line-height:1.12; letter-spacing:-.02em;
+  text-transform:uppercase; text-wrap:balance;
+  text-shadow:0 2px 22px rgba(0,0,0,.5);
+}
+.kp-t b{font-weight:700; color:#E9C36C}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .kp-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+    text-shadow:none; padding-top:.22em; margin-top:-.22em;
+    -webkit-box-decoration-break:clone; box-decoration-break:clone}
+}
+
+/* ---------- СЕТЬ: НИТЬ, УЗЛЫ, ИСКРА ----------
+   Нить рисует скрипт по замеру капсул (координаты — пиксели секции), поэтому
+   толщина одна на любом экране. Свечение — три обводки, как у золотой нити
+   на швах сайта (.vl-thread): широкая янтарная, средняя золотая, волосок.
+   Нить лежит ПОД капсулами (слой 2 < 3): у капсулы она уходит за корпус,
+   а узел-огонёк сидит поверх (он внутри карточки капсулы). */
+.kp-net{position:absolute; left:0; top:0; z-index:2; display:block; overflow:visible; pointer-events:none}
+.kp-th{fill:none; stroke-linecap:round; stroke-linejoin:round}
+.kp-th--g2{stroke:url(#kpNetG2); stroke-width:8;   opacity:.11}
+.kp-th--g1{stroke:url(#kpNetG1); stroke-width:3.6; opacity:.22}
+.kp-th--ln{stroke:url(#kpNetGrad); stroke-width:1.6}
+/* искра — хвост кометы: яркий волосок и широкий тёплый ореол вдоль него
+   (второй путь, а не filter: фильтр пересчитывался бы каждый кадр) */
+.kp-spark{fill:none; stroke:#FFF7DA; stroke-width:2.4; stroke-linecap:round; opacity:.95;
+  stroke-dasharray:28 3000; stroke-dashoffset:28}
+.kp-spark--h{stroke:#FFC76A; stroke-width:9; opacity:.28; stroke-dasharray:40 3000}
+@keyframes kpSpark{0%{stroke-dashoffset:28} 70%,100%{stroke-dashoffset:-1000}}
+@keyframes kpSparkH{0%{stroke-dashoffset:34} 70%,100%{stroke-dashoffset:-994}}
+/* разряд у капсулы при сбое: звёздочка-искра вспыхивает в такт миганию нити */
+.kp-zap{opacity:0}
+.kp-zap-g{fill:url(#kpZapGlow)}
+.kp-zap-c{fill:#FFF6DA}
+.kp-zap-c2{fill:#FFD27A}
+@keyframes kpZap{
+  0%,0.9%{opacity:0} 1%{opacity:1} 1.5%{opacity:0} 2.2%{opacity:1} 2.5%{opacity:.2} 2.8%{opacity:1}
+  3.1%{opacity:0} 3.9%{opacity:.9} 4.2%,100%{opacity:0}
+}
+
+/* Сбой: у каждой капсулы свой кусок нити (скрипт кладёт его в .kp-seg--N).
+   Раз в 20 секунд кусок мигает и гаснет — «связь рвётся», — у капсулы
+   сыплются искры, а её тревожная подпись вспыхивает. Капсулы сбоят
+   по очереди 011 → 032 → 040 → 001, по одной, через 5 секунд. */
+.kp-seg--0,.kp-zap--0,.kp-it--1{--kp-gd:2s}
+.kp-seg--1,.kp-zap--1,.kp-it--2{--kp-gd:7s}
+.kp-seg--2,.kp-zap--2,.kp-it--3{--kp-gd:12s}
+.kp-seg--3,.kp-zap--3,.kp-it--4{--kp-gd:17s}
+@keyframes kpSegFlick{
+  0%{opacity:1} 1%{opacity:.15} 1.6%{opacity:.9} 2.2%{opacity:.05} 3.4%{opacity:.05}
+  3.9%{opacity:.7} 4.4%{opacity:.2} 5.4%{opacity:1} 100%{opacity:1}
+}
+
+/* ---------- РЕШЁТКА КАПСУЛ: ТЕЛЕФОН И ПЛАНШЕТ (основа) ----------
+   Одна колонка, капсулы стоят столбиком слева, нить идёт вертикально
+   сквозь них: с крышки в корпус, из подставки к следующей. */
+.kp-grid{
+  list-style:none; margin:clamp(40px,11vw,64px) 0 0; padding:0;
+  display:grid; row-gap:clamp(52px,13vw,76px);
+}
+.kp-it{
+  position:relative; margin:0;
+  display:grid; grid-template-columns:var(--kp-cw) minmax(0,1fr);
+  column-gap:clamp(14px,4vw,32px); align-items:center;
+}
+.kp-cap{position:relative; margin:0; z-index:1}
+.kp-img{
+  position:relative; z-index:1; display:block; width:100%; height:auto;
+  -webkit-user-drag:none; user-select:none;
+}
+/* ореол за капсулой: тихий лиловый свет отделяет тёмный металл от ночи */
+.kp-cap::before{
+  content:''; position:absolute; z-index:0; left:-38%; right:-38%; top:6%; bottom:10%;
+  border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(130,92,255,.30) 0%, rgba(100,64,230,.14) 50%, rgba(80,50,210,0) 100%);
+}
+/* тёплый свет подставки: продолжает оранжевое свечение, вшитое в картинку */
+.kp-cap::after{
+  content:''; position:absolute; z-index:0; left:-30%; right:-30%; bottom:-4%; height:14%;
+  border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(255,160,50,.40) 0%, rgba(255,140,40,.14) 55%, rgba(255,140,40,0) 100%);
+  animation:kpPad 5.5s ease-in-out infinite alternate;
+}
+@keyframes kpPad{from{opacity:.55} to{opacity:1}}
+/* при сбое корпус на миг «проседает по питанию» */
+@keyframes kpPower{
+  0%{opacity:1} 1%{opacity:.72} 1.6%{opacity:1} 2.4%{opacity:.6} 3.2%{opacity:.95} 3.8%{opacity:.78} 4.6%{opacity:1} 100%{opacity:1}
+}
+
+/* Узел: где нить входит в капсулу — огонёк с кольцом. Стоит в долях
+   картинки: крышка — верх корпуса, подставка — середина оранжевого свечения.
+   Те же доли берёт скрипт для концов нити (KP_LID, KP_PAD). */
+.kp-node{position:absolute; left:50%; z-index:2; width:0; height:0; pointer-events:none}
+.kp-node--lid{top:.8%}
+.kp-node--pad{top:96%}
+.kp-node::before{            /* мягкий ореол, дышит */
+  content:''; position:absolute; left:-30px; top:-30px; width:60px; height:60px; border-radius:50%;
+  background:radial-gradient(closest-side, rgba(255,205,120,.55) 0%, rgba(255,180,80,.2) 45%, rgba(255,180,80,0) 100%);
+  animation:kpHalo 3.4s ease-in-out infinite alternate;
+}
+.kp-node::after{             /* вспышка-волна, когда по нити приходит искра */
+  content:''; position:absolute; left:-14px; top:-14px; width:28px; height:28px; border-radius:50%;
+  box-shadow:inset 0 0 0 1.5px rgba(255,236,190,.95), 0 0 12px rgba(255,200,110,.8);
+  opacity:0; transform:scale(.4);
+}
+.kp-node i{                  /* сердцевина */
+  position:absolute; left:-5.5px; top:-5.5px; width:11px; height:11px; border-radius:50%;
+  background:radial-gradient(circle, #FFFBEA 0 30%, #FCD34D 58%, #E9A23B 100%);
+  /* гнездо разъёма: тёмный зазор и тонкое золотое кольцо вокруг огня */
+  box-shadow:0 0 0 2.2px rgba(14,10,44,.8), 0 0 0 3.4px rgba(253,230,138,.8),
+             0 0 12px 3px rgba(255,200,100,.7), 0 0 28px 8px rgba(245,158,11,.3);
+}
+@keyframes kpHalo{from{opacity:.55; transform:scale(.9)} to{opacity:1; transform:scale(1.08)}}
+@keyframes kpFlare{
+  0%{opacity:0; transform:scale(.4)} 1.5%{opacity:1; transform:scale(.9)}
+  14%{opacity:0; transform:scale(2.4)} 100%{opacity:0; transform:scale(2.4)}
+}
+/* сбой сердцевины: оранжевые рывки, потом снова ровный огонь */
+@keyframes kpCore{
+  0%{opacity:1; transform:scale(1)} 0.8%{opacity:1; transform:scale(1.7)}
+  1.4%{opacity:.2; transform:scale(.8)} 2%{opacity:1; transform:scale(1.4)} 2.8%{opacity:.1; transform:scale(.7)}
+  3.6%{opacity:.35; transform:scale(.8)} 4.4%{opacity:.9; transform:scale(1.2)} 5.4%{opacity:1; transform:scale(1)} 100%{opacity:1; transform:scale(1)}
+}
+/* искры сбоя: пять крошек разлетаются из узла */
+.kp-node b{
+  position:absolute; left:-1.5px; top:-1.5px; width:3px; height:3px; border-radius:50%;
+  background:#FFF1C8; box-shadow:0 0 6px 1px rgba(255,170,60,.95);
+  opacity:0;
+}
+/* направление — поворотом (rotate), лёт — сдвигом вдоль него: в кадрах
+   анимации нет var() */
+.kp-node b:nth-of-type(1){rotate:-145deg}
+.kp-node b:nth-of-type(2){rotate:-48deg}
+.kp-node b:nth-of-type(3){rotate:12deg}
+.kp-node b:nth-of-type(4){rotate:165deg}
+.kp-node b:nth-of-type(5){rotate:-92deg}
+@keyframes kpBurst{
+  0%,0.6%{opacity:0; transform:translate3d(0,0,0) scale(1)}
+  0.9%{opacity:1}
+  3.2%{opacity:0; transform:translate3d(32px,0,0) scale(.4)}
+  100%{opacity:0; transform:translate3d(32px,0,0) scale(.4)}
+}
+/* на телефоне у капсулы оба узла (нить проходит сквозь), на компьютере
+   один: у верхнего ряда — подставка, у нижнего — крышка */
+
+/* ---------- ТЕКСТ ЗАПИСИ ---------- */
+.kp-tx{position:relative; min-width:0}
+.kp-h{
+  margin:0 0 .5em; font-family:"CR Yeseva",Georgia,serif; font-weight:400;
+  font-size:clamp(21px,6vw,26px); line-height:1.08; letter-spacing:.005em; color:#FFF8EA;
+  text-shadow:0 2px 14px rgba(0,0,0,.5);
+}
+.kp-h span{color:var(--kp-gold)}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .kp-h span{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+    text-shadow:none}
+}
+.kp-p{
+  margin:0; max-width:40ch;
+  font-family:"Blogger Sans Medium","Blogger Sans",Arial,sans-serif; font-weight:500;
+  font-size:15px; line-height:1.45; color:rgba(236,240,255,.92);
+  text-wrap:pretty; text-shadow:0 1px 12px rgba(0,0,0,.45);
+}
+/* Тревожная подпись: золотой курсив с лампочкой. Лампочка мигает вместе
+   со сбоем своей капсулы. */
+.kp-al{
+  position:relative; margin:.95em 0 0; max-width:40ch; padding-left:18px;
+  font-family:"Blogger Sans Medium","Blogger Sans",Arial,sans-serif; font-weight:500;
+  font-style:italic; font-size:14.5px; line-height:1.4; color:#F7C561;
+  text-wrap:pretty; text-shadow:0 1px 10px rgba(0,0,0,.5);
+}
+.kp-al::before{
+  content:''; position:absolute; left:2px; top:.5em; width:7px; height:7px; border-radius:50%;
+  background:#FFB23E; box-shadow:0 0 0 2px rgba(255,178,62,.18), 0 0 10px rgba(255,160,50,.8);
+}
+@keyframes kpAlarm{
+  0%{text-shadow:0 1px 10px rgba(0,0,0,.5)} 1%{text-shadow:0 0 14px rgba(255,170,60,.7)}
+  6%{text-shadow:0 0 14px rgba(255,170,60,.7)} 10%,100%{text-shadow:0 1px 10px rgba(0,0,0,.5)}
+}
+@keyframes kpLamp{
+  0%{opacity:.75} 0.8%{opacity:1} 1.4%{opacity:.15} 2.2%{opacity:1} 3%{opacity:.15} 3.8%{opacity:1}
+  4.6%{opacity:.15} 5.4%{opacity:1} 9%{opacity:1} 12%,100%{opacity:.75}
+}
+
+/* на телефоне колонка текста занимает почти весь экран — пыль не нужна */
+@media (max-width:767px){ .kp-dust{display:none} }
+
+/* ---------- ПЛАНШЕТ ---------- */
+@media (min-width:600px) and (max-width:1023px){
+  .kp{--kp-cw:clamp(150px,22vw,190px)}
+  /* столбик по ширине содержимого и по центру — иначе справа пустое поле */
+  .kp-grid{width:fit-content; max-width:100%; margin-left:auto; margin-right:auto}
+  .kp-p{font-size:17px; max-width:42ch}
+  .kp-al{font-size:15.5px; max-width:42ch}
+  .kp-h{font-size:28px}
+  .kp-t{font-size:clamp(28px,4vw,34px)}
+}
+
+/* ---------- КОМПЬЮТЕР: 2x2 «ёлочкой», как на референсе ----------
+   Верхний ряд — капсула слева, текст справа; нижний — текст слева,
+   капсула справа. Правая колонка чуть ниже левой (--kp-sh). Между рядами
+   идёт нить волной: касается подставок верхних капсул и крышек нижних. */
+@media (min-width:1024px){
+  .kp{
+    --kp-cw:clamp(140px,11.2vw,208px);
+    --kp-sh:clamp(18px,2.4vw,46px);
+    padding-top:calc(var(--kp-wave) + clamp(40px,3.6vw,72px));
+  }
+  .kp-t{font-size:clamp(30px,2.75vw,56px); line-height:1.1; letter-spacing:-.025em}
+  .kp-grid{
+    margin-top:clamp(46px,4.6vw,92px);
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    column-gap:clamp(28px,4.4vw,100px); row-gap:clamp(90px,8.4vw,164px);
+  }
+  .kp-it{column-gap:clamp(20px,2.1vw,42px)}
+  .kp-it--2,.kp-it--4{margin-top:var(--kp-sh)}
+  .kp-it--3,.kp-it--4{grid-template-columns:minmax(0,1fr) var(--kp-cw)}
+  .kp-it--3 .kp-cap,.kp-it--4 .kp-cap{order:2}
+  .kp-it--3 .kp-tx,.kp-it--4 .kp-tx{justify-self:end}
+  .kp-it--1 .kp-node--lid,.kp-it--2 .kp-node--lid,
+  .kp-it--3 .kp-node--pad,.kp-it--4 .kp-node--pad{display:none}
+  .kp-tx{margin-top:-4%}
+  .kp-h{font-size:clamp(22px,1.75vw,34px)}
+  .kp-p{font-size:clamp(15px,calc(.62vw + 7.5px),19px); max-width:36ch}
+  .kp-al{font-size:clamp(14px,calc(.5vw + 7.4px),17px); max-width:36ch}
+}
+
+/* Под курсором капсула «подключается»: её кусок нити и ореол разгораются.
+   Кусок нити лежит в общем SVG вне карточки — достаём его через :has(). */
+.kp-th,.kp-cap::before{transition:opacity .45s ease}
+@media (hover:hover) and (pointer:fine){
+  .kp:has(.kp-it--1:hover) .kp-seg--0 .kp-th--g1,
+  .kp:has(.kp-it--2:hover) .kp-seg--1 .kp-th--g1,
+  .kp:has(.kp-it--3:hover) .kp-seg--2 .kp-th--g1,
+  .kp:has(.kp-it--4:hover) .kp-seg--3 .kp-th--g1{opacity:.55}
+  .kp:has(.kp-it--1:hover) .kp-seg--0 .kp-th--g2,
+  .kp:has(.kp-it--2:hover) .kp-seg--1 .kp-th--g2,
+  .kp:has(.kp-it--3:hover) .kp-seg--2 .kp-th--g2,
+  .kp:has(.kp-it--4:hover) .kp-seg--3 .kp-th--g2{opacity:.3}
+  .kp-cap::before{opacity:.8}
+  .kp-it:hover .kp-cap::before{opacity:1}
+}
+
+/* ---------- СИНХРОННОЕ ДВИЖЕНИЕ ----------
+   Искра, вспышки узлов и сбои живут на одних часах: скрипт после каждой
+   перестройки нити снимает и снова ставит .kp--sync, и всё стартует разом
+   (иначе вспышка узла разошлась бы с искрой на время перестройки). */
+.kp--sync .kp-seg{animation:kpSegFlick 20s linear var(--kp-gd) infinite}
+.kp--sync .kp-spark{animation:kpSpark 7s linear infinite}
+.kp--sync .kp-spark--h{animation:kpSparkH 7s linear infinite}
+.kp--sync .kp-zap{animation:kpZap 20s linear var(--kp-gd) infinite}
+.kp--sync .kp-node::after{animation:kpFlare 7s linear var(--kp-t,0s) infinite}
+.kp--sync .kp-img{animation:kpPower 20s linear var(--kp-gd) infinite}
+.kp--sync .kp-node i{animation:kpCore 20s linear var(--kp-gd) infinite}
+.kp--sync .kp-node b{animation:kpBurst 20s cubic-bezier(.2,.7,.3,1) var(--kp-gd) infinite}
+.kp--sync .kp-al{animation:kpAlarm 20s linear var(--kp-gd) infinite}
+.kp--sync .kp-al::before{animation:kpLamp 20s linear var(--kp-gd) infinite}
+
+/* ---------- ПОЯВЛЕНИЕ ----------
+   Прячет только класс .kp--rv (его ставит скрипт) — без скрипта всё видно.
+   Нить прорисовывается от края к краю, узлы загораются, когда она доходит. */
+.kp--rv .kp-t,
+.kp--rv .kp-cap,
+.kp--rv .kp-tx{opacity:0; transform:translate3d(0,22px,0)}
+.kp--rv .kp-t.on,
+.kp--rv .kp-it.on .kp-cap,
+.kp--rv .kp-it.on .kp-tx{opacity:1; transform:none;
+  transition:opacity .8s ease, transform .9s cubic-bezier(.2,.7,.2,1)}
+.kp--rv .kp-it.on .kp-tx{transition-delay:.12s}
+.kp--rv .kp-seg path{stroke-dasharray:1 1; stroke-dashoffset:1}
+.kp--rv .kp-net.on .kp-seg path{animation:kpDraw var(--kp-dd,.5s) linear var(--kp-dl,0s) forwards}
+@keyframes kpDraw{to{stroke-dashoffset:0}}
+.kp--rv .kp-net.done .kp-seg path{stroke-dasharray:none; stroke-dashoffset:0; animation:none}
+.kp--rv .kp-net:not(.done) .kp-spark{visibility:hidden}
+
+/* Экран ушёл из окна — всё движение стоит (класс ставит скрипт). */
+.kp--off *,.kp--off *::before,.kp--off *::after{animation-play-state:paused !important}
+
+@media (prefers-reduced-motion:reduce){
+  .kp *,.kp *::before,.kp *::after{animation:none !important; transition:none !important}
+  .kp-dust,.kp-spark,.kp-zap{display:none}
+  .kp--rv .kp-t,.kp--rv .kp-cap,.kp--rv .kp-tx{opacity:1; transform:none}
+  .kp--rv .kp-seg path{stroke-dasharray:none; stroke-dashoffset:0}
+  .kp-node::after,.kp-node b{opacity:0}
+}
+</style>
+<section class="kp" id="kapsuly" aria-labelledby="kpT">
+  <div class="kp-bg" aria-hidden="true">
+    <div class="kp-fon"></div>
+    <div class="kp-glow"><i></i><i></i><i></i></div>
+    <div class="kp-grain"></div>
+    <div class="kp-dust"><i style="--x:33.4%;--y:20.7%;--s:2px;--o:.38;--dur:13.3s;--t:-4.9s"></i><i style="--x:8.5%;--y:50.6%;--s:2px;--o:.39;--dur:12.3s;--t:-3s"></i><i style="--x:54.8%;--y:13%;--s:3.5px;--o:.41;--dur:10.8s;--t:-6.8s"></i><i style="--x:92.1%;--y:56.5%;--s:3px;--o:.37;--dur:10.8s;--t:-6s"></i><i style="--x:15.5%;--y:43.2%;--s:3.5px;--o:.4;--dur:11.5s;--t:-9.4s"></i><i style="--x:20%;--y:56.9%;--s:2px;--o:.52;--dur:13.4s;--t:-.8s"></i><i style="--x:8.6%;--y:25.3%;--s:3.5px;--o:.54;--dur:11.5s;--t:-6.7s"></i><i style="--x:45.6%;--y:33.2%;--s:2px;--o:.66;--dur:11s;--t:-6.3s"></i><i style="--x:52.4%;--y:81.5%;--s:3px;--o:.48;--dur:16.8s;--t:-2s"></i><i style="--x:42.3%;--y:71.6%;--s:2px;--o:.77;--dur:12.4s;--t:-11.9s"></i><i style="--x:67%;--y:44%;--s:2.5px;--o:.5;--dur:11.8s;--t:-5.9s"></i><i style="--x:77.9%;--y:13.8%;--s:2px;--o:.78;--dur:12.8s;--t:-8.5s"></i><i style="--x:88.7%;--y:76.9%;--s:3.5px;--o:.8;--dur:15.6s;--t:-4.4s"></i><i style="--x:39.3%;--y:64.2%;--s:2px;--o:.77;--dur:11.8s;--t:-7.2s"></i><i style="--x:62.4%;--y:26.3%;--s:2.5px;--o:.41;--dur:11s;--t:-4.3s"></i><i style="--x:84.9%;--y:34.8%;--s:3px;--o:.53;--dur:11.2s;--t:-1.5s"></i><i style="--x:23.5%;--y:84.2%;--s:3px;--o:.79;--dur:14.5s;--t:-5.5s"></i><i style="--x:24.7%;--y:15%;--s:2px;--o:.45;--dur:10.9s;--t:-5.3s"></i></div>
+  </div>
+
+  <!-- Золотая нить дуги сверху — копия нити «снега» (та же кривая и звёздочки). -->
+  <svg class="kp-wave" viewBox="0 0 1200 120" preserveAspectRatio="none"
+       aria-hidden="true" focusable="false">
+    <defs>
+      <path id="kpWaveD" d="M0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0" fill="none" vector-effect="non-scaling-stroke"/>
+    </defs>
+    <use class="vl-thread vl-thread--glow2" href="#kpWaveD"/>
+    <use class="vl-thread vl-thread--glow1" href="#kpWaveD"/>
+    <use class="vl-thread vl-thread--line"  href="#kpWaveD"/>
+    <use class="vl-thread vl-thread--spark" href="#kpWaveD"/>
+    <g>
+      <path class="vl-sp vl-sp2" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(250.0,62.4) scale(2.16,7.20)"/>
+      <path class="vl-sp vl-sp3" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(600.0,76.0) scale(3.84,12.80)"/>
+      <path class="vl-sp vl-sp4" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(950.0,62.4) scale(2.16,7.20)"/>
+    </g>
+  </svg>
+
+  <!-- Нить сети: пустая, её рисует скрипт ниже по замеру капсул. -->
+  <svg class="kp-net" aria-hidden="true" focusable="false" width="0" height="0"></svg>
+
+  <div class="kp-wrap">
+    <h2 class="kp-t" id="kpT">Дети в&nbsp;ходе квеста восстановят <b>главные капсулы времени</b> с&nbsp;событиями, благодаря которым Новый год стал таким, какой он есть сейчас</h2>
+
+    <ol class="kp-grid">
+      <li class="kp-it kp-it--1">
+        <figure class="kp-cap">
+          <img class="kp-img" src="st-kp-petr.webp" width="295" height="698" loading="lazy" decoding="async"
+               alt="Капсула времени 011 с портретом Петра I">
+          <span class="kp-node kp-node--lid" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
+          <span class="kp-node kp-node--pad" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
+        </figure>
+        <div class="kp-tx">
+          <h3 class="kp-h">Капсула <span>011</span></h3>
+          <p class="kp-p">20&nbsp;декабря 1699&nbsp;года. Пётр&nbsp;I издал именной указ №1736 «О&nbsp;праздновании Нового года»: начало года в&nbsp;России&nbsp;- 1&nbsp;января, а&nbsp;летоисчисление ведётся от&nbsp;Рождества Христова.</p>
+          <p class="kp-al">Эта капсула пропала из&nbsp;Министерства. Нового года 1&nbsp;января не&nbsp;будет…</p>
+        </div>
+      </li>
+      <li class="kp-it kp-it--2">
+        <figure class="kp-cap">
+          <img class="kp-img" src="st-kp-ekaterina.webp" width="298" height="699" loading="lazy" decoding="async"
+               alt="Капсула времени 032 с портретом Екатерины II">
+          <span class="kp-node kp-node--lid" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
+          <span class="kp-node kp-node--pad" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
+        </figure>
+        <div class="kp-tx">
+          <h3 class="kp-h">Капсула <span>032</span></h3>
+          <p class="kp-p">1769&nbsp;год. Екатерина&nbsp;II инициировала обычай праздновать Новый год с&nbsp;застольем и&nbsp;маскарадом, а&nbsp;также дарить друг другу подарки.</p>
+          <p class="kp-al">Если не&nbsp;починить эту капсулу, дети останутся без&nbsp;подарков!</p>
+        </div>
+      </li>
+      <li class="kp-it kp-it--3">
+        <figure class="kp-cap">
+          <img class="kp-img" src="st-kp-nikolay.webp" width="298" height="684" loading="lazy" decoding="async"
+               alt="Капсула времени 040 с портретом Николая I">
+          <span class="kp-node kp-node--lid" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
+          <span class="kp-node kp-node--pad" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
+        </figure>
+        <div class="kp-tx">
+          <h3 class="kp-h">Капсула <span>040</span></h3>
+          <p class="kp-p">1860&nbsp;год. По&nbsp;приказу Николая&nbsp;I впервые в&nbsp;России были установлены городские ёлки в&nbsp;Кремле. Это была идея супруги брата императора&nbsp;- Марии Фёдоровны.</p>
+          <p class="kp-al">Без этой капсулы исчезнут все новогодние ёлки в&nbsp;Министерстве</p>
+        </div>
+      </li>
+      <li class="kp-it kp-it--4">
+        <figure class="kp-cap">
+          <img class="kp-img" src="st-kp-ledenec.webp" width="300" height="697" loading="lazy" decoding="async"
+               alt="Капсула времени 001 с карамельной тростью">
+          <span class="kp-node kp-node--lid" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
+          <span class="kp-node kp-node--pad" aria-hidden="true"><i></i><b></b><b></b><b></b><b></b><b></b></span>
+        </figure>
+        <div class="kp-tx">
+          <h3 class="kp-h">Капсула <span>001</span></h3>
+          <p class="kp-p">В&nbsp;1847&nbsp;году карамель стала символом Нового года. Тогда Август Имгард первым нарядил новогоднюю ёлку крюкообразными карамельными палочками&nbsp;- тростями.</p>
+          <p class="kp-al">Мастер-класс по&nbsp;карамели не&nbsp;состоится, если не&nbsp;вернуть эту капсулу на&nbsp;место…</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <div class="cr-snow" aria-hidden="true"></div>
+</section>
+<script>
+/* СТАВРОПОЛЬ: сеть капсул. Нить строится по замеру капсул (перестраивается,
+   когда меняется размер секции: поворот, шрифты догрузились), делится на
+   четыре куска по капсулам — у каждого свой сбой. Искра бежит по всей нити,
+   узел вспыхивает, когда она до него доходит. Появление — когда экран
+   доехал до окна; вне окна всё движение стоит. */
+(function(){
+  var sec = document.getElementById('kapsuly');
+  if (!sec) return;
+  var svg = sec.querySelector('.kp-net');
+  var title = sec.querySelector('.kp-t');
+  var items = [].slice.call(sec.querySelectorAll('.kp-it'));
+  if (!svg || items.length !== 4) return;
+  var LID = .008, PAD = .96;              /* те же доли, что у .kp-node--lid / --pad */
+  var SPARK = 7, TRAVEL = .7 * SPARK;     /* период искры и доля пути — как в kpSpark */
+  var DRAW = 1.9;                         /* сколько секунд прорисовывается нить */
+  var wide = matchMedia('(min-width:1024px)');
+  var still = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* положение в секции по раскладке, без transform (появление сдвигает) */
+  function off(el){
+    var x = 0, y = 0;
+    while (el && el !== sec){ x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
+    return {x:x, y:y};
+  }
+  function cap(k){
+    var f = items[k].querySelector('.kp-cap'), o = off(f);
+    return {x:o.x + f.offsetWidth / 2, top:o.y, h:f.offsetHeight, el:f};
+  }
+  function P(x, y, o, node){ return {x:x, y:y, o:o, node:node}; }
+  /* кубика с касательными вдоль хода нити: гребни волны плоские */
+  function seg(a, b, vert){
+    if (vert){ var dy = (b.y - a.y) * .5; return [a, {x:a.x, y:a.y + dy}, {x:b.x, y:b.y - dy}, b]; }
+    var dx = (b.x - a.x) * .5; return [a, {x:a.x + dx, y:a.y}, {x:b.x - dx, y:b.y}, b];
+  }
+  function half(c){
+    function m(p, q){ return {x:(p.x + q.x) / 2, y:(p.y + q.y) / 2}; }
+    var ab = m(c[0], c[1]), bc = m(c[1], c[2]), cd = m(c[2], c[3]),
+        abc = m(ab, bc), bcd = m(bc, cd), mid = m(abc, bcd);
+    return [[c[0], ab, abc, mid], [mid, bcd, cd, c[3]]];
+  }
+  function r(n){ return Math.round(n * 10) / 10; }
+  function d(cs){
+    var s = 'M' + r(cs[0][0].x) + ',' + r(cs[0][0].y);
+    cs.forEach(function(c){ s += ' C' + r(c[1].x) + ',' + r(c[1].y) + ' ' + r(c[2].x) + ',' + r(c[2].y) + ' ' + r(c[3].x) + ',' + r(c[3].y); });
+    return s;
+  }
+  var NS = 'http://www.w3.org/2000/svg', probe = document.createElementNS(NS, 'path');
+  function len(cs){ probe.setAttribute('d', d(cs)); return probe.getTotalLength(); }
+
+  function build(){
+    var W = sec.offsetWidth, H = sec.offsetHeight, vert = !wide.matches, pts = [], k, q;
+    if (!W || !H) return;
+    svg.appendChild(probe);               /* мерить длину надёжно только в документе */
+    if (!vert){
+      /* компьютер: волна между рядами — подставки верхних капсул, крышки нижних */
+      var c = [0, 1, 2, 3].map(cap), ns = [
+        P(c[0].x, c[0].top + c[0].h * PAD, 0, c[0].el.querySelector('.kp-node--pad')),
+        P(c[1].x, c[1].top + c[1].h * PAD, 1, c[1].el.querySelector('.kp-node--pad')),
+        P(c[2].x, c[2].top + c[2].h * LID, 2, c[2].el.querySelector('.kp-node--lid')),
+        P(c[3].x, c[3].top + c[3].h * LID, 3, c[3].el.querySelector('.kp-node--lid'))];
+      var mid = (Math.max(ns[0].y, ns[1].y) + Math.min(ns[2].y, ns[3].y)) / 2;
+      ns.sort(function(a, b){ return a.x - b.x; });
+      pts = [P(0, mid, -1)].concat(ns, [P(W, mid, -1)]);
+    } else {
+      /* телефон: вертикально сквозь столбик капсул */
+      var t = off(title).y + title.offsetHeight;
+      for (k = 0; k < 4; k++){
+        q = cap(k);
+        if (!k) pts.push(P(q.x, t + 14, -1));
+        pts.push(P(q.x, q.top + q.h * LID, k, q.el.querySelector('.kp-node--lid')),
+                 P(q.x, q.top + q.h * PAD, k, q.el.querySelector('.kp-node--pad')));
+      }
+      /* хвост уходит до самого низа секции: экран «снег» заезжает на нас
+         дугой с золотой нитью и прячет всё, что ниже дуги, — наша нить
+         обрывается ровно на его нити, как отвод от общей линии */
+      q = pts[pts.length - 1];
+      pts.push(P(q.x, H, -1));
+    }
+
+    /* куски по капсулам: у края — целиком ближней, между двумя — пополам */
+    var full = [], pieces = [], cur = null, i;
+    function put(o, c){
+      if (!cur || cur.o !== o){ cur = {o:o, cs:[]}; pieces.push(cur); }
+      cur.cs.push(c);
+    }
+    for (i = 0; i < pts.length - 1; i++){
+      var A = pts[i], B = pts[i + 1], cc = seg(A, B, vert);
+      full.push(cc);
+      if (A.o < 0) put(B.o, cc);
+      else if (B.o < 0 || A.o === B.o) put(A.o, cc);
+      else { var h = half(cc); put(A.o, h[0]); put(B.o, h[1]); }
+    }
+
+    var L = len(full), acc = 0, zs = {};
+    /* узлы вспыхивают, когда до них доходит искра; у первого узла каждой
+       капсулы запоминаем, где на нити он стоит, — там при сбое бьёт разряд */
+    for (i = 0; i < pts.length; i++){
+      if (i) acc += len([full[i - 1]]);
+      if (pts[i].node) pts[i].node.style.setProperty('--kp-t', (acc / L * 1000 / 1028 * TRAVEL).toFixed(2) + 's');
+      if (pts[i].o >= 0 && !(pts[i].o in zs)) zs[pts[i].o] = acc;
+    }
+    /* разряд: при сбое на нити, чуть не доходя до узла, вспыхивает
+       четырёхлучевая звёздочка — та же, что мерцает на золотой нити шва */
+    probe.setAttribute('d', d(full));
+    var zap = '', STAR = 'M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z';
+    Object.keys(zs).forEach(function(o){
+      var c0 = probe.getPointAtLength(Math.max(20, zs[o] - (vert ? 30 : 46))),
+          c1 = probe.getPointAtLength(Math.max(10, zs[o] - (vert ? 50 : 74)));
+      zap += '<g class="kp-zap kp-zap--' + o + '">' +
+        '<circle class="kp-zap-g" cx="' + r(c0.x) + '" cy="' + r(c0.y) + '" r="13"/>' +
+        '<path class="kp-zap-c" d="' + STAR + '" transform="translate(' + r(c0.x) + ',' + r(c0.y) + ') scale(11)"/>' +
+        '<path class="kp-zap-c kp-zap-c2" d="' + STAR + '" transform="translate(' + r(c1.x) + ',' + r(c1.y) + ') rotate(45) scale(5)"/></g>';
+    });
+    var g0 = vert ? [pts[0].x, pts[0].y, pts[0].x, pts[pts.length - 1].y] : [0, 0, W, 0];
+    function grad(id, col, a){
+      return '<linearGradient id="' + id + '" gradientUnits="userSpaceOnUse" x1="' + r(g0[0]) + '" y1="' + r(g0[1]) + '" x2="' + r(g0[2]) + '" y2="' + r(g0[3]) + '">' +
+        '<stop offset="0" stop-color="' + col[0] + '" stop-opacity="0"/>' +
+        '<stop offset="' + a + '" stop-color="' + col[0] + '" stop-opacity="1"/>' +
+        '<stop offset=".5" stop-color="' + col[1] + '" stop-opacity="1"/>' +
+        '<stop offset="' + (1 - a) + '" stop-color="' + col[2] + '" stop-opacity="1"/>' +
+        '<stop offset="1" stop-color="' + col[2] + '" stop-opacity="' + (vert ? 1 : 0) + '"/></linearGradient>';
+    }
+    var fa = vert ? .05 : .07;
+    var html = '<defs>' + grad('kpNetGrad', ['#FCD34D', '#FDE68A', '#F7C561'], fa) +
+      grad('kpNetG1', ['#FCD34D', '#FCD34D', '#FCD34D'], fa) + grad('kpNetG2', ['#F59E0B', '#F59E0B', '#F59E0B'], fa) +
+      '<radialGradient id="kpZapGlow"><stop offset="0" stop-color="#FFB347" stop-opacity=".85"/><stop offset="1" stop-color="#FF8A2E" stop-opacity="0"/></radialGradient></defs>';
+    acc = 0;
+    pieces.forEach(function(p){
+      var pd = d(p.cs), pl = len(p.cs),
+          st = ' style="--kp-dl:' + (acc / L * DRAW).toFixed(3) + 's;--kp-dd:' + (pl / L * DRAW).toFixed(3) + 's"';
+      acc += pl;
+      html += '<g class="kp-seg kp-seg--' + p.o + '">' +
+        '<path class="kp-th kp-th--g2" pathLength="1" d="' + pd + '"' + st + '/>' +
+        '<path class="kp-th kp-th--g1" pathLength="1" d="' + pd + '"' + st + '/>' +
+        '<path class="kp-th kp-th--ln" pathLength="1" d="' + pd + '"' + st + '/></g>';
+    });
+    html += zap + '<path class="kp-spark kp-spark--h" pathLength="1000" d="' + d(full) + '"/>' +
+      '<path class="kp-spark" pathLength="1000" d="' + d(full) + '"/>';
+    svg.setAttribute('width', W); svg.setAttribute('height', H);
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    svg.innerHTML = html;
+    /* искра, вспышки и сбои — на одни часы (см. .kp--sync в стилях) */
+    sec.classList.remove('kp--sync'); void sec.offsetWidth; sec.classList.add('kp--sync');
+  }
+
+  build();
+  var last = '';
+  function again(){
+    var key = sec.offsetWidth + 'x' + sec.offsetHeight + (wide.matches ? 'w' : 'n');
+    if (key !== last){ last = key; build(); }
+  }
+  last = sec.offsetWidth + 'x' + sec.offsetHeight + (wide.matches ? 'w' : 'n');
+  if ('ResizeObserver' in window) new ResizeObserver(again).observe(sec);
+  else addEventListener('resize', again);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(again);
+
+  if (!('IntersectionObserver' in window)) return;
+  /* вне окна движение стоит */
+  new IntersectionObserver(function(es){
+    sec.classList.toggle('kp--off', !es[0].isIntersecting);
+  }, {rootMargin:'120px 0px'}).observe(sec);
+  if (still) return;
+
+  /* появление: заголовок, каждая капсула сама, нить — когда видна решётка */
+  sec.classList.add('kp--rv');
+  var show = new IntersectionObserver(function(es, o){
+    es.forEach(function(e){
+      if (!e.isIntersecting) return;
+      e.target.classList.add('on'); o.unobserve(e.target);
+    });
+  }, {threshold:.18});
+  show.observe(title);
+  items.forEach(function(it){ show.observe(it); });
+  new IntersectionObserver(function(es, o){
+    if (!es[0].isIntersecting) return;
+    o.disconnect();
+    svg.classList.add('on');
+    setTimeout(function(){ svg.classList.add('done'); }, DRAW * 1000 + 300);
+  }, {threshold:.22}).observe(sec.querySelector('.kp-grid'));
+})();
+</script>
 
 <!-- ==================== ЭКРАН 11А: заявка на светлом над мастер-классом ====================
      Вторая светлая форма, копия нижней (экран 11). 16.09.2026 вернулась на
