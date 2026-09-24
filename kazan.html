@@ -31,6 +31,24 @@
 <meta property="og:url" content="https://mnd-kazan.ru/">
 <link rel="canonical" href="https://mnd-kazan.ru/">
 <meta name="twitter:card" content="summary_large_image">
+<!-- ПИКСЕЛЬ VK РЕКЛАМЫ (24.09.2026, plans/2026-09-24-piksel-vk.md в репо МНД AI).
+     Номер свой у каждого города (кабинет ads.vk.com, раздел «Сайты»): Нижний 3796982,
+     Казань 3796983, Тюмень 3796984, Крым 3796985; у Ставрополя пусто - пиксель появится
+     с его доменом. Пустой номер выключает пиксель целиком. ГОРОДСКОЙ КУСОК: sinhron.py
+     приносит сюда номер чужого города спорным местом - оставлять свой. На страницах
+     партнёра (Ярославль, Екатеринбург) этого блока быть не должно - сторож проверяет.
+     Отметку «заявка» ставит единая форма (zsBind): событие lead = цель «Заявка с сайта».
+     О пикселе написано в политике, п. 5.1 (politika.py). -->
+<script>
+window.VK_PIXEL = '3796983';
+(function(){
+  if (!window.VK_PIXEL) return;
+  (window._tmr = window._tmr || []).push({id: window.VK_PIXEL, type: 'pageView', start: Date.now()});
+  var s = document.createElement('script');
+  s.async = true; s.id = 'tmr-code'; s.src = 'https://top-fwz1.mail.ru/js/code.js';
+  document.head.appendChild(s);
+})();
+</script>
 <link rel="preload" as="image" href="poster.webp" fetchpriority="high" media="(min-width: 820px)">
 <link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15896,6 +15914,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       lead.maxCode = zsMaxCode();
       window.__zsLead = lead;
       remember(lead);
+      /* Пиксель VK Рекламы: отметка «заявка» (цель «Заявка с сайта», событие lead).
+         В ВК уходит только сам факт заявки - ни телефона, ни имени. Номер пикселя
+         городской, задан в <head>; нет номера - нет и отметки. */
+      if (window.VK_PIXEL) (window._tmr = window._tmr || []).push({type: 'reachGoal', id: window.VK_PIXEL, goal: 'lead'});
 
       /* sending здесь НЕ снимаем: пока форма на экране, вторая заявка с того же
          номера не нужна. Флаг обнуляется вызовом reset() */
