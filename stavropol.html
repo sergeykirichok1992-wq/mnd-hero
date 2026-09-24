@@ -11521,6 +11521,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      от её кончика до нашего верха остаётся ~80 px на 1600 и ~65 на телефоне. */
   margin-top:calc(-64 * max(1px, (min(94vw, 1462px) - 2*clamp(16px, 3vw, 47.6px)) / 1100));
 }
+/* Телефон: ещё на 27 px выше (Серёга 24.09.2026: «между заголовком и стрелочкой
+   уменьшить отступ процентов на 30»). Было от кончика стрелки до заголовка
+   91 px на 390 и 95 на 360, стало 64 и 68; до нашего верха от стрелки ~30 px. */
+@media (max-width:767px){
+  .kp{margin-top:calc(-64 * max(1px, (min(94vw, 1462px) - 2*clamp(16px, 3vw, 47.6px)) / 1100) - 27px)}
+}
 .kp-bg{
   position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
   background:linear-gradient(180deg,
