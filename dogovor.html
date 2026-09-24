@@ -1,0 +1,720 @@
+<!doctype html>
+<!-- СОБРАНО СКРИПТОМ business/company/dogovor/stranica_dogovora.py (основной репозиторий МНД AI).
+     Руками не править: текст договора - в tekst_dogovora.py, оформление - в politika.py. -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Договор на участие группы - Министерство Новогодних Дел</title>
+<meta name="theme-color" content="#FFFFFF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* СВЕТЛАЯ СТРАНИЦА (просьба Серёги 18.09.2026 «сделай на белом фоне»).
+   Палитра - со светлого экрана заявки v2.html (.sv «По цене сентября»):
+   синий #001B71 для заголовков, золото на два тона гуще сайтового
+   (#E3B34E на белом не читается), голубой бланк #ECF2FE → #DCE7F9. */
+:root{
+  --navy:#001B71; --text:#22305A; --dim:#5A6A93; --faint:#7A88AB;
+  --gold:#C9861F; --gold-t:#8A6111; --line:rgba(0,27,113,.12);
+  color-scheme:light;
+}
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; background:#fff; color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- шапка: раскладка как на v2.html, цвета светлые ----------
+   Вверху прозрачная (под ней и так белое), при прокрутке - белое стекло. */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  padding-top:max(16px, env(safe-area-inset-top));
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(255,255,255,.86);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:var(--navy); text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026). Здесь она ссылка «На главную». */
+.navbtn{
+  border:1px solid #A96D0D; color:var(--gold-t); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none; margin-left:auto;
+}
+.navbtn:hover,.navbtn:focus-visible{background:#A96D0D; color:#fff}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- поле страницы: белое, с еле заметными отблесками ----------
+   Отблески - рецепт .sv-glow (голубые по бокам, тёплый внизу), без анимации.
+   overflow у .oz НЕ hidden: иначе у колонок не работает position:sticky,
+   отблески обрезает своя коробка .oz-glow. */
+.oz{
+  position:relative; isolation:isolate; min-height:100vh; background:#fff;
+  padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%}
+.oz-glow i:nth-child(1){left:-16vw; top:-6%; width:62vw; height:40%;
+  background:radial-gradient(closest-side, rgba(198,219,255,.5) 0%, rgba(198,219,255,.26) 40%, rgba(198,219,255,0) 100%)}
+.oz-glow i:nth-child(2){right:-18vw; top:22%; width:58vw; height:44%;
+  background:radial-gradient(closest-side, rgba(214,224,255,.42) 0%, rgba(214,224,255,.2) 40%, rgba(214,224,255,0) 100%)}
+.oz-glow i:nth-child(3){left:50%; bottom:-14%; width:74vw; height:36%; margin-left:-37vw;
+  background:radial-gradient(closest-side, rgba(255,232,186,.4) 0%, rgba(255,232,186,.18) 40%, rgba(255,232,186,0) 100%)}
+
+/* Контейнер - по общему правилу сайта: широкий, почти во весь экран
+   → ai-clone/feedback/shirokaya-verstka-sayta.md. */
+.oz-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1462px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,47.6px);
+}
+@media (max-width:767px){ .oz-cont{width:100%; padding-inline:20px} }
+
+/* ---------- заголовок: как .sv-t на v2.html ---------- */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:var(--navy);
+}
+.oz-q{color:#A96D0D}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .oz-q{background:linear-gradient(180deg,#B0700F 0%,#9E650B 45%,#8A5607 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
+.pl-meta{
+  margin:0 auto; text-align:center; text-wrap:balance;
+  font-size:max(14px, clamp(14px,1.05vw,17px)); line-height:1.5; color:#3F4F76;
+}
+.pl-meta span{color:var(--dim)}
+
+/* ---------- три колонки: оглавление | документ | коротко ----------
+   Документ - лист шириной с удобную строку, по бокам колонки держат
+   ширину экрана (правило широкой вёрстки). До 1280 px «коротко» встаёт
+   над документом, до 1024 px оглавление убирается совсем. */
+.pl-grid{
+  display:grid; align-items:start;
+  grid-template-columns:minmax(210px,290px) minmax(0,1fr) minmax(240px,330px);
+  grid-template-areas:"toc doc sum";
+  gap:clamp(22px,2.6vw,52px); margin-top:clamp(28px,3.4vw,56px);
+}
+.pl-toc{grid-area:toc; position:sticky; top:84px; max-height:calc(100vh - 104px); overflow:auto}
+.pl-doc{grid-area:doc}
+.pl-sum{grid-area:sum; position:sticky; top:84px}
+@media (max-width:1279px){
+  .pl-grid{grid-template-columns:minmax(200px,260px) minmax(0,1fr);
+    grid-template-areas:"toc sum" "toc doc"}
+  .pl-sum{position:static}
+}
+@media (max-width:1023px){
+  .pl-grid{grid-template-columns:minmax(0,1fr); grid-template-areas:"sum" "doc"}
+  .pl-toc{display:none}
+}
+
+/* оглавление */
+.pl-toc-h, .pl-sum-h{
+  margin:0 0 12px; font:600 12px/1.2 "Golos Text",sans-serif;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold-t);
+}
+.pl-toc ol{margin:0; padding:0; list-style:none; border-left:1px solid var(--line)}
+.pl-toc a{
+  display:block; padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent;
+  font-size:14px; line-height:1.35; color:var(--dim); text-decoration:none;
+  transition:color .2s, border-color .2s;
+}
+.pl-toc a:hover, .pl-toc a:focus-visible{color:var(--navy)}
+.pl-toc a.on{color:var(--gold-t); border-left-color:var(--gold)}
+
+/* Документ - белый лист с тонкой рамкой и тенью (как бланк .sv-card, только
+   белый: длинный текст на голубом читать тяжелее). «Коротко» - голубой
+   бланк .sv-card, чтобы выжимка читалась отдельным предметом. */
+.pl-card{
+  position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.4vw,40px);
+  border-radius:clamp(18px,1.6vw,26px); background:#fff;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.12),
+    0 30px 60px -38px rgba(0,27,113,.32),
+    0 4px 14px -8px rgba(0,27,113,.12);
+}
+.pl-sum .pl-card{
+  background:linear-gradient(180deg,#ECF2FE 0%,#DCE7F9 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.16),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 30px 60px -34px rgba(0,27,113,.42),
+    0 4px 14px -6px rgba(0,27,113,.16);
+}
+.pl-sum dl{margin:0}
+.pl-sum dt{margin:0; font-size:13px; line-height:1.3; color:var(--dim)}
+.pl-sum dd{margin:3px 0 0; font-size:15px; line-height:1.4; color:#0B1B3F; overflow-wrap:anywhere}
+.pl-sum dd + dt{margin-top:14px}
+.pl-sum-note{margin:16px 0 0; font-size:13px; line-height:1.45; color:var(--dim)}
+.pl-sum-link{margin:14px 0 0; font-size:15px}
+.pl-sum a, .pl-foot a{color:var(--gold-t)}
+.pl-sum a:hover, .pl-foot a:hover{color:#A96D0D}
+
+/* сам документ */
+.pl-doc{font-size:max(15px, clamp(15px,1.05vw,17px)); line-height:1.6; color:var(--text)}
+.pl-doc p, .pl-doc li, .pl-doc dd{max-width:68ch}
+.pl-doc p{margin:0}
+.pl-doc p + p, .pl-doc ul + p, .pl-doc .pl-cel + p, .pl-doc p + ul{margin-top:.75em}
+.pl-doc b{color:var(--navy); font-weight:600}
+.pl-doc a{color:var(--gold-t); overflow-wrap:anywhere}
+.pl-doc a:hover{color:#A96D0D}
+.nw, a[href^="tel:"]{white-space:nowrap}
+.pl-intro{margin-bottom:1.6em !important; color:#0B1B3F}
+.pl-sec{scroll-margin-top:88px}
+.pl-sec + .pl-sec{margin-top:1.9em; padding-top:1.7em; border-top:1px solid var(--line)}
+.pl-sec h2{
+  margin:0 0 .8em;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(18px,1.45vw,24px); line-height:1.2; text-transform:uppercase; color:var(--navy);
+}
+.pl-doc ul{margin:0; padding:0; list-style:none}
+.pl-doc li{position:relative; padding-left:1.35em}
+.pl-doc li + li{margin-top:.45em}
+.pl-doc li::before{
+  content:''; position:absolute; left:.2em; top:.66em; width:.42em; height:.42em;
+  border-radius:50%; background:var(--gold);
+}
+.pl-cel{
+  margin-top:1em; padding:.9em 1.1em 1em;
+  border-left:2px solid var(--gold); border-radius:0 12px 12px 0;
+  background:#F3F7FE;
+}
+.pl-cel-h{color:var(--navy); font-weight:600}
+.pl-cel-h span{color:var(--gold-t)}
+.pl-cel dl{
+  display:grid; grid-template-columns:minmax(120px,max-content) minmax(0,1fr);
+  gap:.45em 1.2em; margin:.7em 0 0;
+}
+.pl-cel dt{color:var(--dim); font-size:.92em; line-height:1.55}
+.pl-cel dd{margin:0}
+@media (max-width:640px){
+  .pl-cel{padding:.8em .9em .9em}
+  .pl-cel dl{grid-template-columns:minmax(0,1fr); gap:.1em}
+  .pl-cel dd + dt{margin-top:.55em}
+}
+.pl-red{margin-top:1.8em !important; color:var(--dim); font-style:italic}
+
+/* подвал страницы */
+.pl-foot{
+  margin:clamp(28px,3vw,48px) auto 0; text-align:center;
+  font-size:14px; line-height:1.6; color:var(--faint);
+}
+.pl-foot p{margin:0}
+.pl-foot p + p{margin-top:6px}
+.pl-foot .dot{padding:0 .45em; color:#B4BED6}
+
+/* печать: чёрный текст на белом, без шапки и колонок */
+@media print{
+  .nav, .oz-glow, .pl-toc, .pl-sum, .pl-foot{display:none !important}
+  .oz{padding:0; min-height:0}
+  .oz-cont{width:100%; padding:0}
+  .oz-t, .pl-meta, .pl-meta span{color:#000}
+  .oz-q{background:none; color:#000; -webkit-text-fill-color:#000}
+  .pl-grid{display:block; margin-top:12px}
+  .pl-card{box-shadow:none; padding:0}
+  .pl-doc, .pl-doc b, .pl-sec h2, .pl-cel-h, .pl-cel-h span, .pl-cel dt, .pl-doc a, .pl-intro, .pl-red{color:#000}
+  .pl-doc p, .pl-doc li, .pl-doc dd{max-width:none}
+  .pl-cel{background:none; border-left-color:#999}
+  .pl-doc li::before{background:#000}
+}
+
+/* ---------- только у договора ---------- */
+/* черновик: нерешённые вопросы наверху листа */
+.pl-check{
+  margin:0 0 1.8em; padding:1em 1.2em 1.1em; border-radius:14px;
+  background:#FFF6E3; box-shadow:inset 0 0 0 1px rgba(169,109,13,.28);
+}
+.pl-check-h{margin:0 0 .5em !important; font:600 12px/1.3 "Golos Text",sans-serif;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--gold-t)}
+.pl-check ol{margin:0; padding-left:1.3em}
+.pl-check li{max-width:68ch; padding-left:.2em}
+.pl-check li::before{display:none}
+.pl-check li + li{margin-top:.4em}
+.pl-check li::marker{color:var(--gold-t); font-weight:600}
+
+/* бланк: номер договора, город и дата */
+.pl-blank{text-align:center; margin-bottom:1.4em}
+.pl-blank-t{margin:0 !important; font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(18px,1.45vw,24px); line-height:1.2; color:var(--navy); max-width:none !important}
+.pl-blank-p{margin:.2em auto 0 !important; color:var(--navy); font-weight:600; text-wrap:balance}
+.pl-mesto{display:flex; flex-wrap:wrap; justify-content:space-between; gap:.3em 1.5em;
+  margin:1.1em 0 0 !important; max-width:none !important; color:var(--dim)}
+.pusto{color:var(--faint); letter-spacing:-.04em; word-break:break-all}
+
+/* пункт, на который перешли по ссылке, коротко подсвечивается */
+.pl-doc p[id]{scroll-margin-top:96px}
+.pl-doc p:target{animation:pl-mig 2.4s ease-out}
+@keyframes pl-mig{0%,40%{background:#FFF0CC} 100%{background:transparent}}
+@media (prefers-reduced-motion:reduce){ .pl-doc p:target{animation:none; background:#FFF0CC} }
+
+/* У оферты названия в карточках короткие, у договора бывают в строку
+   («Отмена или перенос по обстоятельствам...»): левая колонка не шире трети,
+   иначе правой не хватает места и телефоны вылезают за край. */
+@media (min-width:641px){ .pl-doc .pl-cel dl{grid-template-columns:fit-content(34%) minmax(0,1fr)} }
+
+/* поля для заполнения (п. 3.1, реквизиты Заказчика) */
+.pl-doc .pl-pola dl{grid-template-columns:minmax(0,1fr) minmax(90px,38%)}
+.pl-pola dt{color:var(--text); font-size:1em}
+.pl-pola dd{align-self:end}
+.pole{display:block; min-height:1.3em; border-bottom:1px dashed rgba(0,27,113,.3)}
+@media (max-width:640px){
+  .pl-doc .pl-pola dl{grid-template-columns:minmax(0,1fr) 34%; gap:.45em .8em}
+  .pl-pola dd + dt{margin-top:0}
+}
+
+/* подписи сторон */
+.pl-podpisi{display:grid; grid-template-columns:1fr 1fr; gap:1em 2em; margin-top:1.4em}
+.pl-podpisi p{margin:0; max-width:none}
+.pl-linia{margin-top:1.6em !important; color:var(--dim)}
+@media (max-width:640px){ .pl-podpisi{grid-template-columns:minmax(0,1fr)} }
+
+/* приложения */
+.pl-pril{margin:-.4em 0 1em !important; color:var(--dim); font-size:.92em}
+.pl-h3{margin:1.4em 0 0; font:600 1em/1.3 "Golos Text",sans-serif; color:var(--navy)}
+.pl-mel{margin-top:1.2em !important; font-size:.92em; color:var(--dim)}
+
+/* цены: таблица на город. Узкий экран - таблица листается сама, страница нет */
+.pl-tab-w{margin-top:1em; overflow-x:auto; -webkit-overflow-scrolling:touch}
+.pl-tab{width:100%; table-layout:fixed; border-collapse:collapse; font-size:.9em; line-height:1.35;
+  font-variant-numeric:tabular-nums}
+.pl-tab thead th:first-child{width:24%}
+.pl-tab th, .pl-tab td{padding:.5em .6em; border-bottom:1px solid var(--line); text-align:center; vertical-align:top}
+.pl-tab thead th{background:#ECF2FE; color:var(--navy); font-weight:600; font-size:.92em}
+.pl-tab thead th:first-child{text-align:left; border-radius:10px 0 0 0}
+.pl-tab thead th:last-child{border-radius:0 10px 0 0}
+.pl-tab tbody th{text-align:left; font-weight:500; color:var(--text)}
+.pl-tab b{font-weight:600}
+/* в ячейке: сверху цена по Акции (жирная), под ней по Тарифу; «/» - для копирования и печати */
+.pl-tab .sl{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0)}
+.pl-tab .tf{display:block; color:var(--dim)}
+.pl-tab tr.vz td, .pl-tab tr.vz th{background:#F7F9FE}
+@media (max-width:640px){
+  .pl-tab{font-size:.8em}
+  .pl-tab th, .pl-tab td{padding:.45em .3em}
+  .pl-tab thead th:first-child{width:26%}
+}
+@media (max-width:400px){ .pl-tab{font-size:.74em} }
+
+/* выжимка у договора выше экрана ноутбука: не прилипает сбоку, как у оферты,
+   а уезжает вместе со страницей - иначе низ обрезается */
+.pl-sum dd{font-size:14.5px}
+.pl-sum dd + dt{margin-top:11px}
+.pl-sum{position:static}
+
+@media print{
+  .pl-check{display:none}
+  .pl-tab thead th, .pl-tab tr.vz td, .pl-tab tr.vz th{background:none}
+  .pl-tab .sl, .pl-tab .tf, .pl-mesto, .pl-pril, .pl-mel, .pl-linia{color:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="https://mnd-nn.ru/">МНД<span>·</span>Договор</a>
+  <a class="navbtn" href="https://mnd-nn.ru/">На главную</a>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <div class="oz-cont">
+    <h1 class="oz-t">Договор<br><span class="oz-q">на участие группы</span></h1>
+    <p class="pl-meta">в мероприятии «Министерство Новогодних Дел»<br><span>Все города · сезон 2026-2027 · черновик от 24 сентября 2026 г.</span></p>
+
+    <div class="pl-grid">
+      <nav class="pl-toc" aria-label="Содержание">
+        <p class="pl-toc-h">Содержание</p>
+        <ol>
+      <li><a href="#r1">1. Термины и определения</a></li>
+      <li><a href="#r2">2. Предмет договора</a></li>
+      <li><a href="#r3">3. Условия оплаты</a></li>
+      <li><a href="#r4">4. Организационная информация</a></li>
+      <li><a href="#r5">5. Права и обязанности Заказчика</a></li>
+      <li><a href="#r6">6. Права и обязанности Исполнителя</a></li>
+      <li><a href="#r7">7. Прочие условия</a></li>
+      <li><a href="#r8">8. Реквизиты и подписи Сторон</a></li>
+      <li><a href="#pr1">Приложение № 1. Организационная информация для участников Группы</a></li>
+      <li><a href="#pr2">Приложение № 2. Стоимость участия в Мероприятии</a></li>
+        </ol>
+      </nav>
+
+      <article class="pl-doc pl-card">
+<div class="pl-check">
+  <p class="pl-check-h">Черновик: решить до отправки клиентам</p>
+  <ol>
+    <li>Опоздание: без возврата после 20 или после 25 минут? Сейчас 20 (п. <a href="#p6-2">6.2</a> и Приложение <a href="#pr1">№ 1</a>).</li>
+    <li>Ставрополь: правильно «ул. Росгипрозем» (карточка площадки, сайт Ставрополя, venue.md). В договоре (раздел <a href="#r8">8</a>) и в оферте стоит опечатка «Рогипрозем». Исправить в обоих документах?</li>
+    <li>Взрослый билет в Тюмени, Крыму и Ставрополе дорожает каждое 1‑е число? Или, как в Нижнем и Казани, в октябре стоит на месте? Сейчас +100 каждое 1‑е число, как в pricing.md этих городов (Приложение <a href="#pr2">№ 2</a>).</li>
+    <li>Льготы (скидка 5% только на детский билет: дети из многодетных семей, дети-инвалиды, дети участников СВО) в договоре не упомянуты, в п. 3.1 есть только персональная скидка. А оферта (её п. 4.2) просит сообщить менеджеру количество льготников. Добавить в п. 3.1 строку «льготные детские билеты»?</li>
+    <li>Оферта (п. 4.1) говорит, что договор заключается не меньше чем на 20 детей, а здесь есть Тариф для Групп до 20. Если маленькие группы тоже подписывают договор, поправить оферту.</li>
+  </ol>
+</div>
+
+<div class="pl-blank">
+  <p class="pl-blank-t">ДОГОВОР № <span class="pusto">__________</span></p>
+  <p class="pl-blank-p">на участие группы в мероприятии «Министерство Новогодних Дел»</p>
+  <p class="pl-mesto"><span>г. <span class="pusto">______________________</span></span><span>«<span class="pusto">____</span>» <span class="pusto">____________________</span> 20<span class="pusto">____</span> г.</span></p>
+</div>
+
+<p class="pl-intro">Индивидуальный предприниматель Киричок Сергей Васильевич (ИНН 910314959705, ОГРНИП 319911200114762), именуемый в дальнейшем «Исполнитель», с одной стороны, и <span class="pusto">______________________________________________________________</span> (фамилия, имя, отчество), представляющий(ая) интересы Группы и именуемый(ая) в дальнейшем «Заказчик», с другой стороны, вместе именуемые «Стороны», заключили настоящий договор (далее - Договор) о нижеследующем.</p>
+
+<section class="pl-sec" id="r1">
+<h2>1. Термины и определения</h2>
+<p id="p1-1">1.1. <b>Мероприятие</b> - интерактивная экскурсия-шоу «Министерство Новогодних Дел (Деда Мороза)» для Групп. Программа и полное описание Мероприятия опубликованы на Сайте.</p>
+<p id="p1-2">1.2. <b>Сайт</b> - сайт Исполнителя (включая поддомены) для города: Нижний Новгород - <a class="nw" href="https://mnd-nn.ru/">mnd-nn.ru</a>; Казань - <a class="nw" href="https://mnd-kazan.ru/">mnd-kazan.ru</a>; Тюмень - <a class="nw" href="https://mnd-tumen.ru/">mnd-tumen.ru</a>; Крым (Симферополь) - <a class="nw" href="https://mnd-crimea.ru/">mnd-crimea.ru</a>; Ставрополь - <span class="nw">mnd-stavropol.ru</span>.</p>
+<p id="p1-3">1.3. <b>Заказчик</b> - лицо, которое заключает Договор и представляет интересы Группы.</p>
+<p id="p1-4">1.4. <b>Участники</b> - дети и взрослые, которые посещают (планируют посетить) Мероприятие в составе Группы.</p>
+<p id="p1-5">1.5. <b>Дети</b> - Участники в возрасте от 4 до 15 лет.</p>
+<p id="p1-6">1.6. <b>Группа</b> - Участники, указанные в Заявке, которые вместе посещают Мероприятие. Исполнитель вправе ограничить наибольшее количество Участников в Группе исходя из вместимости площадки.</p>
+<p id="p1-7">1.7. <b>Дополнительные участники</b> - Участники, о которых Заказчик сообщил после оплаты Договора (пункт <a href="#p2-2">2.2</a>).</p>
+<p id="p1-8">1.8. <b>Заявка</b> - сообщение Заказчика Исполнителю письмом на <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>, в мессенджере или по телефону <a href="tel:+79994447569">+7 (999) 444-75-69</a> (для Казани - <a href="tel:+79993332174">+7 (999) 333-21-74</a>), в котором указаны:</p>
+<ul>
+  <li>количество детей и их возраст;</li>
+  <li>количество сопровождающих взрослых: платных и бесплатных (по Акции);</li>
+  <li>кем взрослые приходятся детям (родитель, учитель и т. п.);</li>
+  <li>имя и контакты Заказчика: номер телефона или имя в мессенджере с названием мессенджера;</li>
+  <li>количество Подарков, если они нужны.</li>
+</ul>
+<p id="p1-9">1.9. <b>Бронирование</b> - закрепление даты и времени Мероприятия за Группой на условиях публичной оферты на бронирование, опубликованной на Сайте. Оплата за бронирование засчитывается в стоимость Договора.</p>
+<p id="p1-10">1.10. <b>Период праздников</b> - период проведения Мероприятия с 27 ноября 2026 г. по 10 января 2027 г.</p>
+<p id="p1-11">1.11. <b>Тариф</b> - стоимость участия в Мероприятии для Групп до 20 детей. Зависит от даты Мероприятия и даты Бронирования (Приложение <a href="#pr2">№ 2</a>).</p>
+<p id="p1-12">1.12. <b>Акция</b> - специальная цена участия для Группы от 20 детей, которую Заказчик собрал для совместного посещения Мероприятия (Приложение <a href="#pr2">№ 2</a>).</p>
+<p id="p1-13">1.13. <b>Подарок</b> - сладкий подарок, который можно добавить к любому тарифу по цене, указанной в рекламе.</p>
+</section>
+
+<section class="pl-sec" id="r2">
+<h2>2. Предмет договора</h2>
+<p id="p2-1">2.1. Исполнитель обязуется за плату организовать и провести Мероприятие для Участников, указанных в Заявке, а Заказчик обязуется оплатить его на условиях Договора.</p>
+<p id="p2-2">2.2. Количество Участников можно увеличить не позднее чем за 3 (три) дня до даты Мероприятия (день Мероприятия не считается). Стоимость Договора в этом случае пересчитывается по ценам, действовавшим на дату Бронирования (раздел <a href="#r3">3</a>).</p>
+<p id="p2-3">2.3. Об увеличении количества Участников Заказчик сообщает письменно, тем же способом, что и Заявку.</p>
+<p id="p2-4">2.4. Если на Мероприятие придёт меньше Участников, чем оплачено по Договору, стоимость Договора не пересчитывается.</p>
+<p id="p2-5">2.5. Цена по Акции ниже обычной, потому что рассчитана на гарантированное посещение Мероприятия всей Группой. Поэтому если Договор оплачен по Акции, при отказе Заказчика от Договора оплата не возвращается.</p>
+</section>
+
+<section class="pl-sec" id="r3">
+<h2>3. Условия оплаты</h2>
+<p id="p3-1">3.1. Стоимость Договора определяется исходя из следующих условий:</p>
+<div class="pl-cel pl-pola">
+  <dl>
+    <dt>Участие в Акции (Группа от 20 детей)</dt><dd>да / нет</dd>
+    <dt>Город и адрес площадки</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Дата Мероприятия</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Время Мероприятия</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Количество детей, всего</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Цена детского билета, руб.</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Количество платных сопровождающих взрослых</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Цена взрослого билета, руб.</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Количество бесплатных сопровождающих взрослых (по Акции)</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Количество бесплатных детских билетов (по Акции)</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Подарки: количество и стоимость, руб.</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Персональная скидка (на каждого Участника или на всю стоимость), если есть</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Стоимость Договора, руб.</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Оплачено при Бронировании, руб.</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt><b>Осталось оплатить, руб.</b></dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+  </dl>
+</div>
+<p id="p3-2">3.2. Счёт Исполнителя оплачивается полностью в течение 1 (одних) суток с момента его направления. Если оплата не поступила в этот срок, Исполнитель вправе снять Бронирование.</p>
+<p id="p3-3">3.3. Если в Группе 20 детей и больше, стоимость участия определяется по Акции. Если 20 детей набралось за счёт Дополнительных участников, а раньше Группа оплатила участие по Тарифу, стоимость Договора пересчитывается по цене Акции.</p>
+<p id="p3-4">3.4. Исполнитель может предоставить Заказчику персональную скидку. Она указывается в счёте отдельной строкой.</p>
+<p id="p3-5">3.5. При увеличении количества Участников стоимость Договора увеличивается по ценам, действовавшим на дату Бронирования.</p>
+<p id="p3-6">3.6. Стоимость Договора оплачивается полностью не позднее чем за 3 (три) дня до Мероприятия (день Мероприятия не считается).</p>
+<p id="p3-7">3.7. Доплата за Дополнительных участников вносится не позднее чем за 3 (три) дня до Мероприятия (день Мероприятия не считается). Если доплата поступит позже, Исполнитель постарается принять Дополнительных участников, но не может этого гарантировать.</p>
+<p id="p3-8">3.8. Оплата считается внесённой с момента поступления денег на расчётный счёт Исполнителя или внесения наличных в офисе Исполнителя.</p>
+<p id="p3-9">3.9. Договор вступает в силу с момента его подписания Сторонами или с момента оплаты Заказчиком счёта Исполнителя, если оплата произошла раньше. Оплачивая счёт, Заказчик подтверждает, что ознакомился с условиями Договора и согласен с ними.</p>
+</section>
+
+<section class="pl-sec" id="r4">
+<h2>4. Организационная информация</h2>
+<p id="p4-1">4.1. Вся организационная информация о Мероприятии приведена в Приложении <a href="#pr1">№ 1</a>.</p>
+<p id="p4-2">4.2. Заказчик доводит организационную информацию до всех Участников Группы. Исполнитель не отвечает за последствия того, что Участники не были с ней ознакомлены.</p>
+</section>
+
+<section class="pl-sec" id="r5">
+<h2>5. Права и обязанности Заказчика</h2>
+<p id="p5-1">5.1. Заказчик обязуется:</p>
+<ul>
+  <li>оплатить Договор, в том числе Дополнительных участников, в порядке и сроки раздела <a href="#r3">3</a>;</li>
+  <li>довести организационную информацию (Приложение <a href="#pr1">№ 1</a>) до всех Участников;</li>
+  <li>познакомить Участников с программой Мероприятия;</li>
+  <li>обеспечить прибытие Участников на площадку к согласованному времени;</li>
+  <li>обеспечить, чтобы Участники организованно покинули площадку в течение 7 (семи) минут после окончания Мероприятия, включая время на одевание;</li>
+  <li>не позднее чем за 3 (три) дня до Мероприятия сообщить количество бесплатных Участников по Акции (Приложение <a href="#pr2">№ 2</a>) тем же способом, что и Заявку.</li>
+</ul>
+<p id="p5-2">5.2. Заказчик вправе:</p>
+<ul>
+  <li>получать от Исполнителя ответы на вопросы о порядке проведения Мероприятия, особенностях площадки и т. п.;</li>
+  <li>увеличить количество Участников в порядке и сроки, предусмотренные Договором.</li>
+</ul>
+</section>
+
+<section class="pl-sec" id="r6">
+<h2>6. Права и обязанности Исполнителя</h2>
+<p id="p6-1">6.1. Исполнитель обязуется:</p>
+<ul>
+  <li>не позднее 3 (трёх) рабочих дней после получения Заявки направить Заказчику ссылку на оплату по его контактам;</li>
+  <li>после полной оплаты письменно подтвердить Заказчику оплату, дату и время Мероприятия и количество Участников - в мессенджере или во ВКонтакте;</li>
+  <li>провести Мероприятие в согласованное время и с надлежащим качеством;</li>
+  <li>пересчитать стоимость Договора в случаях и порядке, предусмотренных Договором;</li>
+  <li>своевременно сообщить Заказчику об отмене или переносе Мероприятия, если они произойдут.</li>
+</ul>
+<p id="p6-2">6.2. Исполнитель вправе:</p>
+<ul>
+  <li>вносить изменения в программу Мероприятия, сохраняя её основную концепцию;</li>
+  <li>отказаться от исполнения Договора в одностороннем порядке, если оплата не внесена в срок или внесена не полностью;</li>
+  <li>если Группа опоздала на 5-20 минут, провести Мероприятие с того этапа, который идёт по расписанию на момент прибытия Группы;</li>
+  <li>если Группа опоздала более чем на 20 минут, отказаться от проведения Мероприятия без возврата его стоимости: после Группы площадку ждут другие группы.</li>
+</ul>
+</section>
+
+<section class="pl-sec" id="r7">
+<h2>7. Прочие условия</h2>
+<p id="p7-1">7.1. Стороны вправе направлять друг другу юридически значимые сообщения по Договору по электронной почте, SMS, в мессенджерах и в социальной сети ВКонтакте.</p>
+<p id="p7-2">7.2. Контакты Исполнителя - электронная почта, номер телефона и привязанные к нему мессенджеры, указанные в разделе <a href="#r8">8</a> и на Сайте. Контакты Заказчика - электронная почта, номер телефона и мессенджеры, указанные в Заявке. По этим же контактам Стороны обмениваются оперативной информацией по Договору.</p>
+<p id="p7-3">7.3. Заявку и сообщения об изменении количества Участников Заказчик направляет письмом на почту Исполнителя или сообщением менеджеру в мессенджере.</p>
+<p id="p7-4">7.4. Юридически значимое сообщение действует с момента его отправки (по почте, SMS или в мессенджере), вручения почтового отправления адресату или его поступления в почтовое отделение. Сообщение считается доставленным и в том случае, если адресат получил его, но по зависящим от него причинам не ознакомился с ним.</p>
+<p id="p7-5">7.5. Разногласия по Договору Стороны решают в досудебном порядке: сначала направляется претензия, срок ответа на неё - 10 (десять) дней. Если договориться не удалось, спор рассматривается в суде по месту нахождения Исполнителя.</p>
+<p id="p7-6">7.6. Исполнитель отвечает за ненадлежащее оказание услуг, в том числе за убытки, в пределах суммы, оплаченной Заказчиком по Договору.</p>
+<p id="p7-7">7.7. Договор не передаёт Заказчику исключительные права или права использования произведений. Материалы Мероприятия принадлежат Исполнителю, поэтому их запись, копирование и распространение в целях, не связанных с исполнением Договора, без согласия Исполнителя не допускаются.</p>
+<p id="p7-8">7.8. Если Мероприятие отменяется по вине Исполнителя, оплаченная стоимость Договора возвращается Заказчику полностью в течение 10 (десяти) дней с даты отмены.</p>
+<p id="p7-9">7.9. Если Мероприятие невозможно провести по обстоятельствам, не зависящим от Исполнителя (в том числе из-за запретительных решений или действий органов власти и контролирующих органов, стихийных бедствий, военных действий, ограничений или запретов на передвижение и проведение мероприятий), Исполнитель сразу сообщает об этом Заказчику.</p>
+<p id="p7-10">7.10. Если такие обстоятельства не отпали до конца Периода праздников, Исполнитель возвращает Заказчику оплаченную стоимость Договора за вычетом 50%. Стороны согласовали, что 50% стоимости соответствуют средним фактическим расходам Исполнителя на подготовку Мероприятия.</p>
+<p id="p7-11">7.11. Если Мероприятие переносится по вине Исполнителя, Заказчик вправе уменьшить количество Участников или изменить их состав и получить возврат стоимости за соответствующее количество Участников.</p>
+<p id="p7-12">7.12. Карамельный мастер-класс - образовательная часть программы: дети учатся делать красивые леденцы. Результат мастер-класса - готовые изделия из карамели. Употребление леденцов в пищу частью Мероприятия не является.</p>
+<p id="p7-13">7.13. Персональные данные Заказчика Исполнитель обрабатывает для исполнения Договора по Политике обработки персональных данных, опубликованной на Сайте.</p>
+<p id="p7-14">7.14. Договор можно подписать обменом подписанными экземплярами (скан, фото, PDF) по почте или в мессенджере. Такие экземпляры имеют силу оригинала.</p>
+<p id="p7-15">7.15. Приложения <a href="#pr1">№ 1</a> и <a href="#pr2">№ 2</a> - неотъемлемая часть Договора.</p>
+</section>
+
+<section class="pl-sec" id="r8">
+<h2>8. Реквизиты и подписи Сторон</h2>
+<div class="pl-cel">
+  <p class="pl-cel-h">Исполнитель: Индивидуальный предприниматель Киричок Сергей Васильевич</p>
+  <dl>
+    <dt>ИНН</dt><dd>910314959705</dd>
+    <dt>ОГРНИП</dt><dd>319911200114762</dd>
+    <dt>Регистрация</dt><dd>05.09.2019, Межрайонная ИФНС России № 11 по Ставропольскому краю</dd>
+    <dt>Расчётный счёт</dt><dd>40802810929050009849</dd>
+    <dt>Банк</dt><dd>Филиал «Нижегородский» АО «АЛЬФА-БАНК»</dd>
+    <dt>БИК</dt><dd>042202824</dd>
+    <dt>Корр. счёт</dt><dd>30101810200000000824</dd>
+    <dt>Адрес для писем</dt><dd>г. Нижний Новгород, ул. Белинского, д. 36, 2 этаж, офис 4</dd>
+    <dt>Телефон</dt><dd><a href="tel:+79994447569">+7 (999) 444-75-69</a>, Казань: <a href="tel:+79993332174">+7 (999) 333-21-74</a></dd>
+    <dt>Почта</dt><dd><a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a></dd>
+  </dl>
+</div>
+<div class="pl-cel">
+  <p class="pl-cel-h">Площадки Мероприятия</p>
+  <dl>
+    <dt>Нижний Новгород</dt><dd>г. Нижний Новгород, Приокский район, дер. Ольгино, д. 62</dd>
+    <dt>Казань</dt><dd>г. Казань, ул. Утренняя, д. 8А (Дербышки)</dd>
+    <dt>Тюмень</dt><dd>Тюменская обл., пос. Боровский, ул. Тракторная, д. 50</dd>
+    <dt>Крым</dt><dd>Симферополь, с. Новопавловка, ул. Севастопольская, д. 134</dd>
+    <dt>Ставрополь</dt><dd>г. Ставрополь, ул. Рогипрозем, д. 291</dd>
+  </dl>
+</div>
+<div class="pl-cel pl-pola">
+  <p class="pl-cel-h">Заказчик</p>
+  <dl>
+    <dt>ФИО</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt></dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Телефон</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+    <dt>Почта</dt><dd><span class="pole" aria-label="заполняется"></span></dd>
+  </dl>
+</div>
+<div class="pl-podpisi">
+  <div><p><b>Исполнитель</b></p><p class="pl-linia"><span class="pusto">_______________</span> / С. В. Киричок /</p></div>
+  <div><p><b>Заказчик</b></p><p class="pl-linia"><span class="pusto">_______________</span> / <span class="pusto">____________________</span> /</p></div>
+</div>
+</section>
+
+<section class="pl-sec" id="pr1">
+<h2>Приложение № 1. Организационная информация для участников Группы</h2>
+<p class="pl-pril">к Договору на участие группы в мероприятии № <span class="pusto">__________</span> от «<span class="pusto">____</span>» <span class="pusto">____________</span> 20<span class="pusto">____</span> г.</p>
+<div class="pl-cel">
+  <dl>
+    <dt>Адрес, дата и время Мероприятия</dt><dd>Указаны в пункте <a href="#p3-1">3.1</a> Договора. Адреса всех площадок - в разделе <a href="#r8">8</a>.</dd>
+    <dt>Опоздание от 5 до 20 минут</dt><dd>Исполнитель вправе провести Мероприятие с того этапа, который идёт по расписанию на момент прибытия Группы.</dd>
+    <dt>Опоздание более 20 минут</dt><dd>Исполнитель вправе отказаться от проведения Мероприятия без возврата его стоимости: после Группы площадку ждут другие группы.</dd>
+    <dt>Отмена или перенос по обстоятельствам, не зависящим от Исполнителя</dt><dd>В том числе запретительные решения или действия органов власти и контролирующих органов, стихийные бедствия, военные действия, ограничения или запреты на передвижение и проведение мероприятий. Порядок - пункты <a href="#p7-9">7.9</a>-<a href="#p7-10">7.10</a> Договора.</dd>
+    <dt>Безопасность детей</dt><dd>Ответственность за детей, их безопасность на площадке и прилегающей территории, поведение в раздевалке до, во время и после Мероприятия несут сопровождающие их взрослые.</dd>
+    <dt>Вещи Участников</dt><dd>Исполнитель не несёт ответственности за вещи Участников, утраченные или забытые на площадке Мероприятия.</dd>
+    <dt>Связь</dt><dd>Телефон <a href="tel:+79994447569">+7 (999) 444-75-69</a> (Казань: <a href="tel:+79993332174">+7 (999) 333-21-74</a>), почта <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>.</dd>
+  </dl>
+</div>
+<div class="pl-podpisi">
+  <div><p><b>Исполнитель</b><br>ИП Киричок С. В.</p><p class="pl-linia"><span class="pusto">_______________</span> / С. В. Киричок /</p></div>
+  <div><p><b>Заказчик</b></p><p class="pl-linia"><span class="pusto">_______________</span> / <span class="pusto">____________________</span> /</p></div>
+</div>
+</section>
+
+<section class="pl-sec" id="pr2">
+<h2>Приложение № 2. Стоимость участия в Мероприятии</h2>
+<p class="pl-pril">к Договору на участие группы в мероприятии № <span class="pusto">__________</span> от «<span class="pusto">____</span>» <span class="pusto">____________</span> 20<span class="pusto">____</span> г.</p>
+<p>Цена билета зависит от категории даты Мероприятия и от даты Бронирования (внесения оплаты за бронирование) и фиксируется на дату Бронирования. 31 декабря, 1 и 2 января Мероприятие не проводится.</p>
+<p><b>Тариф</b> - цена для Групп до 20 детей. <b>Акция</b> - цена для Групп от 20 детей. Бонусы по Акции: +1 детский билет бесплатно и бесплатные билеты для сопровождающих взрослых (количество - в пункте <a href="#p3-1">3.1</a> Договора).</p>
+<h3 class="pl-h3">Категории дат</h3>
+<div class="pl-cel">
+  <dl>
+    <dt>Специальная</dt><dd>27, 30 ноября; 1, 2, 3, 4 декабря</dd>
+    <dt>Стандарт</dt><dd>28, 29 ноября; 7, 8, 9, 10, 14 декабря; 6, 7, 8 января</dd>
+    <dt>Премиум</dt><dd>5, 6, 11, 15, 16, 17, 21, 22, 23, 30 декабря; 9, 10 января</dd>
+    <dt>VIP</dt><dd>12, 13, 18, 19, 20, 24, 25, 26, 27, 28, 29 декабря; 3, 4, 5 января</dd>
+  </dl>
+</div>
+<p class="pl-mel">Цены, руб. В строках категорий: цена детского билета по Акции / по Тарифу. Взрослый билет стоит одинаково по Акции и по Тарифу.</p>
+<div class="pl-tab-w">
+<table class="pl-tab">
+  <thead><tr><th scope="col">Нижний Новгород</th><th>до 1 октября</th><th>1-31 октября</th><th>1-30 ноября</th><th>с 1 декабря</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Специальная</th><td><b>1390</b><span class="sl"> / </span><span class="tf">1690</span></td><td><b>1490</b><span class="sl"> / </span><span class="tf">1790</span></td><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td></tr>
+    <tr><th scope="row">Стандарт</th><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td></tr>
+    <tr><th scope="row">Премиум</th><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td><td><b>1990</b><span class="sl"> / </span><span class="tf">2290</span></td></tr>
+    <tr><th scope="row">VIP</th><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td><td><b>1990</b><span class="sl"> / </span><span class="tf">2290</span></td><td><b>2090</b><span class="sl"> / </span><span class="tf">2390</span></td></tr>
+    <tr class="vz"><th scope="row">Взрослый билет</th><td>700</td><td>700</td><td>800</td><td>900</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="pl-tab-w">
+<table class="pl-tab">
+  <thead><tr><th scope="col">Казань</th><th>до 1 октября</th><th>1-31 октября</th><th>1-30 ноября</th><th>с 1 декабря</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Специальная</th><td><b>1390</b><span class="sl"> / </span><span class="tf">1690</span></td><td><b>1490</b><span class="sl"> / </span><span class="tf">1790</span></td><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td></tr>
+    <tr><th scope="row">Стандарт</th><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td></tr>
+    <tr><th scope="row">Премиум</th><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td><td><b>1990</b><span class="sl"> / </span><span class="tf">2290</span></td></tr>
+    <tr><th scope="row">VIP</th><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td><td><b>1990</b><span class="sl"> / </span><span class="tf">2290</span></td><td><b>2090</b><span class="sl"> / </span><span class="tf">2390</span></td></tr>
+    <tr class="vz"><th scope="row">Взрослый билет</th><td>700</td><td>700</td><td>800</td><td>900</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="pl-tab-w">
+<table class="pl-tab">
+  <thead><tr><th scope="col">Тюмень</th><th>до 1 октября</th><th>1-31 октября</th><th>1-30 ноября</th><th>с 1 декабря</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Специальная</th><td><b>1390</b><span class="sl"> / </span><span class="tf">1690</span></td><td><b>1490</b><span class="sl"> / </span><span class="tf">1790</span></td><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td></tr>
+    <tr><th scope="row">Стандарт</th><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td></tr>
+    <tr><th scope="row">Премиум</th><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td><td><b>1990</b><span class="sl"> / </span><span class="tf">2290</span></td></tr>
+    <tr><th scope="row">VIP</th><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td><td><b>1990</b><span class="sl"> / </span><span class="tf">2290</span></td><td><b>2090</b><span class="sl"> / </span><span class="tf">2390</span></td></tr>
+    <tr class="vz"><th scope="row">Взрослый билет</th><td>800</td><td>900</td><td>1000</td><td>1100</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="pl-tab-w">
+<table class="pl-tab">
+  <thead><tr><th scope="col">Крым</th><th>до 1 октября</th><th>1-31 октября</th><th>1-30 ноября</th><th>с 1 декабря</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Специальная</th><td><b>1290</b><span class="sl"> / </span><span class="tf">1590</span></td><td><b>1390</b><span class="sl"> / </span><span class="tf">1690</span></td><td><b>1490</b><span class="sl"> / </span><span class="tf">1790</span></td><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td></tr>
+    <tr><th scope="row">Стандарт</th><td><b>1490</b><span class="sl"> / </span><span class="tf">1790</span></td><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td></tr>
+    <tr><th scope="row">Премиум</th><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td></tr>
+    <tr><th scope="row">VIP</th><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td><td><b>1990</b><span class="sl"> / </span><span class="tf">2290</span></td></tr>
+    <tr class="vz"><th scope="row">Взрослый билет</th><td>700</td><td>800</td><td>900</td><td>1000</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="pl-tab-w">
+<table class="pl-tab">
+  <thead><tr><th scope="col">Ставрополь</th><th>до 1 октября</th><th>1-31 октября</th><th>1-30 ноября</th><th>с 1 декабря</th></tr></thead>
+  <tbody>
+    <tr><th scope="row">Специальная</th><td><b>1190</b><span class="sl"> / </span><span class="tf">1490</span></td><td><b>1290</b><span class="sl"> / </span><span class="tf">1590</span></td><td><b>1390</b><span class="sl"> / </span><span class="tf">1690</span></td><td><b>1490</b><span class="sl"> / </span><span class="tf">1790</span></td></tr>
+    <tr><th scope="row">Стандарт</th><td><b>1390</b><span class="sl"> / </span><span class="tf">1690</span></td><td><b>1490</b><span class="sl"> / </span><span class="tf">1790</span></td><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td></tr>
+    <tr><th scope="row">Премиум</th><td><b>1490</b><span class="sl"> / </span><span class="tf">1790</span></td><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td></tr>
+    <tr><th scope="row">VIP</th><td><b>1590</b><span class="sl"> / </span><span class="tf">1890</span></td><td><b>1690</b><span class="sl"> / </span><span class="tf">1990</span></td><td><b>1790</b><span class="sl"> / </span><span class="tf">2090</span></td><td><b>1890</b><span class="sl"> / </span><span class="tf">2190</span></td></tr>
+    <tr class="vz"><th scope="row">Взрослый билет</th><td>600</td><td>700</td><td>800</td><td>900</td></tr>
+  </tbody>
+</table>
+</div>
+<div class="pl-podpisi">
+  <div><p><b>Исполнитель</b><br>ИП Киричок С. В.</p><p class="pl-linia"><span class="pusto">_______________</span> / С. В. Киричок /</p></div>
+  <div><p><b>Заказчик</b></p><p class="pl-linia"><span class="pusto">_______________</span> / <span class="pusto">____________________</span> /</p></div>
+</div>
+</section>
+<p class="pl-red">Черновик от 24 сентября 2026 г.</p>
+      </article>
+
+      <aside class="pl-sum" aria-label="Коротко о главном">
+        <div class="pl-card">
+          <p class="pl-sum-h">Коротко о главном</p>
+          <dl>
+        <dt>Оплата</dt><dd>Счёт - в течение суток, вся сумма - не позднее чем за 3 дня до Мероприятия (п. <a href="#p3-2">3.2</a>, <a href="#p3-6">3.6</a>)</dd>
+        <dt>Добавить участников</dt><dd>Не позднее чем за 3 дня, по ценам на дату Бронирования (п. <a href="#p2-2">2.2</a>, <a href="#p3-7">3.7</a>)</dd>
+        <dt>Пришло меньше</dt><dd>Стоимость не пересчитывается (п. <a href="#p2-4">2.4</a>)</dd>
+        <dt>От 20 детей</dt><dd>Цена по Акции. Если Заказчик откажется, оплата по Акции не возвращается (п. <a href="#p2-5">2.5</a>, <a href="#p3-3">3.3</a>)</dd>
+        <dt>Опоздание</dt><dd>5-20 минут - с текущего этапа, больше 20 - без проведения и без возврата (п. <a href="#p6-2">6.2</a>)</dd>
+        <dt>Отменили по нашей вине</dt><dd>Полный возврат в течение 10 дней (п. <a href="#p7-8">7.8</a>)</dd>
+        <dt>Перенесли по нашей вине</dt><dd>Можно уменьшить или поменять состав Группы, за выбывших - возврат (п. <a href="#p7-11">7.11</a>)</dd>
+        <dt>Не по нашей вине</dt><dd>Запрет властей, стихийное бедствие и т. п. не отпали до конца Периода праздников - возврат за вычетом 50% (п. <a href="#p7-9">7.9</a>-<a href="#p7-10">7.10</a>)</dd>
+        <dt>Споры</dt><dd>Претензия, ответ за 10 дней, потом суд по месту Исполнителя (п. <a href="#p7-5">7.5</a>)</dd>
+        <dt>Подписание</dt><dd>Можно обменом сканами по почте или в мессенджере (п. <a href="#p7-14">7.14</a>)</dd>
+          </dl>
+          <p class="pl-sum-note">Это выжимка для удобства. Условия - в полном тексте договора.</p>
+          <p class="pl-sum-link"><a href="https://mnd-nn.ru/oferta-nn.html">Публичная оферта на бронирование&nbsp;→</a></p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="pl-foot">
+      <p><a href="https://mnd-nn.ru/oferta-nn.html">Публичная оферта</a><span class="dot">·</span><a href="https://mnd-nn.ru/politika-nn.html">Политика конфиденциальности</a></p>
+      <p>© 2019-2026 Министерство новогодних дел<span class="dot">·</span>ИП Киричок Сергей Васильевич<span class="dot">·</span>ИНН 910314959705</p>
+    </footer>
+  </div>
+</main>
+
+<script>
+/* шапка темнеет при прокрутке (как на promokody.html) */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){ nav.classList.toggle('solid', window.scrollY > 24); }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* оглавление подсвечивает раздел, который сейчас читают */
+(function(){
+  var links = document.querySelectorAll('.pl-toc a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var byId = {};
+  for (var i = 0; i < links.length; i++) byId[links[i].getAttribute('href').slice(1)] = links[i];
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      for (var k in byId) byId[k].classList.remove('on');
+      var a = byId[e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, {rootMargin:'-20% 0px -70% 0px'});
+  for (var id in byId){ var s = document.getElementById(id); if (s) io.observe(s); }
+})();
+</script>
+</body>
+</html>
