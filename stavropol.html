@@ -10202,22 +10202,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   --np-top:#04071A;          /* низ экрана видео-отзывов (.vz) */
   --np-brown:#1E1109;        /* верх коричневого поля под роликом на телефоне */
   --np-bot:#040A28;          /* верх карты городов (.cr-s3 под плёнкой и тенью, замер) */
-  /* Верхняя кромка карты городов по всей ширине: по краям тёмно-синяя,
-     посередине светлее — туда доходит столб сияния её фона. Посчитано из
-     её же градиентов (эллипс 37,6 % x 54,9 % в точке 50,3 % 40,1 %, плёнка
-     16 %, тень у кромки 0,198) и сверено со снимком до единицы. Профиль
-     от ширины окна не зависит: у эллипса обе доли по высоте. */
-  --np-seam:linear-gradient(90deg, rgb(5,9,37) 0%, rgb(5,9,37) 24%, rgb(7,13,44) 30%,
-    rgb(8,15,50) 35%, rgb(10,17,54) 40%, rgb(10,18,57) 45%, rgb(11,19,58) 50.3%,
-    rgb(11,18,57) 55%, rgb(10,17,55) 60%, rgb(9,15,50) 65%, rgb(7,13,45) 70%,
-    rgb(5,9,37) 76%, rgb(5,9,37) 100%);
-  position:relative; z-index:25; isolation:isolate; overflow:hidden; color:#fff;
+  /* ДУГА НА ШВЕ С КАРТОЙ ГОРОДОВ (просьба Серёги 26.09.2026: «переход дугой
+     и золотой полоской, чтобы по ней блик двигался», как у великанов в
+     Нижнем). Приём и кривая — те же, что у дуги экрана «снег» (.sn-wave),
+     только дуга снизу: наш экран провисает в карту. Полоса ТОЛЬКО в vw, как
+     --sn-wave: из доли 3vw посчитано сплющивание звёздочек на нити. */
+  --np-wave:3vw;
+  /* Слой 26 — выше карты городов (25): дуга заезжает на неё, а карта
+     поднята под нас ровно на полосу дуги. */
+  position:relative; z-index:26; isolation:isolate; overflow:hidden; color:#fff;
   display:grid; grid-template-columns:100%; grid-template-areas:"v" "l";
-  background:var(--np-top);
+  margin-bottom:calc(var(--np-wave) * -1);
 }
 /* Карта городов под нами держит то же верхнее поле, что стояло у неё
-   под видео-отзывами (`.vz-hold + .cr-s3`): его сосед теперь мы. */
-.np + .cr-s3{padding-top:calc(60 * var(--u))}
+   под видео-отзывами (`.vz-hold + .cr-s3`), плюс полосу дуги, которая
+   на неё заехала. 3vw — это --np-wave (у соседа своей переменной нет). */
+.np + .cr-s3{padding-top:calc(60 * var(--u) + 3vw)}
 
 /* ---------- СЦЕНА: заставка, ролик, затемнение ---------- */
 .np-stage{grid-area:v; position:relative; z-index:0; overflow:hidden;
@@ -10271,9 +10271,35 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    синий) и зерно экрана отзывов (`.oz-grain`), чтобы градиент не полосил. */
 .np-low{
   grid-area:l; position:relative; z-index:1;
-  padding:clamp(22px,6vw,34px) 0 clamp(46px,12vw,66px);
+  padding:clamp(22px,6vw,34px) 0 calc(clamp(46px,12vw,66px) + var(--np-wave));
   background:linear-gradient(180deg, var(--np-brown) 0%, #1B1013 30%, #150F2C 60%, #0B0E38 84%, var(--np-bot) 100%);
 }
+/* Вырез дугой. На телефоне низ экрана — это поле с плашками, на компьютере
+   сцена с роликом: маска стоит на том, что лежит у нижней кромки. Две
+   картинки маски: дуга ростом в полосу внизу + сплошная заливка выше
+   (приём .sn-bg, перевёрнутый). ЦВЕТ ПОЛЯ — на самом вырезаемом слое,
+   у секции фона нет: фон секции маска не режет
+   → schedule-app/lessons/vyrez-maskoy-fon-roditelya-prosvechivaet.md */
+.np-low{
+  -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0 L1200,0 Z' fill='black'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
+          mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0 L1200,0 Z' fill='black'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
+  -webkit-mask-size:100% var(--np-wave), 100% calc(100% - var(--np-wave) + 1px);
+          mask-size:100% var(--np-wave), 100% calc(100% - var(--np-wave) + 1px);
+  -webkit-mask-position:left bottom, left top;
+          mask-position:left bottom, left top;
+  -webkit-mask-repeat:no-repeat, no-repeat;
+          mask-repeat:no-repeat, no-repeat;
+}
+/* Золотая нить по кромке выреза: тот же viewBox и preserveAspectRatio, что
+   у маски. Свечение, бегущая искра и мерцание звёздочек — общие классы нити
+   (.vl-thread*, .vl-sp*), «меньше движения» там же. Градиент свой: общий
+   #vlThreadGrad объявлен в разметке «снега», без него нить пропала бы. */
+.np-wave{
+  position:absolute; left:0; right:0; bottom:0; z-index:5;
+  width:100%; height:var(--np-wave); display:block;
+  pointer-events:none; overflow:visible;
+}
+.np-wave .vl-thread--line{stroke:url(#npThreadGrad)}
 /* Отблески гаснут к обеим кромкам поля: иначе янтарный у верха и синий
    у низа рисуют полосу на шве с роликом и с картой городов. */
 .np-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
@@ -10294,14 +10320,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .np-low > .oz-grain{
   -webkit-mask-image:linear-gradient(180deg, transparent 0, #000 22%);
           mask-image:linear-gradient(180deg, transparent 0, #000 22%)}
-/* Шов с картой городов на телефоне: низ поля уходит в её кромку. Под
-   плашками (у .cr-cont слой 2), на них не ложится. */
-.np-low::after{
-  content:''; position:absolute; left:0; right:0; bottom:0; z-index:1;
-  height:clamp(60px,18vw,90px); pointer-events:none; background:var(--np-seam);
-  -webkit-mask-image:linear-gradient(0deg, #000 0%, rgba(0,0,0,0) 100%);
-          mask-image:linear-gradient(0deg, #000 0%, rgba(0,0,0,0) 100%);
-}
 .np .cr-cont{position:relative; z-index:2}
 @media (max-width:767px){ .np .cr-cont{width:100%; padding-inline:20px} }
 
@@ -10361,7 +10379,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
              transform .7s cubic-bezier(.2,.7,.2,1) calc(.1s + var(--i,0) * .12s),
              box-shadow .45s ease}
 /* Экран за кадром — движение стоит. */
-.np.np-off .np-chip::after, .np.np-off .np-star, .np.np-off .np-glow i{animation-play-state:paused}
+.np.np-off .np-chip::after, .np.np-off .np-star, .np.np-off .np-glow i,
+.np.np-off .np-wave .vl-thread--spark, .np.np-off .np-wave .vl-sp{animation-play-state:paused}
 
 /* ---------- КОМПЬЮТЕР И ПЛАНШЕТ ----------
    Экран в пропорцию ролика 16:9, но не выше окна и не ниже 480 px; лишнее
@@ -10371,26 +10390,32 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     display:flex; flex-direction:column; justify-content:center;
     min-height:max(480px, min(56.25vw, 100vh));
     min-height:max(480px, min(56.25vw, 100svh));
-    padding:clamp(56px,6vw,110px) 0;
+    padding:clamp(56px,6vw,110px) 0 calc(clamp(56px,6vw,110px) + var(--np-wave));
   }
   .np-stage{position:absolute; inset:0; aspect-ratio:auto}
+  /* Ролик идёт до самой дуги, как фото у великанов; внизу чуть темнее,
+     чтобы золотая нить не терялась на ярком кадре. */
   .np-shade{
     background:
       linear-gradient(180deg, var(--np-top) 0%, rgba(4,7,26,0) 16%),
+      linear-gradient(0deg, rgba(4,5,20,.55) 0%, rgba(4,5,20,0) 18%),
       radial-gradient(62% 54% at 50% 50%, rgba(4,5,20,.42), rgba(4,5,20,0) 100%),
       rgba(4,5,20,.52);
   }
-  /* Шов с картой городов: ролик уходит в её верхнюю кромку. */
-  .np-stage::after{
-    content:''; position:absolute; left:0; right:0; bottom:0; z-index:2;
-    height:24%; pointer-events:none; background:var(--np-seam);
-    -webkit-mask-image:linear-gradient(0deg, #000 0%, rgba(0,0,0,.8) 24%, rgba(0,0,0,0) 100%);
-            mask-image:linear-gradient(0deg, #000 0%, rgba(0,0,0,.8) 24%, rgba(0,0,0,0) 100%);
-  }
-  .np-low::after{display:none}
   .np-top{padding-block:0}
   .np-t{font-size:clamp(40px,4.6vw,92px)}
-  .np-low{background:none; padding:0; margin-top:clamp(36px,5.2vw,100px)}
+  .np-low{background:none; padding:0; margin-top:clamp(36px,5.2vw,100px);
+    -webkit-mask-image:none; mask-image:none}
+  .np-stage{
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0 L1200,0 Z' fill='black'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
+            mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,0 L0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0 L1200,0 Z' fill='black'/%3E%3C/svg%3E"), linear-gradient(#000,#000);
+    -webkit-mask-size:100% var(--np-wave), 100% calc(100% - var(--np-wave) + 1px);
+            mask-size:100% var(--np-wave), 100% calc(100% - var(--np-wave) + 1px);
+    -webkit-mask-position:left bottom, left top;
+            mask-position:left bottom, left top;
+    -webkit-mask-repeat:no-repeat, no-repeat;
+            mask-repeat:no-repeat, no-repeat;
+  }
   .np-glow, .np-low .oz-grain{display:none}
   .np-list{flex-direction:row; flex-wrap:wrap; justify-content:center; gap:clamp(12px,1.3vw,26px)}
   .np-chip{width:auto; font-size:clamp(17px,1.18vw,23px); padding:.78em 1.3em .78em 1.1em}
@@ -10441,6 +10466,32 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       </ul>
     </div>
   </div>
+  <!-- Золотая нить по кромке дуги на шве с картой городов — копия нити
+       великанов и экрана «снег», только внизу. Звёздочки стоят на кривой. -->
+  <svg class="np-wave" viewBox="0 0 1200 120" preserveAspectRatio="none"
+       aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="npThreadGrad" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0"   stop-color="#F7C561" stop-opacity=".3"/>
+        <stop offset=".14" stop-color="#FCD34D" stop-opacity=".92"/>
+        <stop offset=".5"  stop-color="#FDE68A"/>
+        <stop offset=".85" stop-color="#F59E0B" stop-opacity=".85"/>
+        <stop offset="1"   stop-color="#F7C561" stop-opacity=".1"/>
+      </linearGradient>
+      <path id="npWaveD" d="M0,36.00 C33.3,39.8 66.7,43.7 100.0,47.4 C133.3,51.1 166.7,54.7 200.0,58.0 C233.3,61.3 266.7,64.4 300.0,67.1 C333.3,69.8 366.7,72.2 400.0,74.1 C433.3,76.0 466.7,77.5 500.0,78.5 C533.3,79.5 566.7,80.0 600.0,80.0 C633.3,80.0 666.7,79.5 700.0,78.5 C733.3,77.5 766.7,76.0 800.0,74.1 C833.3,72.2 866.7,69.8 900.0,67.1 C933.3,64.4 966.7,61.3 1000.0,58.0 C1033.3,54.7 1066.7,51.1 1100.0,47.4 C1133.3,43.7 1166.7,39.8 1200.0,36.0" fill="none" vector-effect="non-scaling-stroke"/>
+    </defs>
+    <use class="vl-thread vl-thread--glow2" href="#npWaveD"/>
+    <use class="vl-thread vl-thread--glow1" href="#npWaveD"/>
+    <use class="vl-thread vl-thread--line"  href="#npWaveD"/>
+    <use class="vl-thread vl-thread--spark" href="#npWaveD"/>
+    <g>
+      <path class="vl-sp vl-sp1" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(170.0,51.7) scale(3.00,10.00)"/>
+      <path class="vl-sp vl-sp2" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(420.0,72.6) scale(2.16,7.20)"/>
+      <path class="vl-sp vl-sp3" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(600.0,76.0) scale(3.84,12.80)"/>
+      <path class="vl-sp vl-sp4" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(780.0,72.6) scale(2.16,7.20)"/>
+      <path class="vl-sp vl-sp5" d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z" fill="#FDE68A" transform="translate(1030.0,51.7) scale(3.00,10.00)"/>
+    </g>
+  </svg>
 </section>
 
 <script>
