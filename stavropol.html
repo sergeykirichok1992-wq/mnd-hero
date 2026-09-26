@@ -10580,15 +10580,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
 /* Золотая полоса на шве — повтор нижней кромки экрана 4 (замер по его снимку на
    1600: 12 px, по краям старое золото #E1B639, к середине сочнее, в центре белая
-   вспышка). Лежит внутри секции у самой кромки. */
-.sz-seam{
-  position:absolute; left:0; right:0; z-index:8; height:var(--sz-seam); pointer-events:none;
+   вспышка). Лежит внутри секции у самой кромки. Сама полоса — ::before над своим
+   ореолом ::after: будь она фоном элемента, ореол лёг бы поверх и съел белую вспышку. */
+.sz-seam{position:absolute; left:0; right:0; z-index:8; height:var(--sz-seam); pointer-events:none}
+.sz-seam::before{
+  content:''; position:absolute; inset:0; z-index:1;
   background:
-    radial-gradient(7% 75% at 50% 50%, #FFFFFF 0%, rgba(255,253,236,.96) 40%, rgba(255,246,150,0) 100%),
+    radial-gradient(23% 92% at 50% 50%, #FFFFFF 0%, rgba(255,253,236,.97) 48%, rgba(255,246,150,0) 100%),   /* белая вспышка ~17 % ширины, как у экрана 4 (замер: 254 px на 1440, 338 на 1920) */
     radial-gradient(38% 100% at 50% 50%, rgba(255,228,16,.95) 0%, rgba(255,210,0,.55) 50%, rgba(255,205,0,0) 100%),
     linear-gradient(180deg, #F2D784 0%, #E7BD44 20%, #E1B639 50%, #E3B63A 80%, #D8AD3F 100%);
 }
-.sz-seam::after{content:''; position:absolute; left:50%; top:50%; width:34vw; height:calc(var(--sz-seam) * 3.4);
+.sz-seam::after{content:''; position:absolute; z-index:0; left:50%; top:50%; width:34vw; height:calc(var(--sz-seam) * 3.4);
   transform:translate(-50%,-50%);
   background:radial-gradient(closest-side, rgba(255,238,140,.5), rgba(255,222,100,.18) 55%, rgba(255,222,100,0))}
 .sz-seam--top{top:0; display:none}
@@ -10726,21 +10728,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .sz-sub{margin-top:10px; font-size:15px}
   .sz-list{
     display:flex; margin:24px -16px 0; padding:6px 16px 10px; gap:12px;
-    overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; scroll-padding-inline:16px;
+    /* overflow-y:hidden обязателен: при одном overflow-x:auto браузер делает auto и по
+       вертикали, и лента ездила вверх-вниз на 8 px — свайп по ней «залипал» */
+    overflow-x:auto; overflow-y:hidden; overscroll-behavior-x:contain; scroll-snap-type:x mandatory; scroll-padding-inline:16px;
     scrollbar-width:none; -webkit-overflow-scrolling:touch;
   }
   .sz-list::-webkit-scrollbar{display:none}
+  .sz-list.rv .sz-i{transform:none}                   /* в ленте только проявление, без подъёма */
   .sz-i{flex:0 0 min(84vw,340px); scroll-snap-align:start; padding:18px 20px 20px}
   .sz-dots{display:flex; justify-content:center; gap:8px; margin-top:14px}
   .sz-dots i{display:block; width:6px; height:6px; border-radius:3px; background:rgba(255,214,150,.3);
     transition:width .3s ease, background-color .3s ease}
   .sz-dots i.on{width:18px; background:#F2CD80}
 }
+/* вес селекторов здесь нарочно выше, чем у правил, которые они отменяют
+   (.sz-glow i:nth-child(n), .sz-list.rv .sz-i.on) — иначе отблески плыли бы дальше */
 @media (prefers-reduced-motion:reduce){
-  .sz-list.rv .sz-i{opacity:1; transform:none; transition:none}
-  .sz-glow i, .sz-dust i, .sz-i::after, .sz-ic, .sz-ic-w::before, .sz-t b, .sz-st i{animation:none}
-  .sz-dust i, .sz-st i, .sz-i::after{display:none}
-  .sz-i{transition:none}
+  .sz-list.rv .sz-i, .sz-list.rv .sz-i.on{opacity:1; transform:none; transition:none}
+  .sz .sz-glow i:nth-child(n), .sz .sz-dust i, .sz .sz-i::after, .sz .sz-ic,
+  .sz .sz-ic-w::before, .sz .sz-t b, .sz .sz-st i{animation:none}
+  .sz .sz-dust i, .sz .sz-st i, .sz .sz-i::after{display:none}
+  .sz .sz-list .sz-i{transition:none; translate:none}
 }
 </style>
 <section class="cr sz" id="sezon" aria-labelledby="szT">
@@ -10787,15 +10795,17 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   if (!sec) return;
   var ul = sec.querySelector('.sz-list');
   var li = ul.children;
-  for (var i = 0; i < li.length; i++) li[i].style.setProperty('--sd', (i * 1.25) + 's');
+  // блик раз в 10 с, плашки делят круг поровну — ровная очередь при любом их числе
+  for (var i = 0; i < li.length; i++) li[i].style.setProperty('--sd', (i * 10 / li.length).toFixed(2) + 's');
   if (!('IntersectionObserver' in window)) { sec.classList.add('in'); return; }
 
   new IntersectionObserver(function(es){
     sec.classList.toggle('in', es[0].isIntersecting);
   }, {rootMargin: '120px 0px'}).observe(sec);
 
-  var cols = function(){ return Math.max(1, getComputedStyle(ul).gridTemplateColumns.split(' ').length); };
-  var n = cols();
+  // сколько плашек в ряду: у ленты (flex) — одна, у сетки — по числу колонок
+  var cs = getComputedStyle(ul);
+  var n = cs.display === 'grid' ? Math.max(1, cs.gridTemplateColumns.split(' ').length) : 1;
   for (var j = 0; j < li.length; j++) li[j].style.setProperty('--d', (j % n) * 90 + 'ms');
   ul.classList.add('rv');
   var io = new IntersectionObserver(function(es){
