@@ -10513,15 +10513,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      здесь — экран оставлять, у Тюмени его нет.
 
      МАТЕРИАЛ со старого сайта (блок node168 — компьютер, node667 — телефон): фон — те же фото
-     архива под чёрной вуалью 64 % (у телефона свой кадр), восемь пунктов компьютерной версии
-     и их значки. Картинки собирает sayt-nn/instrumenty/sezon_stavropol.py.
+     архива под чёрной вуалью 64 % (у телефона свой кадр), пункты компьютерной версии и их
+     значки. Картинки собирает sayt-nn/instrumenty/sezon_stavropol.py. Из восьми пунктов
+     Серёга убрал два: «Больше динамики - танцев и музыки» и «Больше времени на программу
+     и фото» (26.09.2026) — осталось шесть.
      ПОДАЧА своя (Серёга, в тот же день: «сделай в нашем стиле… текст в еле заметные плашки,
      добавь волшебства, компактнее, текст меньше»): пункты на еле заметном тёплом стекле
      с волосяной золотой кромкой (материя карточек фактов «Капсулы времени», .tm-f), значки
      парят над тёплым ореолом, по плашкам по очереди проходит блик, над архивом всплывает
      золотая пыль и дышат лиловые/янтарные отблески, по слову «Сезон» пробегает отсвет.
-     Раскладка: от 1180 px четыре плашки в ряд, до 1180 две, до 640 лента, которую
-     листают пальцем (с точками). Движение крутится только пока экран виден (класс .in)
+     Раскладка: от 1100 px три плашки в ряд (два ряда), до 1100 две, до 640 лента,
+     которую листают пальцем (с точками). Текст плашек 16-19 px: первый заход с 14-15,5
+     Серёга назвал слишком мелким. Движение крутится только пока экран виден (класс .in)
      и выключено при «меньше движения».
 
      ЗАГОЛОВОК ПОКА ТЕКСТОМ. Картинку «Сезон 2026-2027» Серёга делает сам: придёт — встаёт
@@ -10630,18 +10633,18 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* ---------- плашки ---------- */
 .sz-list{
   list-style:none; margin:clamp(28px,2.8vw,44px) 0 0; padding:0;
-  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(12px,1.25vw,20px);
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(14px,1.4vw,22px);
 }
 /* Еле заметное тёплое стекло: заливка 3-8 % и волосяная золотая кромка внутренней
    тенью (как у .tm-f — высота не зависит от толщины линии); к нижнему углу —
    тень лилового перелива. Блюра под стеклом нет намеренно: фон и так размыт,
    а backdrop-filter над дышащими отблесками пересчитывался бы каждый кадр. */
 .sz-i{
-  --ic:clamp(48px,3.5vw,56px);
+  --ic:clamp(56px,4.2vw,68px);
   position:relative; isolation:isolate; overflow:hidden;
   display:grid; grid-template-columns:var(--ic) minmax(0,1fr); align-items:center; align-content:start;
-  column-gap:14px; row-gap:12px;
-  padding:18px 20px 20px; border-radius:18px;
+  column-gap:16px; row-gap:14px;
+  padding:clamp(18px,1.5vw,24px) clamp(20px,1.6vw,26px) clamp(20px,1.6vw,26px); border-radius:20px;
   background:linear-gradient(160deg, rgba(255,228,184,.08) 0%, rgba(255,210,150,.035) 46%, rgba(132,74,214,.06) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(255,214,150,.17),
@@ -10669,12 +10672,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 @keyframes szFloat{0%,100%{transform:translate3d(0,0,0)} 50%{transform:translate3d(0,-4px,0)}}
 .sz-h{
   margin:0; font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(16px,1.12vw,18.5px); line-height:1.15; color:#FFD189; text-wrap:balance;
+  font-size:clamp(19px,1.4vw,23px); line-height:1.15; color:#FFD189; text-wrap:balance;
 }
 .sz-p{
   grid-column:1/-1; margin:0;
   font-family:"Blogger Sans Medium","Blogger Sans",Arial,sans-serif; font-weight:500;
-  font-size:clamp(14px,.94vw,15.5px); line-height:1.42; color:rgba(255,255,255,.9);
+  font-size:clamp(16px,1.15vw,19px); line-height:1.45; color:rgba(255,255,255,.92);
   text-wrap:pretty; text-shadow:0 1px 12px rgba(0,0,0,.35);
 }
 @media (hover:hover) and (pointer:fine){
@@ -10708,8 +10711,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .sz{padding-top:calc(var(--sz-seam) + clamp(48px,6vw,76px))}
   .sz-seam--top{display:block}
 }
-/* до 1180 четыре в ряд тесно — две */
-@media (max-width:1179px){
+/* до 1100 три в ряд тесно — две */
+@media (max-width:1099px){
   .sz-list{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 /* до 768 у .cr-cont нет полей (так у экранов-копий) — даём свои */
@@ -10727,7 +10730,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     scrollbar-width:none; -webkit-overflow-scrolling:touch;
   }
   .sz-list::-webkit-scrollbar{display:none}
-  .sz-i{flex:0 0 min(80vw,330px); scroll-snap-align:start; padding:16px 18px 18px}
+  .sz-i{flex:0 0 min(84vw,340px); scroll-snap-align:start; padding:18px 20px 20px}
   .sz-dots{display:flex; justify-content:center; gap:8px; margin-top:14px}
   .sz-dots i{display:block; width:6px; height:6px; border-radius:3px; background:rgba(255,214,150,.3);
     transition:width .3s ease, background-color .3s ease}
@@ -10761,22 +10764,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <h3 class="sz-h">Внедрили познавательную часть</h3>
         <p class="sz-p">Мы добавили историческую составляющую в квест. Дети узнают множество фактов из истории России и мира, познакомятся с выдающимися личностями разных эпох нашей страны в игровой форме.</p></li>
       <li class="sz-i"><span class="sz-ic-w"><img class="sz-ic" src="st-sz-i4.webp" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
-        <h3 class="sz-h">Больше динамики&nbsp;- танцев и&nbsp;музыки</h3>
-        <p class="sz-p">Вы просили больше танца на улице? Во время приветственного шоу во дворе детки с главными героями станцуют флеш-моб в формате тик-ток. Видео с танцем мы снимем для вас на видео!</p></li>
-      <li class="sz-i"><span class="sz-ic-w"><img class="sz-ic" src="st-sz-i5.webp" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
         <h3 class="sz-h">Новый карамельный мастер-класс</h3>
         <p class="sz-p">Новые формы и цвета леденцов! Но все тот же насыщенный вкус карамели, которую вы так хвалили в прошлом году!</p></li>
-      <li class="sz-i"><span class="sz-ic-w"><img class="sz-ic" src="st-sz-i6.webp" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
-        <h3 class="sz-h">Больше времени на&nbsp;программу и&nbsp;фото</h3>
-        <p class="sz-p">Мы таки решились убрать чаепитие в пользу карамельного МК, квеста и фотографирования. Все же чаем детей не удивить!</p></li>
-      <li class="sz-i"><span class="sz-ic-w"><img class="sz-ic" src="st-sz-i7.webp" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
+      <li class="sz-i"><span class="sz-ic-w"><img class="sz-ic" src="st-sz-i5.webp" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
         <h3 class="sz-h">Новые герои, образы, костюмы и&nbsp;реквизит</h3>
         <p class="sz-p">Каждый год мы добавляем новых героев, шьем новые костюмы и изготавливаем новый реквизит, чтобы деткам было интересно приехать к нам снова!</p></li>
-      <li class="sz-i"><span class="sz-ic-w"><img class="sz-ic" src="st-sz-i8.webp" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
+      <li class="sz-i"><span class="sz-ic-w"><img class="sz-ic" src="st-sz-i6.webp" width="192" height="192" alt="" loading="lazy" decoding="async"></span>
         <h3 class="sz-h">Новый кабинет Деда Мороза&nbsp;- тайный архив</h3>
         <p class="sz-p">В этот раз вы попадете в загадочный архив Деда Мороза с колоритным интерьером, различными артефактами, старинными реликвиями, летописями и машиной времени!</p></li>
     </ul>
-    <div class="sz-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="sz-dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
   </div>
   <div class="sz-seam sz-seam--bot" aria-hidden="true"></div>
 </section>
