@@ -10214,10 +10214,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   display:grid; grid-template-columns:100%; grid-template-areas:"v" "l";
   margin-bottom:calc(var(--np-wave) * -1);
 }
-/* Карта городов под нами держит то же верхнее поле, что стояло у неё
-   под видео-отзывами (`.vz-hold + .cr-s3`), плюс полосу дуги, которая
-   на неё заехала. 3vw — это --np-wave (у соседа своей переменной нет). */
-.np + .cr-s3{padding-top:calc(60 * var(--u) + 3vw)}
+/* Карта городов поднята под нас на полосу дуги, и ровно столько же
+   прибавлено к её верхнему полю — заголовок карты стоит от шва, как стоял.
+   Поле берём её же (82,5*--u, на телефоне 70*--u), 3vw — это --np-wave
+   (у соседа своей переменной нет). Селектор `~`, а не `+`: между нами
+   и картой стоит <script> экрана, и «сосед вплотную» не срабатывает
+   (так было мёртвым и правило `.vz-hold + .cr-s3`). */
+#novaya ~ .cr-s3{padding-top:calc(82.5 * var(--u) + 3vw)}
+@media (max-width:767px){ #novaya ~ .cr-s3{padding-top:calc(70 * var(--u) + 3vw)} }
 
 /* ---------- СЦЕНА: заставка, ролик, затемнение ---------- */
 .np-stage{grid-area:v; position:relative; z-index:0; overflow:hidden;
@@ -10427,6 +10431,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 /* «Меньше движения»: ни блика, ни мерцания, ни дрейфа; ролика тоже нет
    (скрипт не ставит файл) — стоит заставка. Селекторы не слабее отменяемых
    → schedule-app/lessons/reduced-motion-perebivaet-animation-name.md */
+/* Печать: появление не сработало бы (наблюдатель не видит лист) — показать всё. */
+@media print{
+  .np.np-anim .np-t, .np.np-anim .np-chip{opacity:1 !important; transform:none !important; transition:none !important}
+}
 @media (prefers-reduced-motion:reduce){
   .np .np-chip::after{animation:none}
   .np .np-star{animation:none; opacity:1; transform:none}
@@ -10513,7 +10521,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
   var net  = navigator.connection || {};
   var skupo = net.saveData === true || /(^|-)(slow-)?2g$|^3g$/.test(net.effectiveType || '');
-  var file = '', shown = false, tries = 0, hochu = false, near = false, inView = false;
+  var file = '', shown = false, tries = 0, hochu = false, near = false, inView = false, secIn = false;
   var io = 'IntersectionObserver' in window;
 
   /* Всплытие: прячем только если есть чем показать обратно. */
@@ -10564,19 +10572,24 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   }
 
   function tick(){
-    sec.classList.toggle('np-off', !inView || document.hidden);
+    sec.classList.toggle('np-off', !secIn || document.hidden);
     if(!mozhno()){ stop(); spryatat(); return }
     if(!near) return;
     zaryadit();
     if(inView && !document.hidden) play(); else stop();
   }
 
+  /* Ролик смотрит на свою полосу (.np-stage), а не на весь экран: на телефоне
+     под полосой ещё поле с плашками, и ролик играл бы за кадром. Блик и
+     звёздочки (np-off) — по всему экрану. */
   if(io){
     new IntersectionObserver(function(es){ near = es[es.length - 1].isIntersecting; tick() },
-      {rootMargin:'300px 0px'}).observe(sec);
+      {rootMargin:'300px 0px'}).observe(box);
     new IntersectionObserver(function(es){ inView = es[es.length - 1].isIntersecting; tick() })
+      .observe(box);
+    new IntersectionObserver(function(es){ secIn = es[es.length - 1].isIntersecting; tick() })
       .observe(sec);
-  } else { near = inView = true; tick() }
+  } else { near = inView = secIn = true; tick() }
 
   document.addEventListener('visibilitychange', tick);
   function slushat(mq, fn){ if(mq.addEventListener) mq.addEventListener('change', fn);
