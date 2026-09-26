@@ -154,21 +154,29 @@ body.tiho, body.tiho *{cursor:none}
   var MAXW = okna.reduce(function(m, o){ return Math.max(m, o.w); }, 0);
 
   /* ---------- загрузка: каждому окну своё случайное начало ---------- */
+  /* Ролик, который не загрузился, тоже считаем: иначе подсказка «51 из 52»
+     висела бы поверх кадра и попала в запись. И на всякий случай через 20 с
+     она прячется в любом случае. */
   var gotovo = 0;
+  function eshcheOdin(){
+    gotovo++;
+    if (gotovo < okna.length){
+      podskazka.textContent = 'Загружаю ролики: ' + gotovo + ' из ' + okna.length;
+    } else {
+      podskazka.textContent = 'Готово. F - весь экран, пробел - пауза, ← → - скорость';
+      setTimeout(function(){ podskazka.classList.add('skryt'); }, 3500);
+    }
+  }
+  setTimeout(function(){ podskazka.classList.add('skryt'); }, 20000);
   okna.forEach(function(o){
+    var uchten = false;
+    function uchest(){ if (!uchten){ uchten = true; eshcheOdin(); } }
     o.vid.addEventListener('loadedmetadata', function(){
       var d = o.vid.duration;
       if (d > 1) o.vid.currentTime = Math.random() * (d - 1);
     }, {once:true});
-    o.vid.addEventListener('canplaythrough', function(){
-      gotovo++;
-      if (gotovo < okna.length){
-        podskazka.textContent = 'Загружаю ролики: ' + gotovo + ' из ' + okna.length;
-      } else {
-        podskazka.textContent = 'Готово. F - весь экран, пробел - пауза, ← → - скорость';
-        setTimeout(function(){ podskazka.classList.add('skryt'); }, 3500);
-      }
-    }, {once:true});
+    o.vid.addEventListener('canplaythrough', uchest, {once:true});
+    o.vid.addEventListener('error', uchest, {once:true});
   });
 
   /* ---------- кадр 16:9 вписан в окно ---------- */
