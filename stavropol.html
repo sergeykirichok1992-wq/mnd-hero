@@ -10254,15 +10254,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 
 /* ---------- ЗАГОЛОВОК ----------
-   Как на других тёмных экранах: Blogger Sans Bold прописными, белый,
-   вторая половина золотом. Крупнее обычного — на прототипе это главное
-   на экране, как у первого экрана. */
+   Шрифт — как «Ставрополь» на первом экране (.city): Prata прописными,
+   только жирнее (просьба Серёги 26.09.2026, до этого был Blogger Sans Bold).
+   У Prata одно начертание, жирного нет: попроси браузер font-weight:700 —
+   он нарисует поддельный, каждый по-своему. Поэтому жирность даёт обводка
+   буквы тем же цветом (currentColor, у золотой строки — золотом), .028em:
+   на 1920 это 2,5 px, на телефоне меньше пикселя. Белый, вторая строка
+   золотом. Крупнее обычного — на прототипе это главное на экране. */
 .np-top{grid-area:v; align-self:center; padding-block:20px}
 .np-t{
   margin:0 auto; text-align:center; text-wrap:balance;
-  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
-  font-size:clamp(26px,7.4vw,40px); line-height:1.06; letter-spacing:.01em;
+  font-family:"Prata",Georgia,serif; font-weight:400; font-synthesis:none;
+  font-size:clamp(24px,6.6vw,40px); line-height:1.14; letter-spacing:.03em;
   text-transform:uppercase; color:#fff;
+  -webkit-text-stroke:.028em currentColor;
   text-shadow:0 2px 10px rgba(2,4,20,.8), 0 0 30px rgba(2,4,20,.55);
 }
 .np-gold{color:#F7C561;
@@ -10406,7 +10411,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       rgba(4,5,20,.52);
   }
   .np-top{padding-block:0}
-  .np-t{font-size:clamp(40px,4.6vw,92px)}
+  .np-t{font-size:clamp(38px,4.3vw,86px)}
   .np-low{background:none; padding:0; margin-top:clamp(36px,5.2vw,100px);
     -webkit-mask-image:none; mask-image:none}
   .np-stage{
