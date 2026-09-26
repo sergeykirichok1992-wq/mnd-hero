@@ -10164,6 +10164,379 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <video id="vzFull" controls playsinline preload="none"></video>
 </div>
 
+<!-- ==================== ТОЛЬКО СТАВРОПОЛЬ (26.09.2026): «СОВЕРШЕННО НОВАЯ ПРОГРАММА» ====================
+     Экран сразу после видео-отзывов, перед картой городов. Видеофон, заголовок
+     и пять надписей про новое в программе. Стили, разметка и скрипт лежат
+     ОДНИМ куском, как у экрана «снег»: для sinhron.py это одна городская
+     вставка. В Тюмени этого экрана нет — если скрипт остановится здесь,
+     экран оставлять. -->
+<style>
+/* Пространство имён `np-`. Просьба Серёги 26.09.2026: «экран после блока
+   с видео-отзывами, видеофон притемнённый», текст как на его прототипе:
+   «Совершенно новая программа» и пять надписей «Новый сценарий / Новое
+   оформление / Новые герои / Новый МК / Новый реквизит», «с нашим фирменным
+   дизайном, чтобы обращали внимание на надписи».
+
+   НАДПИСИ НЕ КНОПКИ: на них не нажимают, поэтому стандарт кнопок к ним
+   не относится, и похожими на кнопку их делать нельзя. Это стеклянные плашки
+   по рецепту, который Серёга велел запомнить
+   (ai-clone/feedback/effekt-plashek-steklo-s-blikom.md): тёплое стекло,
+   волосяная золотая кромка, по плашкам по очереди бежит блик. Внимание к ним
+   держат блик, мерцающая звёздочка и то, что плашки всплывают по одной.
+   От прозрачной кнопки их отличает всё: строчные буквы вместо прописных,
+   стекло вместо пустоты внутри, звёздочка, нет свечения-обводки в 1,5 px.
+
+   РОЛИК «новый сайт/сайт ставропроль /видео фон.m4v» (1920x1080, 60 к/с,
+   40 МБ) пережат без звука в 30 к/с: st-np-1920.mp4 — 2,8 МБ,
+   st-np-1280.mp4 — 1,4 МБ, st-np-mob.mp4 (960x540) — 0,9 МБ. Заставка
+   до загрузки — первый кадр, st-np-*.webp. Файл ставит скрипт ниже, когда
+   экран в 300 px от окна; играет только пока виден.
+
+   КОМПЬЮТЕР И ПЛАНШЕТ (от 768 px): ролик во весь экран, заголовок и плашки
+   поверх, как на прототипе.
+   ТЕЛЕФОН (до 767 px, вторая просьба Серёги в тот же день): тот же ролик
+   полосой 4:3, на нём только заголовок; плашки ниже, на своём фоне —
+   тёплый коричневый (свечи из ролика) с отблесками, книзу уходит в синий
+   карты городов. */
+.np{
+  --np-top:#04071A;          /* низ экрана видео-отзывов (.vz) */
+  --np-brown:#1E1109;        /* верх коричневого поля под роликом на телефоне */
+  --np-bot:#040A28;          /* верх карты городов (.cr-s3 под плёнкой и тенью, замер) */
+  /* Верхняя кромка карты городов по всей ширине: по краям тёмно-синяя,
+     посередине светлее — туда доходит столб сияния её фона. Посчитано из
+     её же градиентов (эллипс 37,6 % x 54,9 % в точке 50,3 % 40,1 %, плёнка
+     16 %, тень у кромки 0,198) и сверено со снимком до единицы. Профиль
+     от ширины окна не зависит: у эллипса обе доли по высоте. */
+  --np-seam:linear-gradient(90deg, rgb(5,9,37) 0%, rgb(5,9,37) 24%, rgb(7,13,44) 30%,
+    rgb(8,15,50) 35%, rgb(10,17,54) 40%, rgb(10,18,57) 45%, rgb(11,19,58) 50.3%,
+    rgb(11,18,57) 55%, rgb(10,17,55) 60%, rgb(9,15,50) 65%, rgb(7,13,45) 70%,
+    rgb(5,9,37) 76%, rgb(5,9,37) 100%);
+  position:relative; z-index:25; isolation:isolate; overflow:hidden; color:#fff;
+  display:grid; grid-template-columns:100%; grid-template-areas:"v" "l";
+  background:var(--np-top);
+}
+/* Карта городов под нами держит то же верхнее поле, что стояло у неё
+   под видео-отзывами (`.vz-hold + .cr-s3`): его сосед теперь мы. */
+.np + .cr-s3{padding-top:calc(60 * var(--u))}
+
+/* ---------- СЦЕНА: заставка, ролик, затемнение ---------- */
+.np-stage{grid-area:v; position:relative; z-index:0; overflow:hidden;
+  aspect-ratio:4/3; background:#07060F}
+.np-still,.np-video{
+  position:absolute; inset:0; width:100%; height:100%;
+  display:block; object-fit:cover; pointer-events:none;
+}
+/* Ролик прозрачен, пока не нарисован первый кадр: не видно чёрной вспышки,
+   а если Safari запретит автозапуск, его панель с кнопкой не видна —
+   стоит заставка. Приём экрана «снег» (.sn-video). */
+.np-video{opacity:0; transition:opacity .6s ease}
+.np-video.on{opacity:1}
+.np-video::-webkit-media-controls,
+.np-video::-webkit-media-controls-enclosure,
+.np-video::-webkit-media-controls-panel,
+.np-video::-webkit-media-controls-panel-container,
+.np-video::-webkit-media-controls-overlay-play-button,
+.np-video::-webkit-media-controls-start-playback-button{
+  display:none !important; opacity:0 !important; -webkit-appearance:none;
+}
+/* Притемнение. Сверху ролик выходит из цвета видео-отзывов, снизу уходит
+   в коричневое поле; посередине, под заголовком, темнее всего. */
+.np-shade{
+  position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:
+    linear-gradient(180deg, var(--np-top) 0%, rgba(4,7,26,0) 24%),
+    linear-gradient(0deg, var(--np-brown) 0%, rgba(30,17,9,.6) 12%, rgba(30,17,9,0) 34%),
+    radial-gradient(74% 56% at 50% 50%, rgba(4,5,20,.42), rgba(4,5,20,0) 100%),
+    rgba(4,5,20,.5);
+}
+
+/* ---------- ЗАГОЛОВОК ----------
+   Как на других тёмных экранах: Blogger Sans Bold прописными, белый,
+   вторая половина золотом. Крупнее обычного — на прототипе это главное
+   на экране, как у первого экрана. */
+.np-top{grid-area:v; align-self:center; padding-block:20px}
+.np-t{
+  margin:0 auto; text-align:center; text-wrap:balance;
+  font-family:"Blogger Sans","CR Blogger",Arial,sans-serif; font-weight:700;
+  font-size:clamp(26px,7.4vw,40px); line-height:1.06; letter-spacing:.01em;
+  text-transform:uppercase; color:#fff;
+  text-shadow:0 2px 10px rgba(2,4,20,.8), 0 0 30px rgba(2,4,20,.55);
+}
+.np-gold{color:#F7C561;
+  text-shadow:0 2px 10px rgba(2,4,20,.8), 0 0 30px rgba(247,197,97,.32)}
+
+/* ---------- ПОЛЕ С ПЛАШКАМИ ----------
+   Телефон: своё поле под роликом. Коричневое сверху, через лиловый к синему
+   карты городов внизу; поверх три медленных отблеска (янтарный, лиловый,
+   синий) и зерно экрана отзывов (`.oz-grain`), чтобы градиент не полосил. */
+.np-low{
+  grid-area:l; position:relative; z-index:1;
+  padding:clamp(22px,6vw,34px) 0 clamp(46px,12vw,66px);
+  background:linear-gradient(180deg, var(--np-brown) 0%, #1B1013 30%, #150F2C 60%, #0B0E38 84%, var(--np-bot) 100%);
+}
+/* Отблески гаснут к обеим кромкам поля: иначе янтарный у верха и синий
+   у низа рисуют полосу на шве с роликом и с картой городов. */
+.np-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg, transparent 0, #000 24%, #000 62%, transparent 100%);
+          mask-image:linear-gradient(180deg, transparent 0, #000 24%, #000 62%, transparent 100%)}
+.np-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.np-glow i:nth-child(1){left:-34%; top:-14%; width:96%; height:64%;
+  background:radial-gradient(closest-side, rgba(236,150,62,.3) 0%, rgba(236,150,62,.13) 48%, rgba(236,150,62,0) 100%);
+  animation:bkDrift1 38s ease-in-out infinite alternate}
+.np-glow i:nth-child(2){right:-38%; top:20%; width:100%; height:58%;
+  background:radial-gradient(closest-side, rgba(126,58,214,.3) 0%, rgba(126,58,214,.12) 48%, rgba(126,58,214,0) 100%);
+  animation:bkDrift2 45s ease-in-out infinite alternate}
+.np-glow i:nth-child(3){left:-24%; bottom:-22%; width:118%; height:60%;
+  background:radial-gradient(closest-side, rgba(56,78,200,.34) 0%, rgba(56,78,200,.13) 48%, rgba(56,78,200,0) 100%);
+  animation:bkDrift3 33s ease-in-out infinite alternate}
+/* Зерно тоже проявляется не с самой кромки: оно светлит поле на пять
+   уровней, и под роликом выходила ступенька. */
+.np-low > .oz-grain{
+  -webkit-mask-image:linear-gradient(180deg, transparent 0, #000 22%);
+          mask-image:linear-gradient(180deg, transparent 0, #000 22%)}
+/* Шов с картой городов на телефоне: низ поля уходит в её кромку. Под
+   плашками (у .cr-cont слой 2), на них не ложится. */
+.np-low::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; z-index:1;
+  height:clamp(60px,18vw,90px); pointer-events:none; background:var(--np-seam);
+  -webkit-mask-image:linear-gradient(0deg, #000 0%, rgba(0,0,0,0) 100%);
+          mask-image:linear-gradient(0deg, #000 0%, rgba(0,0,0,0) 100%);
+}
+.np .cr-cont{position:relative; z-index:2}
+@media (max-width:767px){ .np .cr-cont{width:100%; padding-inline:20px} }
+
+/* ---------- ПЛАШКИ ----------
+   Телефон: столбиком одной ширины — вразбивку пилюли разной длины
+   рассыпались бы. Кегль не мельче 16 px (Серёга о плашках: 14-15 px
+   «слишком маленький»). */
+.np-list{
+  list-style:none; margin:0 auto; padding:0;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+}
+.np-chip{
+  position:relative; isolation:isolate; overflow:hidden;
+  display:flex; align-items:center; justify-content:center; gap:.6em;
+  width:min(100%,320px); margin:0; padding:.78em 1.4em;
+  border-radius:999px;
+  font-family:"Blogger Sans Medium","CR Blogger",Arial,sans-serif; font-weight:500;
+  font-size:17px; line-height:1.2; letter-spacing:.01em; color:#FFF4DE;
+  text-shadow:0 1px 6px rgba(2,4,20,.55);
+  background:
+    linear-gradient(160deg, rgba(255,228,184,.11) 0%, rgba(255,210,150,.045) 46%, rgba(132,74,214,.1) 100%),
+    rgba(8,8,28,.3);
+  box-shadow:inset 0 0 0 1px rgba(255,214,150,.42), inset 0 1px 0 rgba(255,255,255,.1),
+             0 18px 36px -24px rgba(0,0,0,.9), 0 0 26px -12px rgba(255,190,96,.35);
+  transition:box-shadow .45s ease;
+}
+/* Блик: светлая косая полоса раз в 10 с. Пять плашек делят круг поровну
+   (по 2 с), поэтому блик бежит по ряду волной. */
+.np-chip::after{
+  content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(105deg, rgba(255,236,190,0) 34%, rgba(255,236,190,.1) 46%,
+    rgba(255,250,232,.2) 50%, rgba(255,236,190,.1) 54%, rgba(255,236,190,0) 66%);
+  transform:translateX(-110%);
+  animation:npSheen 10s ease-in-out infinite; animation-delay:calc(var(--i,0) * 2s);
+}
+@keyframes npSheen{0%,74%{transform:translateX(-110%)} 100%{transform:translateX(110%)}}
+/* Звёздочка — та же, что искрит на золотой нити экрана «снег» (.vl-sp). */
+.np-star{
+  flex:0 0 auto; display:block; width:.9em; height:.9em; fill:#FCD34D;
+  filter:drop-shadow(0 0 5px rgba(252,211,77,.75));
+  animation:npTwinkle 3.2s ease-in-out infinite; animation-delay:calc(var(--i,0) * -.64s);
+}
+@keyframes npTwinkle{0%,100%{opacity:.55; transform:scale(.8)} 50%{opacity:1; transform:scale(1.08)}}
+@media (hover:hover) and (pointer:fine){
+  .np-chip:hover{box-shadow:inset 0 0 0 1px rgba(255,214,150,.6), inset 0 1px 0 rgba(255,255,255,.12),
+    0 18px 36px -24px rgba(0,0,0,.9), 0 0 34px -6px rgba(255,190,96,.45)}
+}
+
+/* ---------- ПОЯВЛЕНИЕ ----------
+   Заголовок и плашки всплывают, когда доезжают до окна, плашки по одной.
+   Прячет их только скрипт (класс np-anim): без скрипта всё видно сразу. */
+.np.np-anim .np-t, .np.np-anim .np-chip{opacity:0; transform:translate3d(0,18px,0)}
+.np.np-anim .np-t.on{opacity:1; transform:none;
+  transition:opacity .9s ease, transform .9s cubic-bezier(.2,.7,.2,1)}
+.np.np-anim .np-list.on .np-chip{opacity:1; transform:none;
+  transition:opacity .7s ease calc(.1s + var(--i,0) * .12s),
+             transform .7s cubic-bezier(.2,.7,.2,1) calc(.1s + var(--i,0) * .12s),
+             box-shadow .45s ease}
+/* Экран за кадром — движение стоит. */
+.np.np-off .np-chip::after, .np.np-off .np-star, .np.np-off .np-glow i{animation-play-state:paused}
+
+/* ---------- КОМПЬЮТЕР И ПЛАНШЕТ ----------
+   Экран в пропорцию ролика 16:9, но не выше окна и не ниже 480 px; лишнее
+   срезает object-fit:cover. Заголовок и плашки по центру, поверх ролика. */
+@media (min-width:768px){
+  .np{
+    display:flex; flex-direction:column; justify-content:center;
+    min-height:max(480px, min(56.25vw, 100vh));
+    min-height:max(480px, min(56.25vw, 100svh));
+    padding:clamp(56px,6vw,110px) 0;
+  }
+  .np-stage{position:absolute; inset:0; aspect-ratio:auto}
+  .np-shade{
+    background:
+      linear-gradient(180deg, var(--np-top) 0%, rgba(4,7,26,0) 16%),
+      radial-gradient(62% 54% at 50% 50%, rgba(4,5,20,.42), rgba(4,5,20,0) 100%),
+      rgba(4,5,20,.52);
+  }
+  /* Шов с картой городов: ролик уходит в её верхнюю кромку. */
+  .np-stage::after{
+    content:''; position:absolute; left:0; right:0; bottom:0; z-index:2;
+    height:24%; pointer-events:none; background:var(--np-seam);
+    -webkit-mask-image:linear-gradient(0deg, #000 0%, rgba(0,0,0,.8) 24%, rgba(0,0,0,0) 100%);
+            mask-image:linear-gradient(0deg, #000 0%, rgba(0,0,0,.8) 24%, rgba(0,0,0,0) 100%);
+  }
+  .np-low::after{display:none}
+  .np-top{padding-block:0}
+  .np-t{font-size:clamp(40px,4.6vw,92px)}
+  .np-low{background:none; padding:0; margin-top:clamp(36px,5.2vw,100px)}
+  .np-glow, .np-low .oz-grain{display:none}
+  .np-list{flex-direction:row; flex-wrap:wrap; justify-content:center; gap:clamp(12px,1.3vw,26px)}
+  .np-chip{width:auto; font-size:clamp(17px,1.18vw,23px); padding:.78em 1.3em .78em 1.1em}
+}
+/* Пока пять в ряд не влезают (до 1200 px), ряд уже: плашки ложатся 3+2,
+   а не 4 и одна сиротой. */
+@media (min-width:768px) and (max-width:1199px){ .np-list{max-width:700px} }
+
+/* «Меньше движения»: ни блика, ни мерцания, ни дрейфа; ролика тоже нет
+   (скрипт не ставит файл) — стоит заставка. Селекторы не слабее отменяемых
+   → schedule-app/lessons/reduced-motion-perebivaet-animation-name.md */
+@media (prefers-reduced-motion:reduce){
+  .np .np-chip::after{animation:none}
+  .np .np-star{animation:none; opacity:1; transform:none}
+  .np .np-glow i{animation:none}
+}
+</style>
+
+<section class="cr np" id="novaya" aria-labelledby="npT">
+  <div class="np-stage" aria-hidden="true">
+    <picture>
+      <source media="(max-width:767px)" srcset="st-np-mob.webp" width="960" height="540">
+      <img class="np-still" src="st-np-1280.webp"
+           srcset="st-np-1280.webp 1280w, st-np-1920.webp 1920w" sizes="100vw"
+           width="1920" height="1080" alt="" loading="lazy" decoding="async">
+    </picture>
+    <video class="np-video" muted autoplay loop playsinline webkit-playsinline preload="none"
+           disablepictureinpicture disableremoteplayback x-webkit-airplay="deny"
+           tabindex="-1"
+           data-wide="st-np-1920.mp4" data-mid="st-np-1280.mp4" data-mob="st-np-mob.mp4"></video>
+    <div class="np-shade"></div>
+  </div>
+
+  <div class="cr-cont np-top">
+    <h2 class="np-t" id="npT">Совершенно новая<br> <span class="np-gold">программа</span></h2>
+  </div>
+
+  <div class="np-low">
+    <div class="np-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="oz-grain" aria-hidden="true"></div>
+    <div class="cr-cont">
+      <ul class="np-list">
+        <li class="np-chip" style="--i:0"><svg class="np-star" viewBox="-1 -1 2 2" aria-hidden="true" focusable="false"><path d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z"/></svg><span>Новый сценарий</span></li>
+        <li class="np-chip" style="--i:1"><svg class="np-star" viewBox="-1 -1 2 2" aria-hidden="true" focusable="false"><path d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z"/></svg><span>Новое оформление</span></li>
+        <li class="np-chip" style="--i:2"><svg class="np-star" viewBox="-1 -1 2 2" aria-hidden="true" focusable="false"><path d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z"/></svg><span>Новые герои</span></li>
+        <li class="np-chip" style="--i:3"><svg class="np-star" viewBox="-1 -1 2 2" aria-hidden="true" focusable="false"><path d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z"/></svg><span>Новый МК</span></li>
+        <li class="np-chip" style="--i:4"><svg class="np-star" viewBox="-1 -1 2 2" aria-hidden="true" focusable="false"><path d="M0,-1 C.2,-.2 .2,-.2 1,0 C.2,.2 .2,.2 0,1 C-.2,.2 -.2,.2 -1,0 C-.2,-.2 -.2,-.2 0,-1 Z"/></svg><span>Новый реквизит</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<script>
+/* Экран «Совершенно новая программа». Ролик — приём экрана «снег»: файл
+   ставится, когда экран в 300 px от окна, играет, только пока экран виден
+   и вкладка открыта. Какой файл: до 768 px телефонный 960x540, дальше
+   1920 или 1280 по НАСТОЯЩИМ точкам экрана (плотность не выше двух).
+   «Меньше движения», экономия трафика, медленная сеть — ролика нет,
+   стоит заставка. Флаг `hochu` — отказ на наш же pause() не считать
+   запретом автозапуска. Здесь же — всплытие заголовка и плашек и пауза
+   блика, пока экран за кадром. */
+(function(){
+  var sec = document.getElementById('novaya');
+  var box = sec && sec.querySelector('.np-stage');
+  var v = box && box.querySelector('video');
+  if(!v) return;
+
+  var wide = window.matchMedia('(min-width:768px)');
+  var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var net  = navigator.connection || {};
+  var skupo = net.saveData === true || /(^|-)(slow-)?2g$|^3g$/.test(net.effectiveType || '');
+  var file = '', shown = false, tries = 0, hochu = false, near = false, inView = false;
+  var io = 'IntersectionObserver' in window;
+
+  /* Всплытие: прячем только если есть чем показать обратно. */
+  if(io && !calm.matches){
+    sec.classList.add('np-anim');
+    var rise = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){ e.target.classList.add('on'); rise.unobserve(e.target) }
+      });
+    }, {threshold:.3});
+    rise.observe(sec.querySelector('.np-t'));
+    rise.observe(sec.querySelector('.np-list'));
+  }
+
+  function mozhno(){ return !calm.matches && !skupo }
+  function nuzhen(){
+    if(!wide.matches) return v.getAttribute('data-mob');
+    var nado = window.innerWidth * Math.min(window.devicePixelRatio || 1, 2);
+    return v.getAttribute(nado > 1360 ? 'data-wide' : 'data-mid');
+  }
+  function pokazat(){ if(!shown){ shown = true; v.classList.add('on') } }
+  function zhdatKadr(){
+    if(v.requestVideoFrameCallback) v.requestVideoFrameCallback(pokazat);
+    else v.addEventListener('playing', pokazat, {once:true});
+  }
+  function spryatat(){ shown = false; v.classList.remove('on') }
+
+  function play(){
+    hochu = true;
+    var p = v.play();
+    if(p && p.catch) p.catch(function(){
+      if(!hochu) return;
+      if(++tries < 4) setTimeout(function(){ if(hochu) play() }, 320);
+      else document.addEventListener('pointerdown', function(){ if(hochu) play() }, {once:true});
+    });
+  }
+  function stop(){ hochu = false; if(file) v.pause() }
+
+  function zaryadit(){
+    var f = nuzhen();
+    if(!f || f === file) return;
+    file = f; tries = 0; spryatat();
+    /* muted и свойством тоже, ДО src: Safari решает про звук в момент
+       подстановки файла. */
+    v.muted = true; v.defaultMuted = true; v.playsInline = true;
+    v.src = f; v.load();
+    zhdatKadr();
+  }
+
+  function tick(){
+    sec.classList.toggle('np-off', !inView || document.hidden);
+    if(!mozhno()){ stop(); spryatat(); return }
+    if(!near) return;
+    zaryadit();
+    if(inView && !document.hidden) play(); else stop();
+  }
+
+  if(io){
+    new IntersectionObserver(function(es){ near = es[es.length - 1].isIntersecting; tick() },
+      {rootMargin:'300px 0px'}).observe(sec);
+    new IntersectionObserver(function(es){ inView = es[es.length - 1].isIntersecting; tick() })
+      .observe(sec);
+  } else { near = inView = true; tick() }
+
+  document.addEventListener('visibilitychange', tick);
+  function slushat(mq, fn){ if(mq.addEventListener) mq.addEventListener('change', fn);
+    else if(mq.addListener) mq.addListener(fn) }
+  /* Окно растянули через 768 px — нужен другой файл (tick сам сменит,
+     если экран рядом). «Меньше движения» выключили — ждём кадр заново. */
+  slushat(wide, tick);
+  slushat(calm, function(){ stop(); spryatat(); file = ''; tick() });
+})();
+</script>
+
 <!-- ==================== ЭКРАН 3: карта городов ====================
      Тот же экран старого сайта, но с двумя отличиями, о которых просил Серёга:
      1) названия городов — живой текст, а не запечённые в картинку буквы;
