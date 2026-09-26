@@ -7943,6 +7943,176 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .oz .cr-cont{width:100%; padding-inline:20px}
 }
 </style>
+
+<!-- ТОЛЬКО СТАВРОПОЛЬ: стили экрана видео-отзывов в ОТДЕЛЬНОМ <style>, как у
+     экрана отзывов: файл правят несколько сессий, и своя коробка не даёт чужой
+     незакрытой скобке уронить экран → schedule-app/lessons/otdelnyy-style-ne-lomaetsya-chuzhoy-skobkoy.md -->
+<style>
+/* ==================== ТОЛЬКО СТАВРОПОЛЬ (26.09.2026): ВИДЕО-ОТЗЫВЫ ====================
+   Пространство имён `vz-`. Просьба Серёги: экран под блоком с цифрами «в формате
+   как экран с отзывами», много маленьких и больших окон с видео, лента едет
+   влево сама, заголовок «294 видео-отзыва с площадки Ставрополя 2025:»
+   и кнопка «Смотреть все». Кнопка прозрачная (выбор Серёги) и ведёт
+   в плейлист ВК. В окнах играют кусочки по 5 с без звука (тоже его выбор),
+   по нажатию ролик целиком со звуком открывается в окне поверх страницы.
+
+   Всё, что взято у экрана отзывов как есть, взято его классами: небо, отблески,
+   зерно, звёзды, заголовок и подзаголовок (`oz-glow`, `oz-grain`, `oz-stars`,
+   `oz-t`, `oz-q`, `oz-lead`). Своё здесь только лента, окна и просмотр.
+
+   ГДЕ СТОИТ: сразу под вторым экраном (цифры сезона), перед картой городов.
+   На шве со вторым экраном лежит плашка «5 звёзд на Яндексе» (`.ya5`, слой 26) —
+   экран стоит на слое 25, как все `.cr`, и плашка остаётся поверх. Раньше
+   под плашкой начиналась карта, и её верхнее поле было раздуто под нижнюю
+   половину плашки; теперь это поле у нас, а карте возвращено прежнее.
+
+   ОКНА ДВУХ РАЗМЕРОВ. Большое — во всю высоту ленты, маленькие стоят парами
+   друг над другом в столбике той же высоты. Все ролики 16:9, поэтому ширину
+   окна даёт его высота. Порядок и размер каждого ролика — в
+   `sayt-nn/instrumenty/video_otzyvy_stavropol.py`, он же печатает разметку.
+
+   Высота ленты — одно число `--vh`, остальное считается от него: 300*--u это
+   373 px на 1600 и шире (большое окно 663 px, маленькое 322), 307 px на 1280 —
+   на экране компьютера сразу семь-восемь окон, «много», как просил Серёга.
+   На телефоне держит 50vw: 195 px на 390, большое окно 347 px шириной —
+   почти во весь экран. Первый заход был 400*--u: на 1600 большое окно
+   выходило 884 px, в кадр влезало два столбика, и много окон не читалось. */
+.vz-hold{position:relative; z-index:25}
+.vz-hold + .cr-s3{padding-top:calc(60 * var(--u))}
+.vz{
+  --vh: min(50vw, calc(300 * var(--u)));
+  --vg: calc(var(--vh) * .04);             /* зазор между окнами */
+  --vr: calc(var(--vh) * .034);            /* скругление углов */
+  position:relative; z-index:1; isolation:isolate; overflow:hidden; color:#fff;
+  /* Сверху — нижняя половина плашки «5 звёзд» (0,114 её ширины, число из
+     описания `.ya5`) плюс воздух до звёзд. */
+  padding:calc(min(94vw, calc(666 * var(--u))) * .114 + clamp(30px,3.6vw,64px)) 0 clamp(56px,6.4vw,108px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+/* Блик на шве с белым вторым экраном — тот же снимок, что у экрана отзывов.
+   Стоит СНАРУЖИ секции: у неё `overflow:hidden`, и верхнюю половину срезало бы. */
+.vz-blik{
+  position:absolute; z-index:3; left:0; right:0; top:0; pointer-events:none;
+  aspect-ratio:2000/381; transform:translateY(-48.5%);
+  background:url(v2-sm-blik.webp) center/100% 100% no-repeat;
+}
+@media (max-width:767px){
+  .vz .cr-cont{width:100%; padding-inline:20px}
+}
+
+/* ---------- ЛЕНТА ---------- во всю ширину окна, снаружи `.cr-cont` */
+.vz-wrap{
+  margin-top:clamp(26px,3.1vw,54px);
+  overflow:hidden;
+  padding:calc(var(--vh) * .05) 0;             /* запас под тень окон */
+  touch-action:pan-y;                          /* вертикаль отдаём странице */
+  user-select:none; -webkit-user-select:none;
+}
+.vz-band{display:flex; align-items:flex-start; width:max-content; will-change:transform}
+.vz-band > *{flex:0 0 auto; margin-right:var(--vg)}
+.vz-col{display:flex; flex-direction:column; justify-content:space-between; height:var(--vh)}
+/* Окно — кнопка: по нажатию открывается ролик целиком. Размер маленького:
+   половина высоты ленты без зазора, ширина по 16:9. */
+.vz-card{
+  --h: calc((var(--vh) - var(--vg)) / 2);
+  position:relative; display:block; padding:0; border:0; margin:0;
+  height:var(--h); width:calc(var(--h) * 16 / 9);
+  border-radius:var(--vr); overflow:hidden; cursor:pointer;
+  background:#0B1450;
+  box-shadow:0 calc(var(--vh) * .02) calc(var(--vh) * .05) rgba(2,5,22,.6);
+  transition:box-shadow .3s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.vz-card--b{--h: var(--vh)}
+/* Скругление и у окна, и у ролика: в Safari скруглённый блок с overflow:hidden
+   внутри едущего слоя оставляет по углам прямоугольные хвосты
+   → lessons/skruglenie-uglov-v-dvizhushchemsya-sloe.md */
+.vz-card video{
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+  object-fit:cover; border-radius:inherit; pointer-events:none;
+}
+/* Лёгкая тень снизу, чтобы кружок ▶ и время читались на светлом кадре */
+.vz-card::after{
+  content:''; position:absolute; inset:auto 0 0 0; height:45%; z-index:1;
+  pointer-events:none; border-radius:0 0 var(--vr) var(--vr);
+  background:linear-gradient(180deg, rgba(4,7,26,0), rgba(4,7,26,.5));
+}
+/* Кружок ▶ — тот же, что на экране коротких роликов (`.vd-play`), только
+   в углу: середину кадра занимает лицо. Размер от высоты окна. */
+.vz-play{
+  position:absolute; left:5%; bottom:7%; z-index:2;
+  width:calc(var(--h) * .2); height:calc(var(--h) * .2);
+  min-width:26px; min-height:26px; max-width:64px; max-height:64px;
+  border-radius:50%; display:grid; place-items:center;
+  background:linear-gradient(180deg,#FDE68A,#FCD34D 52%,#F59E0B);
+  box-shadow:0 0 0 1px rgba(251,191,36,.5), 0 4px 14px rgba(2,5,20,.5), 0 0 22px 2px rgba(245,158,11,.26);
+  transition:transform .22s ease;
+}
+.vz-play svg{width:38%; height:38%; fill:#451A03; transform:translateX(8%)}
+.vz-time{
+  position:absolute; right:4%; bottom:8%; z-index:2;
+  padding:.2em .55em; border-radius:999px;
+  background:rgba(4,7,26,.72); color:#fff;
+  font-family:"CR Blogger",Arial,sans-serif; font-size:max(10px,.72vw); line-height:1.5;
+  letter-spacing:.02em; font-variant-numeric:tabular-nums;
+}
+@media (hover:hover) and (pointer:fine){
+  .vz-wrap{cursor:grab}
+  .vz-wrap.drag, .vz-wrap.drag *{cursor:grabbing}
+  .vz-card:hover{box-shadow:0 calc(var(--vh) * .03) calc(var(--vh) * .07) rgba(2,5,22,.7),
+                            0 0 0 2px rgba(240,201,122,.6)}
+  .vz-card:hover .vz-play{transform:scale(1.1)}
+}
+.vz-card:focus-visible{outline:3px solid rgba(255,238,190,.9); outline-offset:3px}
+@media (prefers-reduced-motion:reduce){
+  .vz-wrap{overflow-x:auto; touch-action:auto; -webkit-overflow-scrolling:touch}
+}
+
+/* ---------- кнопка в плейлист ВК ----------
+   Прозрачная (вид 2, выбор Серёги 26.09.2026). Ширина как у кнопки экрана
+   отзывов: 480 px на телефоне, по надписи от 768 px → sayt-nn/standart-knopok.md */
+.vz-send{margin-top:clamp(28px,3.2vw,52px); text-align:center}
+.vz-send .zs-btn{width:min(100%,480px)}
+@media (min-width:768px){ .vz-send .zs-btn{width:auto} }
+
+/* ---------- ПРОСМОТР РОЛИКА ЦЕЛИКОМ ----------
+   Окно поверх страницы — по рецепту просмотра документов (`.of-ov`, `.of-x`):
+   то же тёмное стекло и тот же круглый крестик. Ролик вписан целиком:
+   ширина не больше экрана и не больше, чем даёт высота окна при 16:9. */
+.vz-ov{
+  position:fixed; inset:0; z-index:90;
+  display:flex; align-items:center; justify-content:center;
+  padding:clamp(12px,3vw,28px);
+  background:rgba(2,4,12,.9);
+  -webkit-backdrop-filter:blur(7px) saturate(.85); backdrop-filter:blur(7px) saturate(.85);
+  opacity:0; transition:opacity .3s ease;
+}
+.vz-ov[hidden]{display:none}
+.vz-ov.on{opacity:1}
+.vz-ov video{
+  display:block; width:min(100%, calc((100svh - clamp(110px,14vh,160px)) * 16 / 9), 1280px);
+  aspect-ratio:16/9; height:auto; background:#000;
+  border-radius:clamp(6px,.7vw,12px); box-shadow:0 30px 70px -30px rgba(0,0,0,.95);
+  transform:scale(.96); transition:transform .35s cubic-bezier(.2,.7,.2,1);
+}
+.vz-ov.on video{transform:none}
+.vz-x{
+  position:fixed; top:clamp(12px,2vw,26px); right:clamp(12px,2vw,26px);
+  display:flex; align-items:center; justify-content:center;
+  width:clamp(42px,3.4vw,52px); height:clamp(42px,3.4vw,52px); padding:0;
+  border:1px solid rgba(255,255,255,.18); border-radius:999px;
+  background:rgba(8,12,34,.72); color:#DCE5FF; cursor:pointer;
+  transition:color .25s ease, border-color .25s ease, background .25s ease;
+}
+.vz-x svg{width:44%; height:44%; display:block;
+  fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round}
+@media (hover:hover) and (pointer:fine){
+  .vz-x:hover{color:#FFD189; border-color:rgba(227,179,78,.5); background:rgba(227,179,78,.14)}
+}
+.vz-x:focus-visible{outline:2px solid #FFD189; outline-offset:2px}
+</style>
 <!-- Стили квиза лежат в ОТДЕЛЬНОМ <style> намеренно, как у экранов 9, 11, 15
      и фильма: файл правит вторая сессия, и незакрытая скобка в чужом блоке
      не должна ронять этот экран (и наоборот). -->
@@ -9926,6 +10096,68 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <div class="cr ya5">
   <img src="ya5.webp" width="1443" height="451" loading="lazy" decoding="async"
        alt="Министерство Новогодних Дел на Яндекс Картах: оценка 5,0 из 5 по 242 оценкам">
+</div>
+
+<!-- ==================== ТОЛЬКО СТАВРОПОЛЬ (26.09.2026): ВИДЕО-ОТЗЫВЫ ====================
+     Лента роликов из плейлиста ВК, едет влево сама. Окна большие и маленькие
+     (маленькие парами в столбике). Разметку ленты печатает
+     sayt-nn/instrumenty/video_otzyvy_stavropol.py, ролики лежат в vo/.
+     Стили — блок «ТОЛЬКО СТАВРОПОЛЬ: ВИДЕО-ОТЗЫВЫ» после стилей экрана
+     отзывов, скрипт — такой же блок после скрипта ленты отзывов.
+     В Тюмени этого экрана нет: при синхронизации спорные места решать
+     в пользу Ставрополя. -->
+<div class="vz-hold">
+<div class="vz-blik" aria-hidden="true"></div>
+<section class="cr vz" id="vidotzyvy" aria-labelledby="vzT">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="oz-grain" aria-hidden="true"></div>
+
+  <div class="cr-cont">
+    <p class="oz-stars" role="img" aria-label="Пять звёзд из пяти">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2.6l3.9 9.9L30 13.5l-7.9 6.1 2.9 10.1L16 23.6 7 29.7l2.9-10.1L2 13.5l10.1-1z"/></svg>
+    </p>
+    <h2 class="oz-t" id="vzT">294 видео-отзыва<br>
+      <span class="oz-q">с площадки Ставрополя 2025:</span></h2>
+    <p class="oz-lead">Нажмите на любое окно, и отзыв откроется целиком со звуком.</p>
+  </div>
+
+  <div class="vz-wrap" id="vzWrap">
+    <div class="vz-band" id="vzBand">
+      <button class="vz-card vz-card--b" type="button" data-full="vo/st-01-full.mp4" aria-label="Смотреть видео-отзыв 1 целиком, со звуком, 0:18"><video muted playsinline loop preload="none" poster="vo/st-01.webp" data-src="vo/st-01.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:18</span></button>
+      <div class="vz-col"><button class="vz-card" type="button" data-full="vo/st-02-full.mp4" aria-label="Смотреть видео-отзыв 2 целиком, со звуком, 0:19"><video muted playsinline loop preload="none" poster="vo/st-02.webp" data-src="vo/st-02.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:19</span></button><button class="vz-card" type="button" data-full="vo/st-03-full.mp4" aria-label="Смотреть видео-отзыв 3 целиком, со звуком, 0:20"><video muted playsinline loop preload="none" poster="vo/st-03.webp" data-src="vo/st-03.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:20</span></button></div>
+      <div class="vz-col"><button class="vz-card" type="button" data-full="vo/st-04-full.mp4" aria-label="Смотреть видео-отзыв 4 целиком, со звуком, 0:45"><video muted playsinline loop preload="none" poster="vo/st-04.webp" data-src="vo/st-04.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:45</span></button><button class="vz-card" type="button" data-full="vo/st-05-full.mp4" aria-label="Смотреть видео-отзыв 5 целиком, со звуком, 0:16"><video muted playsinline loop preload="none" poster="vo/st-05.webp" data-src="vo/st-05.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:16</span></button></div>
+      <button class="vz-card vz-card--b" type="button" data-full="vo/st-06-full.mp4" aria-label="Смотреть видео-отзыв 6 целиком, со звуком, 0:28"><video muted playsinline loop preload="none" poster="vo/st-06.webp" data-src="vo/st-06.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:28</span></button>
+      <div class="vz-col"><button class="vz-card" type="button" data-full="vo/st-07-full.mp4" aria-label="Смотреть видео-отзыв 7 целиком, со звуком, 0:36"><video muted playsinline loop preload="none" poster="vo/st-07.webp" data-src="vo/st-07.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:36</span></button><button class="vz-card" type="button" data-full="vo/st-08-full.mp4" aria-label="Смотреть видео-отзыв 8 целиком, со звуком, 0:13"><video muted playsinline loop preload="none" poster="vo/st-08.webp" data-src="vo/st-08.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:13</span></button></div>
+      <button class="vz-card vz-card--b" type="button" data-full="vo/st-09-full.mp4" aria-label="Смотреть видео-отзыв 9 целиком, со звуком, 0:15"><video muted playsinline loop preload="none" poster="vo/st-09.webp" data-src="vo/st-09.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:15</span></button>
+      <div class="vz-col"><button class="vz-card" type="button" data-full="vo/st-10-full.mp4" aria-label="Смотреть видео-отзыв 10 целиком, со звуком, 0:31"><video muted playsinline loop preload="none" poster="vo/st-10.webp" data-src="vo/st-10.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:31</span></button><button class="vz-card" type="button" data-full="vo/st-11-full.mp4" aria-label="Смотреть видео-отзыв 11 целиком, со звуком, 0:27"><video muted playsinline loop preload="none" poster="vo/st-11.webp" data-src="vo/st-11.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:27</span></button></div>
+      <div class="vz-col"><button class="vz-card" type="button" data-full="vo/st-12-full.mp4" aria-label="Смотреть видео-отзыв 12 целиком, со звуком, 0:25"><video muted playsinline loop preload="none" poster="vo/st-12.webp" data-src="vo/st-12.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:25</span></button><button class="vz-card" type="button" data-full="vo/st-13-full.mp4" aria-label="Смотреть видео-отзыв 13 целиком, со звуком, 0:13"><video muted playsinline loop preload="none" poster="vo/st-13.webp" data-src="vo/st-13.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:13</span></button></div>
+      <button class="vz-card vz-card--b" type="button" data-full="vo/st-14-full.mp4" aria-label="Смотреть видео-отзыв 14 целиком, со звуком, 0:27"><video muted playsinline loop preload="none" poster="vo/st-14.webp" data-src="vo/st-14.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:27</span></button>
+      <div class="vz-col"><button class="vz-card" type="button" data-full="vo/st-15-full.mp4" aria-label="Смотреть видео-отзыв 15 целиком, со звуком, 0:23"><video muted playsinline loop preload="none" poster="vo/st-15.webp" data-src="vo/st-15.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:23</span></button><button class="vz-card" type="button" data-full="vo/st-16-full.mp4" aria-label="Смотреть видео-отзыв 16 целиком, со звуком, 0:31"><video muted playsinline loop preload="none" poster="vo/st-16.webp" data-src="vo/st-16.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:31</span></button></div>
+      <button class="vz-card vz-card--b" type="button" data-full="vo/st-17-full.mp4" aria-label="Смотреть видео-отзыв 17 целиком, со звуком, 0:39"><video muted playsinline loop preload="none" poster="vo/st-17.webp" data-src="vo/st-17.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:39</span></button>
+      <div class="vz-col"><button class="vz-card" type="button" data-full="vo/st-18-full.mp4" aria-label="Смотреть видео-отзыв 18 целиком, со звуком, 0:12"><video muted playsinline loop preload="none" poster="vo/st-18.webp" data-src="vo/st-18.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:12</span></button><button class="vz-card" type="button" data-full="vo/st-19-full.mp4" aria-label="Смотреть видео-отзыв 19 целиком, со звуком, 0:11"><video muted playsinline loop preload="none" poster="vo/st-19.webp" data-src="vo/st-19.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:11</span></button></div>
+      <button class="vz-card vz-card--b" type="button" data-full="vo/st-20-full.mp4" aria-label="Смотреть видео-отзыв 20 целиком, со звуком, 0:14"><video muted playsinline loop preload="none" poster="vo/st-20.webp" data-src="vo/st-20.mp4" aria-hidden="true"></video><span class="vz-play" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 4.5v15l13-7.5z"/></svg></span><span class="vz-time" aria-hidden="true">0:14</span></button>
+    </div>
+  </div>
+
+  <div class="cr-cont">
+    <div class="vz-send">
+      <a class="zs-btn zs-btn--ghost" href="https://vkvideo.ru/playlist/-232716559_2" target="_blank" rel="noopener"><span class="zs-t">Смотреть все</span></a>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- Просмотр ролика целиком. Одно окно на все двадцать, спрятано `hidden`;
+     ролик получает адрес только по нажатию, до этого ничего не качается. -->
+<div class="vz-ov" id="vzOv" role="dialog" aria-modal="true" aria-label="Видео-отзыв" hidden>
+  <button class="vz-x" type="button" id="vzX" aria-label="Закрыть видео">
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <video id="vzFull" controls playsinline preload="none"></video>
 </div>
 
 <!-- ==================== ЭКРАН 3: карта городов ====================
@@ -20345,6 +20577,252 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      поменять высоту секции, а вместе с ней и ширину кадров. */
   window.addEventListener('load', function(){ if (sobrano) izmerit(); });
 
+  var tmr = null;
+  window.addEventListener('resize', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 150);
+  });
+  window.addEventListener('orientationchange', function(){
+    clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 300);
+  });
+})();
+</script>
+
+<!-- ТОЛЬКО СТАВРОПОЛЬ: скрипт экрана видео-отзывов в ОТДЕЛЬНОМ <script>,
+     как у ленты отзывов: чужая ошибка не должна ронять этот экран. -->
+<script>
+/* ==================== ТОЛЬКО СТАВРОПОЛЬ (26.09.2026): ЛЕНТА ВИДЕО-ОТЗЫВОВ ====================
+   Лента едет справа налево сама и разгоняется пальцем или мышью — приём
+   и числа ленты отзывов (экран 19Б): 26 px/с на телефонной высоте кадра,
+   потолок броска 2400, затухание 0,75 с. Петля без шва: окна повторены
+   дважды, сдвиг берётся по остатку от ширины одного повтора.
+
+   РОЛИКИ ИГРАЮТ ТОЛЬКО В ОКНАХ, КОТОРЫЕ ВИДНО. Каждое окно под присмотром
+   IntersectionObserver: подъехало к краю экрана — получает адрес ролика
+   (до этого у <video> только стоп-кадр и `preload="none"`) и включается,
+   уехало — встаёт на паузу. Так на телефоне одновременно играют два-три
+   ролика, а не сорок, и качается только то, до чего лента доехала.
+
+   САМИ РОЛИКИ НЕ ИГРАЮТ при «меньше движения» (это тоже движение) и при
+   режиме экономии трафика: в окнах остаются стоп-кадры, нажатие работает.
+
+   НАЖАТИЕ И ПЕРЕТАСКИВАНИЕ РАЗВЕДЕНЫ ПО ПРОЙДЕННОМУ ПУТИ, порог 8 px, как
+   у ленты отзывов. `e.detail !== 0` — чтобы Enter с клавиатуры после броска
+   мышью всё равно открывал ролик (подробно — в скрипте экрана 19Б).
+
+   ПРОСМОТР ЦЕЛИКОМ. Окно `#vzOv` одно; ролик получает адрес по нажатию
+   и теряет его при закрытии — иначе браузер докачивал бы его в фоне.
+   Пока открыт просмотр, лента стоит и её ролики на паузе. */
+(function(){
+  'use strict';
+  var wrap = document.getElementById('vzWrap');
+  var band = document.getElementById('vzBand');
+  var ov = document.getElementById('vzOv');
+  var full = document.getElementById('vzFull');
+  var xBtn = document.getElementById('vzX');
+  if (!wrap || !band || !ov || !full) return;
+
+  var calm = window.matchMedia('(prefers-reduced-motion:reduce)');
+  var ekonom = !!(navigator.connection && navigator.connection.saveData);
+  var cols = Array.prototype.slice.call(band.children);    /* настоящие, без копий */
+  var N = cols.length;
+  if (!N) return;
+
+  function slushat(mq, fn){
+    if (mq.addEventListener) mq.addEventListener('change', fn);
+    else if (mq.addListener) mq.addListener(fn);
+  }
+
+  /* ---------- ролики в окнах ---------- */
+  var smotryu = false;       /* открыт просмотр целиком */
+  var glazV = null;
+  function mozhnoIgrat(){ return !calm.matches && !ekonom && !smotryu; }
+  function vkl(v){
+    if (!v.getAttribute('src')){ v.src = v.getAttribute('data-src'); }
+    v.muted = true;          /* свойство, не только атрибут: без него iOS не пустит */
+    var p = v.play();
+    if (p && p.catch) p.catch(function(){});   /* энергосбережение: остаётся стоп-кадр */
+  }
+  function nabl(v){
+    if (glazV) glazV.observe(v);
+  }
+  if ('IntersectionObserver' in window){
+    glazV = new IntersectionObserver(function(en){
+      for (var i = 0; i < en.length; i++){
+        var v = en[i].target;
+        v._vidno = en[i].isIntersecting;
+        if (v._vidno && mozhnoIgrat()) vkl(v);
+        else if (!v.paused) v.pause();
+      }
+    }, {rootMargin:'150px 12% 150px 12%'});
+  }
+  function vseRoliki(){ return band.querySelectorAll('video'); }
+  Array.prototype.forEach.call(vseRoliki(), nabl);
+  function pauzaVse(){
+    Array.prototype.forEach.call(vseRoliki(), function(v){ if (!v.paused) v.pause(); });
+  }
+  function prodolzhit(){
+    if (!mozhnoIgrat()) return;
+    Array.prototype.forEach.call(vseRoliki(), function(v){ if (v._vidno) vkl(v); });
+  }
+
+  /* ---------- бегущая лента ---------- */
+  var BASE = 26, LH0 = 240, MAXV = 2400, TAU = 0.75;
+  var sobrano = false, shag = 0, pos = 0, v = BASE, raf = 0, last = 0;
+  var tyanut = false, pid = null, x0 = 0, t0 = 0, vx = 0, proshel = 0;
+  var glaz = null, naEkrane = false;
+
+  function sobrat(){
+    if (sobrano) return;
+    for (var i = 0; i < N; i++){
+      var k = cols[i].cloneNode(true);
+      k.classList.add('vz-clone');
+      k.setAttribute('aria-hidden', 'true');
+      var knopki = k.matches('button') ? [k] : k.querySelectorAll('button');
+      Array.prototype.forEach.call(knopki, function(b){ b.setAttribute('tabindex', '-1'); });
+      band.appendChild(k);
+      Array.prototype.forEach.call(k.querySelectorAll('video'), function(vv){
+        vv.removeAttribute('src'); nabl(vv);
+      });
+    }
+    sobrano = true;
+    izmerit();
+  }
+  function razobrat(){
+    var k = band.querySelectorAll('.vz-clone');
+    for (var i = 0; i < k.length; i++){
+      Array.prototype.forEach.call(k[i].querySelectorAll('video'), function(vv){
+        if (glazV) glazV.unobserve(vv);
+      });
+      k[i].parentNode.removeChild(k[i]);
+    }
+    sobrano = false; pos = 0; v = BASE; shag = 0;
+    band.style.transform = '';
+  }
+  /* Меряем прямоугольниками, а не offsetLeft: ширина окна дробная, и
+     округление на тринадцати столбцах копилось бы в рывок на каждом обороте. */
+  function izmerit(){
+    if (!sobrano) return;
+    var a = band.children[0], b = band.children[N];
+    if (!a || !b){ shag = 0; return; }
+    var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+    shag = rb.left - ra.left;
+    BASE = 26 * Math.max(1, (ra.height || LH0) / LH0);
+    polozhit();
+  }
+  function polozhit(){
+    var x = shag ? -(((pos % shag) + shag) % shag) : 0;
+    band.style.transform = 'translate3d(' + x.toFixed(2) + 'px,0,0)';
+  }
+  function kadr(now){
+    raf = requestAnimationFrame(kadr);
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+    last = now;
+    if (!tyanut){
+      v += (BASE - v) * (1 - Math.exp(-dt / TAU));
+      pos += v * dt;
+    }
+    polozhit();
+  }
+  function pusk(){ if (!raf && sobrano && !smotryu){ last = 0; raf = requestAnimationFrame(kadr); } }
+  function stop(){ if (raf){ cancelAnimationFrame(raf); raf = 0; } }
+
+  wrap.addEventListener('pointerdown', function(e){
+    if (!sobrano) return;
+    tyanut = true;
+    pid = e.pointerId; x0 = e.clientX; t0 = e.timeStamp; vx = 0; proshel = 0;
+    wrap.classList.add('drag');
+    try{ wrap.setPointerCapture(pid); }catch(err){}
+  });
+  wrap.addEventListener('pointermove', function(e){
+    if (!tyanut || e.pointerId !== pid) return;
+    var dx = e.clientX - x0, dt = (e.timeStamp - t0) / 1000;
+    pos -= dx;
+    proshel += Math.abs(dx);
+    if (dt > 0.004) vx = 0.7 * vx + 0.3 * (dx / dt);
+    x0 = e.clientX; t0 = e.timeStamp;
+    polozhit();
+  });
+  function otpustit(){
+    if (!tyanut) return;
+    tyanut = false;
+    wrap.classList.remove('drag');
+    if (pid !== null){ try{ wrap.releasePointerCapture(pid); }catch(err){} pid = null; }
+    if (proshel < 8) return;
+    v = Math.max(-MAXV, Math.min(MAXV, -vx));
+  }
+  wrap.addEventListener('pointerup', otpustit);
+  wrap.addEventListener('pointercancel', otpustit);
+  wrap.addEventListener('lostpointercapture', otpustit);
+  wrap.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+  /* ---------- просмотр целиком ---------- */
+  var otkuda = null;         /* окно, с которого открыли: туда вернуть фокус */
+  function otkryt(btn){
+    otkuda = btn;
+    smotryu = true;
+    stop(); pauzaVse();
+    /* Стоп-кадр из окна ленты: если телефон не даст включить ролик сам,
+       в окне будет кадр с кнопкой ▶ плеера, а не чёрный прямоугольник. */
+    var mal = btn.querySelector('video');
+    full.poster = mal ? mal.getAttribute('poster') : '';
+    full.preload = 'auto';
+    full.src = btn.getAttribute('data-full');
+    ov.hidden = false;
+    requestAnimationFrame(function(){ ov.classList.add('on'); });
+    document.documentElement.style.overflow = 'hidden';
+    var p = full.play();
+    if (p && p.catch) p.catch(function(){});  /* не дали играть сам — жмут ▶ в плеере */
+    (xBtn || full).focus({preventScroll:true});
+  }
+  function zakryt(){
+    if (ov.hidden) return;
+    full.pause();
+    full.removeAttribute('src'); full.load();   /* иначе докачивает в фоне */
+    ov.classList.remove('on');
+    ov.hidden = true;
+    document.documentElement.style.overflow = '';
+    smotryu = false;
+    if (naEkrane) pusk();
+    prodolzhit();
+    if (otkuda && !otkuda.closest('.vz-clone')) otkuda.focus({preventScroll:true});
+    otkuda = null;
+  }
+
+  wrap.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('.vz-card');
+    if (e.detail !== 0 && proshel >= 8){ e.preventDefault(); proshel = 0; return; }
+    proshel = 0;
+    if (btn) otkryt(btn);
+  });
+  if (xBtn) xBtn.addEventListener('click', zakryt);
+  ov.addEventListener('click', function(e){ if (e.target === ov) zakryt(); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && !ov.hidden) zakryt();
+    /* фокус не уходит из окна просмотра: в нём две вещи, крестик и плеер */
+    if (e.key === 'Tab' && !ov.hidden){
+      var el = [xBtn, full], i = el.indexOf(document.activeElement);
+      e.preventDefault();
+      el[(i + (e.shiftKey ? el.length - 1 : 1)) % el.length].focus();
+    }
+  });
+
+  /* ---------- включение ---------- */
+  function smotret(){
+    if (glaz || !('IntersectionObserver' in window)){ naEkrane = true; pusk(); return; }
+    glaz = new IntersectionObserver(function(en){
+      naEkrane = en[0].isIntersecting;
+      if (naEkrane) pusk(); else stop();
+    }, {rootMargin:'100px'});
+    glaz.observe(wrap);
+  }
+  function svet(){
+    if (!calm.matches){ sobrat(); smotret(); prodolzhit(); }
+    else { stop(); razobrat(); pauzaVse(); }
+  }
+  svet();
+  slushat(calm, svet);
+
+  window.addEventListener('load', function(){ if (sobrano) izmerit(); });
   var tmr = null;
   window.addEventListener('resize', function(){
     clearTimeout(tmr); tmr = setTimeout(function(){ if (sobrano) izmerit(); }, 150);
