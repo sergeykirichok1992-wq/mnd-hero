@@ -10505,6 +10505,186 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 })();
 </script>
 
+<!-- ==================== СТАВРОПОЛЬ: ЭКРАН «СЕЗОН 2026-2027: ЧТО НОВОГО?» ====================
+     ТОЛЬКО В stavropol.html (26.09.2026, просьба Серёги: «после экрана где, когда и для кого
+     сделай экран сезон 2026-27 что нового? как на старом сайте ministrynn.ru, с коричневым
+     фоном… картинку я другую сделаю для заголовка сезон 2026-2027, фон используй такой же»).
+     Для sinhron.py это городская вставка между экраном 4 и бронью: если он остановится
+     здесь — экран оставлять, у Тюмени его нет.
+
+     Копия блока старого сайта (node168 — компьютер, node667 — телефон): тот же фон (фото
+     архива под чёрной вуалью 64 %, у телефона свой кадр), восемь пунктов компьютерной
+     версии в две колонки, на телефоне столбиком по центру. Значки и фон собирает
+     sayt-nn/instrumenty/sezon_stavropol.py (качает со старого сайта). Размеры сняты со
+     старого сайта и идут через --u (класс cr), как у остальных экранов-копий.
+
+     ЗАГОЛОВОК ПОКА ТЕКСТОМ. Картинку «Сезон 2026-2027» Серёга делает сам: придёт — встаёт
+     картинкой на место .sz-head, текст h2 оставить для читалок и поиска.
+
+     Стыки. Сверху на широком экране на нас ложится золотая полоса экрана 4 (вшита
+     в v2-snow.webp; экран 4 на слое 26, выше нас, и заходит на нас прозрачным хвостом).
+     До 1280 px у экрана 4 белое поле без полосы — рисуем свою (.sz-seam--top). Снизу своя
+     полоса того же вида на кромке брони: верх брони (лиловое зарево) сделан под неё. -->
+<style>
+.sz{
+  overflow:hidden; isolation:isolate; color:#fff;
+  /* толщина золотой полосы — как у экрана 4: у него полоса вшита в картинку, а картинка
+     растёт по высоте только до 1462 px ширины (--w), поэтому и тут min(100vw,1462px):
+     12 px на 1600 и шире, 10,5 на 1280, на телефоне 5 */
+  --sz-seam:max(5px, calc(min(100vw,1462px) * .0082));
+  padding:calc(92 * var(--u)) 0 calc(100 * var(--u) + var(--sz-seam));
+}
+/* фон: фото архива cover + чёрная вуаль 64 % — ровно как на старом сайте */
+.sz-bg{position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:#050302 url(st-sz-fon.webp) 50% 50% / cover no-repeat}
+.sz-bg::after{content:''; position:absolute; inset:0; background:rgba(0,0,0,.64)}
+
+/* Золотая полоса на шве — повтор нижней кромки экрана 4 (замер по его снимку на
+   1600: 12 px, по краям старое золото #E1B639, к середине сочнее, в центре белая
+   вспышка). Лежит внутри секции у самой кромки. */
+.sz-seam{
+  position:absolute; left:0; right:0; z-index:8; height:var(--sz-seam); pointer-events:none;
+  background:
+    radial-gradient(7% 75% at 50% 50%, #FFFFFF 0%, rgba(255,253,236,.96) 40%, rgba(255,246,150,0) 100%),
+    radial-gradient(38% 100% at 50% 50%, rgba(255,228,16,.95) 0%, rgba(255,210,0,.55) 50%, rgba(255,205,0,0) 100%),
+    linear-gradient(180deg, #F2D784 0%, #E7BD44 20%, #E1B639 50%, #E3B63A 80%, #D8AD3F 100%);
+}
+.sz-seam::after{content:''; position:absolute; left:50%; top:50%; width:34vw; height:calc(var(--sz-seam) * 3.4);
+  transform:translate(-50%,-50%);
+  background:radial-gradient(closest-side, rgba(255,238,140,.5), rgba(255,222,100,.18) 55%, rgba(255,222,100,0))}
+.sz-seam--top{top:0; display:none}
+.sz-seam--bot{bottom:0}
+
+
+/* ---------- заголовок (временный, до картинки Серёги) ----------
+   Набор тёмных экранов страницы: Blogger Sans Bold капсом, «Сезон» золотой
+   заливкой — как «СЕЗОН» на картинке старого экрана, годы белым. */
+.sz-t{
+  margin:0; text-align:center; color:#fff;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:calc(66 * var(--u)); line-height:1; letter-spacing:-.01em;
+  text-transform:uppercase; text-wrap:balance;
+  text-shadow:0 2px 24px rgba(0,0,0,.55);
+}
+.sz-t b{font-weight:700; color:#E9C36C}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .sz-t b{background:linear-gradient(180deg,#FFF3CF 0%,#F6DFA6 38%,#EFC97E 62%,#D9A44A 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;
+    text-shadow:none; padding-top:.22em; margin-top:-.22em}
+}
+.sz-sub{display:block; margin-top:calc(18 * var(--u)); font-size:calc(30 * var(--u)); letter-spacing:.02em}
+
+/* ---------- пункты ----------
+   Числа старого сайта (контейнер 1100): две колонки по 530 с зазором 40,
+   в пункте значок 65, отступ 30, текст 435; ряды через 62. Заголовок пункта
+   26/28,6 цвета #FFD197, текст 18/21,6 белый, между ними 12. Шрифт — Blogger
+   Sans обычный (у старого сайта вес 500 при одном начертании 400 рисуется
+   обычным), поэтому CR Blogger 400. */
+.sz-list{
+  list-style:none; margin:calc(64 * var(--u)) auto 0; padding:0;
+  width:min(100%, calc(1100 * var(--u)));
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:calc(40 * var(--u)); row-gap:calc(62 * var(--u));
+}
+.sz-i{display:grid; grid-template-columns:calc(65 * var(--u)) minmax(0,1fr); column-gap:calc(30 * var(--u)); align-items:start}
+.sz-ic{display:block; width:calc(65 * var(--u)); height:calc(65 * var(--u))}
+.sz-h{margin:0; font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:calc(26 * var(--u)); line-height:1.1; color:#FFD197}
+.sz-p{margin:calc(12 * var(--u)) 0 0; font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:calc(18 * var(--u)); line-height:1.2; color:#fff}
+
+/* появление: пункты всплывают, когда доезжают до экрана. Прячет только
+   класс .rv, его вешает скрипт — без JS всё видно сразу */
+.sz-list.rv .sz-i{opacity:0; transform:translateY(16px)}
+.sz-list.rv .sz-i.on{opacity:1; transform:none;
+  transition:opacity .6s ease, transform .7s cubic-bezier(.2,.7,.2,1); transition-delay:var(--d,0ms)}
+
+/* до 1280 px у экрана 4 белое поле без золотой полосы — сверху своя */
+@media (max-width:1279px){
+  .sz{padding-top:calc(var(--sz-seam) + 92 * var(--u))}
+  .sz-seam--top{display:block}
+}
+/* до 900 px две колонки тесные — столбик по центру, числа телефонной версии
+   старого сайта: значок 80, заголовок 25,6/28,16, текст 16/19,2, пункты через 64 */
+@media (max-width:899px){
+  .sz-list{grid-template-columns:minmax(0,1fr); row-gap:64px; width:auto; max-width:560px;
+    padding:0 clamp(16px,6.4vw,26px); margin-top:48px}
+  .sz-i{display:flex; flex-direction:column; align-items:center; text-align:center}
+  .sz-ic{width:80px; height:80px; margin-bottom:11px}
+  .sz-h{font-size:25.6px; line-height:1.1; text-wrap:balance}
+  .sz-p{font-size:16px; line-height:1.2; margin-top:20px}
+}
+/* телефон: свой кадр фона (как у старого сайта), заголовок в три строки */
+@media (max-width:767px){
+  .sz{padding:calc(var(--sz-seam) + 64px) 0 calc(var(--sz-seam) + 88px)}
+  .sz-bg{background-image:url(st-sz-fon-mob.webp)}
+  .sz-head{padding:0 16px}
+  .sz-t{font-size:clamp(40px,13vw,64px); line-height:1.02}
+  .sz-t b{display:block}
+  .sz-sub{margin-top:14px; font-size:clamp(20px,6.2vw,30px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .sz-list.rv .sz-i{opacity:1; transform:none; transition:none}
+}
+</style>
+<section class="cr sz" id="sezon" aria-labelledby="szT">
+  <div class="sz-bg" aria-hidden="true"></div>
+  <div class="sz-seam sz-seam--top" aria-hidden="true"></div>
+  <div class="cr-cont">
+    <div class="sz-head">
+      <h2 class="sz-t" id="szT"><b>Сезон</b> 2026-2027 <span class="sz-sub">Что нового?</span></h2>
+    </div>
+    <ul class="sz-list">
+      <li class="sz-i"><img class="sz-ic" src="st-sz-i1.webp" width="192" height="192" alt="" loading="lazy" decoding="async"><div>
+        <h3 class="sz-h">Новая тематика и формат квеста</h3>
+        <p class="sz-p">Логические цепочки, поиск улик и зацепок, сопоставление фактов и решение головоломок. В этом году перед карамельным МК детей ждет увлекательное новогоднее расследование!</p></div></li>
+      <li class="sz-i"><img class="sz-ic" src="st-sz-i2.webp" width="192" height="192" alt="" loading="lazy" decoding="async"><div>
+        <h3 class="sz-h">Больше технологичности</h3>
+        <p class="sz-p">Теперь наш Министр покажет не только как работает пульт управления делами Деда Мороза с новыми трюками и видео-звонками в прошлое, но и большую электронную машину времени в своем кабинете-архиве!</p></div></li>
+      <li class="sz-i"><img class="sz-ic" src="st-sz-i3.webp" width="192" height="192" alt="" loading="lazy" decoding="async"><div>
+        <h3 class="sz-h">Внедрили<br> познавательную часть</h3>
+        <p class="sz-p">Мы добавили историческую составляющую в квест. Дети узнают множество фактов из истории России и мира, познакомятся с выдающимися личностями разных эпох нашей страны в игровой форме.</p></div></li>
+      <li class="sz-i"><img class="sz-ic" src="st-sz-i4.webp" width="192" height="192" alt="" loading="lazy" decoding="async"><div>
+        <h3 class="sz-h">Больше динамики&nbsp;- танцев и&nbsp;музыки</h3>
+        <p class="sz-p">Вы просили больше танца на улице? Во время приветственного шоу во дворе детки с главными героями станцуют флеш-моб в формате тик-ток. Видео с танцем мы снимем для вас на видео!</p></div></li>
+      <li class="sz-i"><img class="sz-ic" src="st-sz-i5.webp" width="192" height="192" alt="" loading="lazy" decoding="async"><div>
+        <h3 class="sz-h">Новый карамельный мастер-класс</h3>
+        <p class="sz-p">Новые формы и цвета леденцов! Но все тот же насыщенный вкус карамели, которую вы так хвалили в прошлом году!</p></div></li>
+      <li class="sz-i"><img class="sz-ic" src="st-sz-i6.webp" width="192" height="192" alt="" loading="lazy" decoding="async"><div>
+        <h3 class="sz-h">Больше времени<br> на программу и фото</h3>
+        <p class="sz-p">Мы таки решились убрать чаепитие в пользу карамельного МК, квеста и фотографирования. Все же чаем детей не удивить!</p></div></li>
+      <li class="sz-i"><img class="sz-ic" src="st-sz-i7.webp" width="192" height="192" alt="" loading="lazy" decoding="async"><div>
+        <h3 class="sz-h">Новые герои, образы,<br> костюмы и реквизит</h3>
+        <p class="sz-p">Каждый год мы добавляем новых героев, шьем новые костюмы и изготавливаем новый реквизит, чтобы деткам было интересно приехать к нам снова!</p></div></li>
+      <li class="sz-i"><img class="sz-ic" src="st-sz-i8.webp" width="192" height="192" alt="" loading="lazy" decoding="async"><div>
+        <h3 class="sz-h">Новый кабинет Деда Мороза&nbsp;-<br> тайный архив</h3>
+        <p class="sz-p">В этот раз вы попадете в загадочный архив Деда Мороза с колоритным интерьером, различными артефактами, старинными реликвиями, летописями и машиной времени!</p></div></li>
+    </ul>
+  </div>
+  <div class="sz-seam sz-seam--bot" aria-hidden="true"></div>
+</section>
+
+<script>
+/* «Сезон 2026-2027»: пункты всплывают, когда каждый доезжает до экрана (на телефоне
+   столбик длиной в три экрана — общий сигнал проиграл бы нижние пункты за кадром).
+   Соседи по ряду на компьютере — с задержкой 80 мс, правый чуть позже левого. */
+(function(){
+  var ul = document.querySelector('#sezon .sz-list');
+  if (!ul || !('IntersectionObserver' in window)) return;
+  var li = ul.children;
+  for (var i = 0; i < li.length; i++) li[i].style.setProperty('--d', (i % 2) * 80 + 'ms');
+  ul.classList.add('rv');
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if (!e.isIntersecting) return;
+      e.target.classList.add('on');
+      io.unobserve(e.target);
+    });
+  }, {rootMargin: '0px 0px -8% 0px'});
+  for (var j = 0; j < li.length; j++) io.observe(li[j]);
+})();
+</script>
+
 <!-- ==================== ЭКРАН 5: бронь по стартовым ценам ====================
      Большое окно заявки поверх ночного неба. Поля и кнопка — из единого блока
      заявки (.zs-*), логику отправки даёт window.zsBind — своей у экрана нет. -->
