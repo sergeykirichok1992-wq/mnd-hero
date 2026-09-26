@@ -8011,7 +8011,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   user-select:none; -webkit-user-select:none;
 }
 .vz-band{display:flex; align-items:flex-start; width:max-content; will-change:transform}
-.vz-band > *{flex:0 0 auto; margin-right:var(--vg)}
+/* Зазор справа у каждого столбца. Селектор нарочно двойной: у `.vz-card` ниже
+   стоит `margin:0` (кнопке браузер даёт свои поля), и при `.vz-band > *` он
+   перебивал зазор у больших окон — они стояли вплотную к соседнему столбику
+   (нашёл Серёга на телефоне 26.09.2026). */
+.vz-band > .vz-col, .vz-band > .vz-card{flex:0 0 auto; margin-right:var(--vg)}
 .vz-col{display:flex; flex-direction:column; justify-content:space-between; height:var(--vh)}
 /* Окно — кнопка: по нажатию открывается ролик целиком. Размер маленького:
    половина высоты ленты без зазора, ширина по 16:9. */
