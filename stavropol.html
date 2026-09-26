@@ -10955,7 +10955,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      без них последние `</figure>` и `</div>` совпадали с Нижним, и новая
      нижегородская карточка в конце ленты вставлялась в Тюмень молча, мимо
      спорных мест (проверено на клоне). После разбора спора сверить:
-     в `#cfTrack` только `pers/ty-*.webp`, подписи «N из 7» подряд. -->
+     в `#cfTrack` только `pers/ty-*.webp`, подписи «N из 7» подряд.
+
+     СТАВРОПОЛЬ (26.09.2026): ВОСЕМЬ СВОИХ КАРТОЧЕК. Серёга убрал Бабу Ягу
+     и ассистентов министра и добавил трёх героев программы Б: Снежану
+     Снеговикторовну и двух Хранителей времени (`pers/st-*.webp`, исходники
+     в `~/Desktop/новый сайт/сайт ставропроль /персонажи/`, собирает
+     `personazhi.py stavropol`). Новые стоят первыми, на месте Бабы Яги:
+     первая карточка встаёт в центр при открытии экрана. Остальные пять —
+     тюменские `ty-*.webp`, общие файлы. Разметка ленты городская:
+     тюменская правка карточек выйдет в `sinhron.py` спорной —
+     ставропольские карточки оставлять. Концовка помечена `/st-pers`
+     и `/cfTrack st`, чтобы новая тюменская карточка в конце ленты
+     не въехала сюда молча. Подписи «N из 8». -->
 <div class="cf-hold">
 <div class="cf-blik" aria-hidden="true"></div>
 <section class="cf cr" id="heroes" aria-labelledby="cfT">
@@ -10977,42 +10989,47 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="cf-frame" id="cfFrame" tabindex="0" role="region"
        aria-roledescription="карусель" aria-label="Персонажи вселенной МНД">
     <div class="cf-track" id="cfTrack">
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="1 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="1 из 8">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/ty-baba-yaga.webp"
-             alt="Деловая Баба Яга с планшетом и метлой - главная в канцелярии министерства. Теперь добрая!">
+             src="pers/st-snezhana.webp"
+             alt="Снежана Снеговикторовна в голубой шубе, с чемоданчиком и планшетом - проверяющая женщина из РусКонфетНадзора">
       </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="2 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="2 из 8">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
-             src="pers/ty-assistenty.webp"
-             alt="Ассистенты министра, две девушки с рюкзаками и большим леденцом - отвечают за порядок и тёплый приём гостей в МНД">
+             src="pers/st-hranitel.webp"
+             alt="Хранитель времени в цилиндре с шестерёнками - хранитель капсул времени, один из ведущих в доме">
       </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="3 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="3 из 8">
+        <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
+             src="pers/st-hranitelnica.webp"
+             alt="Хранитель времени в плаще, с посохом-часами - основной ведущий квеста во время уличной части">
+      </figure>
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="4 из 8">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
              src="pers/ty-ded.webp"
              alt="Дед Мороз с посохом в роскошном синем костюме и с бородой 70 см из сарлыка">
       </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="4 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="5 из 8">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
              src="pers/ty-karamelshchiki.webp"
              alt="Доктора карамельных наук - карамельщики, ведущие мастер-класса">
       </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="5 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="6 из 8">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
              src="pers/ty-luminiscena.webp"
              alt="Люминесцена в ярком костюме и со светящимися очками - художница, рисующая волшебные сказки светом">
       </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="6 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="7 из 8">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
              src="pers/ty-ministr.webp"
              alt="Министр Новогодних Дел с посохом - главный ведущий программы в доме">
       </figure>
-      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="7 из 7">
+      <figure class="cf-card" role="group" aria-roledescription="слайд" aria-label="8 из 8">
         <img loading="lazy" decoding="async" width="800" height="1430" draggable="false"
              src="pers/ty-elektroshka.webp"
              alt="Электрошка в гирляндах на стремянке - умеет создать электричество с помощью танца!">
-      </figure><!-- /ty-pers: последняя тюменская карточка -->
-    </div><!-- /cfTrack ty -->
+      </figure><!-- /st-pers: последняя ставропольская карточка -->
+    </div><!-- /cfTrack st -->
   </div>
 </section>
 </div>
