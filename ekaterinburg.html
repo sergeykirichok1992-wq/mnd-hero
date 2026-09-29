@@ -23,15 +23,16 @@
      билет от 700 (у Тюмени 800), программа без карточки «Машина времени
      для посланий», свой логотип первого экрана ekb-logo.webp и своя
      подпись под ним на телефоне ekb-mob-tekst.webp, юридические страницы
-     (oferta-ekaterinburg.html, promokody-ekaterinburg.html), реквизиты
-     и контакты партнёра, и СВОЙ ЭКРАН «ТАКАЯ ЖЕ СКАЗОЧНАЯ ЛОКАЦИЯ»
+     (politika-, soglasie-, oferta-, promokody-ekaterinburg.html), реквизиты
+     и контакты партнёра, пиксель VK Рекламы партнёра 3798045,
+     и СВОЙ ЭКРАН «ТАКАЯ ЖЕ СКАЗОЧНАЯ ЛОКАЦИЯ»
      под каруселью площадки (ищи «ЕКАТЕРИНБУРГ: ЭКРАН «ЛОКАЦИЯ»»).
 
      ВПИСАТЬ - метки в тексте на местах, где ждём данные от партнёра:
      вместимость площадки, сообщества ВК, перевозчики, дорога от центра.
 
      Пока закрыта от поисковиков (noindex): снять, когда партнёр утвердит
-     данные и появятся его политика и согласие.
+     данные. Политика и согласие есть с 29.09.2026.
 
      ОБЩИЕ ПРАВКИ СЮДА РУКАМИ НЕ ПЕРЕНОСЯТ: правится Тюмень, потом
      `python3 "sayt-nn/instrumenty/sinhron.py" ekaterinburg`. Городское
@@ -56,8 +57,8 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
 <title>Министерство Новогодних Дел - новогодняя экскурсия-шоу для детей в Екатеринбурге</title>
 <meta name="theme-color" content="#04070F">
-<!-- Черновик: партнёр ещё не подтвердил вместимость, перевозчиков и соцсети,
-     политики и согласия Екатеринбурга пока нет. Снимать вместе с решением Серёги. -->
+<!-- Черновик: партнёр ещё не подтвердил вместимость, перевозчиков и соцсети.
+     Снимать вместе с решением Серёги. -->
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="Новогодняя экскурсия-шоу для детей от Министерства Новогодних Дел в Екатеринбурге. Для классов и семей.">
 <meta property="og:type" content="website">
@@ -70,6 +71,25 @@
 <meta property="og:url" content="https://mnd-ekb.ru/">
 <link rel="canonical" href="https://mnd-ekb.ru/">
 <meta name="twitter:card" content="summary_large_image">
+<!-- ПИКСЕЛЬ VK РЕКЛАМЫ ПАРТНЁРА (29.09.2026, просьба партнёра): его кабинет VK Рекламы,
+     Екатеринбург (mnd-ekb.ru) 3798045. Код тот же, что у наших городов в v2.html, свои - номер и этот
+     комментарий. ГОРОДСКОЙ КУСОК: sinhron.py принесёт сюда номер нашего города спорным
+     местом - оставлять номер партнёра. Наш номер здесь нельзя: посетители и заявки
+     партнёра ушли бы в наш рекламный кабинет. Сторож (storozh_yaroslavl.py) пропускает
+     только номера партнёра: 3798042 (Ярославль) и 3798045 (Екатеринбург), номер 3798042
+     на этой странице был бы ошибкой города. Отметку «заявка» ставит единая форма (zsBind):
+     событие lead, цель под него партнёр заводит в своём кабинете. О пикселе - в политике
+     партнёра, п. 5.1 (собирает sayt/politika_partner.py в папке «Система партнёра»). -->
+<script>
+window.VK_PIXEL = '3798045';
+(function(){
+  if (!window.VK_PIXEL) return;
+  (window._tmr = window._tmr || []).push({id: window.VK_PIXEL, type: 'pageView', start: Date.now()});
+  var s = document.createElement('script');
+  s.async = true; s.id = 'tmr-code'; s.src = 'https://top-fwz1.mail.ru/js/code.js';
+  document.head.appendChild(s);
+})();
+</script>
 <link rel="preload" as="image" href="ty-poster.webp" fetchpriority="high" media="(min-width: 820px)">
 <link rel="preload" as="image" href="ty-poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preload" as="image" href="ekb-mob-tekst.webp?v=1" media="(max-width: 819px)">
@@ -17288,9 +17308,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       if (!ENDPOINT){ done(); return; }
       fetch(ENDPOINT, {
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(lead)
-      }).then(done, done);     /* сеть отвалилась — заявку всё равно показываем принятой:
-                                  номер уже лежит в памяти браузера, а извиняться перед
-                                  человеком за нашу сеть незачем */
+      }).then(function(r){
+        /* Пиксель VK Рекламы: отметка «заявка» (цель «Заявка с сайта», событие lead)
+           - только когда сервер заявку ПРИНЯЛ (ответ 2xx). Раньше отметка уходила до
+           отправки, и ВК считал заявками и те, что сервер отклонил (26.09.2026: по ВК
+           заявка в Нижнем была, в базе нет) - реклама училась на пустышках. В ВК уходит
+           только факт заявки - ни телефона, ни имени. Номер пикселя городской, задан
+           в <head>; нет номера - нет и отметки. */
+        try {
+          if (r && r.ok && window.VK_PIXEL) (window._tmr = window._tmr || []).push({type: 'reachGoal', id: window.VK_PIXEL, goal: 'lead'});
+        } catch (e) { /* сбой чужого счётчика не должен оставить человека на «Отправляем…» */ }
+        done();
+      }, done);     /* сеть отвалилась — заявку всё равно показываем принятой:
+                       номер уже лежит в памяти браузера, а извиняться перед
+                       человеком за нашу сеть незачем */
     });
 
     form.__zsBound = true;

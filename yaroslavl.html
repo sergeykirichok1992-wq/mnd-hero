@@ -17,7 +17,7 @@
      Своё у Ярославля: город и адрес площадки (пос. Пятовское, 4-я Пятовская, 16),
      метаданные, юридические страницы
      (politika-yaroslavl.html, soglasie-yaroslavl.html, oferta-yaroslavl.html),
-     реквизиты и контакты партнёра.
+     реквизиты и контакты партнёра, пиксель VK Рекламы партнёра 3798042.
 
      ВПИСАТЬ - метки в тексте на местах, где ждём данные партнёра:
      телефон, соцсети, реквизиты ИП, офис, перевозчики.
@@ -67,6 +67,25 @@
 <meta property="og:url" content="https://mnd-nn.ru/yaroslavl.html">
 <link rel="canonical" href="https://mnd-nn.ru/yaroslavl.html">
 <meta name="twitter:card" content="summary_large_image">
+<!-- ПИКСЕЛЬ VK РЕКЛАМЫ ПАРТНЁРА (29.09.2026, просьба партнёра): его кабинет VK Рекламы,
+     Ярославль (mnd-yar.ru) 3798042. Код тот же, что у наших городов в v2.html, свои - номер и этот
+     комментарий. ГОРОДСКОЙ КУСОК: sinhron.py принесёт сюда номер нашего города спорным
+     местом - оставлять номер партнёра. Наш номер здесь нельзя: посетители и заявки
+     партнёра ушли бы в наш рекламный кабинет. Сторож (storozh_yaroslavl.py) пропускает
+     только номера партнёра: 3798042 (Ярославль) и 3798045 (Екатеринбург), номер 3798045
+     на этой странице был бы ошибкой города. Отметку «заявка» ставит единая форма (zsBind):
+     событие lead, цель под него партнёр заводит в своём кабинете. О пикселе - в политике
+     партнёра, п. 5.1 (собирает sayt/politika_partner.py в папке «Система партнёра»). -->
+<script>
+window.VK_PIXEL = '3798042';
+(function(){
+  if (!window.VK_PIXEL) return;
+  (window._tmr = window._tmr || []).push({id: window.VK_PIXEL, type: 'pageView', start: Date.now()});
+  var s = document.createElement('script');
+  s.async = true; s.id = 'tmr-code'; s.src = 'https://top-fwz1.mail.ru/js/code.js';
+  document.head.appendChild(s);
+})();
+</script>
 <link rel="preload" as="image" href="poster.webp" fetchpriority="high" media="(min-width: 820px)">
 <link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15973,9 +15992,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       if (!ENDPOINT){ done(); return; }
       fetch(ENDPOINT, {
         method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(lead)
-      }).then(done, done);     /* сеть отвалилась — заявку всё равно показываем принятой:
-                                  номер уже лежит в памяти браузера, а извиняться перед
-                                  человеком за нашу сеть незачем */
+      }).then(function(r){
+        /* Пиксель VK Рекламы: отметка «заявка» (цель «Заявка с сайта», событие lead)
+           - только когда сервер заявку ПРИНЯЛ (ответ 2xx). Раньше отметка уходила до
+           отправки, и ВК считал заявками и те, что сервер отклонил (26.09.2026: по ВК
+           заявка в Нижнем была, в базе нет) - реклама училась на пустышках. В ВК уходит
+           только факт заявки - ни телефона, ни имени. Номер пикселя городской, задан
+           в <head>; нет номера - нет и отметки. */
+        try {
+          if (r && r.ok && window.VK_PIXEL) (window._tmr = window._tmr || []).push({type: 'reachGoal', id: window.VK_PIXEL, goal: 'lead'});
+        } catch (e) { /* сбой чужого счётчика не должен оставить человека на «Отправляем…» */ }
+        done();
+      }, done);     /* сеть отвалилась — заявку всё равно показываем принятой:
+                       номер уже лежит в памяти браузера, а извиняться перед
+                       человеком за нашу сеть незачем */
     });
 
     form.__zsBound = true;
