@@ -12,9 +12,13 @@
 
   План и все принятые решения - в основном репозитории «МНД AI»:
   plans/2026-09-19-propusk.md.
-  Шаблон и шрифт лежат рядом: propusk/shablon.webp, propusk/charis-bold.woff2
-  (Charis SIL Bold, лицензия OFL - propusk/OFL.txt). Шаблон поменяли -
+  Шаблон и шрифт лежат рядом: propusk/shablon.webp, propusk/charis-regular.woff2
+  (Charis SIL Regular, лицензия OFL - propusk/OFL.txt). Шаблон поменяли -
+  собрать его заново скриптом sayt-nn/instrumenty/propusk_shablon.py (вырезает
+  круг под фото, стирает впечатанный абзац, печатает числа круга) и
   пересчитать числа в объекте PASS в начале скрипта, больше нигде.
+  Шаблон с 01.10.2026 - «исходник 1.png» Серёги (~/Desktop/пропуск/), образец
+  расстановки имени и даты - «референс.png» там же.
 
   Одна страница на все домены: mnd-nn.ru, mnd-kazan.ru, mnd-tumen.ru.
   В меню не стоит, поисковикам закрыта (noindex).
@@ -55,7 +59,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <!-- Шрифт пропуска грузим заранее: на холсте он появится только после загрузки,
      а человек может нажать «Сгенерировать» уже через минуту после входа -->
-<link rel="preload" href="propusk/charis-bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="propusk/charis-regular.woff2" as="font" type="font/woff2" crossorigin>
 <!-- заголовок - первое, что видно: без предзагрузки он мигает запасным шрифтом -->
 <link rel="preload" href="propusk/display.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="propusk/display-italic.woff2" as="font" type="font/woff2" crossorigin>
@@ -75,12 +79,14 @@
   font-family:"Propusk Text"; font-style:normal; font-weight:400; font-display:swap;
   src:url(cr-roboto.woff) format("woff");
 }
-/* Шрифт картинки пропуска - Charis SIL Bold, урезанный до латиницы и
+/* Шрифт картинки пропуска - Charis SIL Regular, урезанный до латиницы и
    кириллицы. Имя «Propusk Serif» - то же, что зашито внутри файла: «Charis»
-   и «SIL» по лицензии OFL нельзя ставить на изменённую версию шрифта. */
+   и «SIL» по лицензии OFL нельзя ставить на изменённую версию шрифта.
+   Обычное начертание, не жирное: абзац шаблона 01.10.2026 набран Charter
+   обычным, и Charis того же рисунка совпал с ним по ширине строк до пикселя. */
 @font-face{
-  font-family:"Propusk Serif"; font-style:normal; font-weight:700; font-display:block;
-  src:url(propusk/charis-bold.woff2) format("woff2");
+  font-family:"Propusk Serif"; font-style:normal; font-weight:400; font-display:block;
+  src:url(propusk/charis-regular.woff2) format("woff2");
 }
 /* Шрифт заголовка страницы - Playfair Display (OFL), прямой и курсив
    жирностью 700. Имя своё: см. комментарий в начале файла. */
@@ -585,7 +591,7 @@ body{
   width:min(100%, 420px, calc((100svh - 250px) * 9 / 16));
   min-width:min(100%, 280px);
   /* кружок шаблона прозрачный - подложка видна только в нём */
-  background:radial-gradient(circle at 49.2% 21.5%, #25306E 0%, #141A48 12%, #0B1030 26%);
+  background:radial-gradient(circle at 50% 19.67%, #25306E 0%, #141A48 12%, #0B1030 26%);   /* центр круга шаблона: 540/1080, 377,7/1920 */
   box-shadow:0 0 0 1px rgba(227,179,78,.28), 0 40px 90px -40px rgba(0,0,0,.95), 0 0 120px -40px rgba(108,43,217,.55)}
 @media (min-width:1024px){
   .pv-frame{width:100%; min-width:0}
@@ -593,7 +599,7 @@ body{
 .pv-frame img{display:block; width:100%; height:auto}
 .pv-ph{opacity:.4; filter:saturate(.75)}
 .pv.has .pv-ph,.pv.has .pv-cap{display:none}
-.pv-cap{position:absolute; left:49.2%; top:21.5%; width:40%; margin:0; transform:translate(-50%,-50%);
+.pv-cap{position:absolute; left:50%; top:19.67%; width:40%; margin:0; transform:translate(-50%,-50%);
   text-align:center; font-family:var(--head); font-weight:700; font-size:clamp(14px,1.2vw,17px);
   line-height:1.2; letter-spacing:.04em; text-transform:uppercase; color:#EBD3A0}   /* на тёмном шаблоне - светлое золото */
 /* данные поменяли после сборки - картинку гасим и закрываем плашкой, чтобы
@@ -901,7 +907,7 @@ body{
       <aside class="pv" id="pv" aria-labelledby="pvH">
         <h2 class="vh" id="pvH">Готовый пропуск</h2>
         <div class="pv-frame">
-          <img class="pv-ph" src="propusk/shablon.webp" width="1080" height="1920" alt="" decoding="async">
+          <img class="pv-ph" src="propusk/shablon.webp?v=2" width="1080" height="1920" alt="" decoding="async">
           <p class="pv-cap" aria-hidden="true">Здесь появится пропуск</p>
           <img class="pv-img" id="pvImg" width="1080" height="1920" alt="" hidden>
           <div class="pv-stale" id="pvStale" hidden><p>Вы изменили данные - нажмите «Сгенерировать» ещё раз</p></div>
@@ -947,28 +953,41 @@ body{
 'use strict';
 
 /* ---------- ШАБЛОН ----------
-   Шаблон поменяли - пересчитать эти числа (замер: plans/2026-09-19-propusk.md,
-   фаза 1). Все координаты в пикселях картинки 1080x1920. */
+   Шаблон 01.10.2026 - «исходник 1.png» Серёги, собран скриптом
+   sayt-nn/instrumenty/propusk_shablon.py. Расстановка имени и даты - по его
+   образцу «референс.png»: имя над абзацем, дата над линией, обе зелёные.
+   Шаблон поменяли - пересчитать эти числа. Все координаты в пикселях
+   картинки 1080x1920. Кегли и строки сняты так: Charis обычный подгонялся
+   по ширине строк исходника и образца, линия шрифта - по верху и низу букв.
+   Метка ?v=2 в адресе обязательна: файл заменён под тем же именем, и без
+   неё браузер отдал бы прежний шаблон из кеша. Следующая замена - ?v=3. */
 var PASS = {
-  template: 'propusk/shablon.webp',
+  template: 'propusk/shablon.webp?v=2',
   W: 1080, H: 1920,
   bg: '#0B1030',                      // под фото: если края кружка полупрозрачные, видно тёмное, а не чёрное
   font: '"Propusk Serif", Georgia, "Times New Roman", serif',
-  // кружок: центр дырки по серому диску макета, фото кладём на 3 px шире
-  // дырки, чтобы под карамельной рамкой не осталось щели
-  circle: { cx: 531, cy: 412, rHole: 237.5, rPhoto: 240.5 },
-  // абзац в рамке: кегль подобран под ширину строк макета (Charis шире Charter)
-  para: { cx: 540, baseline: 1171, size: 42.2, line: 52.25, color: '#FFFFFF',
-          m: ['Приглашен самим министром', 'новогодних дел на встречу с', 'настоящим Дедом Морозом'],
-          f: ['Приглашена самим министром', 'новогодних дел на встречу с', 'настоящим Дедом Морозом'] },
-  // белая линия под имя (для справки: имя и дата стоят по её центру)
-  line: { x1: 300, x2: 789, y: 1421 },
-  // имя: золото рамки, подгонка кегля по ширине; не влезло и на минимуме - две строки.
-  // maxW 520 - чуть шире линии бланка (489 px, x 300..789): при 600 длинное имя
-  // висело за её концами и подходило к фонарю справа (x от 834)
-  name: { cx: 544.5, baseline: 1406, maxW: 520, max: 60, min: 34, two: 44, color: '#FFDA77' },
-  // дата: ниже 1464 не опускать - там начинается росчерк подписи Деда Мороза
-  date: { cx: 544.5, baseline: 1464, maxW: 560, size: 36, min: 28, color: '#FFFFFF' }
+  weight: 400,
+  // кружок: белый диск шаблона, подобран скриптом по краю в 360 точках.
+  // Дырка на 1,2 px шире белого края, фото - ещё на 2 px шире, чтобы под
+  // золотым кольцом не осталось щели
+  circle: { cx: 540, cy: 377.7, rHole: 286.5, rPhoto: 288.5 },
+  // абзац в рамке: из шаблона стёрт, набирается здесь - он зависит от рода.
+  // Текст мальчика - как в исходнике Серёги, буква в букву («Звездной» без ё -
+  // так у него). У девочки «Приглашена» и «участницей». Кегль 42,1 - ширина
+  // первой строки 599 px, как в исходнике
+  para: { cx: 540, baseline: 1231, size: 42.1, line: 52, color: '#FFFFFF',
+          m: ['Приглашен самим министром', 'новогодних дел стать', 'участником «Звездной смены»'],
+          f: ['Приглашена самим министром', 'новогодних дел стать', 'участницей «Звездной смены»'] },
+  // белая линия под датой (для справки)
+  line: { x1: 296, x2: 783, y: 1433 },
+  // Имя над абзацем, зелёное, как на образце (#A4C28B - замер по буквам).
+  // Центр - 540, как у абзаца и линии: на образце имя и дата стоят на 14 px
+  // левее, на глаз. Кегль образца 60 - это «Сергей Киричок»; длинное имя
+  // уменьшается до 36, не влезло и так - две строки (верхняя уходит вверх,
+  // до пунктирной рамки ещё ~25 px)
+  name: { cx: 540, baseline: 1158, maxW: 640, max: 60, min: 36, two: 42, color: '#A4C28B' },
+  // дата над линией: «12.12.2026 в 12:30», как на образце
+  date: { cx: 540, baseline: 1415, maxW: 470, size: 38, min: 30, color: '#A4C28B' }
 };
 
 /* ---------- СЕЗОН ----------
@@ -1735,7 +1754,7 @@ loadTemplate().catch(function(){});   // заранее: к нажатию ша�
 function fontReady(){
   if (!document.fonts || !document.fonts.load) return Promise.resolve(false);
   return Promise.race([
-    document.fonts.load('700 48px "Propusk Serif"').then(function(l){ return l.length > 0; }, function(){ return false; }),
+    document.fonts.load(PASS.weight + ' 48px "Propusk Serif"').then(function(l){ return l.length > 0; }, function(){ return false; }),
     new Promise(function(r){ setTimeout(function(){ r(false); }, 3000); })
   ]);
 }
@@ -1745,7 +1764,7 @@ fontReady();
 function fontRetry(){
   if (typeof FontFace !== 'function' || !document.fonts || !document.fonts.add) return Promise.resolve(false);
   var ff;
-  try { ff = new FontFace('Propusk Serif', 'url(propusk/charis-bold.woff2)', { weight: '700', style: 'normal' }); }
+  try { ff = new FontFace('Propusk Serif', 'url(propusk/charis-regular.woff2)', { weight: String(PASS.weight), style: 'normal' }); }
   catch(_){ return Promise.resolve(false); }
   return Promise.race([
     ff.load().then(function(f){ document.fonts.add(f); return true; }, function(){ return false; }),
@@ -1756,7 +1775,7 @@ function fontEnsure(){
   return fontReady().then(function(ok){ return ok || fontRetry(); });
 }
 
-function fontPx(s){ return '700 ' + s + 'px ' + PASS.font; }
+function fontPx(s){ return PASS.weight + ' ' + s + 'px ' + PASS.font; }
 // самый крупный кегль из [min..max] с шагом 0,5, при котором строка влезает в maxW
 function fitSize(ctx, text, max, min, maxW){
   for (var s = max; s >= min; s -= 0.5){
@@ -1788,9 +1807,10 @@ function drawName(ctx, name){
   ctx.fillText(best.b, n.cx, n.baseline, n.maxW);
   ctx.fillText(best.a, n.cx, n.baseline - Math.round(s2 * 1.16), n.maxW);
 }
+// «12.12.2026 в 12:30» - как на образце Серёги 01.10.2026
 function dateText(snap){
-  var d = snap.date;
-  return d.d + ' ' + MONTHS_GEN[d.m] + ' ' + d.y + ' в ' + snap.hh + ':' + snap.mm;
+  var d = snap.date, two = function(n){ return (n < 10 ? '0' : '') + n; };
+  return two(d.d) + '.' + two(d.m + 1) + '.' + d.y + ' в ' + snap.hh + ':' + snap.mm;
 }
 // Рисуем только из снимка формы, сделанного в момент нажатия: сборка ждёт
 // шрифт до нескольких секунд, и правка за это время не должна попасть
