@@ -2551,6 +2551,71 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .sv .zs-price{color:#3F4F76}
 .sv .zs-price b{color:#E5534B}   /* светлый красный на бланке даёт 2,3 к 1, этот - 3,3 */
 
+/* ---------- СЧЁТЧИК ДО ПОВЫШЕНИЯ ЦЕНЫ (30.09.2026) ----------
+   Просьба Серёги: «в формах счётчики обратного отсчёта до повышения цены».
+   Стоит сразу под строкой цены в каждой открытой форме - человек уже смотрит
+   на цифры, и рядом с ними видно, сколько эти цифры ещё продержатся.
+
+   В РАЗМЕТКЕ ЕГО НЕТ. Блок вставляет скрипт «ЦЕНА В ФОРМАХ СЧИТАЕТСЯ ОТ ДАТЫ»
+   за каждой `.zs-price`, и только пока впереди есть повышение. Без JS счётчика
+   нет вовсе: замершие цифры врали бы. Во всплывающем окне его нет по той же
+   причине, что и цены (Серёга, 12.09.2026, см. блок выше).
+
+   Ячейки - «тёплое стекло с золотой кромкой», рецепт плашек, который Серёга
+   просил запомнить 26.09.2026: заливка в несколько процентов, волосяная кромка
+   внутренней тенью, раз в 10 с по ячейкам волной проходит блик (`--sd` ставит
+   скрипт). Блик крутится, только пока счётчик на экране (класс `.on`).
+   Цифры - Blogger Sans, как заголовок формы. Ширина ячейки жёсткая: иначе ряд
+   дёргался бы каждую секунду, когда «1» сменяется на «0». */
+.zs-cd{margin:clamp(16px,1.6vw,22px) auto 0; text-align:center}
+.zs-cd-lab{margin:0 0 clamp(9px,.9vw,12px); font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(11.5px,.9vw,13px); font-weight:600; letter-spacing:.2em;
+  text-transform:uppercase; color:#E3B34E}
+.zs-cd-row{display:inline-flex; gap:clamp(8px,.8vw,12px)}
+.zs-cd-c{position:relative; isolation:isolate; overflow:hidden;
+  display:flex; flex-direction:column; align-items:center;
+  width:clamp(66px,5.6vw,88px); padding:clamp(10px,.9vw,13px) 0 clamp(8px,.75vw,11px);
+  border-radius:18px;
+  background:linear-gradient(160deg, rgba(255,228,184,.09) 0%, rgba(255,210,150,.04) 46%, rgba(132,74,214,.08) 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,214,150,.22), inset 0 1px 0 rgba(255,255,255,.08),
+             0 18px 36px -24px rgba(0,0,0,.85)}
+.zs-cd-c::after{content:''; position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(105deg, rgba(255,236,190,0) 34%, rgba(255,236,190,.09) 47%,
+    rgba(255,250,232,.16) 50%, rgba(255,236,190,.09) 53%, rgba(255,236,190,0) 66%);
+  transform:translateX(-110%)}
+.zs-cd.on .zs-cd-c::after{animation:zsCdSheen 10s ease-in-out infinite; animation-delay:var(--sd,0s)}
+@keyframes zsCdSheen{0%,74%{transform:translateX(-110%)} 100%{transform:translateX(110%)}}
+.zs-cd-n{display:block; font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(28px,2.6vw,42px); line-height:1; letter-spacing:.02em;
+  font-variant-numeric:tabular-nums; color:#fff}
+.zs-cd-u{display:block; margin-top:clamp(5px,.5vw,7px); font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(10.5px,.8vw,12px); font-weight:600; letter-spacing:.06em;
+  text-transform:uppercase; color:#9FB2D4}
+/* цифра сменилась - чуть опускается сверху на место */
+.zs-cd.on .zs-cd-n.tk{animation:zsCdTick .38s cubic-bezier(.2,.7,.2,1)}
+@keyframes zsCdTick{from{transform:translateY(-.14em); opacity:.35} to{transform:none; opacity:1}}
+/* на светлом бланке стекло не видно - там белая плашка с той же золотой
+   кромкой, а цифры цветом заголовка бланка */
+.sv .zs-cd-lab{color:#A96D0D}
+.sv .zs-cd-c{background:linear-gradient(160deg,#FFFFFF 0%,#FDF8EE 60%,#F4F0FC 100%);
+  box-shadow:inset 0 0 0 1px rgba(169,109,13,.3), 0 14px 30px -18px rgba(0,27,113,.35)}
+.sv .zs-cd-c::after{background:linear-gradient(105deg, rgba(227,179,78,0) 34%, rgba(227,179,78,.12) 47%,
+    rgba(227,179,78,.22) 50%, rgba(227,179,78,.12) 53%, rgba(227,179,78,0) 66%)}
+.sv .zs-cd-n{color:#001B71}
+.sv .zs-cd-u{color:#4E5D82}
+/* до 380 px четыре ячейки по 66 не влезают в окно формы */
+@media (max-width:380px){
+  .zs-cd-lab{letter-spacing:.12em}   /* при .2em надпись на 320 px ломалась на две строки */
+  .zs-cd-row{gap:6px}
+  .zs-cd-c{width:60px; border-radius:15px}
+  .zs-cd-n{font-size:26px}
+  .zs-cd-u{font-size:10px; letter-spacing:.03em}
+}
+/* селекторы отмены не слабее отменяемых → lessons/reduced-motion-perebivaet-animation-name.md */
+@media (prefers-reduced-motion: reduce){
+  .zs-cd.on .zs-cd-c::after, .zs-cd.on .zs-cd-n.tk{animation:none}
+}
+
 .zs-step[hidden]{display:none}
 .zs-form{margin-top:clamp(20px,2.2vw,25.5px); text-align:left}
 .zs-f + .zs-f{margin-top:clamp(14px,1.5vw,17px)}
@@ -11210,7 +11275,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
            sizes="(max-width:559px) 150vw, (max-width:1279px) 94vw, min(94vw, 1400px)"
            width="2774" height="151" loading="lazy" decoding="async" alt="" aria-hidden="true">
       <p class="sv-eyebrow">Сезон 2026/27 · Ярославль</p>
-      <h2 class="sv-t" id="sv2T">Успейте забрать лучшие даты<br class="sv-br"> <b>по цене сентября!</b></h2>
+      <h2 class="sv-t" id="sv2T">Успейте забрать лучшие даты<br class="sv-br"> <b>по цене <span class="zs-mes">сентября</span>!</b></h2>
       <p class="zs-price">от <b>1390 руб</b> до <b>1790 руб</b> для групп</p>
       <p class="sv-lede">Мы перезвоним Вам в течение <b>30&nbsp;минут</b>, предложим лучшие даты
         и цены, а также <b>отправим в <span class="mx">МАХ</span></b> или ТГ
@@ -11538,7 +11603,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
      ЦЕНА В РАЗМЕТКЕ - СЕНТЯБРЬСКАЯ, и это не заглушка: без JS человек и
      поисковик видят настоящую цену, а не пустое место. Скрипт в конце
-     страницы переписывает её на текущую ступень (+100 ₽ каждого 1 числа).
+     страницы переписывает её на текущую ступень (+100 ₽ на каждой; даты
+     ступеней - в STEPS скрипта «ЭКРАН 15: ЦЕНЫ ПО КАЛЕНДАРЮ»).
 
      МЕНЯЕШЬ ЦЕНЫ - правь data-base у карточки (это цена СЕНТЯБРЯ, от неё
      скрипт считает все остальные) и заодно сентябрьские числа в разметке.
@@ -11601,7 +11667,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1390&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1490&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 15 октября</span><b>1490&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -11630,7 +11696,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1590&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1690&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 15 октября</span><b>1690&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -11658,7 +11724,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1690&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1790&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 15 октября</span><b>1790&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -11688,14 +11754,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1790&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1890&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 15 октября</span><b>1890&nbsp;₽</b></p>
           </div>
         </div>
       </article>
     </div>
 
     <div class="pr-notes">
-      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b> каждого 1 числа месяца!
+      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b>&nbsp;- 15&nbsp;октября, 1&nbsp;ноября и 1&nbsp;декабря!
         Чем раньше забронируете, тем дешевле&nbsp;- дата за вами закрепляется по той цене, которая была в день брони.</p>
 
       <div class="pr-two">
@@ -13078,7 +13144,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
            sizes="(max-width:559px) 150vw, (max-width:1279px) 94vw, min(94vw, 1400px)"
            width="2774" height="151" loading="lazy" decoding="async" alt="" aria-hidden="true">
       <p class="sv-eyebrow">Сезон 2026/27 · Ярославль</p>
-      <h2 class="sv-t" id="svT">Успейте забрать лучшие даты<br class="sv-br"> <b>по цене сентября!</b></h2>
+      <h2 class="sv-t" id="svT">Успейте забрать лучшие даты<br class="sv-br"> <b>по цене <span class="zs-mes">сентября</span>!</b></h2>
       <p class="zs-price">от <b>1390 руб</b> до <b>1790 руб</b> для групп</p>
       <p class="sv-lede">Мы перезвоним Вам в течение <b>30&nbsp;минут</b>, предложим лучшие даты
         и цены, а также <b>отправим в <span class="mx">МАХ</span></b> или ТГ
@@ -17426,6 +17492,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    и своего сервера у неё нет. Поэтому подстраховка простая: пока сегодняшний
    день раньше первой ступени, показывается первая, а не отрицательная. Цена
    всё равно называется менеджером по телефону, экран её только показывает.
+   Часовой пояс посетителя при этом не важен: ступени и «сейчас» считаются
+   по Москве (30.09.2026 - с тех пор, как повышение бывает не в полночь).
 
    ПОСЛЕ 1 ДЕКАБРЯ повышений больше нет: строка «С 1 …» у карточек прячется,
    а объяснение под таблицей меняется на «это финальные цены сезона». */
@@ -17437,18 +17505,28 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      цене. Названия месяцев в родительном падеже - они идут в строку «С 1 …».
      adult - прибавка к взрослому билету: в октябре он не дорожает, дальше
      +100 с 1 ноября и ещё +100 с 1 декабря (решения Серёги: Нижний и Казань -
-     17.09.2026, все города - 24.09.2026; так же в договоре и в боте). */
+     17.09.2026, все города - 24.09.2026; так же в договоре и в боте).
+     t - МОСКОВСКОЕ время начала ступени: Date.UTC(год, месяц с нуля, число, час).
+     Час пишется, только если повышение не в полночь. Первое повышение
+     (Серёга, 30.09.2026): Нижний и Казань - 1 октября в 19:00, остальные
+     города - 15 октября; дальше у всех 1 ноября и 1 декабря. */
   var STEPS = [
     { t: Date.UTC(2026, 8, 1), add:   0, adult:   0, from: 'сентября' },
-    { t: Date.UTC(2026, 9, 1), add: 100, adult:   0, from: 'октября'  },
+    { t: Date.UTC(2026, 9,15), add: 100, adult:   0, from: 'октября'  },   /* 15 октября (Серёга, 30.09.2026); у Нижнего и Казани - 1 октября в 19:00 */
     { t: Date.UTC(2026,10, 1), add: 200, adult: 100, from: 'ноября'   },
     { t: Date.UTC(2026,11, 1), add: 300, adult: 200, from: 'декабря'  }
   ];
 
-  var n = new Date();
-  var today = Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
+  /* «15 октября», «1 октября в 19:00» - когда начинается ступень; берётся из t. */
+  function den(s){
+    var d = new Date(s.t), h = d.getUTCHours();
+    return d.getUTCDate() + ' ' + s.from + (h ? ' в ' + h + ':00' : '');
+  }
+
+  /* московские часы в той же записи, что t у ступеней */
+  var seychas = Date.now() + 3 * 3600000;
   var i = 0;
-  for(var k = 0; k < STEPS.length; k++){ if(today >= STEPS[k].t) i = k; }
+  for(var k = 0; k < STEPS.length; k++){ if(seychas >= STEPS[k].t) i = k; }
 
   var cur  = STEPS[i];
   var prev = i > 0 ? STEPS[i - 1] : null;
@@ -17477,7 +17555,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     if(elNext){
       if(next){
-        elNext.innerHTML = '<span>С 1 ' + next.from + '</span><b>' + money(base + next.add) + '</b>';
+        elNext.innerHTML = '<span>С ' + den(next) + '</span><b>' + money(base + next.add) + '</b>';
         elNext.hidden = false;
       } else {
         elNext.hidden = true;
@@ -17504,7 +17582,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* Какие повышения взрослого ещё впереди: «на 100 ₽ с 1 ноября и ещё на 100 ₽ с 1 декабря». */
   var vzrVperedi = [], vzrPred = cur;
   for(var j = i + 1; j < STEPS.length; j++){
-    if(STEPS[j].adult > vzrPred.adult) vzrVperedi.push('на ' + (STEPS[j].adult - vzrPred.adult) + '&nbsp;₽ с 1 ' + STEPS[j].from);
+    if(STEPS[j].adult > vzrPred.adult) vzrVperedi.push('на ' + (STEPS[j].adult - vzrPred.adult) + '&nbsp;₽ с ' + den(STEPS[j]));
     vzrPred = STEPS[j];
   }
   [].forEach.call(document.querySelectorAll('.pr-grow-adult'), function(p){
@@ -17517,14 +17595,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      попросил 10.09.2026 сказать короче - «растут каждого 1 числа месяца!».
      Написать его намертво в разметке всё равно нельзя: после 1 декабря
      повышений не остаётся, и обещание роста стало бы неправдой - тогда
-     строка меняется на финальную. */
+     строка меняется на финальную.
+     ИСКЛЮЧЕНИЕ - ступень не с 1-го (15 октября у всех, кроме Нижнего и Казани):
+     пока она впереди, «каждого 1 числа» было бы неправдой, и строка называет
+     даты повышений. */
+  var vperedi = STEPS.slice(i + 1);
+  var ne1 = vperedi.some(function(s){ return new Date(s.t).getUTCDate() !== 1; });
+  var daty = vperedi.map(den);
+  var spisok = daty.length > 1 ? daty.slice(0, -1).join(', ') + ' и ' + daty[daty.length - 1] : daty[0];
   var grow = sec.querySelector('.pr-grow');
   if(grow){
-    grow.innerHTML = next
-      ? 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца! Чем раньше забронируете, ' +
-        'тем дешевле - дата за вами закрепляется по той цене, которая была в день брони.'
-      : 'Это финальные цены сезона: последнее повышение было 1 декабря. ' +
-        'Дата за вами закрепляется по той цене, которая была в день брони.';
+    grow.innerHTML = !next
+      ? 'Это финальные цены сезона: последнее повышение было 1 декабря. ' +
+        'Дата за вами закрепляется по той цене, которая была в день брони.'
+      : (ne1 ? 'Цены растут на <b>100 ₽</b> - ' + spisok + '! '
+             : 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца! ') +
+        'Чем раньше забронируете, тем дешевле - дата за вами закрепляется по той цене, которая была в день брони.';
   }
 })();
 </script>
@@ -18567,19 +18653,22 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 (function(){
   'use strict';
 
-  /* дата, с которой действует цена -> [детский «от», детский «до»] */
+  /* дата (и час, если не полночь) по Москве, с которой действует цена ->
+     [детский «от», детский «до»]. Час пишется так: '2026-10-01T19:00'. */
   var PRAJS = [
     ['2026-09-01', 1390, 1790],
-    ['2026-10-01', 1490, 1890],
+    ['2026-10-15', 1490, 1890],   /* 15 октября (Серёга, 30.09.2026); у Нижнего и Казани - 1 октября в 19:00 */
     ['2026-11-01', 1590, 1990],
     ['2026-12-01', 1690, 2090]
   ];
 
+  /* +03:00 - Москва: повышение наступает по нашему времени */
+  function msk(s){ return new Date(s + (s.length > 10 ? '' : 'T00:00') + ':00+03:00'); }
+
   function ceny(d){
     var p = PRAJS[0];
     for (var i = 0; i < PRAJS.length; i++){
-      /* +03:00 - Москва: граница месяца наступает по нашему времени */
-      if (d >= new Date(PRAJS[i][0] + 'T00:00:00+03:00')) p = PRAJS[i];
+      if (d >= msk(PRAJS[i][0])) p = PRAJS[i];
     }
     return p;
   }
@@ -18595,13 +18684,130 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     }
   }
 
-  postavit(new Date());
+  /* ---------- СЧЁТЧИК ДО ПОВЫШЕНИЯ И МЕСЯЦ В ЗАГОЛОВКЕ (30.09.2026) ----------
+     Просьба Серёги: «в формах счётчики обратного отсчёта до повышения цены».
+     Даты повышений - те же строки PRAJS, отдельной таблицы нет: где там
+     15 октября, счётчик сам считает до 15-го, где 19:00 - до 19:00. Стили - блок «СЧЁТЧИК
+     ДО ПОВЫШЕНИЯ ЦЕНЫ» рядом со стилями `.zs-price`.
+
+     Счётчик ставится под каждой строкой `.zs-price`: появится у формы строка
+     цены - появится и он. Повышений впереди нет (после 1 декабря) - его нет.
+     Дошёл до нуля - скрипт сам переставляет цены и месяц и считает до
+     следующего повышения, страницу перезагружать не надо.
+
+     МЕСЯЦ В ЗАГОЛОВКЕ «по цене сентября!» (`.zs-mes`) тоже отсюда: с 1 октября
+     «сентября» было бы неправдой. Берётся месяц ступени, которая действует
+     сейчас, поэтому где повышение 15 октября, до 15-го честно остаётся «сентября».
+
+     Часы - те же, что у цены: браузерные, поправленные по серверу, если
+     разошлись больше чем на 3 секунды. */
+  var sdvig = 0;                        /* поправка к часам браузера, мс */
+  function seychas(){ return new Date(Date.now() + sdvig); }
+
+  function sleduyushchee(d){            /* ближайшее повышение после d или null */
+    for (var i = 0; i < PRAJS.length; i++){
+      var g = msk(PRAJS[i][0]);
+      if (g > d) return g;
+    }
+    return null;
+  }
+
+  var MES = ['января','февраля','марта','апреля','мая','июня','июля',
+             'августа','сентября','октября','ноября','декабря'];
+  function mesyac(d){
+    var m = MES[parseInt(ceny(d)[0].slice(5, 7), 10) - 1];
+    var uzly = document.querySelectorAll('.zs-mes');
+    for (var i = 0; i < uzly.length; i++){
+      if (uzly[i].textContent !== m) uzly[i].textContent = m;
+    }
+  }
+
+  var EDIN = [['день','дня','дней'], ['час','часа','часов'],
+              ['минута','минуты','минут'], ['секунда','секунды','секунд']];
+  function skl(n, f){
+    var a = n % 100, b = n % 10;
+    if (a > 10 && a < 20) return f[2];
+    return b === 1 ? f[0] : (b > 1 && b < 5 ? f[1] : f[2]);
+  }
+
+  var bloki = [], ceni = document.querySelectorAll('.zs-price');
+  for (var c = 0; c < ceni.length; c++){
+    var el = document.createElement('div');
+    el.className = 'zs-cd';
+    el.setAttribute('role', 'timer');
+    var h = '<p class="zs-cd-lab">До повышения цены осталось</p><div class="zs-cd-row">';
+    /* блик проходит четыре ячейки за 10 с - волной, по 2,5 с на ячейку */
+    for (var k = 0; k < 4; k++){
+      h += '<span class="zs-cd-c" style="--sd:' + (k * 2.5) + 's">' +
+           '<b class="zs-cd-n">00</b><span class="zs-cd-u"></span></span>';
+    }
+    el.innerHTML = h + '</div>';
+    el.hidden = true;                   /* покажет первый тик, если есть до чего считать */
+    ceni[c].parentNode.insertBefore(el, ceni[c].nextSibling);
+    bloki.push(el);
+  }
+
+  /* блик и «прыжок» цифры крутятся, только пока счётчик на экране */
+  if (window.IntersectionObserver){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ e.target.classList.toggle('on', e.isIntersecting); });
+    });
+    bloki.forEach(function(b){ io.observe(b); });
+  }
+
+  var tekG = -1, tajmer = 0;
+  function tik(){
+    clearTimeout(tajmer);
+    var d = seychas(), g = sleduyushchee(d);
+
+    /* перешагнули повышение (или первый запуск) - переставить цены и месяц */
+    if ((g ? g.getTime() : 0) !== tekG){
+      tekG = g ? g.getTime() : 0;
+      postavit(d);
+      mesyac(d);
+    }
+    if (!g){
+      bloki.forEach(function(b){ b.hidden = true; });
+      return;
+    }
+
+    var s = Math.floor((g - d) / 1000);
+    var ch = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
+    bloki.forEach(function(b){
+      var yach = b.querySelectorAll('.zs-cd-c');
+      for (var k = 0; k < 4; k++){
+        var n = yach[k].firstChild, t = (ch[k] < 10 ? '0' : '') + ch[k];
+        if (n.textContent !== t){
+          n.textContent = t;
+          if (!b.hidden){ n.classList.remove('tk'); void n.offsetWidth; n.classList.add('tk'); }
+        }
+        yach[k].lastChild.textContent = skl(ch[k], EDIN[k]);
+      }
+      b.hidden = false;
+    });
+
+    /* следующий тик - ровно на границе секунды, чтобы счёт не «плыл» */
+    tajmer = setTimeout(tik, 1000 - (Date.now() + sdvig) % 1000 + 15);
+  }
+
+  tik();
+
+  /* вкладка была в фоне - браузер придерживал таймер; догоняем сразу */
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) tik(); });
 
   /* переспрашиваем дату у сервера; ответ на HEAD этой же страницы дешёвый */
   try {
     fetch(location.pathname, {method:'HEAD', cache:'no-store'}).then(function(r){
       var h = r && r.headers && r.headers.get('Date');
-      if (h) postavit(new Date(h));
+      var s = h ? new Date(h) : null;
+      if (!s || isNaN(s.getTime())) return;
+      /* заголовок точен до секунды - мелкий разнобой не трогаем, иначе
+         секунды у всех дёргались бы на одну при каждой загрузке */
+      if (Math.abs(s.getTime() - Date.now()) > 3000){
+        sdvig = s.getTime() - Date.now();
+        tekG = -1;                      /* переставить цены по серверному времени */
+        tik();
+      }
     }).catch(function(){});
   } catch(_){}
 })();
