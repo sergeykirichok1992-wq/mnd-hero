@@ -3,15 +3,15 @@
   СОБРАНО СКРИПТОМ propusk_partner.py из propusk.html. Руками не править:
   правка - в propusk.html, потом запуск скрипта.
 
-  ПОЧЁТНЫЙ ПРОПУСК - страница-генератор для родителей, сайт Ярославля
-  (mnd-yar.ru). Родитель загружает фото ребёнка, пишет имя, выбирает мальчик/девочка,
+  ПОЧЁТНЫЙ ПРОПУСК - страница-генератор для родителей, сайт Екатеринбурга
+  (mnd-ekb.ru). Родитель загружает фото ребёнка, пишет имя, выбирает мальчик/девочка,
   дату и время экскурсии и получает картинку 1080x1920.
 
   Всё собирается в браузере на холсте (canvas). Фото и имя никуда не уходят:
   ни на сервер, ни в localStorage, метрик на странице нет.
   В меню не стоит, поисковикам закрыта (noindex).
 -->
-<html lang="ru" data-shablon="smena">
+<html lang="ru" data-shablon="tayna">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -24,7 +24,7 @@
 <meta property="og:site_name" content="Министерство Новогодних Дел">
 <meta property="og:title" content="Почётный пропуск - Министерство Новогодних Дел">
 <meta property="og:description" content="Именной пропуск на экскурсию с фото ребёнка: загрузите фото, напишите имя, выберите дату и время.">
-<meta property="og:image" content="https://mnd-yar.ru/og.jpg">
+<meta property="og:image" content="https://mnd-ekb.ru/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
@@ -1004,7 +1004,7 @@ var PASS = Object.assign({}, OBSHCHEE, SHABLONY[SHABLON]);
 /* ---------- СЕЗОН ----------
    Даты экскурсий по business/cities/<город>/schedule.md. Месяцы календаря
    строятся от from до to сами. */
-var SEASON = { from: '2026-11-27', to: '2027-01-10', off: ['2026-12-31', '2027-01-01', '2027-01-02'] };
+var SEASON = { from: '2026-11-30', to: '2027-01-10', off: ['2026-12-31', '2027-01-01', '2027-01-02'] };
 // Сеансы в городах разные (у Казани :00 и :30), поэтому шаг 15 минут
 var HOURS = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 var MINUTES = ['00', '15', '30', '45'];

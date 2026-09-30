@@ -149,6 +149,24 @@ body{
 .navinfo i{color:#C2AF88; font-style:normal}
 /* Адрес и даты рядом с «МНД 2026-2027» (14.09.2026) — на месте прежней метки «демо».
    На телефоне в шапку не помещаются, там они есть на первом экране. */
+/* «Сделать пропуск» в шапке (01.10.2026, Серёга: «просто как текст
+   подчёркнутый»). Ссылка, а не кнопка - под стандарт кнопок не идёт.
+   Ведёт на страницу почётного пропуска. Шаблон пропуска у городов разный:
+   «Звёздная смена» (Нижний, Казань, Крым, Ярославль) и «тайная встреча»
+   (Тюмень, Ставрополь - propusk.html?p=tayna, ЕКБ - propusk-ekaterinburg.html),
+   поэтому адрес ссылки городской: при синхронизации спор - в пользу города.
+   Стоит перед правой группой шапки и сама уводит её вправо (margin-left:auto),
+   соседу справа отступ снимаем. */
+.navlink{
+  margin-left:auto; font:400 15px/1.2 "Golos Text",sans-serif;
+  color:rgba(255,255,255,.92); letter-spacing:.02em; white-space:nowrap;
+  text-decoration:underline; text-decoration-color:rgba(255,255,255,.45);
+  text-decoration-thickness:1px; text-underline-offset:4px;
+  text-shadow:0 1px 8px rgba(0,0,0,.65);
+  transition:color .2s ease, text-decoration-color .2s ease;
+}
+.navlink:hover,.navlink:focus-visible{color:#FFE7BC; text-decoration-color:currentColor}
+.nav .navlink ~ .navtel,.nav .navlink ~ .zs-btn{margin-left:0}
 @media(max-width:880px){ .navinfo{display:none} }
 /* на телефоне шапка не помещалась: кнопка уезжала за правый край */
 @media(max-width:520px){
@@ -157,6 +175,14 @@ body{
   .brand{font-size:11px; letter-spacing:.07em}
   .nav .zs-btn{--zs-btn-h:32px; --zs-btn-fs:11px; padding:5px 12px}
 }
+
+/* «Сделать пропуск» и ширина шапки. Со ссылкой всё в один ряд не влезает
+   (замер 01.10.2026: надпись 159 px, адрес с датами 433, ссылка 129, МАХ 135) -
+   иначе сплющивается кнопка МАХ. Поэтому адрес с датами прячется раньше:
+   до 1020 px, а не до 880 (он есть и на первом экране). На телефоне надпись
+   «МНД 2026-2027» уступает место ссылке, как в Нижнем номеру. */
+@media(max-width:1019px){ .navinfo{display:none} }
+@media(max-width:560px){ .nav .brand{display:none} .navlink{font-size:14px; letter-spacing:0} }
 
 /* ---------- первый экран ---------- */
 #hero{height:320vh; position:relative}   /* Тюмень: темп ролика под колесом считается от 400vh (ролик 11,25 с
@@ -9796,6 +9822,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   line-height:1.5; color:#C2CEEF; border-bottom:1px solid rgba(194,206,239,.32);
   transition:color .25s ease, border-color .25s ease}
 .pd-mail:hover,.pd-mail:focus-visible{color:#fff; border-color:rgba(255,255,255,.7)}
+/* «Сделать почётный пропуск» под подписью логотипа (01.10.2026). Как почта
+   в соседней колонке - подчёркнутая ссылка, только тёплым золотом: рядом
+   слова «Звёздная смена», и это приглашение, а не справка */
+.pd-pass{display:inline-block; margin:clamp(12px,1.2vw,18px) 0 0; text-decoration:none;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(13.4px,1.02vw,15.2px);
+  line-height:1.5; color:#F1D695; border-bottom:1px solid rgba(241,214,149,.4);
+  transition:color .25s ease, border-color .25s ease}
+.pd-pass:hover,.pd-pass:focus-visible{color:#fff; border-color:rgba(255,255,255,.7)}
 .pd-adr{margin:0; font-family:"Golos Text",Arial,sans-serif;
   font-size:clamp(13.4px,1.02vw,15.2px); line-height:1.55; color:#A9B8E0}
 .pd-adr + .pd-adr{margin-top:clamp(14px,1.4vw,22px)}
@@ -10073,6 +10107,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 <header class="nav" id="nav">
   <div class="brand">МНД 2026-2027</div>
   <span class="navinfo">Ставрополь, ул. Росгипрозем, 291<b>·</b><i>27 ноября - 10 января</i></span>
+  <a class="navlink" href="propusk.html?p=tayna">Сделать пропуск</a>
   <a class="zs-btn zs-btn--ghost zs-btn--ghost-purple" href="https://max.ru/id910314959705_bot" data-mx-bot target="_blank" rel="noopener">
     <span class="zs-t">Написать в МАХ</span></a>
 </header>
@@ -16157,6 +16192,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                alt="Министерство новогодних дел Деда Мороза">
           <p class="pd-slogan">Экскурсия-шоу <b>«Звёздная смена»</b> в Министерство
             новогодних дел Деда Мороза. Сезон 2026/27, Ставрополь</p>
+          <!-- страница почётного пропуска (01.10.2026); адрес городской - шаблон пропуска у городов разный -->
+          <a class="pd-pass" href="propusk.html?p=tayna">Сделать почётный пропуск</a>
         </div>
 
         <div class="pd-col">
