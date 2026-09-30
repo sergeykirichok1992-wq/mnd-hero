@@ -2988,8 +2988,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
    В РАЗМЕТКЕ ЕГО НЕТ. Блок вставляет скрипт «ЦЕНА В ФОРМАХ СЧИТАЕТСЯ ОТ ДАТЫ»
    за каждой `.zs-price`, и только пока впереди есть повышение. Без JS счётчика
-   нет вовсе: замершие цифры врали бы. Во всплывающем окне его нет по той же
-   причине, что и цены (Серёга, 12.09.2026, см. блок выше).
+   нет вовсе: замершие цифры врали бы. Во всплывающем окне - маленький,
+   в одну строку (`.zs-cd--mini` ниже): цены там нет, а срок показать можно.
 
    Ячейки - «тёплое стекло с золотой кромкой», рецепт плашек, который Серёга
    просил запомнить 26.09.2026: заливка в несколько процентов, волосяная кромка
@@ -3041,6 +3041,27 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .zs-cd-n{font-size:26px}
   .zs-cd-u{font-size:10px; letter-spacing:.03em}
 }
+/* МАЛЕНЬКИЙ СЧЁТЧИК ВО ВСПЛЫВАЮЩЕМ ОКНЕ (30.09.2026). Цены в окне нет
+   (Серёга, 12.09.2026), но срок - не цена: одна строка под подзаголовком
+   в тонкой золотой рамке, без плашек, чтобы не спорить с заголовком окна
+   и полями. Разметку строит тот же скрипт, что и большой счётчик, ячейки
+   здесь просто вытянуты в строку «21 час 25 минут 03 секунды».
+   Дни прячутся, пока их ноль. Селекторы в два класса - сильнее правил
+   большого счётчика, в том числе из блока «до 380 px» выше. */
+.zs-cd--mini{display:flex; flex-wrap:wrap; align-items:baseline; justify-content:center;
+  column-gap:10px; row-gap:4px; width:fit-content; max-width:100%;
+  margin:clamp(12px,1.2vw,15px) auto 0; padding:7px 16px 8px; border-radius:14px;
+  background:rgba(255,214,150,.06); box-shadow:inset 0 0 0 1px rgba(255,214,150,.22)}
+.zs-cd--mini[hidden]{display:none}
+.zs-cd--mini .zs-cd-lab{margin:0; font-size:11px; letter-spacing:.16em}
+.zs-cd--mini .zs-cd-row{gap:8px}
+.zs-cd--mini .zs-cd-c{flex-direction:row; align-items:baseline; gap:4px; width:auto; padding:0;
+  border-radius:0; overflow:visible; background:none; box-shadow:none}
+.zs-cd--mini .zs-cd-c[hidden]{display:none}
+.zs-cd--mini .zs-cd-c::after{content:none}
+.zs-cd--mini .zs-cd-n{font-size:18px}
+.zs-cd--mini .zs-cd-u{margin:0; font-size:12.5px; font-weight:500; letter-spacing:0;
+  text-transform:none; color:#B7C6E2}
 /* селекторы отмены не слабее отменяемых → lessons/reduced-motion-perebivaet-animation-name.md */
 @media (prefers-reduced-motion: reduce){
   .zs-cd.on .zs-cd-c::after, .zs-cd.on .zs-cd-n.tk{animation:none}
@@ -12824,7 +12845,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1390&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 15 октября</span><b>1490&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1490&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -12848,7 +12869,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1590&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 15 октября</span><b>1690&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1690&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -12876,7 +12897,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1690&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 15 октября</span><b>1790&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1790&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -12906,14 +12927,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1790&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 15 октября</span><b>1890&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1890&nbsp;₽</b></p>
           </div>
         </div>
       </article>
     </div>
 
     <div class="pr-notes">
-      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b>&nbsp;- 15&nbsp;октября, 1&nbsp;ноября и 1&nbsp;декабря!
+      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b> каждого 1 числа месяца!
         Чем раньше забронируете, тем дешевле&nbsp;- дата за вами закрепляется по той цене, которая была в день брони.</p>
 
       <div class="pr-two">
@@ -18828,7 +18849,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      города - 15 октября; дальше у всех 1 ноября и 1 декабря. */
   var STEPS = [
     { t: Date.UTC(2026, 8, 1), add:   0, adult:   0, from: 'сентября' },
-    { t: Date.UTC(2026, 9,15), add: 100, adult:   0, from: 'октября'  },   /* 15 октября (Серёга, 30.09.2026); у Нижнего и Казани - 1 октября в 19:00 */
+    { t: Date.UTC(2026, 9, 1, 19), add: 100, adult:   0, from: 'октября'  },   /* Екатеринбург: 1 октября в 19:00, как Нижний и Казань (Серёга, 30.09.2026 вечером, вместо 15 октября) */
     { t: Date.UTC(2026,10, 1), add: 200, adult: 100, from: 'ноября'   },
     { t: Date.UTC(2026,11, 1), add: 300, adult: 200, from: 'декабря'  }
   ];
@@ -19973,7 +19994,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      [детский «от», детский «до»]. Час пишется так: '2026-10-01T19:00'. */
   var PRAJS = [
     ['2026-09-01', 1390, 1790],
-    ['2026-10-15', 1490, 1890],   /* 15 октября (Серёга, 30.09.2026); у Нижнего и Казани - 1 октября в 19:00 */
+    ['2026-10-01T19:00', 1490, 1890],   /* Екатеринбург: 1 октября в 19:00, как Нижний и Казань (Серёга, 30.09.2026 вечером, вместо 15 октября) */
     ['2026-11-01', 1590, 1990],
     ['2026-12-01', 1690, 2090]
   ];
@@ -20046,10 +20067,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     return b === 1 ? f[0] : (b > 1 && b < 5 ? f[1] : f[2]);
   }
 
-  var bloki = [], ceni = document.querySelectorAll('.zs-price');
-  for (var c = 0; c < ceni.length; c++){
+  var bloki = [];
+  function sdelat(klass, posle){
     var el = document.createElement('div');
-    el.className = 'zs-cd';
+    el.className = klass;
     el.setAttribute('role', 'timer');
     var h = '<p class="zs-cd-lab">До повышения цены осталось</p><div class="zs-cd-row">';
     /* блик проходит четыре ячейки за 10 с - волной, по 2,5 с на ячейку */
@@ -20059,9 +20080,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     }
     el.innerHTML = h + '</div>';
     el.hidden = true;                   /* покажет первый тик, если есть до чего считать */
-    ceni[c].parentNode.insertBefore(el, ceni[c].nextSibling);
+    posle.parentNode.insertBefore(el, posle.nextSibling);
     bloki.push(el);
   }
+  var ceni = document.querySelectorAll('.zs-price');
+  for (var c = 0; c < ceni.length; c++) sdelat('zs-cd', ceni[c]);
+  /* маленький - во всплывающем окне, под подзаголовком (стили `.zs-cd--mini`).
+     Подзаголовок кнопки переписывают своим data-zs-sub, счётчик стоит рядом
+     с ним, а не внутри, и переписывание его не задевает. */
+  var podz = document.getElementById('zsSub');
+  if (podz) sdelat('zs-cd zs-cd--mini', podz);
 
   /* блик и «прыжок» цифры крутятся, только пока счётчик на экране */
   if (window.IntersectionObserver){
@@ -20091,6 +20119,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var ch = [Math.floor(s / 86400), Math.floor(s % 86400 / 3600), Math.floor(s % 3600 / 60), s % 60];
     bloki.forEach(function(b){
       var yach = b.querySelectorAll('.zs-cd-c');
+      /* в маленьком строка «0 дней 21 час…» читалась бы как ошибка */
+      if (b.classList.contains('zs-cd--mini')) yach[0].hidden = ch[0] === 0;
       for (var k = 0; k < 4; k++){
         var n = yach[k].firstChild, t = (ch[k] < 10 ? '0' : '') + ch[k];
         if (n.textContent !== t){
