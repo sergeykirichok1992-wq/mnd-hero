@@ -14341,7 +14341,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1190&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1290&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1290&nbsp;₽</b></p><!-- не тюменское 15-е -->
           </div>
         </div>
       </article>
@@ -14370,7 +14370,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1390&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1490&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1490&nbsp;₽</b></p><!-- не тюменское 15-е -->
           </div>
         </div>
       </article>
@@ -14398,7 +14398,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1490&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1590&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1590&nbsp;₽</b></p><!-- не тюменское 15-е -->
           </div>
         </div>
       </article>
@@ -14428,14 +14428,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1590&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1690&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 1 октября</span><b>1690&nbsp;₽</b></p><!-- не тюменское 15-е -->
           </div>
         </div>
       </article>
     </div>
 
     <div class="pr-notes">
-      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b> каждого 1 числа месяца!
+      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b> каждого 1 числа месяца!<!-- у Ставрополя все повышения с 1-го; тюменские «15 октября» не переносить -->
         Чем раньше забронируете, тем дешевле&nbsp;- дата за вами закрепляется по той цене, которая была в день брони.</p>
 
       <div class="pr-two">
@@ -20393,7 +20393,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      17.09.2026, все города - 24.09.2026; так же в договоре и в боте). */
   var STEPS = [
     { t: Date.UTC(2026, 8, 1), add:   0, adult:   0, from: 'сентября' },
-    { t: Date.UTC(2026, 9, 1), add: 100, adult:   0, from: 'октября'  },
+    { t: Date.UTC(2026, 9, 1), add: 100, adult:   0, from: 'октября'  },  /* у Ставрополя 1 октября; у Тюмени 15-е - не переносить */
     { t: Date.UTC(2026,10, 1), add: 200, adult: 100, from: 'ноября'   },
     { t: Date.UTC(2026,11, 1), add: 300, adult: 200, from: 'декабря'  }
   ];
@@ -21769,7 +21769,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* дата, с которой действует цена -> [детский «от», детский «до»] */
   var PRAJS = [
     ['2026-09-01', 1190, 1590],
-    ['2026-10-01', 1290, 1690],
+    ['2026-10-01', 1290, 1690],   /* у Ставрополя 1 октября; у Тюмени 15-е - не переносить */
     ['2026-11-01', 1390, 1790],
     ['2026-12-01', 1490, 1890]
   ];

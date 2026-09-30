@@ -12591,7 +12591,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
      ЦЕНА В РАЗМЕТКЕ - СЕНТЯБРЬСКАЯ, и это не заглушка: без JS человек и
      поисковик видят настоящую цену, а не пустое место. Скрипт в конце
-     страницы переписывает её на текущую ступень (+100 ₽ каждого 1 числа).
+     страницы переписывает её на текущую ступень (+100 ₽ на каждой; даты
+     ступеней - в STEPS скрипта «ЭКРАН 15: ЦЕНЫ ПО КАЛЕНДАРЮ»).
 
      МЕНЯЕШЬ ЦЕНЫ - правь data-base у карточки (это цена СЕНТЯБРЯ, от неё
      скрипт считает все остальные) и заодно сентябрьские числа в разметке.
@@ -12654,7 +12655,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1390&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1490&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 15 октября</span><b>1490&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -12683,7 +12684,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1590&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1690&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 15 октября</span><b>1690&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -12711,7 +12712,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1690&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1790&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 15 октября</span><b>1790&nbsp;₽</b></p>
           </div>
         </div>
       </article>
@@ -12741,14 +12742,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <div class="pr-plate">
             <p class="pr-lab">Сейчас</p>
             <p class="pr-now"><b class="pr-cur">1790&nbsp;₽</b><s class="pr-was" hidden></s></p>
-            <p class="pr-next"><span>С 1 октября</span><b>1890&nbsp;₽</b></p>
+            <p class="pr-next"><span>С 15 октября</span><b>1890&nbsp;₽</b></p>
           </div>
         </div>
       </article>
     </div>
 
     <div class="pr-notes">
-      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b> каждого 1 числа месяца!
+      <p class="pr-grow">Цены растут на <b>100&nbsp;₽</b>&nbsp;- 15&nbsp;октября, 1&nbsp;ноября и 1&nbsp;декабря!
         Чем раньше забронируете, тем дешевле&nbsp;- дата за вами закрепляется по той цене, которая была в день брони.</p>
 
       <div class="pr-two">
@@ -18731,13 +18732,20 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      цене. Названия месяцев в родительном падеже - они идут в строку «С 1 …».
      adult - прибавка к взрослому билету: в октябре он не дорожает, дальше
      +100 с 1 ноября и ещё +100 с 1 декабря (решения Серёги: Нижний и Казань -
-     17.09.2026, все города - 24.09.2026; так же в договоре и в боте). */
+     17.09.2026, все города - 24.09.2026; так же в договоре и в боте).
+     day - число, если ступень начинается не с 1-го (без него - 1-е). */
   var STEPS = [
     { t: Date.UTC(2026, 8, 1), add:   0, adult:   0, from: 'сентября' },
-    { t: Date.UTC(2026, 9, 1), add: 100, adult:   0, from: 'октября'  },
+    /* ТОЛЬКО ТЮМЕНЬ: первое повышение 15 октября, а не 1-го (решение Серёги
+       30.09.2026; так же в боте и в договоре). В копиях Тюмени (Ставрополь,
+       Екатеринбург) повышение 1 октября - при синхронизации сюда не переносить. */
+    { t: Date.UTC(2026, 9,15), add: 100, adult:   0, from: 'октября', day: 15 },
     { t: Date.UTC(2026,10, 1), add: 200, adult: 100, from: 'ноября'   },
     { t: Date.UTC(2026,11, 1), add: 300, adult: 200, from: 'декабря'  }
   ];
+
+  /* «15 октября», «1 ноября» - с какого дня ступень. */
+  function den(s){ return (s.day || 1) + ' ' + s.from; }
 
   var n = new Date();
   var today = Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
@@ -18771,7 +18779,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     if(elNext){
       if(next){
-        elNext.innerHTML = '<span>С 1 ' + next.from + '</span><b>' + money(base + next.add) + '</b>';
+        elNext.innerHTML = '<span>С ' + den(next) + '</span><b>' + money(base + next.add) + '</b>';
         elNext.hidden = false;
       } else {
         elNext.hidden = true;
@@ -18798,7 +18806,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* Какие повышения взрослого ещё впереди: «на 100 ₽ с 1 ноября и ещё на 100 ₽ с 1 декабря». */
   var vzrVperedi = [], vzrPred = cur;
   for(var j = i + 1; j < STEPS.length; j++){
-    if(STEPS[j].adult > vzrPred.adult) vzrVperedi.push('на ' + (STEPS[j].adult - vzrPred.adult) + '&nbsp;₽ с 1 ' + STEPS[j].from);
+    if(STEPS[j].adult > vzrPred.adult) vzrVperedi.push('на ' + (STEPS[j].adult - vzrPred.adult) + '&nbsp;₽ с ' + den(STEPS[j]));
     vzrPred = STEPS[j];
   }
   [].forEach.call(document.querySelectorAll('.pr-grow-adult'), function(p){
@@ -18811,14 +18819,21 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      попросил 10.09.2026 сказать короче - «растут каждого 1 числа месяца!».
      Написать его намертво в разметке всё равно нельзя: после 1 декабря
      повышений не остаётся, и обещание роста стало бы неправдой - тогда
-     строка меняется на финальную. */
+     строка меняется на финальную.
+     ИСКЛЮЧЕНИЕ - ступень не с 1-го (у Тюмени 15 октября): пока она впереди,
+     «каждого 1 числа» было бы неправдой, и строка называет даты повышений. */
+  var vperedi = STEPS.slice(i + 1);
+  var ne1 = vperedi.some(function(s){ return s.day && s.day !== 1; });
+  var daty = vperedi.map(den);
+  var spisok = daty.length > 1 ? daty.slice(0, -1).join(', ') + ' и ' + daty[daty.length - 1] : daty[0];
   var grow = sec.querySelector('.pr-grow');
   if(grow){
-    grow.innerHTML = next
-      ? 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца! Чем раньше забронируете, ' +
-        'тем дешевле - дата за вами закрепляется по той цене, которая была в день брони.'
-      : 'Это финальные цены сезона: последнее повышение было 1 декабря. ' +
-        'Дата за вами закрепляется по той цене, которая была в день брони.';
+    grow.innerHTML = !next
+      ? 'Это финальные цены сезона: последнее повышение было 1 декабря. ' +
+        'Дата за вами закрепляется по той цене, которая была в день брони.'
+      : (ne1 ? 'Цены растут на <b>100 ₽</b> - ' + spisok + '! '
+             : 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца! ') +
+        'Чем раньше забронируете, тем дешевле - дата за вами закрепляется по той цене, которая была в день брони.';
   }
 })();
 </script>
@@ -19864,7 +19879,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   /* дата, с которой действует цена -> [детский «от», детский «до»] */
   var PRAJS = [
     ['2026-09-01', 1390, 1790],
-    ['2026-10-01', 1490, 1890],
+    ['2026-10-15', 1490, 1890],   /* ТОЛЬКО ТЮМЕНЬ: 15 октября, а не 1-го (Серёга, 30.09.2026) */
     ['2026-11-01', 1590, 1990],
     ['2026-12-01', 1690, 2090]
   ];
