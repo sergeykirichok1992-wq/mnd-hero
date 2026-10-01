@@ -36,6 +36,14 @@
    менять и картинку, и строки реквизитов ниже, иначе QR и ручной ввод
    поведут на разные счета.
 
+   ПЕРВЫЙ БЛОК - СБП НА ОРГАНИЗАЦИЮ (добавлен 01.10.2026 вечером, Серёга
+   прислал код в красной рамке). В коде ссылка СБП
+   https://qr.nspk.ru/AS1R002E82E1QTF7905P3Q6UMSRLABDU - статический код без
+   суммы, сумму человек вводит сам. oplata-sbp-qr.png перерисован из этой
+   ссылки и проверен распознаванием. С телефона та же ссылка открывает выбор
+   банка - поэтому в блоке она ещё и текстовой ссылкой. Назначения платежа
+   у оплаты по СБП на организацию нет - красной рамки в этом блоке нет.
+
    Оформление - с promokody.html: шапка, ночное небо, карточки. Кнопок по
    стандарту здесь нет: строки реквизитов копируются нажатием, это не кнопки
    экрана. Ссылки «На главную» ведут на "/", скрипт внизу возвращает на
@@ -141,14 +149,14 @@ body{
 .oz-lead b{color:#F0C97A; font-weight:600}
 
 /* ---------- карточки способов оплаты ----------
-   Три в ряд на компьютере, одна под другой на телефоне. Порядок - как просил
-   Серёга: QR-код, реквизиты, перевод по номеру телефона. */
+   Два в ряд на компьютере (блоков четыре, в три колонки реквизиты не
+   помещаются), одна под другой на телефоне. Порядок - как просил Серёга:
+   СБП на организацию, QR-код, реквизиты, перевод по номеру телефона. */
 .op-grid{
-  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
   gap:clamp(14px,1.6vw,26px); margin:clamp(28px,3.4vw,56px) auto 0;
   align-items:start;
 }
-@media (max-width:1100px){ .op-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:760px){ .op-grid{grid-template-columns:1fr} }
 .op-card{
   position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.2vw,36px);
@@ -384,6 +392,20 @@ body{
 
       <section class="op-card op-card--gold">
         <span class="op-num">1</span>
+        <h2 class="op-h">Оплата на организацию <b>по СБП</b></h2>
+        <div class="op-qr"><img src="oplata-sbp-qr.png" width="984" height="984"
+          alt="QR-код СБП для оплаты на организацию"></div>
+        <p>Открыли страницу с телефона? <a href="https://qr.nspk.ru/AS1R002E82E1QTF7905P3Q6UMSRLABDU"
+          target="_blank" rel="noopener">Нажмите сюда</a> и выберите свой банк - откроется оплата по СБП.
+          Или <a href="oplata-sbp-qr.png" download="QR-SBP-MND.png">сохраните QR-код</a> и загрузите
+          его из галереи в разделе <b>оплаты по QR-коду</b>.</p>
+        <p class="op-note">Открыли с компьютера? Наведите на код камеру телефона
+          или отсканируйте его в приложении своего банка.</p>
+        <p class="op-sum">Введите сумму, которую Вам прислал менеджер</p>
+      </section>
+
+      <section class="op-card">
+        <span class="op-num">2</span>
         <h2 class="op-h">Оплата <b>по QR-коду</b></h2>
         <div class="op-qr"><img src="oplata-qr.png" width="780" height="780"
           alt="QR-код для оплаты: ИП Киричок Сергей Васильевич, счёт 40802810700003745759 в АО «ТБанк»"></div>
@@ -408,7 +430,7 @@ body{
       </section>
 
       <section class="op-card">
-        <span class="op-num">2</span>
+        <span class="op-num">3</span>
         <h2 class="op-h">Реквизиты ИП <b>для ручного ввода</b></h2>
         <p class="rq-hint">Нажмите, чтобы скопировать</p>
         <ul class="rq">
@@ -446,7 +468,7 @@ body{
       </section>
 
       <section class="op-card">
-        <span class="op-num">3</span>
+        <span class="op-num">4</span>
         <h2 class="op-h">Перевод <b>по номеру телефона</b></h2>
         <p>Перевод по СБП руководителю <b>ИП&nbsp;Киричок С.&nbsp;В.</b></p>
         <p class="op-banks-k">Банки получателя</p>
