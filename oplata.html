@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Оплата - Министерство Новогодних Дел</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#04070F">
+<meta name="description" content="Как оплатить мероприятие Министерства Новогодних Дел: QR-код, реквизиты ИП Киричок С. В. или перевод по номеру телефона.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Министерство Новогодних Дел">
+<meta property="og:title" content="Оплата - Министерство Новогодних Дел">
+<meta property="og:description" content="QR-код, реквизиты для перевода и перевод по номеру телефона.">
+<meta property="og:image" content="https://mnd-nn.ru/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://mnd-nn.ru/oplata.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700&family=Golos+Text:wght@400;500;600;700&display=swap">
+<style>
+/* ==================== ОПЛАТА ====================
+   Запасная страница оплаты, одна на все наши города: https://mnd-nn.ru/oplata.html
+   (Серёга, 01.10.2026). Появилась, когда в ссылках PayKeeper перестал
+   работать СБП от Альфа-Банка (plans/problems-log.md, P64). Менеджер шлёт
+   ссылку клиенту, клиент платит и присылает скриншот или платёжку.
+   Закрыта от поиска (noindex), в меню и карте сайта её нет.
+
+   СЧЁТ - В Т-БАНКЕ, А НЕ В АЛЬФЕ из договора и оферты. QR-код прислал Серёга
+   (картинка из приложения Т-Банка), в нём: ИП Киричок Сергей Васильевич,
+   р/с 40802810700003745759, АО «ТБанк», БИК 044525974, к/с 30101810145250000974,
+   ИНН 910314959705. oplata-qr.png перерисован из той же строки (ST00012,
+   без суммы и назначения) и сверен с оригиналом байт в байт. Меняется счёт -
+   менять и картинку, и строки реквизитов ниже, иначе QR и ручной ввод
+   поведут на разные счета.
+
+   Оформление - с promokody.html: шапка, ночное небо, карточки. Кнопок по
+   стандарту здесь нет: строки реквизитов копируются нажатием, это не кнопки
+   экрана. Ссылки «На главную» ведут на "/", скрипт внизу возвращает на
+   страницу города, с которой человек пришёл. */
+:root{
+  --ink:#04070F; --ink2:#080D1B; --line:#18223B;
+  --text:#DCE4F3; --dim:#8695B3; --faint:#5A6784;
+  --gold:#E3B34E; --moon:#7FA8D9;
+  color-scheme:dark;
+}
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ink); color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- шапка (та же, что на promokody.html) ---------- */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  padding-top:max(16px, env(safe-area-inset-top));
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(4,7,15,.82);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+.navbtn{
+  border:1px solid var(--gold); color:var(--gold); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none; margin-left:auto;
+}
+.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- поле страницы: ночное небо (как на promokody.html) ---------- */
+.oz{
+  position:relative; isolation:isolate; overflow:hidden; min-height:100vh;
+  padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 16%,#060B2E 46%,#050922 76%,#04071A 100%);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.oz-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:42%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:ozDrift1 38s ease-in-out infinite alternate}
+.oz-glow i:nth-child(2){right:-20vw; top:24%; width:70vw; height:44%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.32) 0%, rgba(108,43,217,.2) 32%, rgba(108,43,217,.07) 64%, rgba(108,43,217,0) 100%);
+  animation:ozDrift2 45s ease-in-out infinite alternate}
+.oz-glow i:nth-child(3){left:50%; bottom:-8%; width:78vw; height:40%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.2) 0%, rgba(227,179,78,.13) 32%, rgba(227,179,78,.04) 64%, rgba(227,179,78,0) 100%);
+  animation:ozDrift3 33s ease-in-out infinite alternate}
+@keyframes ozDrift1{from{transform:translate3d(0,0,0) scale(1);    opacity:.9}
+                    to  {transform:translate3d(4%,3%,0) scale(1.08); opacity:1}}
+@keyframes ozDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
+                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.86}}
+@keyframes ozDrift3{from{transform:translate3d(0,0,0) scale(1);    opacity:.84}
+                    to  {transform:translate3d(5%,-4%,0) scale(1.1); opacity:1}}
+.oz-grain{position:absolute; inset:0; z-index:0; pointer-events:none; opacity:.05;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E") 0 0/140px 140px repeat}
+
+/* Контейнер - широкий, по общему правилу сайта (ai-clone/feedback/shirokaya-verstka-sayta.md). */
+.oz-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1462px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,47.6px);
+}
+@media (max-width:767px){ .oz-cont{width:100%; padding-inline:16px} }
+
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+.oz-q{color:#F0C97A}
+.oz-lead{
+  max-width:760px; margin:0 auto;
+  text-align:center; text-wrap:balance;
+  font-size:max(16px, clamp(16px,1.3vw,21px)); line-height:1.45; color:#B9C8F5;
+}
+.oz-lead b{color:#F0C97A; font-weight:600}
+
+/* ---------- карточки способов оплаты ----------
+   Три в ряд на компьютере, одна под другой на телефоне. Порядок - как просил
+   Серёга: QR-код, реквизиты, перевод по номеру телефона. */
+.op-grid{
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:clamp(14px,1.6vw,26px); margin:clamp(28px,3.4vw,56px) auto 0;
+  align-items:start;
+}
+@media (max-width:1100px){ .op-grid{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:760px){ .op-grid{grid-template-columns:1fr} }
+.op-card{
+  position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.2vw,36px);
+  border-radius:clamp(18px,1.6vw,26px);
+  background:linear-gradient(180deg, rgba(20,28,84,.62), rgba(10,15,52,.62));
+  border:1px solid rgba(146,167,214,.18);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05), 0 24px 60px -34px rgba(0,0,0,.8);
+}
+.op-card--gold{border-color:rgba(227,179,78,.42);
+  background:linear-gradient(180deg, rgba(58,44,20,.55), rgba(16,16,44,.62))}
+.op-card--wide{grid-column:1 / -1}
+.op-num{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:34px; height:34px; margin-bottom:clamp(10px,1vw,14px); border-radius:50%;
+  border:1px solid rgba(227,179,78,.55); color:#F0C97A;
+  font:700 16px/1 "Blogger Sans","Golos Text",Arial,sans-serif;
+}
+.op-h{
+  margin:0 0 clamp(12px,1.1vw,18px);
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(20px,1.7vw,28px); line-height:1.15; text-transform:uppercase; color:#fff;
+}
+.op-h b{color:#F0C97A; font-weight:700}
+.op-card p{
+  margin:0; max-width:60ch;
+  font-size:max(16px, clamp(16px,1.1vw,18px)); line-height:1.5; color:#C9D6EE;
+}
+.op-card p + p{margin-top:.7em}
+.op-card b{color:#fff; font-weight:600}
+.op-note{margin-top:clamp(12px,1.2vw,18px) !important; color:var(--dim) !important}
+.op-card a{color:#EBD3A0}
+
+/* QR на белой подложке: тёмный код на тёмном поле камера банка не прочтёт. */
+.op-qr{
+  display:block; width:min(100%,280px); margin:0 auto clamp(16px,1.6vw,22px);
+  padding:10px; border-radius:16px; background:#fff;
+  box-shadow:0 0 0 1px rgba(227,179,78,.5), 0 18px 50px -20px rgba(227,179,78,.35);
+}
+.op-qr img{display:block; width:100%; height:auto; image-rendering:pixelated}
+
+/* ---------- строки реквизитов: нажал - скопировал ---------- */
+.rq{margin:0; padding:0; list-style:none}
+.rq-row{
+  all:unset; box-sizing:border-box; display:grid;
+  grid-template-columns:minmax(0,1fr) auto; column-gap:12px; row-gap:2px;
+  padding:11px 12px; margin:0 -12px; width:calc(100% + 24px);
+  border-radius:10px; cursor:pointer; transition:background .2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.rq li + li{border-top:1px solid rgba(146,167,214,.12)}
+.rq-row:hover,.rq-row:focus-visible{background:rgba(146,167,214,.08)}
+.rq-row:focus-visible{outline:2px solid rgba(227,179,78,.6); outline-offset:-2px}
+.rq-k{grid-column:1; font-size:14px; color:var(--dim)}
+.rq-v{
+  grid-column:1; font-size:max(16px, clamp(16px,1.1vw,18px)); line-height:1.35; color:#fff;
+  font-weight:500; overflow-wrap:anywhere; font-variant-numeric:tabular-nums;
+}
+.rq-ic{
+  grid-column:2; grid-row:1 / span 2; align-self:center;
+  display:flex; align-items:center; gap:6px; color:var(--dim); font-size:14px;
+  transition:color .2s;
+}
+.rq-ic svg{width:18px; height:18px; flex:none}
+.rq-row:hover .rq-ic{color:#EBD3A0}
+.rq-row.ok .rq-ic{color:#8FD6A3}
+.rq-ok{display:none}
+.rq-row.ok .rq-ok{display:inline}
+
+/* номер телефона - главное в карточке, крупно */
+.rq-row--big .rq-v{
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(26px,2.3vw,36px); color:#F0C97A; letter-spacing:.01em;
+}
+
+.op-back{margin:clamp(28px,3vw,48px) auto 0; text-align:center}
+.op-back a{color:#EBD3A0; font-size:max(16px, clamp(16px,1.1vw,18px))}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="/" data-op-home>МНД<span>·</span>Звёздная смена</a>
+  <a class="navbtn" href="/" data-op-home>На главную</a>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="oz-grain" aria-hidden="true"></div>
+
+  <div class="oz-cont">
+    <h1 class="oz-t">Выберите удобный<br><span class="oz-q">способ оплаты</span></h1>
+    <p class="oz-lead">После оплаты пришлите <b>скриншот или платёжку</b> менеджеру</p>
+
+    <div class="op-grid">
+
+      <section class="op-card op-card--gold">
+        <span class="op-num">1</span>
+        <h2 class="op-h">Оплата <b>по QR-коду</b></h2>
+        <div class="op-qr"><img src="oplata-qr.png" width="780" height="780"
+          alt="QR-код для оплаты: ИП Киричок Сергей Васильевич, счёт 40802810700003745759 в АО «ТБанк»"></div>
+        <p>Откройте приложение своего банка и выберите <b>оплату по QR-коду</b>.
+          Наведите камеру - реквизиты подставятся сами, останется ввести сумму.</p>
+        <p class="op-note">Открыли страницу с телефона? <a href="oplata-qr.png" download="QR-oplata-MND.png">Сохраните QR-код</a>
+          и выберите его в приложении банка из галереи.</p>
+      </section>
+
+      <section class="op-card">
+        <span class="op-num">2</span>
+        <h2 class="op-h">Реквизиты <b>для перевода</b></h2>
+        <ul class="rq">
+          <li><button class="rq-row" type="button" data-copy="ИП Киричок Сергей Васильевич">
+            <span class="rq-k">Получатель</span><span class="rq-v">ИП Киричок Сергей Васильевич</span>
+            <span class="rq-ic" aria-hidden="true"></span></button></li>
+          <li><button class="rq-row" type="button" data-copy="910314959705">
+            <span class="rq-k">ИНН</span><span class="rq-v">910314959705</span>
+            <span class="rq-ic" aria-hidden="true"></span></button></li>
+          <li><button class="rq-row" type="button" data-copy="40802810700003745759">
+            <span class="rq-k">Расчётный счёт</span><span class="rq-v">40802810700003745759</span>
+            <span class="rq-ic" aria-hidden="true"></span></button></li>
+          <li><button class="rq-row" type="button" data-copy="АО «ТБанк»">
+            <span class="rq-k">Банк</span><span class="rq-v">АО «ТБанк»</span>
+            <span class="rq-ic" aria-hidden="true"></span></button></li>
+          <li><button class="rq-row" type="button" data-copy="044525974">
+            <span class="rq-k">БИК</span><span class="rq-v">044525974</span>
+            <span class="rq-ic" aria-hidden="true"></span></button></li>
+          <li><button class="rq-row" type="button" data-copy="30101810145250000974">
+            <span class="rq-k">Корр. счёт</span><span class="rq-v">30101810145250000974</span>
+            <span class="rq-ic" aria-hidden="true"></span></button></li>
+          <li><button class="rq-row" type="button" data-copy="Оплата новогоднего мероприятия">
+            <span class="rq-k">Назначение платежа</span><span class="rq-v">Оплата новогоднего мероприятия</span>
+            <span class="rq-ic" aria-hidden="true"></span></button></li>
+        </ul>
+        <p class="op-note">Нажмите на строку, чтобы скопировать.</p>
+      </section>
+
+      <section class="op-card">
+        <span class="op-num">3</span>
+        <h2 class="op-h">Перевод <b>по номеру телефона</b></h2>
+        <p>Перевод по СБП руководителю <b>ИП&nbsp;Киричок С.&nbsp;В.</b></p>
+        <ul class="rq" style="margin-top:clamp(10px,1vw,14px)">
+          <li><button class="rq-row rq-row--big" type="button" data-copy="+79161520828">
+            <span class="rq-k">Номер для перевода</span><span class="rq-v">+7&nbsp;(916)&nbsp;152-08-28</span>
+            <span class="rq-ic" aria-hidden="true"></span></button></li>
+        </ul>
+        <p class="op-note">В приложении своего банка выберите перевод по номеру телефона (СБП)
+          и вставьте номер. Получатель - Сергей Васильевич К.</p>
+      </section>
+
+      <section class="op-card op-card--wide">
+        <h2 class="op-h">Публичная <b>оферта</b></h2>
+        <p>Оплачивая, Вы принимаете условия <a href="oferta.html">публичной оферты на бронирование</a>.
+          Она одна для всех наших городов.</p>
+      </section>
+
+    </div>
+
+    <p class="op-back"><a href="/" data-op-home>Вернуться на главную страницу</a></p>
+  </div>
+</main>
+
+<script>
+/* ==================== ШАПКА (как на promokody.html) ==================== */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){
+    if (window.scrollY > 24) nav.classList.add('solid');
+    else nav.classList.remove('solid');
+  }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* ==================== «НА ГЛАВНУЮ» ====================
+   Пришли со страницы города на этом же домене - возвращаем туда. */
+(function(){
+  try {
+    var r = document.referrer ? new URL(document.referrer) : null;
+    if (!r || r.host !== location.host || /oplata\.html$/.test(r.pathname)) return;
+    var home = r.origin + r.pathname;
+    var links = document.querySelectorAll('[data-op-home]');
+    for (var i = 0; i < links.length; i++) links[i].href = home;
+  } catch(_){}
+})();
+
+/* ==================== КОПИРОВАНИЕ РЕКВИЗИТОВ ====================
+   Нажатие на строку кладёт значение в буфер. clipboard API есть не везде
+   (старые WebView в мессенджерах) - запасной путь через скрытое поле. */
+(function(){
+  var IC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span class="rq-ok">Скопировано</span>';
+  var rows = document.querySelectorAll('.rq-row');
+  function zapas(t){
+    var ta = document.createElement('textarea');
+    ta.value = t; ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(_){}
+    document.body.removeChild(ta);
+  }
+  for (var i = 0; i < rows.length; i++) (function(row){
+    row.querySelector('.rq-ic').innerHTML = IC;
+    row.setAttribute('aria-label', row.querySelector('.rq-k').textContent + ': ' + row.getAttribute('data-copy') + '. Нажмите, чтобы скопировать');
+    var tm;
+    row.addEventListener('click', function(){
+      var t = row.getAttribute('data-copy');
+      if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).catch(function(){ zapas(t); });
+      else zapas(t);
+      row.classList.add('ok');
+      clearTimeout(tm); tm = setTimeout(function(){ row.classList.remove('ok'); }, 1800);
+    });
+  })(rows[i]);
+})();
+</script>
+</body>
+</html>
