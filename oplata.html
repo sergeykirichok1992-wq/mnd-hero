@@ -223,8 +223,120 @@ body{
   font-size:clamp(26px,2.3vw,36px); color:#F0C97A; letter-spacing:.01em;
 }
 
+/* Банки, где номер принимает переводы (Серёга, 01.10.2026: «над номером
+   телефона добавь сбер, т-банк, альфа банк»). Плашки - подписи, не кнопки:
+   нажимать на них нечего. Точка - фирменный цвет банка, знаков банков нет. */
+.op-banks-k{margin:clamp(14px,1.3vw,20px) 0 8px !important; font-size:14px !important; color:var(--dim) !important}
+.op-banks{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 6px; padding:0; list-style:none}
+.op-banks li{
+  display:inline-flex; align-items:center; gap:8px; padding:7px 14px 7px 12px;
+  border-radius:999px; border:1px solid rgba(146,167,214,.24); background:rgba(146,167,214,.07);
+  font-size:16px; font-weight:500; color:#fff; line-height:1.2;
+}
+.op-banks i{width:10px; height:10px; border-radius:50%; flex:none}
+
 .op-back{margin:clamp(28px,3vw,48px) auto 0; text-align:center}
 .op-back a{color:#EBD3A0; font-size:max(16px, clamp(16px,1.1vw,18px))}
+
+/* ==================== ПОДВАЛ ====================
+   Как подвал v2.html (Серёга, 01.10.2026: «добавь внизу логотип и ссылки
+   как в подвале все, кроме мессенджеров, + канал МАХ (не бот)»). Классы
+   и размеры - оттуда же (.pd-*), без строки города, кнопок мессенджеров
+   и снегопада. Меняется подвал Нижнего - сверить и этот.
+   Канал МАХ - max.ru/id910314959705_biz; бот (_bot) сюда не ставить. */
+.pd{
+  position:relative; isolation:isolate; overflow:hidden; color:#fff;
+  padding:clamp(40px,4vw,72px) 0 calc(clamp(104px,10.4vw,180px) + clamp(26px,2.6vw,44px));
+  background:linear-gradient(180deg,#04071A 0%,#070C2E 30%,#0A1140 60%,#04071A 100%);
+  border-top:1px solid rgba(158,180,255,.12);
+}
+.pd-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.pd-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.pd-glow i:nth-child(1){left:-18vw; top:-10%; width:68vw; height:56%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.44) 0%, rgba(47,49,146,.28) 32%, rgba(47,49,146,.09) 64%, rgba(47,49,146,0) 100%);
+  animation:ozDrift1 44s ease-in-out infinite alternate}
+.pd-glow i:nth-child(2){right:-20vw; top:2%; width:70vw; height:62%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.3) 0%, rgba(108,43,217,.19) 32%, rgba(108,43,217,.06) 64%, rgba(108,43,217,0) 100%);
+  animation:ozDrift2 51s ease-in-out infinite alternate}
+@media (prefers-reduced-motion:reduce){ .pd-glow i, .oz-glow i{animation:none} }
+.pd-forest{
+  position:absolute; left:0; right:0; bottom:0; z-index:1; pointer-events:none;
+  height:clamp(104px,10.4vw,180px);
+  background:url(v2-pd-elki.svg) repeat-x center bottom/auto 100%;
+}
+.pd-cont{
+  position:relative; z-index:7;
+  width:min(94vw,1462px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,47.6px);
+}
+@media (max-width:767px){ .pd-cont{width:100%; padding-inline:16px} }
+.pd-main{
+  display:grid; grid-template-columns:1fr; gap:clamp(30px,3.2vw,54px);
+  padding:0 0 clamp(30px,3.2vw,52px);
+  border-bottom:1px solid rgba(158,180,255,.14);
+}
+@media (min-width:700px){ .pd-main{grid-template-columns:repeat(2,1fr)} }
+@media (min-width:1080px){ .pd-main{grid-template-columns:1.25fr 1fr 1.05fr 1fr; gap:clamp(24px,2.4vw,44px)} }
+.pd-col{min-width:0}
+.pd-ct{
+  margin:0 0 clamp(12px,1.2vw,18px);
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(9.7px,.86vw,11.1px);
+  font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:#93A6DA;
+}
+.pd-logo{display:block; width:clamp(180px,15.5vw,258px); height:auto; margin:0 0 clamp(14px,1.4vw,22px)}
+.pd-slogan{margin:0; max-width:34ch; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(13.4px,1.02vw,15.2px); line-height:1.55; color:#A9B8E0}
+.pd-slogan b{font-weight:600; color:#fff}
+.pd-tel{
+  display:inline-block; text-decoration:none; color:#FFD189;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(21px,1.85vw,29px); line-height:1.2; letter-spacing:.01em;
+  white-space:nowrap; transition:color .25s ease, text-shadow .25s ease;
+}
+.pd-tel:hover,.pd-tel:focus-visible{color:#FFE7BC; text-shadow:0 0 26px rgba(227,179,78,.5)}
+.pd-note{margin:clamp(6px,.6vw,10px) 0 0; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(12.6px,.95vw,14.2px); line-height:1.5; color:#8FA2D4}
+.pd-mail,.pd-pass,.pd-mx{display:inline-block; margin:clamp(14px,1.4vw,22px) 0 0; text-decoration:none;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(13.4px,1.02vw,15.2px);
+  line-height:1.5; color:#C2CEEF; border-bottom:1px solid rgba(194,206,239,.32);
+  transition:color .25s ease, border-color .25s ease}
+.pd-pass{margin-top:clamp(12px,1.2vw,18px); color:#F1D695; border-color:rgba(241,214,149,.4)}
+/* Канал МАХ - ссылка под почтой, со значком МАХ (тот же, что у кнопки на v2.html) */
+.pd-mx-w{display:block}
+.pd-mx{margin-top:clamp(10px,1vw,14px); color:#D9C8FF; border-color:rgba(190,160,255,.4)}
+.pd-mx svg{width:1.05em; height:1.05em; vertical-align:-.16em; margin-right:.35em}
+.pd-mail:hover,.pd-mail:focus-visible,.pd-pass:hover,.pd-pass:focus-visible,
+.pd-mx:hover,.pd-mx:focus-visible{color:#fff; border-color:rgba(255,255,255,.7)}
+.pd-adr{margin:0; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(13.4px,1.02vw,15.2px); line-height:1.55; color:#A9B8E0}
+.pd-adr + .pd-adr{margin-top:clamp(14px,1.4vw,22px)}
+.pd-adr b{display:block; font-weight:600; color:#fff}
+.pd-adr span{display:block; color:#8FA2D4}
+.pd-nav{margin:0; padding:0; list-style:none; display:grid; gap:clamp(9px,.85vw,13px)}
+.pd-nav a{
+  text-decoration:none; font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(13.4px,1.02vw,15.2px); line-height:1.4; color:#C2CEEF;
+  transition:color .25s ease, padding-left .25s ease;
+}
+.pd-nav a:hover,.pd-nav a:focus-visible{color:#FFD189; padding-left:6px}
+.pd-legal{
+  display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+  gap:clamp(10px,1.1vw,20px); padding:clamp(22px,2.2vw,36px) 0 0;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(12.2px,.92vw,13.8px);
+  line-height:1.55; color:#7D8DBC;
+}
+.pd-legal p{margin:0}
+.pd-legal a{color:#A9B8E0; text-decoration:none; border-bottom:1px solid rgba(169,184,224,.3);
+  transition:color .25s ease, border-color .25s ease}
+.pd-legal a:hover,.pd-legal a:focus-visible{color:#FFD189; border-color:rgba(227,179,78,.6)}
+.pd-legal .pd-dot{padding:0 .45em; color:#4F5C86}
+@media (max-width:699px){
+  .pd-main{text-align:center}
+  .pd-logo{margin-left:auto; margin-right:auto}
+  .pd-slogan{margin-left:auto; margin-right:auto}
+  .pd-nav a:hover,.pd-nav a:focus-visible{padding-left:0}
+  .pd-legal{justify-content:center; text-align:center}
+}
 </style>
 </head>
 <body>
@@ -257,7 +369,7 @@ body{
 
       <section class="op-card">
         <span class="op-num">2</span>
-        <h2 class="op-h">Реквизиты <b>для перевода</b></h2>
+        <h2 class="op-h">Реквизиты ИП <b>для ручного ввода</b></h2>
         <ul class="rq">
           <li><button class="rq-row" type="button" data-copy="ИП Киричок Сергей Васильевич">
             <span class="rq-k">Получатель</span><span class="rq-v">ИП Киричок Сергей Васильевич</span>
@@ -288,13 +400,19 @@ body{
         <span class="op-num">3</span>
         <h2 class="op-h">Перевод <b>по номеру телефона</b></h2>
         <p>Перевод по СБП руководителю <b>ИП&nbsp;Киричок С.&nbsp;В.</b></p>
-        <ul class="rq" style="margin-top:clamp(10px,1vw,14px)">
+        <p class="op-banks-k">Банки получателя</p>
+        <ul class="op-banks" aria-label="Банки получателя">
+          <li><i style="background:#21A038"></i>Сбер</li>
+          <li><i style="background:#FFDD2D"></i>Т-Банк</li>
+          <li><i style="background:#EF3124"></i>Альфа-Банк</li>
+        </ul>
+        <ul class="rq">
           <li><button class="rq-row rq-row--big" type="button" data-copy="+79161520828">
             <span class="rq-k">Номер для перевода</span><span class="rq-v">+7&nbsp;(916)&nbsp;152-08-28</span>
             <span class="rq-ic" aria-hidden="true"></span></button></li>
         </ul>
-        <p class="op-note">В приложении своего банка выберите перевод по номеру телефона (СБП)
-          и вставьте номер. Получатель - Сергей Васильевич К.</p>
+        <p class="op-note">В приложении своего банка выберите перевод по номеру телефона (СБП),
+          вставьте номер и выберите один из этих банков. Получатель - Сергей Васильевич К.</p>
       </section>
 
       <section class="op-card op-card--wide">
@@ -308,6 +426,61 @@ body{
     <p class="op-back"><a href="/" data-op-home>Вернуться на главную страницу</a></p>
   </div>
 </main>
+
+<footer class="pd">
+  <div class="pd-glow" aria-hidden="true"><i></i><i></i></div>
+  <div class="pd-forest" aria-hidden="true"></div>
+  <div class="pd-cont">
+
+    <div class="pd-main">
+
+      <div class="pd-col">
+        <img class="pd-logo" src="v2-pd-logo.webp?v=2" width="640" height="256"
+             loading="lazy" decoding="async"
+             alt="Министерство новогодних дел Деда Мороза">
+        <p class="pd-slogan">Экскурсия-шоу <b>«Звёздная смена»</b> в Министерство
+          новогодних дел Деда Мороза. Сезон 2026/27, Нижний Новгород</p>
+        <a class="pd-pass" href="propusk.html">Сделать почётный пропуск</a>
+      </div>
+
+      <div class="pd-col">
+        <h3 class="pd-ct">Позвонить</h3>
+        <a class="pd-tel" href="tel:+79994447569">+7 (999) 444-75-69</a>
+        <p class="pd-note">Ежедневно с 10:00 до 19:00</p>
+        <a class="pd-mail" href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>
+        <span class="pd-mx-w"><a class="pd-mx" href="https://max.ru/id910314959705_biz" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3.6 19V7.1c0-.8.98-1.16 1.48-.55L12 15l6.92-8.45c.5-.61 1.48-.25 1.48.55V19"/></svg>Наш канал в МАХ</a></span>
+      </div>
+
+      <div class="pd-col">
+        <h3 class="pd-ct">Адреса</h3>
+        <p class="pd-adr"><b>Площадка</b>Нижний Новгород, Ольгино, 62
+          <span>Приокский район, 20 минут от центра</span></p>
+        <p class="pd-adr"><b>Офис продаж</b>Нижний Новгород, ул. Белинского, 36
+          <span>2 этаж, офис 4</span></p>
+      </div>
+
+      <div class="pd-col">
+        <h3 class="pd-ct">На сайте</h3>
+        <ul class="pd-nav">
+          <li><a href="/#whatawaits" data-op-hash>Что ждёт детей</a></li>
+          <li><a href="/#prices" data-op-hash>Цены и даты</a></li>
+          <li><a href="/#bonuses" data-op-hash>Условия для групп</a></li>
+          <li><a href="/#otzyvy" data-op-hash>Отзывы</a></li>
+          <li><a href="/#faq" data-op-hash>Ответы на вопросы</a></li>
+          <li><a href="/#official" data-op-hash>Официальная информация</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="pd-legal">
+      <p>© 2019-2026 Министерство новогодних дел<span class="pd-dot">·</span>Нижний Новгород</p>
+      <p>ИП Киричок Сергей Васильевич<span class="pd-dot">·</span>ИНН 910314959705<span class="pd-dot">·</span><a href="/#official" data-op-hash>Документы и реквизиты</a><span class="pd-dot">·</span><a href="promokody.html">Правила промокодов</a><span class="pd-dot">·</span><a href="oferta.html">Публичная оферта</a><span class="pd-dot">·</span><a href="politika-nn.html">Политика конфиденциальности</a></p>
+    </div>
+
+  </div>
+</footer>
 
 <script>
 /* ==================== ШАПКА (как на promokody.html) ==================== */
@@ -331,6 +504,8 @@ body{
     var home = r.origin + r.pathname;
     var links = document.querySelectorAll('[data-op-home]');
     for (var i = 0; i < links.length; i++) links[i].href = home;
+    var hs = document.querySelectorAll('[data-op-hash]');
+    for (var j = 0; j < hs.length; j++) hs[j].href = home + hs[j].getAttribute('href').slice(1);
   } catch(_){}
 })();
 
