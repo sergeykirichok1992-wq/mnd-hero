@@ -340,6 +340,21 @@ body{
 }
 .sh-tel:hover{color:#8A5A08}
 .sh-tel:focus-visible{outline:3px solid #8A5A08; outline-offset:3px; border-radius:6px}
+/* общая страница: номер с подписью, чей он */
+.sh-tel-w{display:inline-flex; flex-direction:column; align-items:center; gap:2px}
+.sh-tels:has(.sh-tel-w){row-gap:18px}
+.sh-tel-g{font:600 12.5px/1.3 "Golos Text",Arial,sans-serif; letter-spacing:.08em;
+  text-transform:uppercase; color:#5B6A92; text-align:center}
+/* общая страница: ответ, который в городах разный, - город за городом.
+   Золотая волосяная черта слева держит кусок одного города вместе. */
+.qa-a .sh-gor{margin:0 0 .95em; padding-left:14px; border-left:2px solid rgba(227,179,78,.6)}
+.qa-a .sh-gor:last-child{margin-bottom:0}
+.qa-a .sh-gor p{margin-bottom:.4em}
+.qa-a .sh-gor p:last-child{margin-bottom:0}
+.qa-a .sh-gor ul{margin:.15em 0 .4em}
+.qa-a .sh-gor ul:last-child{margin-bottom:0}
+.qa-a .pr-adult{white-space:nowrap}   /* «от 700 ₽» не рвётся после «от» */
+.qa-a .sh-gor-h{font-weight:600; color:#16264D; font-size:.84em; letter-spacing:.07em; text-transform:uppercase}
 
 /* ---------- подвал ---------- */
 .sf{background:#04070F; color:var(--dim); text-align:center;
@@ -831,7 +846,7 @@ body{
       <li class="sh-st is-next"><span class="sh-tag">Дальше</span>
         <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6.5 3.5h11M6.5 20.5h11"/><path d="M8 3.5c0 4.3 4 5.4 4 8.5s-4 4.2-4 8.5M16 3.5c0 4.3-4 5.4-4 8.5s4 4.2 4 8.5"/><path d="M10 18.4h4"/></svg><b class="sh-n" aria-hidden="true">3</b></span>
         <h2 class="sh-h"><span class="sh-sr">Шаг 3. </span>14 дней на сборы</h2>
-        <p class="sh-p"><b>При предоплате в сентябре - 30 дней.</b> Без спешки уточните, сколько детей пойдёт (мало ли, кто-то добавится или отпадёт), и соберите деньги в классе.</p>
+        <p class="sh-p">Без спешки уточните, сколько детей пойдёт (мало ли, кто-то добавится или отпадёт), и соберите деньги в классе.</p>
       </li>
       <li class="sh-st has-when">
         <span class="sh-icrow"><span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 16.6V11a6 6 0 0 1 12 0v5.6l1.6 2.1H4.4z"/><path d="M10 20.6a2 2 0 0 0 4 0"/><path d="M12 3.2V5"/></svg><b class="sh-n" aria-hidden="true">4</b></span><span class="sh-when">на 12-й день</span></span>
@@ -846,7 +861,7 @@ body{
       <li class="sh-st">
         <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M6 3.5h12v17l-2.4-1.6-2.4 1.6-2.4-1.6-2.4 1.6L6 20.5z"/><path d="M9 8.3h6M9 11.8h6M9 15.3h3.5"/></svg><b class="sh-n" aria-hidden="true">6</b></span>
         <h2 class="sh-h"><span class="sh-sr">Шаг 6. </span>Полный расчёт</h2>
-        <p class="sh-p">В те же 14 (или 30) дней, но не позже чем за 3 дня до праздника, оплачиваете оставшуюся сумму. Предоплата в неё уже засчитана. Тоже официально, с чеком.</p>
+        <p class="sh-p">В те же 14 дней, но не позже чем за 3 дня до праздника, оплачиваете оставшуюся сумму. Предоплата в неё уже засчитана. Тоже официально, с чеком.</p>
       </li>
       <li class="sh-st">
         <span class="sh-ic"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M3.6 9.1V7.4a1.8 1.8 0 0 1 1.8-1.8h13.2a1.8 1.8 0 0 1 1.8 1.8v1.7a2.9 2.9 0 0 0 0 5.8v1.7a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8v-1.7a2.9 2.9 0 0 0 0-5.8Z"/><path d="M12 9.4v5.2M9.4 12h5.2"/></svg><b class="sh-n" aria-hidden="true">7</b></span>
@@ -1354,6 +1369,8 @@ body{
    и своего сервера у неё нет. Поэтому подстраховка простая: пока сегодняшний
    день раньше первой ступени, показывается первая, а не отрицательная. Цена
    всё равно называется менеджером по телефону, экран её только показывает.
+   Часовой пояс посетителя при этом не важен: ступени и «сейчас» считаются
+   по Москве (30.09.2026 - с тех пор, как повышение бывает не в полночь).
 
    ПОСЛЕ 1 ДЕКАБРЯ повышений больше нет: строка «С 1 …» у карточек прячется,
    а объяснение под таблицей меняется на «это финальные цены сезона». */
@@ -1365,18 +1382,28 @@ body{
      цене. Названия месяцев в родительном падеже - они идут в строку «С 1 …».
      adult - прибавка к взрослому билету: в октябре он не дорожает, дальше
      +100 с 1 ноября и ещё +100 с 1 декабря (решения Серёги: Нижний и Казань -
-     17.09.2026, все города - 24.09.2026; так же в договоре и в боте). */
+     17.09.2026, все города - 24.09.2026; так же в договоре и в боте).
+     t - МОСКОВСКОЕ время начала ступени: Date.UTC(год, месяц с нуля, число, час).
+     Час пишется, только если повышение не в полночь. Первое повышение
+     (Серёга, 30.09.2026): Нижний и Казань - 1 октября в 19:00, остальные
+     города - 15 октября; дальше у всех 1 ноября и 1 декабря. */
   var STEPS = [
     { t: Date.UTC(2026, 8, 1), add:   0, adult:   0, from: 'сентября' },
-    { t: Date.UTC(2026, 9, 1), add: 100, adult:   0, from: 'октября'  },
+    { t: Date.UTC(2026, 9, 1, 19), add: 100, adult:   0, from: 'октября'  },   /* Нижний и Казань: 1 октября в 19:00 */
     { t: Date.UTC(2026,10, 1), add: 200, adult: 100, from: 'ноября'   },
     { t: Date.UTC(2026,11, 1), add: 300, adult: 200, from: 'декабря'  }
   ];
 
-  var n = new Date();
-  var today = Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
+  /* «15 октября», «1 октября в 19:00» - когда начинается ступень; берётся из t. */
+  function den(s){
+    var d = new Date(s.t), h = d.getUTCHours();
+    return d.getUTCDate() + ' ' + s.from + (h ? ' в ' + h + ':00' : '');
+  }
+
+  /* московские часы в той же записи, что t у ступеней */
+  var seychas = Date.now() + 3 * 3600000;
   var i = 0;
-  for(var k = 0; k < STEPS.length; k++){ if(today >= STEPS[k].t) i = k; }
+  for(var k = 0; k < STEPS.length; k++){ if(seychas >= STEPS[k].t) i = k; }
 
   var cur  = STEPS[i];
   var prev = i > 0 ? STEPS[i - 1] : null;
@@ -1405,7 +1432,7 @@ body{
 
     if(elNext){
       if(next){
-        elNext.innerHTML = '<span>С 1 ' + next.from + '</span><b>' + money(base + next.add) + '</b>';
+        elNext.innerHTML = '<span>С ' + den(next) + '</span><b>' + money(base + next.add) + '</b>';
         elNext.hidden = false;
       } else {
         elNext.hidden = true;
@@ -1432,7 +1459,7 @@ body{
   /* Какие повышения взрослого ещё впереди: «на 100 ₽ с 1 ноября и ещё на 100 ₽ с 1 декабря». */
   var vzrVperedi = [], vzrPred = cur;
   for(var j = i + 1; j < STEPS.length; j++){
-    if(STEPS[j].adult > vzrPred.adult) vzrVperedi.push('на ' + (STEPS[j].adult - vzrPred.adult) + '&nbsp;₽ с 1 ' + STEPS[j].from);
+    if(STEPS[j].adult > vzrPred.adult) vzrVperedi.push('на ' + (STEPS[j].adult - vzrPred.adult) + '&nbsp;₽ с ' + den(STEPS[j]));
     vzrPred = STEPS[j];
   }
   [].forEach.call(document.querySelectorAll('.pr-grow-adult'), function(p){
@@ -1445,14 +1472,22 @@ body{
      попросил 10.09.2026 сказать короче - «растут каждого 1 числа месяца!».
      Написать его намертво в разметке всё равно нельзя: после 1 декабря
      повышений не остаётся, и обещание роста стало бы неправдой - тогда
-     строка меняется на финальную. */
+     строка меняется на финальную.
+     ИСКЛЮЧЕНИЕ - ступень не с 1-го (15 октября у всех, кроме Нижнего и Казани):
+     пока она впереди, «каждого 1 числа» было бы неправдой, и строка называет
+     даты повышений. */
+  var vperedi = STEPS.slice(i + 1);
+  var ne1 = vperedi.some(function(s){ return new Date(s.t).getUTCDate() !== 1; });
+  var daty = vperedi.map(den);
+  var spisok = daty.length > 1 ? daty.slice(0, -1).join(', ') + ' и ' + daty[daty.length - 1] : daty[0];
   var grow = sec.querySelector('.pr-grow');
   if(grow){
-    grow.innerHTML = next
-      ? 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца! Чем раньше забронируете, ' +
-        'тем дешевле - дата за вами закрепляется по той цене, которая была в день брони.'
-      : 'Это финальные цены сезона: последнее повышение было 1 декабря. ' +
-        'Дата за вами закрепляется по той цене, которая была в день брони.';
+    grow.innerHTML = !next
+      ? 'Это финальные цены сезона: последнее повышение было 1 декабря. ' +
+        'Дата за вами закрепляется по той цене, которая была в день брони.'
+      : (ne1 ? 'Цены растут на <b>100 ₽</b> - ' + spisok + '! '
+             : 'Цены растут на <b>100 ₽</b> каждого 1 числа месяца! ') +
+        'Чем раньше забронируете, тем дешевле - дата за вами закрепляется по той цене, которая была в день брони.';
   }
 })();
 </script>
