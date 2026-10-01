@@ -241,6 +241,26 @@ body{
 }
 .op-banks i{width:10px; height:10px; border-radius:50%; flex:none}
 
+/* Сумма - во всех трёх блоках, назначение платежа в красной рамке - в первых
+   двух (Серёга, 01.10.2026: «введите сумму, которую прислал менеджер»,
+   назначение «предоплата / оплата за экскурсию в МНД», «выдели красной
+   обводкой»). Варианты назначения копируются нажатием, как реквизиты. */
+.op-card p.op-sum{
+  display:flex; align-items:center; gap:10px; margin-top:clamp(16px,1.4vw,22px);
+  color:#fff; font-weight:600;
+}
+.op-sum::before{
+  content:'₽'; flex:none; display:flex; align-items:center; justify-content:center;
+  width:30px; height:30px; border-radius:50%; border:1px solid rgba(227,179,78,.6);
+  color:#F0C97A; font-size:15px; font-weight:700;
+}
+.op-naz{
+  margin-top:clamp(14px,1.3vw,18px); padding:14px 16px 6px;
+  border:1.5px solid rgba(255,96,96,.85); border-radius:14px;
+  background:rgba(255,72,72,.08); box-shadow:0 0 26px -10px rgba(255,80,80,.55);
+}
+.op-card p.op-naz-t{margin:0 0 2px; font-size:15px; font-weight:600; color:#FFB8B8}
+
 .op-back{margin:clamp(28px,3vw,48px) auto 0; text-align:center}
 .op-back a{color:#EBD3A0; font-size:max(16px, clamp(16px,1.1vw,18px))}
 
@@ -370,9 +390,21 @@ body{
         <!-- Сначала телефон: так страницу открывают чаще (Серёга, 01.10.2026) -->
         <p>Открыли страницу с телефона? <a href="oplata-qr.png" download="QR-oplata-MND.png">Сохраните QR-код</a>,
           откройте приложение своего банка, выберите <b>оплату по QR-коду</b> и загрузите
-          картинку из галереи. Реквизиты подставятся сами, останется ввести сумму.</p>
+          картинку из галереи. Реквизиты подставятся сами, останется ввести сумму и назначение платежа.</p>
         <p class="op-note">Открыли с компьютера? Выберите в приложении банка оплату по QR-коду
           и наведите камеру телефона на экран.</p>
+        <p class="op-sum">Введите сумму, которую Вам прислал менеджер</p>
+        <div class="op-naz">
+          <p class="op-naz-t">Назначение платежа - обязательно укажите</p>
+          <ul class="rq">
+            <li><button class="rq-row" type="button" data-copy="Предоплата за экскурсию в МНД">
+              <span class="rq-k">Если вносите предоплату</span><span class="rq-v">Предоплата за экскурсию в&nbsp;МНД</span>
+              <span class="rq-ic" aria-hidden="true"></span></button></li>
+            <li><button class="rq-row" type="button" data-copy="Оплата за экскурсию в МНД">
+              <span class="rq-k">Если оплачиваете остаток или всю сумму</span><span class="rq-v">Оплата за экскурсию в&nbsp;МНД</span>
+              <span class="rq-ic" aria-hidden="true"></span></button></li>
+          </ul>
+        </div>
       </section>
 
       <section class="op-card">
@@ -398,10 +430,19 @@ body{
           <li><button class="rq-row" type="button" data-copy="30101810145250000974">
             <span class="rq-k">Корр. счёт</span><span class="rq-v">30101810145250000974</span>
             <span class="rq-ic" aria-hidden="true"></span></button></li>
-          <li><button class="rq-row" type="button" data-copy="Оплата новогоднего мероприятия">
-            <span class="rq-k">Назначение платежа</span><span class="rq-v">Оплата новогоднего мероприятия</span>
-            <span class="rq-ic" aria-hidden="true"></span></button></li>
         </ul>
+        <p class="op-sum">Введите сумму, которую Вам прислал менеджер</p>
+        <div class="op-naz">
+          <p class="op-naz-t">Назначение платежа - обязательно укажите</p>
+          <ul class="rq">
+            <li><button class="rq-row" type="button" data-copy="Предоплата за экскурсию в МНД">
+              <span class="rq-k">Если вносите предоплату</span><span class="rq-v">Предоплата за экскурсию в&nbsp;МНД</span>
+              <span class="rq-ic" aria-hidden="true"></span></button></li>
+            <li><button class="rq-row" type="button" data-copy="Оплата за экскурсию в МНД">
+              <span class="rq-k">Если оплачиваете остаток или всю сумму</span><span class="rq-v">Оплата за экскурсию в&nbsp;МНД</span>
+              <span class="rq-ic" aria-hidden="true"></span></button></li>
+          </ul>
+        </div>
       </section>
 
       <section class="op-card">
@@ -421,6 +462,7 @@ body{
         </ul>
         <p class="op-note">В приложении своего банка выберите перевод по номеру телефона (СБП),
           вставьте номер и выберите один из этих банков. Получатель - Сергей Васильевич К.</p>
+        <p class="op-sum">Введите сумму, которую Вам прислал менеджер</p>
       </section>
 
       <section class="op-card op-card--wide">
