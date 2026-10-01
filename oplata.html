@@ -215,6 +215,12 @@ body{
 .rq-row:hover .rq-ic{color:#EBD3A0}
 .rq-row.ok .rq-ic{color:#8FD6A3}
 .rq-ok{display:none}
+/* Подсказка один раз, мелко, над столбиком значков копирования
+   (Серёга, 01.10.2026). Прижата вправо - туда, где стоят значки. */
+.op-card p.rq-hint{
+  max-width:none; margin:0 0 2px; text-align:right;
+  font-size:11px; line-height:1.3; letter-spacing:.02em; color:var(--faint);
+}
 .rq-row.ok .rq-ok{display:inline}
 
 /* номер телефона - главное в карточке, крупно */
@@ -370,6 +376,7 @@ body{
       <section class="op-card">
         <span class="op-num">2</span>
         <h2 class="op-h">Реквизиты ИП <b>для ручного ввода</b></h2>
+        <p class="rq-hint">Нажмите, чтобы скопировать</p>
         <ul class="rq">
           <li><button class="rq-row" type="button" data-copy="ИП Киричок Сергей Васильевич">
             <span class="rq-k">Получатель</span><span class="rq-v">ИП Киричок Сергей Васильевич</span>
@@ -393,7 +400,6 @@ body{
             <span class="rq-k">Назначение платежа</span><span class="rq-v">Оплата новогоднего мероприятия</span>
             <span class="rq-ic" aria-hidden="true"></span></button></li>
         </ul>
-        <p class="op-note">Нажмите на строку, чтобы скопировать.</p>
       </section>
 
       <section class="op-card">
