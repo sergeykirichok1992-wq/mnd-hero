@@ -9927,7 +9927,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       "logo": "https://mnd-stavropol.ru/og.jpg",
       "image": "https://mnd-stavropol.ru/og.jpg",
       "email": "ministry.newyear@yandex.ru",
-      "telephone": "+79994447569",
+      "telephone": "+79873962000",
       "taxID": "910314959705",
       "identifier": [
         {
@@ -9942,7 +9942,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         }
       ],
       "sameAs": [
-        "https://max.ru/id910314959705_biz",
+        "https://max.ru/id910314959705_bot",
         "https://vk.com/ministrystavropol",
         "https://t.me/ministry_newyear"
       ]
@@ -9963,7 +9963,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       "name": "Министерство Новогодних Дел",
       "url": "https://mnd-stavropol.ru/",
       "image": "https://mnd-stavropol.ru/og.jpg",
-      "telephone": "+79994447569",
+      "telephone": "+79873962000",
       "email": "ministry.newyear@yandex.ru",
       "address": {
         "@type": "PostalAddress",
@@ -10128,6 +10128,69 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 }
 </script>
 <!-- /SEO-РАЗМЕТКА -->
+<!-- ТЕЛЕФОНЫ ГОРОДА -->
+<style>
+/* Телефоны города (06.10.2026, просьба Серёги). КУСОК СТАВИТ
+   sayt-nn/instrumenty/telefony.py, руками не править: номера и пороги
+   шапки живут в скрипте. */
+
+/* Шапка: номера столбиком у кнопки МАХ, жирно и чуть крупнее прежних 15 px
+   («в шапке выдели жирным и больше чуть»). Ширина цифр одинаковая
+   (tabular-nums) — номера стоят ровной колонкой. */
+.navtels{margin-left:auto; flex:0 0 auto; display:flex; flex-direction:column;
+  align-items:flex-start; gap:1px}
+.nav .navlink ~ .navtels{margin-left:0}
+.nav .navtels .navtel{margin:0;
+  font:700 17px/1.15 "Golos Text",sans-serif; letter-spacing:.01em;
+  font-variant-numeric:tabular-nums; color:#fff; white-space:nowrap;
+  text-decoration:none; text-shadow:0 1px 8px rgba(0,0,0,.65);
+  transition:color .2s ease}
+.nav .navtels .navtel:hover,.nav .navtels .navtel:focus-visible{color:#FFE7BC}
+@media(max-width:1220px){ .navinfo{display:none} }
+@media(max-width:760px){ .nav .brand{display:none} }
+@media(max-width:600px){ .nav .navlink{display:none} }
+/* на телефоне номера слева, кнопка МАХ у правого края */
+@media(max-width:600px){
+  .nav .navtels{margin-left:0}
+  .nav .navtels ~ .zs-btn{margin-left:auto}
+}
+@media(max-width:520px){
+  .nav .navtels .navtel{font-size:15px; letter-spacing:0}
+}
+
+/* Подвал: номера — самое крупное в подвале, каждый своей строкой
+   («укажи номера в подвалах сайтов большими»), было 21-29 px, стало 27-40.
+   В четыре колонки (от 1080 px) такой номер шире прежней колонки
+   «Позвонить», поэтому она взяла места у логотипа и навигации:
+   было 1.25 / 1 / 1.05 / 1. Номер — 8,8 своего кегля в ширину. */
+.pd-col .pd-tel{display:block; width:max-content; max-width:100%;
+  font-size:28px; line-height:1.15}
+.pd-col .pd-tel + .pd-tel{margin-top:clamp(4px,.45vw,8px)}
+/* до 700 px подвал выровнен по центру - номера тоже */
+@media (max-width:699px){ .pd-col .pd-tel{margin-inline:auto} }
+@media (min-width:1080px){
+  .pd-main{grid-template-columns:1.1fr 1.45fr 1fr .95fr}
+  .pd-col .pd-tel{font-size:clamp(26px,2.5vw,40px)}
+}
+
+/* Строка под кнопкой открытых форм: «Или позвоните:» и номера. На тёмных
+   окнах (экран 5, квиз) номера золотом, как в подвале, на светлых бланках
+   (.sv) — тёмно-синим. */
+.zs-tels{margin:clamp(16px,1.7vw,24px) auto 0; display:flex; flex-wrap:wrap;
+  justify-content:center; align-items:baseline; text-align:center;
+  column-gap:clamp(14px,1.4vw,22px); row-gap:4px;
+  font-family:"Golos Text",Arial,sans-serif; font-size:clamp(14px,1.05vw,16px);
+  line-height:1.35; color:#8FA3C8}
+.zs-tels a{font-weight:700; font-size:clamp(17px,1.35vw,21px);
+  font-variant-numeric:tabular-nums; letter-spacing:.01em; color:#FFD189;
+  text-decoration:none; white-space:nowrap; transition:color .2s ease}
+.zs-tels a:hover,.zs-tels a:focus-visible{color:#FFE7BC}
+.sv .zs-tels{color:#4E5D82}
+.sv .zs-tels a{color:#1B2C57}
+.sv .zs-tels a:hover,.sv .zs-tels a:focus-visible{color:#8C1B12}
+@media(max-width:600px){ .zs-tels > span{flex-basis:100%} }
+</style>
+<!-- /ТЕЛЕФОНЫ ГОРОДА -->
 </head>
 <body>
 
@@ -10135,6 +10198,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   <div class="brand">МНД 2026-2027</div>
   <span class="navinfo">Ставрополь, ул. Росгипрозем, 291<b>·</b><i>27 ноября - 10 января</i></span>
   <a class="navlink" href="propusk.html?p=tayna">Сделать пропуск</a>
+  <span class="navtels"><a class="navtel" href="tel:+79873962000">+7 (987) 396-20-00</a><a class="navtel" href="tel:+79994447569">+7 (999) 444-75-69</a></span>
   <a class="zs-btn zs-btn--ghost zs-btn--ghost-purple" href="https://max.ru/id910314959705_bot" data-mx-bot target="_blank" rel="noopener">
     <span class="zs-t">Написать в МАХ</span></a>
 </header>
@@ -11168,6 +11232,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <button class="zs-btn zs-btn--lg" type="submit"><span class="zs-t">Забронировать дату</span></button>
           <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на <a href="soglasie-stavropol.html" target="_blank" rel="noopener">обработку персональных данных</a>
             и на звонок от менеджера. Телефон нужен только для связи по заявке.<br><a href="politika-stavropol.html" target="_blank" rel="noopener">Политика конфиденциальности</a></p>
+          <p class="zs-tels"><span>Или позвоните:</span><a href="tel:+79873962000">+7 (987) 396-20-00</a><a href="tel:+79994447569">+7 (999) 444-75-69</a></p>
         </div>
       </form>
 
@@ -13526,6 +13591,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <button class="zs-btn" type="submit"><span class="zs-t">Оставить заявку</span></button>
           <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на <a href="soglasie-stavropol.html" target="_blank" rel="noopener">обработку персональных данных</a>
             и на звонок от менеджера. Телефон нужен только для связи по заявке.<br><a href="politika-stavropol.html" target="_blank" rel="noopener">Политика конфиденциальности</a></p>
+          <p class="zs-tels"><span>Или позвоните:</span><a href="tel:+79873962000">+7 (987) 396-20-00</a><a href="tel:+79994447569">+7 (999) 444-75-69</a></p>
         </div>
       </form>
 
@@ -14892,6 +14958,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
               <button class="zs-btn" type="submit"><span class="zs-t">Рассчитать стоимость и получить подарок</span></button>
               <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на <a href="soglasie-stavropol.html" target="_blank" rel="noopener">обработку персональных данных</a>
                 и на звонок от менеджера. Телефон нужен только для связи по заявке.<br><a href="politika-stavropol.html" target="_blank" rel="noopener">Политика конфиденциальности</a></p>
+              <p class="zs-tels"><span>Или позвоните:</span><a href="tel:+79873962000">+7 (987) 396-20-00</a><a href="tel:+79994447569">+7 (999) 444-75-69</a></p>
             </div>
           </form>
         </div>
@@ -16108,6 +16175,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           <button class="zs-btn" type="submit"><span class="zs-t">Оставить заявку</span></button>
           <p class="zs-fine">Нажимая кнопку, вы соглашаетесь на <a href="soglasie-stavropol.html" target="_blank" rel="noopener">обработку персональных данных</a>
             и на звонок от менеджера. Телефон нужен только для связи по заявке.<br><a href="politika-stavropol.html" target="_blank" rel="noopener">Политика конфиденциальности</a></p>
+          <p class="zs-tels"><span>Или позвоните:</span><a href="tel:+79873962000">+7 (987) 396-20-00</a><a href="tel:+79994447569">+7 (999) 444-75-69</a></p>
         </div>
       </form>
 
@@ -16225,6 +16293,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
         <div class="pd-col">
           <h3 class="pd-ct">Позвонить</h3>
+          <a class="pd-tel" href="tel:+79873962000">+7 (987) 396-20-00</a>
           <a class="pd-tel" href="tel:+79994447569">+7 (999) 444-75-69</a>
           <p class="pd-note">Ежедневно с 10:00 до 19:00</p>
           <a class="pd-mail" href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>
