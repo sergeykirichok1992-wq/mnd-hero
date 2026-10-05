@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://mnd-crimea.ru/</loc>
+    <lastmod>2026-10-06</lastmod>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://mnd-crimea.ru/politika-crimea.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mnd-crimea.ru/soglasie-crimea.html</loc>
+    <lastmod>2026-09-26</lastmod>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://mnd-crimea.ru/oferta-crimea.html</loc>
+    <lastmod>2026-10-01</lastmod>
+    <priority>0.5</priority>
+  </url>
+</urlset>

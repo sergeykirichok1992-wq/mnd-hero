@@ -17,3 +17,5 @@ Disallow:
 Sitemap: https://mnd-nn.ru/sitemap-nn.xml
 Sitemap: https://mnd-kazan.ru/sitemap-kazan.xml
 Sitemap: https://mnd-tumen.ru/sitemap-tyumen.xml
+Sitemap: https://mnd-crimea.ru/sitemap-crimea.xml
+Sitemap: https://mnd-stavropol.ru/sitemap-stavropol.xml
