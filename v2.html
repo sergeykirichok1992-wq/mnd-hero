@@ -36,6 +36,21 @@ window.VK_PIXEL = '3796982';
   document.head.appendChild(s);
 })();
 </script>
+<!-- ЯНДЕКС МЕТРИКА -->
+<!-- Счётчик ставит sayt-nn/instrumenty/metrika.py (репо МНД AI) — руками не править.
+     Один счётчик на все пять наших доменов, кабинет Яндекса ministry.newyear.
+     Цель «заявка» (lead) ставит единая форма zsBind. О Метрике — политика, п. 5.2. -->
+<script>
+window.YM_ID = 113446662;
+(function(m,e,t,r,i,k,a){
+  m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+  m[i].l=1*new Date();
+  for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+  k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=113446662', 'ym');
+ym(113446662, 'init', {ssr:true, webvisor:true, clickmap:true, referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<!-- /ЯНДЕКС МЕТРИКА -->
 <link rel="preload" as="image" href="poster.webp" fetchpriority="high" media="(min-width: 820px)">
 <link rel="preload" as="image" href="poster-mob.webp" fetchpriority="high" media="(max-width: 819px)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16364,6 +16379,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         try {
           if (r && r.ok && window.VK_PIXEL) (window._tmr = window._tmr || []).push({type: 'reachGoal', id: window.VK_PIXEL, goal: 'lead'});
         } catch (e) { /* сбой чужого счётчика не должен оставить человека на «Отправляем…» */ }
+        try { if (r && r.ok && window.YM_ID && window.ym) ym(window.YM_ID, 'reachGoal', 'lead'); } catch (e) {}  /* ЯНДЕКС МЕТРИКА: цель lead, ставит metrika.py */
         done();
       }, done);     /* сеть отвалилась — заявку всё равно показываем принятой:
                        номер уже лежит в памяти браузера, а извиняться перед
