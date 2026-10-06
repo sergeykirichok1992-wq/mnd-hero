@@ -1,0 +1,464 @@
+<!doctype html>
+<!-- СОБРАНО СКРИПТОМ sayt-nn/instrumenty/oferta_bilety.py (основной репозиторий МНД AI).
+     Руками не править: правка текста - в скрипте, потом запуск. Оформление - из politika.py,
+     реквизиты - из oferta.py. -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Оферта на билеты в сборную группу - Министерство Новогодних Дел</title>
+<meta name="theme-color" content="#FFFFFF">
+<meta name="description" content="Условия покупки билетов в сборную группу Министерства Новогодних Дел онлайн в городах: Нижний Новгород, Казань, Тюмень, Крым, Ставрополь. Оплата, электронный билет, возврат и перенос.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* СВЕТЛАЯ СТРАНИЦА (просьба Серёги 18.09.2026 «сделай на белом фоне»).
+   Палитра - со светлого экрана заявки v2.html (.sv «По цене сентября»):
+   синий #001B71 для заголовков, золото на два тона гуще сайтового
+   (#E3B34E на белом не читается), голубой бланк #ECF2FE → #DCE7F9. */
+:root{
+  --navy:#001B71; --text:#22305A; --dim:#5A6A93; --faint:#7A88AB;
+  --gold:#C9861F; --gold-t:#8A6111; --line:rgba(0,27,113,.12);
+  color-scheme:light;
+}
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; background:#fff; color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- шапка: раскладка как на v2.html, цвета светлые ----------
+   Вверху прозрачная (под ней и так белое), при прокрутке - белое стекло. */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  padding-top:max(16px, env(safe-area-inset-top));
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(255,255,255,.86);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:var(--navy); text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026). Здесь она ссылка «На главную». */
+.navbtn{
+  border:1px solid #A96D0D; color:var(--gold-t); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none; margin-left:auto;
+}
+.navbtn:hover,.navbtn:focus-visible{background:#A96D0D; color:#fff}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- поле страницы: белое, с еле заметными отблесками ----------
+   Отблески - рецепт .sv-glow (голубые по бокам, тёплый внизу), без анимации.
+   overflow у .oz НЕ hidden: иначе у колонок не работает position:sticky,
+   отблески обрезает своя коробка .oz-glow. */
+.oz{
+  position:relative; isolation:isolate; min-height:100vh; background:#fff;
+  padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%}
+.oz-glow i:nth-child(1){left:-16vw; top:-6%; width:62vw; height:40%;
+  background:radial-gradient(closest-side, rgba(198,219,255,.5) 0%, rgba(198,219,255,.26) 40%, rgba(198,219,255,0) 100%)}
+.oz-glow i:nth-child(2){right:-18vw; top:22%; width:58vw; height:44%;
+  background:radial-gradient(closest-side, rgba(214,224,255,.42) 0%, rgba(214,224,255,.2) 40%, rgba(214,224,255,0) 100%)}
+.oz-glow i:nth-child(3){left:50%; bottom:-14%; width:74vw; height:36%; margin-left:-37vw;
+  background:radial-gradient(closest-side, rgba(255,232,186,.4) 0%, rgba(255,232,186,.18) 40%, rgba(255,232,186,0) 100%)}
+
+/* Контейнер - по общему правилу сайта: широкий, почти во весь экран
+   → ai-clone/feedback/shirokaya-verstka-sayta.md. */
+.oz-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1462px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,47.6px);
+}
+@media (max-width:767px){ .oz-cont{width:100%; padding-inline:20px} }
+
+/* ---------- заголовок: как .sv-t на v2.html ---------- */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:var(--navy);
+}
+.oz-q{color:#A96D0D}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .oz-q{background:linear-gradient(180deg,#B0700F 0%,#9E650B 45%,#8A5607 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
+.pl-meta{
+  margin:0 auto; text-align:center; text-wrap:balance;
+  font-size:max(14px, clamp(14px,1.05vw,17px)); line-height:1.5; color:#3F4F76;
+}
+.pl-meta span{color:var(--dim)}
+
+/* ---------- три колонки: оглавление | документ | коротко ----------
+   Документ - лист шириной с удобную строку, по бокам колонки держат
+   ширину экрана (правило широкой вёрстки). До 1280 px «коротко» встаёт
+   над документом, до 1024 px оглавление убирается совсем. */
+.pl-grid{
+  display:grid; align-items:start;
+  grid-template-columns:minmax(210px,290px) minmax(0,1fr) minmax(240px,330px);
+  grid-template-areas:"toc doc sum";
+  gap:clamp(22px,2.6vw,52px); margin-top:clamp(28px,3.4vw,56px);
+}
+.pl-toc{grid-area:toc; position:sticky; top:84px; max-height:calc(100vh - 104px); overflow:auto}
+.pl-doc{grid-area:doc}
+.pl-sum{grid-area:sum; position:sticky; top:84px}
+@media (max-width:1279px){
+  .pl-grid{grid-template-columns:minmax(200px,260px) minmax(0,1fr);
+    grid-template-areas:"toc sum" "toc doc"}
+  .pl-sum{position:static}
+}
+@media (max-width:1023px){
+  .pl-grid{grid-template-columns:minmax(0,1fr); grid-template-areas:"sum" "doc"}
+  .pl-toc{display:none}
+}
+
+/* оглавление */
+.pl-toc-h, .pl-sum-h{
+  margin:0 0 12px; font:600 12px/1.2 "Golos Text",sans-serif;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold-t);
+}
+.pl-toc ol{margin:0; padding:0; list-style:none; border-left:1px solid var(--line)}
+.pl-toc a{
+  display:block; padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent;
+  font-size:14px; line-height:1.35; color:var(--dim); text-decoration:none;
+  transition:color .2s, border-color .2s;
+}
+.pl-toc a:hover, .pl-toc a:focus-visible{color:var(--navy)}
+.pl-toc a.on{color:var(--gold-t); border-left-color:var(--gold)}
+
+/* Документ - белый лист с тонкой рамкой и тенью (как бланк .sv-card, только
+   белый: длинный текст на голубом читать тяжелее). «Коротко» - голубой
+   бланк .sv-card, чтобы выжимка читалась отдельным предметом. */
+.pl-card{
+  position:relative; padding:clamp(20px,2.2vw,36px) clamp(20px,2.4vw,40px);
+  border-radius:clamp(18px,1.6vw,26px); background:#fff;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.12),
+    0 30px 60px -38px rgba(0,27,113,.32),
+    0 4px 14px -8px rgba(0,27,113,.12);
+}
+.pl-sum .pl-card{
+  background:linear-gradient(180deg,#ECF2FE 0%,#DCE7F9 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.16),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 30px 60px -34px rgba(0,27,113,.42),
+    0 4px 14px -6px rgba(0,27,113,.16);
+}
+.pl-sum dl{margin:0}
+.pl-sum dt{margin:0; font-size:13px; line-height:1.3; color:var(--dim)}
+.pl-sum dd{margin:3px 0 0; font-size:15px; line-height:1.4; color:#0B1B3F; overflow-wrap:anywhere}
+.pl-sum dd + dt{margin-top:14px}
+.pl-sum-note{margin:16px 0 0; font-size:13px; line-height:1.45; color:var(--dim)}
+.pl-sum-link{margin:14px 0 0; font-size:15px}
+.pl-sum a, .pl-foot a{color:var(--gold-t)}
+.pl-sum a:hover, .pl-foot a:hover{color:#A96D0D}
+
+/* сам документ */
+.pl-doc{font-size:max(15px, clamp(15px,1.05vw,17px)); line-height:1.6; color:var(--text)}
+.pl-doc p, .pl-doc li, .pl-doc dd{max-width:68ch}
+.pl-doc p{margin:0}
+.pl-doc p + p, .pl-doc ul + p, .pl-doc .pl-cel + p, .pl-doc p + ul{margin-top:.75em}
+.pl-doc b{color:var(--navy); font-weight:600}
+.pl-doc a{color:var(--gold-t); overflow-wrap:anywhere}
+.pl-doc a:hover{color:#A96D0D}
+.nw, a[href^="tel:"]{white-space:nowrap}
+.pl-intro{margin-bottom:1.6em !important; color:#0B1B3F}
+.pl-sec{scroll-margin-top:88px}
+.pl-sec + .pl-sec{margin-top:1.9em; padding-top:1.7em; border-top:1px solid var(--line)}
+.pl-sec h2{
+  margin:0 0 .8em;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(18px,1.45vw,24px); line-height:1.2; text-transform:uppercase; color:var(--navy);
+}
+.pl-doc ul{margin:0; padding:0; list-style:none}
+.pl-doc li{position:relative; padding-left:1.35em}
+.pl-doc li + li{margin-top:.45em}
+.pl-doc li::before{
+  content:''; position:absolute; left:.2em; top:.66em; width:.42em; height:.42em;
+  border-radius:50%; background:var(--gold);
+}
+.pl-cel{
+  margin-top:1em; padding:.9em 1.1em 1em;
+  border-left:2px solid var(--gold); border-radius:0 12px 12px 0;
+  background:#F3F7FE;
+}
+.pl-cel-h{color:var(--navy); font-weight:600}
+.pl-cel-h span{color:var(--gold-t)}
+.pl-cel dl{
+  display:grid; grid-template-columns:minmax(120px,max-content) minmax(0,1fr);
+  gap:.45em 1.2em; margin:.7em 0 0;
+}
+.pl-cel dt{color:var(--dim); font-size:.92em; line-height:1.55}
+.pl-cel dd{margin:0}
+@media (max-width:640px){
+  .pl-cel{padding:.8em .9em .9em}
+  .pl-cel dl{grid-template-columns:minmax(0,1fr); gap:.1em}
+  .pl-cel dd + dt{margin-top:.55em}
+}
+.pl-red{margin-top:1.8em !important; color:var(--dim); font-style:italic}
+
+/* подвал страницы */
+.pl-foot{
+  margin:clamp(28px,3vw,48px) auto 0; text-align:center;
+  font-size:14px; line-height:1.6; color:var(--faint);
+}
+.pl-foot p{margin:0}
+.pl-foot p + p{margin-top:6px}
+.pl-foot .dot{padding:0 .45em; color:#B4BED6}
+
+/* печать: чёрный текст на белом, без шапки и колонок */
+@media print{
+  .nav, .oz-glow, .pl-toc, .pl-sum, .pl-foot{display:none !important}
+  .oz{padding:0; min-height:0}
+  .oz-cont{width:100%; padding:0}
+  .oz-t, .pl-meta, .pl-meta span{color:#000}
+  .oz-q{background:none; color:#000; -webkit-text-fill-color:#000}
+  .pl-grid{display:block; margin-top:12px}
+  .pl-card{box-shadow:none; padding:0}
+  .pl-doc, .pl-doc b, .pl-sec h2, .pl-cel-h, .pl-cel-h span, .pl-cel dt, .pl-doc a, .pl-intro, .pl-red{color:#000}
+  .pl-doc p, .pl-doc li, .pl-doc dd{max-width:none}
+  .pl-cel{background:none; border-left-color:#999}
+  .pl-doc li::before{background:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <span class="brand">МНД<span>·</span>Все города</span>
+  <a class="navbtn" href="#goroda">Сайты городов</a>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <div class="oz-cont">
+    <h1 class="oz-t">Публичная<br><span class="oz-q">оферта</span></h1>
+    <p class="pl-meta">на покупку билетов в сборную группу онлайн<br><span>Министерство Новогодних Дел · Нижний Новгород, Казань, Тюмень, Крым, Ставрополь · редакция от 7 октября 2026 г.</span></p>
+
+    <div class="pl-grid">
+      <nav class="pl-toc" aria-label="Содержание">
+        <p class="pl-toc-h">Содержание</p>
+        <ol>
+      <li><a href="#r1">1. Термины</a></li>
+      <li><a href="#r2">2. Предмет</a></li>
+      <li><a href="#r3">3. Как заключается договор</a></li>
+      <li><a href="#r4">4. Цена и оплата</a></li>
+      <li><a href="#r5">5. Билет и посещение</a></li>
+      <li><a href="#r6">6. Возврат Билетов</a></li>
+      <li><a href="#r7">7. Персональные данные</a></li>
+      <li><a href="#r8">8. Изменение оферты</a></li>
+      <li><a href="#r9">9. Вопросы и претензии</a></li>
+      <li><a href="#r10">10. Прочее</a></li>
+      <li><a href="#r11">11. Реквизиты Исполнителя</a></li>
+        </ol>
+      </nav>
+
+      <article class="pl-doc pl-card">
+<p class="pl-intro">Пожалуйста, прочитайте оферту до оплаты. Если что-то непонятно, спросите до оплаты: по телефону своего города (он есть на Странице покупки и на Сайте) или по почте <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>.</p>
+<section class="pl-sec" id="r1">
+<h2>1. Термины</h2>
+<p>1.1. <b>Исполнитель</b> - индивидуальный предприниматель Киричок Сергей Васильевич, ИНН 910314959705, ОГРНИП 319911200114762. Реквизиты - в разделе 11.</p>
+<p>1.2. <b>Покупатель</b> - гражданин старше 18 лет, который покупает Билеты для себя, своих детей или других Посетителей и принимает оферту. Оферта не предназначена для организаций и индивидуальных предпринимателей.</p>
+<p>1.3. <b>Посетитель</b> - ребёнок или взрослый, который посещает Мероприятие по Билету.</p>
+<p>1.4. <b>Мероприятие</b> - новогодняя экскурсионно-развлекательная программа «Министерство Новогодних Дел» (зрелищно-развлекательное мероприятие). Описание программы, возраст участников, продолжительность и адрес площадки указаны на Сайте города.</p>
+<p>1.5. <b>Сайт</b> - сайт Исполнителя для города:</p>
+<ul>
+  <li>Нижний Новгород - <a class="nw" href="https://mnd-nn.ru/">mnd-nn.ru</a>;</li>
+  <li>Казань - <a class="nw" href="https://mnd-kazan.ru/">mnd-kazan.ru</a>;</li>
+  <li>Тюмень - <a class="nw" href="https://mnd-tumen.ru/">mnd-tumen.ru</a>;</li>
+  <li>Крым (Симферополь) - <a class="nw" href="https://mnd-crimea.ru/">mnd-crimea.ru</a>;</li>
+  <li>Ставрополь - <a class="nw" href="https://mnd-stavropol.ru/">mnd-stavropol.ru</a>.</li>
+</ul>
+<p>1.6. <b>Сборная группа</b> - группа, которую Исполнитель собирает на один Сеанс из Посетителей разных семей. Состав группы определяет Исполнитель.</p>
+<p>1.7. <b>Сеанс</b> - дата и время посещения Мероприятия Сборной группой, открытые для покупки на Странице покупки.</p>
+<p>1.8. <b>Страница покупки</b> - страница Исполнителя <a class="nw" href="https://slots.ministrynewyear.ru/bilety">slots.ministrynewyear.ru/bilety</a>, на которой Покупатель выбирает город, Сеанс, количество Билетов и оплачивает их.</p>
+<p>1.9. <b>Билет</b> - электронный билет на посещение Мероприятия в выбранный Сеанс: детский или взрослый. Все Билеты одного Заказа объединены в один электронный пропуск с QR-кодом и номером Заказа.</p>
+<p>1.10. <b>Заказ</b> - Билеты на один Сеанс, оплаченные одной оплатой. У каждого Заказа есть номер вида MND-NN-000123.</p>
+</section>
+
+<section class="pl-sec" id="r2">
+<h2>2. Предмет</h2>
+<p>2.1. Исполнитель обеспечивает Посетителям посещение Мероприятия в составе Сборной группы в выбранный Сеанс, а Покупатель оплачивает Билеты.</p>
+<p>2.2. Детский Билет - для ребёнка, взрослый - для сопровождающего взрослого. В Заказе должен быть хотя бы один детский Билет. Взрослые Билеты покупать не обязательно: дети могут пройти программу без сопровождающих, вместе со Сборной группой и сотрудниками Исполнителя. Взрослый приводит такого ребёнка к началу Сеанса и забирает сразу после окончания программы.</p>
+<p>2.3. Количество мест в Сеансе ограничено. Сколько детских и взрослых мест осталось, показывает Страница покупки.</p>
+</section>
+
+<section class="pl-sec" id="r3">
+<h2>3. Как заключается договор</h2>
+<p>3.1. Покупатель выбирает на Странице покупки Сеанс и количество Билетов, указывает имя, телефон и почту, отмечает «Согласен с условиями оферты» и переходит к оплате.</p>
+<p>3.2. Места держатся за Покупателем 20 (двадцать) минут. Если за это время оплата не прошла, Заказ отменяется и места освобождаются.</p>
+<p>3.3. Договор по этой оферте заключается в момент оплаты Заказа. Оплата - это принятие оферты (пункт 3 статьи 438 Гражданского кодекса РФ).</p>
+<p>3.4. Если оплата прошла позже 20 (двадцати) минут (например, банк задержал подтверждение), а мест в Сеансе к этому времени не осталось, Исполнитель сообщает об этом Покупателю и по его выбору переносит Заказ на другой Сеанс или возвращает деньги полностью.</p>
+</section>
+
+<section class="pl-sec" id="r4">
+<h2>4. Цена и оплата</h2>
+<p>4.1. Цены детского и взрослого Билета указаны на Странице покупки для каждого Сеанса. Цена фиксируется в момент оформления Заказа.</p>
+<p>4.2. Заказ оплачивается полностью, онлайн: банковской картой или другим способом, который предлагает платёжная страница. Оплата проходит на странице платёжного сервиса PayKeeper, данные карты Исполнитель не получает.</p>
+<p>4.3. На каждую оплату и на каждый возврат Исполнитель выдаёт кассовый чек. Чек приходит на почту, которую Покупатель указал при покупке.</p>
+<p>4.4. При покупке на Странице покупки скидки и промокоды не применяются. Льготный Билет оформляется через менеджера Исполнителя по правилам, опубликованным на Сайте.</p>
+</section>
+
+<section class="pl-sec" id="r5">
+<h2>5. Билет и посещение</h2>
+<p>5.1. Сразу после оплаты электронный пропуск с QR-кодом появляется на странице Заказа, его можно скачать. Ссылку на страницу Заказа Покупатель может запросить у менеджера по номеру Заказа.</p>
+<p>5.2. Билет не именной: Покупатель может передать его другим Посетителям.</p>
+<p>5.3. Не позднее чем за 2 (два) дня до Сеанса менеджер Исполнителя присылает Покупателю адрес площадки и как добраться: в мессенджер, по SMS или на почту. Адреса площадок указаны также в разделе 11 и на Сайте города.</p>
+<p>5.4. На входе Посетители показывают QR-код с экрана телефона или распечатанный. По одному QR-коду проходят все Посетители Заказа; проход отмечается, повторно по тем же Билетам пройти нельзя.</p>
+<p>5.5. Приходить лучше за 15 (пятнадцать) минут до начала Сеанса. Опоздание не продлевает программу.</p>
+</section>
+
+<section class="pl-sec" id="r6">
+<h2>6. Возврат Билетов</h2>
+<p>6.1. Билеты возвращаются по правилам возврата билетов на зрелищные мероприятия: статья 52.1 Основ законодательства Российской Федерации о культуре и Правила, утверждённые постановлением Правительства РФ от 18.09.2020 № 1491.</p>
+<p>6.2. <b>Если Покупатель отказался от посещения сам</b>, возвращается:</p>
+<ul>
+  <li>100% цены Билетов - если заявление подано не позднее чем за 10 (десять) дней до дня Сеанса;</li>
+  <li>50% - если менее чем за 10 (десять) дней, но не позднее чем за 5 (пять) дней;</li>
+  <li>30% - если менее чем за 5 (пять) дней, но не позднее чем за 3 (три) дня;</li>
+  <li>если до дня Сеанса осталось менее 3 (трёх) дней, деньги не возвращаются, кроме случаев из пункта 6.3.</li>
+</ul>
+<p>6.3. <b>Болезнь или смерть близкого.</b> Полная цена Билета возвращается, если Посетитель не может прийти из-за своей болезни или смерти члена своей семьи или близкого родственника, подтверждённых документами, и заявление подано не позднее дня Сеанса. Документ медицинской организации о болезни (справка или листок нетрудоспособности), свидетельство о смерти и документы о родстве прикладываются к заявлению или присылаются не позднее 14 (четырнадцати) дней после дня Сеанса.</p>
+<p>6.4. <b>Если Сеанс отменил или перенёс Исполнитель</b> либо заменил Мероприятие, Покупатель по своему выбору получает полную цену Билетов или переходит на другой Сеанс без доплаты.</p>
+<p>6.5. <b>Как вернуть.</b> Покупатель пишет заявление в свободной форме на почту <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a>: номер Заказа, имя, телефон и причину. Копию чека и Билета прикладывать не нужно - Исполнитель найдёт их по номеру Заказа. День подачи заявления - день, когда отправлено письмо.</p>
+<p>6.6. Исполнитель рассматривает заявление в течение 10 (десяти) дней со дня его получения и возвращает деньги не позднее 10 (десяти) дней со дня решения о возврате - тем же способом, которым была оплата (на ту же карту).</p>
+<p>6.7. <b>Перенос вместо возврата.</b> По договорённости с менеджером Билеты можно перенести на другой Сеанс Сборной группы в том же городе, если на нём есть свободные места. Если цена Билетов нового Сеанса на день переноса другая, разница доплачивается или возвращается.</p>
+</section>
+
+<section class="pl-sec" id="r7">
+<h2>7. Персональные данные</h2>
+<p>7.1. Исполнитель обрабатывает данные Покупателя (имя, телефон, почту, сведения о Заказе и оплате), чтобы заключить и исполнить договор: выставить счёт, отправить чек, связаться по Заказу. Обработка - по <a href="politika-nn.html">Политике обработки персональных данных</a>. Для этой цели согласие не требуется (пункт 5 части 1 статьи 6 Федерального закона № 152-ФЗ).</p>
+<p>7.2. Имена, фамилии и другие сведения о детях Исполнитель при покупке не запрашивает. На Билете нет имени и телефона Покупателя.</p>
+</section>
+
+<section class="pl-sec" id="r8">
+<h2>8. Изменение оферты</h2>
+<p>8.1. Исполнитель может изменить оферту, опубликовав новую редакцию на этой странице. Заказы, оплаченные раньше, действуют на условиях редакции, которая была опубликована в день оплаты.</p>
+</section>
+
+<section class="pl-sec" id="r9">
+<h2>9. Вопросы и претензии</h2>
+<p>9.1. Вопросы и претензии принимаются по почте <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a> и по адресу офиса из раздела 11. Исполнитель отвечает в течение 10 (десяти) календарных дней.</p>
+<p>9.2. К договору применяется право Российской Федерации.</p>
+</section>
+
+<section class="pl-sec" id="r10">
+<h2>10. Прочее</h2>
+<p>10.1. Оферта не заменяет договор на посещение Мероприятия организованной группой (классом, школой): такие группы бронируют дату по отдельной оферте на бронирование.</p>
+</section>
+
+<section class="pl-sec" id="r11">
+<h2>11. Реквизиты Исполнителя</h2>
+<div class="pl-cel">
+  <p class="pl-cel-h">Индивидуальный предприниматель Киричок Сергей Васильевич</p>
+  <dl>
+    <dt>ИНН</dt><dd>910314959705</dd>
+    <dt>ОГРНИП</dt><dd>319911200114762</dd>
+    <dt>Регистрация</dt><dd>05.09.2019, Межрайонная инспекция Федеральной налоговой службы № 11 по Ставропольскому краю</dd>
+    <dt>Расчётный счёт</dt><dd>40802810929050009849</dd>
+    <dt>Банк</dt><dd>Филиал «Нижегородский» АО «АЛЬФА-БАНК»</dd>
+    <dt>БИК</dt><dd>042202824</dd>
+    <dt>Корр. счёт</dt><dd>30101810200000000824</dd>
+    <dt>Адрес для писем</dt><dd>г. Нижний Новгород, ул. Белинского, д. 36, 2 этаж, офис 4</dd>
+    <dt>Телефон</dt><dd><a href="tel:+79994447569">+7 (999) 444-75-69</a>, Казань: <a href="tel:+79993332174">+7 (999) 333-21-74</a></dd>
+    <dt>Почта</dt><dd><a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a></dd>
+  </dl>
+</div>
+<div class="pl-cel">
+  <p class="pl-cel-h">Площадки</p>
+  <dl>
+    <dt>Нижний Новгород</dt><dd>дер. Ольгино, д. 62</dd>
+    <dt>Казань</dt><dd>ул. Утренняя, д. 8А (Дербышки)</dd>
+    <dt>Тюмень</dt><dd>пос. Боровский, ул. Трактовая, д. 50</dd>
+    <dt>Крым</dt><dd>Симферополь, с. Новопавловка, ул. Севастопольская, д. 134</dd>
+    <dt>Ставрополь</dt><dd>ул. Росгипрозем, д. 291</dd>
+  </dl>
+</div>
+</section>
+<p class="pl-red">Редакция от 7 октября 2026 г.</p>
+      </article>
+
+      <aside class="pl-sum" aria-label="Коротко о главном">
+        <div class="pl-card">
+          <p class="pl-sum-h">Коротко о главном</p>
+          <dl>
+        <dt>Что покупаете</dt><dd>Билеты в сборную группу на выбранные дату и время</dd>
+        <dt>Оплата</dt><dd>Сразу 100% онлайн, чек на почту. Места держатся 20 минут</dd>
+        <dt>Билет</dt><dd>Пропуск с QR-кодом сразу после оплаты: покажите его на входе</dd>
+        <dt>Передумали</dt><dd>За 10 дней и раньше - 100%, за 5-9 дней - 50%, за 3-4 дня - 30%, позже - не возвращается</dd>
+        <dt>Болезнь</dt><dd>100% по документу, если написать не позднее дня сеанса</dd>
+        <dt>Если отменили мы</dt><dd>Возвращаем всё или переносим на другой сеанс без доплаты</dd>
+        <dt>Как вернуть</dt><dd>Письмо на <a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a> с номером заказа. Решение - 10 дней, деньги - ещё до 10 дней</dd>
+          </dl>
+          <p class="pl-sum-note">Это выжимка для удобства. Условия - в полном тексте оферты.</p>
+          <p class="pl-sum-link"><a href="politika-nn.html">Политика конфиденциальности&nbsp;→</a></p>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="pl-foot">
+      <p><a href="politika-nn.html">Политика конфиденциальности</a><span class="dot">·</span><a href="oferta.html">Оферта на бронирование для организованных групп</a></p>
+      <p id="goroda">Сайты городов: <a href="https://mnd-nn.ru/">Нижний&nbsp;Новгород</a><span class="dot">·</span><wbr><a href="https://mnd-kazan.ru/">Казань</a><span class="dot">·</span><wbr><a href="https://mnd-tumen.ru/">Тюмень</a><span class="dot">·</span><wbr><a href="https://mnd-crimea.ru/">Крым</a><span class="dot">·</span><wbr><a href="https://mnd-stavropol.ru/">Ставрополь</a></p>
+      <p>© 2019-2026 Министерство новогодних дел<span class="dot">·</span>ИП Киричок Сергей Васильевич<span class="dot">·</span>ИНН 910314959705</p>
+    </footer>
+  </div>
+</main>
+
+<script>
+/* шапка темнеет при прокрутке (как на promokody.html) */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){ nav.classList.toggle('solid', window.scrollY > 24); }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* оглавление подсвечивает раздел, который сейчас читают */
+(function(){
+  var links = document.querySelectorAll('.pl-toc a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var byId = {};
+  for (var i = 0; i < links.length; i++) byId[links[i].getAttribute('href').slice(1)] = links[i];
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      for (var k in byId) byId[k].classList.remove('on');
+      var a = byId[e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, {rootMargin:'-20% 0px -70% 0px'});
+  for (var id in byId){ var s = document.getElementById(id); if (s) io.observe(s); }
+})();
+</script>
+</body>
+</html>
