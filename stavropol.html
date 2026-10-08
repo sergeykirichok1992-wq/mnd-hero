@@ -3497,6 +3497,63 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .zs-sky i{animation:none}
   .zs-step[data-step="2"]:not([hidden]) .zs-seal{animation:none}
 }
+
+/* КУПИТЕ БИЛЕТЫ САМИ: стили */
+/* ==================== ОКНО «КУПИТЕ БИЛЕТЫ САМИ» ====================
+   Третий шаг всплывающего окна заявки (#zsStep3): его видят те, кто в заявке
+   выбрал «Индивидуально». Билеты в малую семейную группу можно купить онлайн
+   без менеджера, акцент на МАХ (Серёга: «там связь стабильнее»). Открывает шаг
+   window.zsKupit в конце скрипта окна. Кнопки по стандарту, вид выбрал Серёга:
+   «Купить в МАХ» - обычная фиолетовая, «Купить на сайте» - прозрачная.
+   Окно тёмное, поэтому прозрачная остаётся светлым золотом.
+   КУСОК ОБЩИЙ НА ЧЕТЫРЕ ГОРОДА, руками не править: ставит
+   sayt-nn/instrumenty/kupit_okno.py. */
+.zs-step[data-step="3"]:not([hidden]) .zs-seal{animation:zsSeal .7s cubic-bezier(.2,.8,.2,1) both}
+.kp .zs-seal{width:clamp(60px,5.4vw,72px); height:clamp(60px,5.4vw,72px); margin-bottom:clamp(12px,1.3vw,16px)}
+.kp .zs-seal svg{width:58%; height:58%}
+.kp .zs-sub{max-width:40ch; font-size:clamp(14px,1.15vw,15.5px); color:#A9B9D8}
+/* Цена малой семейной группы (Серёга, 08.10.2026: «написать цену 2500 и взрослые 1000»).
+   Исключение из правила «во всплывающем окне цены нет» (см. .zs-price): шаг 3 видят только
+   семьи, и цена здесь - довод купить самим. Начертание и цвета - как у строки цены в формах. */
+.kp-cena{margin:clamp(12px,1.3vw,16px) auto 0;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:clamp(17px,1.45vw,21px); line-height:1.25; letter-spacing:.01em; color:#B7C6E2}
+.kp-cena b{font-weight:400; color:#FF7A6E; white-space:nowrap}
+/* три шага покупки: карточки тёплого стекла с золотой кромкой, номер - золотой пилюлей */
+.kp-steps{list-style:none; margin:clamp(16px,1.8vw,22px) 0 0; padding:0;
+  display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.kp-steps li{display:flex; flex-direction:column; align-items:center; gap:9px;
+  padding:14px 10px 15px; border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,236,190,.07),rgba(255,255,255,.02));
+  box-shadow:inset 0 0 0 1px rgba(227,179,78,.24), inset 0 1px 0 rgba(255,238,190,.12);
+  font-family:"Golos Text",Arial,sans-serif; font-size:15px; line-height:1.3; color:#E6EDF9; text-wrap:balance}
+.kp-steps b{flex:0 0 auto; width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:15px; font-weight:700; color:#451A03;
+  background:linear-gradient(180deg,#FDE68A,#FCD34D 52%,#F59E0B);
+  box-shadow:0 0 18px -4px rgba(245,158,11,.6)}
+.kp-nw{white-space:nowrap}
+/* довод за МАХ - главный текст шага, поэтому крупнее подзаголовка */
+.kp-mx{margin:clamp(18px,2vw,24px) auto 0; max-width:42ch;
+  font-family:"Golos Text",Arial,sans-serif;
+  font-size:clamp(16px,1.3vw,17.5px); line-height:1.45; color:#C9D6EE; text-wrap:pretty}
+.kp-mx b{color:#fff; font-weight:700}
+/* две кнопки в ряд, ширина у пары одна; на узком экране встают столбиком */
+.kp-btns{margin-top:clamp(16px,1.8vw,20px); display:flex; flex-wrap:wrap; justify-content:center; gap:12px}
+.kp-btns .zs-btn{flex:1 1 200px; max-width:480px}
+.kp-btns .pd-i{margin:0 0 0 .05em; width:1.2em; height:1.2em}
+.kp-btns .mx-arrow svg{animation:mxArrow 1.6s ease-in-out infinite}
+.kp-fine{margin:clamp(14px,1.5vw,18px) auto 0; max-width:46ch;
+  font-family:"Golos Text",Arial,sans-serif; font-size:13px; line-height:1.45; color:#8296B8}
+@media (max-width:480px){
+  .kp-steps{grid-template-columns:1fr; gap:8px}
+  .kp-steps li{flex-direction:row; gap:12px; padding:10px 14px; text-align:left}
+}
+@media (prefers-reduced-motion:reduce){
+  .zs-step[data-step="3"]:not([hidden]) .zs-seal{animation:none}
+  .kp-btns .mx-arrow svg{animation:none}
+}
+/* /КУПИТЕ БИЛЕТЫ САМИ: стили */
 /* ==================== ЭКРАН 7: «В какую красоту попадут дети» ====================
    Карусель по коду, который прислал Серёга: большой кадр, под ним полоса
    миниатюр, где выбранное разворачивается, а остальные сжаты в узкие полоски.
@@ -16486,6 +16543,44 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
       </div>
 
+      <!-- КУПИТЕ БИЛЕТЫ САМИ: шаг 3 -->
+      <!-- Шаг 3 «Купите билеты сами» (Серёга, 08.10.2026). КУСОК ОБЩИЙ НА ЧЕТЫРЕ
+           ГОРОДА, руками не править: ставит sayt-nn/instrumenty/kupit_okno.py.
+           Видят те, кто в любой форме с выбором формата (экраны 5, 11А, 11 и это
+           окно) выбрал «Индивидуально». Открывает window.zsKupit (конец скрипта
+           окна). Ссылку на бота с меткой kupit_<код заявки> ставит общий скрипт
+           «ССЫЛКА НА БОТА В МАХ» (data-mx-bot + data-mx-start): бот узнаёт заявку
+           и сразу присылает покупку. Адрес «Купить на сайте» скрипт меняет на
+           город из заявки. Цена малой семейной группы - из
+           schedule-app/src/lib/sbor/ceny.ts (SEMEYNYY_FORMAT). -->
+      <div class="zs-step kp" data-step="3" id="zsStep3" hidden>
+        <div class="zs-seal" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 6h13a1.5 1.5 0 0 1 1.5 1.5v2a2.5 2.5 0 0 0 0 5v2a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5v-2a2.5 2.5 0 0 0 0-5v-2A1.5 1.5 0 0 1 5.5 6Z"/><path d="M15.2 8.2v7.6" stroke-dasharray="1.3 1.9"/><path d="M7.4 10.4h4.4M7.4 13.6h2.8"/></svg>
+        </div>
+        <h2 class="zs-h" id="zsH3">Купите билеты сами&nbsp;- без менеджера</h2>
+        <p class="zs-sub">Заявка принята, менеджер перезвонит. Но ждать не обязательно:
+          билеты в малую семейную группу можно купить самим онлайн за&nbsp;пару&nbsp;минут</p>
+        <p class="kp-cena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
+        <ol class="kp-steps">
+          <li><b>1</b><span>Выберите дату и время</span></li>
+          <li><b>2</b><span>Оплатите онлайн</span></li>
+          <li><b>3</b><span>Билет с <span class="kp-nw">QR-кодом</span> придёт на почту</span></li>
+        </ol>
+        <p class="kp-mx"><b>Лучше через бот в <span class="mx">МАХ</span></b> - там связь стабильнее,
+          без блокировок. Бот сразу пришлёт ссылку на покупку, а если появятся вопросы, менеджер
+          ответит прямо в чате. Напоминания о празднике тоже придут туда.</p>
+        <div class="kp-btns">
+          <a class="zs-btn zs-btn--purple" data-mx-bot data-mx-start="kupit" href="#" target="_blank" rel="noopener">
+            <span class="zs-t">Купить в <span class="mx">МАХ</span></span>
+            <i class="pd-i mx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4.5 12h14M13 6l6 6-6 6"/></svg></i></a>
+          <a class="zs-btn zs-btn--ghost" id="zsKupitSayt" href="https://slots.ministrynewyear.ru/bilety" target="_blank" rel="noopener">
+            <span class="zs-t">Купить на сайте</span></a>
+        </div>
+        <p class="kp-fine">Онлайн продаются билеты только в малую семейную группу: до 15 детей
+          от 4 до 11 лет из разных семей. Если страница оплаты не открывается, отключите VPN.</p>
+      </div>
+      <!-- /КУПИТЕ БИЛЕТЫ САМИ: шаг 3 -->
+
     </div>
   </div>
 </div>
@@ -19211,6 +19306,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         if (send) send.disabled = false;
         if (sendT) sendT.textContent = baseSend;
         if (opts.onDone) opts.onDone(lead);
+        /* «Индивидуально» → окно «Купите билеты сами» (kupit_okno.py); нет окна - строка ничего не делает */
+        if (window.zsKupit) window.zsKupit(lead);
       }
       if (!ENDPOINT){ done(); return; }
       fetch(ENDPOINT, {
@@ -19327,6 +19424,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       /* всегда открываем на шаге «форма», даже если в прошлый раз заявку уже
          отправили: человек мог вернуться за второй датой */
       step1.hidden = false; step2.hidden = true;
+      /* шаг 3 «Купите билеты сами» (kupit_okno.py) прячем вместе со вторым */
+      var s3 = document.getElementById('zsStep3'); if (s3) s3.hidden = true;
       win.setAttribute('aria-labelledby', 'zsH');
       if (api) api.reset();
 
@@ -19366,6 +19465,63 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     document.getElementById('zsX').addEventListener('click', close);
     document.getElementById('zsDone').addEventListener('click', close);
     ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
+
+    /* КУПИТЕ БИЛЕТЫ САМИ: логика */
+    /* ---------- окно «Купите билеты сами» (Серёга, 08.10.2026) ----------
+       КУСОК ОБЩИЙ НА ЧЕТЫРЕ ГОРОДА, руками не править: ставит
+       sayt-nn/instrumenty/kupit_okno.py. Тем, кто в заявке выбрал «Индивидуально»,
+       показать, что билеты можно купить самим, без менеджера, с акцентом на МАХ.
+       Зовёт zsBind сразу после отправки любой формы. Отправили из этого окна - оно
+       переключается с «заявка принята» на шаг 3. Из формы на странице - окно
+       открывается поверх её «заявка принята» через 0,6 с: человек успевает увидеть,
+       что заявка ушла, а закроет окно - увидит её снова.
+       Город - из заявки, а не со страницы: можно выбрать и другой. Онлайн-сеансы
+       на 08.10.2026 открыты в этих четырёх городах, в Нижнем их нет - для него окна
+       нет, человек видит обычное «заявка принята». Откроются сеансы в Нижнем -
+       дописать 'Нижний Новгород': 'nn' в kupit_okno.py и перезапустить его. */
+    var step3 = document.getElementById('zsStep3');
+    var kupitSayt = document.getElementById('zsKupitSayt');
+    var KUPIT = {'Тюмень':'tyumen', 'Казань':'kazan', 'Крым':'crimea', 'Ставрополь':'stavropol'};
+    var BILETY = 'https://slots.ministrynewyear.ru/bilety/';
+
+    function showKupit(){
+      step1.hidden = true; step2.hidden = true; step3.hidden = false;
+      win.setAttribute('aria-labelledby', 'zsH3');
+      win.scrollTop = 0;
+      setTimeout(function(){
+        var b = step3.querySelector('a[data-mx-bot]');
+        if (b && window.matchMedia('(hover: hover) and (pointer: fine)').matches) b.focus();
+        else win.focus();
+      }, 60);
+    }
+
+    window.zsKupit = function(lead){
+      var kod = step3 && kupitSayt && lead && lead.visit === 'Индивидуальное' &&
+                Object.prototype.hasOwnProperty.call(KUPIT, lead.city) && KUPIT[lead.city];
+      if (!kod) return;
+      kupitSayt.href = BILETY + kod;
+      /* окно открыто и не закрывается прямо сейчас - переключаем шаг; закрывается
+         (закрыли, пока заявка летела) - откроем заново через те же полсекунды */
+      if (!ov.hidden && !closeTimer){ showKupit(); return; }
+      setTimeout(function(){
+        if (!ov.hidden) return;          /* за эти полсекунды человек сам открыл окно - не мешаем */
+        if (closeTimer){ clearTimeout(closeTimer); closeTimer = 0; }
+        lastFocus = document.activeElement; source = '';
+        lock();
+        ov.hidden = false;
+        requestAnimationFrame(function(){ ov.classList.add('on'); });
+        document.addEventListener('keydown', onKey, true);
+        showKupit();
+      }, 600);
+    };
+    /* Посмотреть окно, не оставляя заявку: <домен города>/?okno=kupit (для Серёги
+       и проверок: в amoCRM ничего не уходит, бот откроется без кода). Город -
+       свой, первый в списке городов окна заявки. */
+    if (/[?&]okno=kupit(&|$)/.test(location.search)){
+      var svoy = document.querySelector('#zsCity option:not([value=""])');
+      window.zsKupit({visit: 'Индивидуальное', city: svoy ? svoy.textContent.trim() : ''});
+    }
+    /* /КУПИТЕ БИЛЕТЫ САМИ: логика */
   })();
 })();
 </script>
@@ -22239,7 +22395,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      (и на касание, и на фокус с клавиатуры) - к загрузке страницы кода ещё нет. */
   function withCode(a){
     var code = window.__zsLead && window.__zsLead.maxCode;
-    a.href = code ? BOT + '?start=' + encodeURIComponent(code) : BOT;
+    /* У кнопки окна «Купите билеты сами» своя метка (data-mx-start="kupit", kupit_okno.py):
+       бот по ней сразу присылает покупку - kupit_<код>, без заявки просто kupit */
+    var pre = a.getAttribute('data-mx-start');
+    var start = pre ? (code ? pre + '_' + code : pre) : code;
+    a.href = start ? BOT + '?start=' + encodeURIComponent(start) : BOT;
   }
   function onPress(){ withCode(this); }
 

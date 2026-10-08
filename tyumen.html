@@ -3237,15 +3237,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .zs-step[data-step="2"]:not([hidden]) .zs-seal{animation:none}
 }
 
-/* ==================== ОКНО «КУПИТЕ БИЛЕТЫ САМИ» (ТОЛЬКО ТЮМЕНЬ, 08.10.2026) ====================
+/* КУПИТЕ БИЛЕТЫ САМИ: стили */
+/* ==================== ОКНО «КУПИТЕ БИЛЕТЫ САМИ» ====================
    Третий шаг всплывающего окна заявки (#zsStep3): его видят те, кто в заявке
-   выбрал «Индивидуально». Билеты в сборную группу можно купить онлайн без
-   менеджера, акцент на МАХ (Серёга: «там связь стабильнее»). Открывает шаг
-   window.zsKupit в блоке окна. Кнопки по стандарту, вид выбрал Серёга:
+   выбрал «Индивидуально». Билеты в малую семейную группу можно купить онлайн
+   без менеджера, акцент на МАХ (Серёга: «там связь стабильнее»). Открывает шаг
+   window.zsKupit в конце скрипта окна. Кнопки по стандарту, вид выбрал Серёга:
    «Купить в МАХ» - обычная фиолетовая, «Купить на сайте» - прозрачная.
-   Окно тёмное, поэтому прозрачная остаётся светлым золотом. */
+   Окно тёмное, поэтому прозрачная остаётся светлым золотом.
+   КУСОК ОБЩИЙ НА ЧЕТЫРЕ ГОРОДА, руками не править: ставит
+   sayt-nn/instrumenty/kupit_okno.py. */
 .zs-step[data-step="3"]:not([hidden]) .zs-seal{animation:zsSeal .7s cubic-bezier(.2,.8,.2,1) both}
 .kp .zs-seal{width:clamp(60px,5.4vw,72px); height:clamp(60px,5.4vw,72px); margin-bottom:clamp(12px,1.3vw,16px)}
+.kp .zs-seal svg{width:58%; height:58%}
 .kp .zs-sub{max-width:40ch; font-size:clamp(14px,1.15vw,15.5px); color:#A9B9D8}
 /* Цена малой семейной группы (Серёга, 08.10.2026: «написать цену 2500 и взрослые 1000»).
    Исключение из правила «во всплывающем окне цены нет» (см. .zs-price): шаг 3 видят только
@@ -3262,13 +3266,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   background:linear-gradient(180deg,rgba(255,236,190,.07),rgba(255,255,255,.02));
   box-shadow:inset 0 0 0 1px rgba(227,179,78,.24), inset 0 1px 0 rgba(255,238,190,.12);
   font-family:"Golos Text",Arial,sans-serif; font-size:15px; line-height:1.3; color:#E6EDF9; text-wrap:balance}
-.kp-nw{white-space:nowrap}
-.kp .zs-seal svg{width:58%; height:58%}
 .kp-steps b{flex:0 0 auto; width:30px; height:30px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   font-size:15px; font-weight:700; color:#451A03;
   background:linear-gradient(180deg,#FDE68A,#FCD34D 52%,#F59E0B);
   box-shadow:0 0 18px -4px rgba(245,158,11,.6)}
+.kp-nw{white-space:nowrap}
 /* довод за МАХ - главный текст шага, поэтому крупнее подзаголовка */
 .kp-mx{margin:clamp(18px,2vw,24px) auto 0; max-width:42ch;
   font-family:"Golos Text",Arial,sans-serif;
@@ -3289,6 +3292,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .zs-step[data-step="3"]:not([hidden]) .zs-seal{animation:none}
   .kp-btns .mx-arrow svg{animation:none}
 }
+/* /КУПИТЕ БИЛЕТЫ САМИ: стили */
 /* ==================== ЭКРАН 7: «В какую красоту попадут дети» ====================
    Карусель по коду, который прислал Серёга: большой кадр, под ним полоса
    миниатюр, где выбранное разворачивается, а остальные сжаты в узкие полоски.
@@ -14844,13 +14848,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
       </div>
 
-      <!-- шаг 3: «Купите билеты сами» - ТОЛЬКО ТЮМЕНЬ (Серёга, 08.10.2026).
-           Видят те, кто в любой форме с выбором формата (экраны 5, 11А, 11
-           и это окно) выбрал «Индивидуально». Открывает window.zsKupit
-           (блок окна ниже по файлу), стили - блок «ОКНО «КУПИТЕ БИЛЕТЫ САМИ»».
-           Ссылку на бота с кодом заявки ставит общий скрипт «ССЫЛКА НА БОТА
-           В МАХ» (data-mx-bot): бот узнаёт заявку, чат встаёт в сделку.
-           Адрес «Купить на сайте» скрипт меняет на город из заявки. -->
+      <!-- КУПИТЕ БИЛЕТЫ САМИ: шаг 3 -->
+      <!-- Шаг 3 «Купите билеты сами» (Серёга, 08.10.2026). КУСОК ОБЩИЙ НА ЧЕТЫРЕ
+           ГОРОДА, руками не править: ставит sayt-nn/instrumenty/kupit_okno.py.
+           Видят те, кто в любой форме с выбором формата (экраны 5, 11А, 11 и это
+           окно) выбрал «Индивидуально». Открывает window.zsKupit (конец скрипта
+           окна). Ссылку на бота с меткой kupit_<код заявки> ставит общий скрипт
+           «ССЫЛКА НА БОТА В МАХ» (data-mx-bot + data-mx-start): бот узнаёт заявку
+           и сразу присылает покупку. Адрес «Купить на сайте» скрипт меняет на
+           город из заявки. Цена малой семейной группы - из
+           schedule-app/src/lib/sbor/ceny.ts (SEMEYNYY_FORMAT). -->
       <div class="zs-step kp" data-step="3" id="zsStep3" hidden>
         <div class="zs-seal" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 6h13a1.5 1.5 0 0 1 1.5 1.5v2a2.5 2.5 0 0 0 0 5v2a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5v-2a2.5 2.5 0 0 0 0-5v-2A1.5 1.5 0 0 1 5.5 6Z"/><path d="M15.2 8.2v7.6" stroke-dasharray="1.3 1.9"/><path d="M7.4 10.4h4.4M7.4 13.6h2.8"/></svg>
@@ -14858,8 +14865,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <h2 class="zs-h" id="zsH3">Купите билеты сами&nbsp;- без менеджера</h2>
         <p class="zs-sub">Заявка принята, менеджер перезвонит. Но ждать не обязательно:
           билеты в малую семейную группу можно купить самим онлайн за&nbsp;пару&nbsp;минут</p>
-        <!-- цена малой семейной группы - из schedule-app/src/lib/sbor/ceny.ts (SEMEYNYY_FORMAT):
-             поменялась там - поменять здесь -->
         <p class="kp-cena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
         <ol class="kp-steps">
           <li><b>1</b><span>Выберите дату и время</span></li>
@@ -14870,17 +14875,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           без блокировок. Бот сразу пришлёт ссылку на покупку, а если появятся вопросы, менеджер
           ответит прямо в чате. Напоминания о празднике тоже придут туда.</p>
         <div class="kp-btns">
-          <!-- data-mx-start="kupit": бот получает метку kupit_<код заявки> и вместо общего
-               приветствия сразу присылает покупку (schedule-app/src/lib/max-bot/metka-rules.ts) -->
           <a class="zs-btn zs-btn--purple" data-mx-bot data-mx-start="kupit" href="#" target="_blank" rel="noopener">
             <span class="zs-t">Купить в <span class="mx">МАХ</span></span>
             <i class="pd-i mx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4.5 12h14M13 6l6 6-6 6"/></svg></i></a>
-          <a class="zs-btn zs-btn--ghost" id="zsKupitSayt" href="https://slots.ministrynewyear.ru/bilety/tyumen" target="_blank" rel="noopener">
+          <a class="zs-btn zs-btn--ghost" id="zsKupitSayt" href="https://slots.ministrynewyear.ru/bilety" target="_blank" rel="noopener">
             <span class="zs-t">Купить на сайте</span></a>
         </div>
         <p class="kp-fine">Онлайн продаются билеты только в малую семейную группу: до 15 детей
           от 4 до 11 лет из разных семей. Если страница оплаты не открывается, отключите VPN.</p>
       </div>
+      <!-- /КУПИТЕ БИЛЕТЫ САМИ: шаг 3 -->
 
     </div>
   </div>
@@ -17593,7 +17597,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         if (send) send.disabled = false;
         if (sendT) sendT.textContent = baseSend;
         if (opts.onDone) opts.onDone(lead);
-        /* ТОЛЬКО ТЮМЕНЬ: «Индивидуально» → окно «Купите билеты сами» (window.zsKupit, блок окна) */
+        /* «Индивидуально» → окно «Купите билеты сами» (kupit_okno.py); нет окна - строка ничего не делает */
         if (window.zsKupit) window.zsKupit(lead);
       }
       if (!ENDPOINT){ done(); return; }
@@ -17710,7 +17714,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
       /* всегда открываем на шаге «форма», даже если в прошлый раз заявку уже
          отправили: человек мог вернуться за второй датой */
-      step1.hidden = false; step2.hidden = true; if (step3) step3.hidden = true;
+      step1.hidden = false; step2.hidden = true;
+      /* шаг 3 «Купите билеты сами» (kupit_okno.py) прячем вместе со вторым */
+      var s3 = document.getElementById('zsStep3'); if (s3) s3.hidden = true;
       win.setAttribute('aria-labelledby', 'zsH');
       if (api) api.reset();
 
@@ -17751,17 +17757,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     document.getElementById('zsDone').addEventListener('click', close);
     ov.addEventListener('click', function(e){ if (e.target === ov) close(); });
 
-    /* ---------- «КУПИТЕ БИЛЕТЫ САМИ» (ТОЛЬКО ТЮМЕНЬ, 08.10.2026) ----------
-       Серёга: тем, кто в заявке выбрал «Индивидуально», показать, что билеты
-       можно купить самим, без менеджера, с акцентом на МАХ. Зовёт zsBind сразу
-       после отправки любой формы. Отправили из этого окна - оно переключается
-       с «заявка принята» на шаг 3. Из формы на странице - окно открывается
-       поверх её «заявка принята» через 0,6 с: человек успевает увидеть, что
-       заявка ушла, а закроет окно - увидит её снова.
-       Город - из заявки, а не со страницы: на сайте Тюмени можно выбрать
-       и другой. Онлайн-сеансы на 08.10.2026 открыты в этих четырёх городах,
-       в Нижнем их нет - для него окна нет, человек видит обычное «заявка
-       принята». Откроются сеансы в Нижнем - дописать 'Нижний Новгород': 'nn'. */
+    /* КУПИТЕ БИЛЕТЫ САМИ: логика */
+    /* ---------- окно «Купите билеты сами» (Серёга, 08.10.2026) ----------
+       КУСОК ОБЩИЙ НА ЧЕТЫРЕ ГОРОДА, руками не править: ставит
+       sayt-nn/instrumenty/kupit_okno.py. Тем, кто в заявке выбрал «Индивидуально»,
+       показать, что билеты можно купить самим, без менеджера, с акцентом на МАХ.
+       Зовёт zsBind сразу после отправки любой формы. Отправили из этого окна - оно
+       переключается с «заявка принята» на шаг 3. Из формы на странице - окно
+       открывается поверх её «заявка принята» через 0,6 с: человек успевает увидеть,
+       что заявка ушла, а закроет окно - увидит её снова.
+       Город - из заявки, а не со страницы: можно выбрать и другой. Онлайн-сеансы
+       на 08.10.2026 открыты в этих четырёх городах, в Нижнем их нет - для него окна
+       нет, человек видит обычное «заявка принята». Откроются сеансы в Нижнем -
+       дописать 'Нижний Новгород': 'nn' в kupit_okno.py и перезапустить его. */
     var step3 = document.getElementById('zsStep3');
     var kupitSayt = document.getElementById('zsKupitSayt');
     var KUPIT = {'Тюмень':'tyumen', 'Казань':'kazan', 'Крым':'crimea', 'Ставрополь':'stavropol'};
@@ -17797,9 +17805,14 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         showKupit();
       }, 600);
     };
-    /* Посмотреть окно, не оставляя заявку: https://mnd-tumen.ru/?okno=kupit
-       (для Серёги и проверок: в amoCRM ничего не уходит, бот откроется без кода) */
-    if (/[?&]okno=kupit(&|$)/.test(location.search)) window.zsKupit({visit: 'Индивидуальное', city: 'Тюмень'});
+    /* Посмотреть окно, не оставляя заявку: <домен города>/?okno=kupit (для Серёги
+       и проверок: в amoCRM ничего не уходит, бот откроется без кода). Город -
+       свой, первый в списке городов окна заявки. */
+    if (/[?&]okno=kupit(&|$)/.test(location.search)){
+      var svoy = document.querySelector('#zsCity option:not([value=""])');
+      window.zsKupit({visit: 'Индивидуальное', city: svoy ? svoy.textContent.trim() : ''});
+    }
+    /* /КУПИТЕ БИЛЕТЫ САМИ: логика */
   })();
 })();
 </script>
@@ -20478,8 +20491,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      (и на касание, и на фокус с клавиатуры) - к загрузке страницы кода ещё нет. */
   function withCode(a){
     var code = window.__zsLead && window.__zsLead.maxCode;
-    /* ТОЛЬКО ТЮМЕНЬ: у кнопки окна «Купите билеты сами» своя метка (data-mx-start="kupit") -
-       бот по ней сразу присылает покупку: kupit_<код>, без заявки - просто kupit */
+    /* У кнопки окна «Купите билеты сами» своя метка (data-mx-start="kupit", kupit_okno.py):
+       бот по ней сразу присылает покупку - kupit_<код>, без заявки просто kupit */
     var pre = a.getAttribute('data-mx-start');
     var start = pre ? (code ? pre + '_' + code : pre) : code;
     a.href = start ? BOT + '?start=' + encodeURIComponent(start) : BOT;
