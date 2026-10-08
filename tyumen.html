@@ -17785,6 +17785,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         showKupit();
       }, 600);
     };
+    /* Посмотреть окно, не оставляя заявку: https://mnd-tumen.ru/?okno=kupit
+       (для Серёги и проверок: в amoCRM ничего не уходит, бот откроется без кода) */
+    if (/[?&]okno=kupit(&|$)/.test(location.search)) window.zsKupit({visit: 'Индивидуальное', city: 'Тюмень'});
   })();
 })();
 </script>
