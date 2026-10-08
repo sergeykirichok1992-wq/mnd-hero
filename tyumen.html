@@ -3247,6 +3247,13 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .zs-step[data-step="3"]:not([hidden]) .zs-seal{animation:zsSeal .7s cubic-bezier(.2,.8,.2,1) both}
 .kp .zs-seal{width:clamp(60px,5.4vw,72px); height:clamp(60px,5.4vw,72px); margin-bottom:clamp(12px,1.3vw,16px)}
 .kp .zs-sub{max-width:40ch; font-size:clamp(14px,1.15vw,15.5px); color:#A9B9D8}
+/* Цена малой семейной группы (Серёга, 08.10.2026: «написать цену 2500 и взрослые 1000»).
+   Исключение из правила «во всплывающем окне цены нет» (см. .zs-price): шаг 3 видят только
+   семьи, и цена здесь - довод купить самим. Начертание и цвета - как у строки цены в формах. */
+.kp-cena{margin:clamp(12px,1.3vw,16px) auto 0;
+  font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
+  font-size:clamp(17px,1.45vw,21px); line-height:1.25; letter-spacing:.01em; color:#B7C6E2}
+.kp-cena b{font-weight:400; color:#FF7A6E; white-space:nowrap}
 /* три шага покупки: карточки тёплого стекла с золотой кромкой, номер - золотой пилюлей */
 .kp-steps{list-style:none; margin:clamp(16px,1.8vw,22px) 0 0; padding:0;
   display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
@@ -14850,24 +14857,29 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <h2 class="zs-h" id="zsH3">Купите билеты сами&nbsp;- без менеджера</h2>
         <p class="zs-sub">Заявка принята, менеджер перезвонит. Но ждать не обязательно:
-          билеты в сборную группу можно купить онлайн за пару минут</p>
+          билеты в малую семейную группу можно купить самим онлайн за&nbsp;пару&nbsp;минут</p>
+        <!-- цена малой семейной группы - из schedule-app/src/lib/sbor/ceny.ts (SEMEYNYY_FORMAT):
+             поменялась там - поменять здесь -->
+        <p class="kp-cena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
         <ol class="kp-steps">
           <li><b>1</b><span>Выберите дату и время</span></li>
           <li><b>2</b><span>Оплатите онлайн</span></li>
           <li><b>3</b><span>Билет с <span class="kp-nw">QR-кодом</span> придёт на почту</span></li>
         </ol>
         <p class="kp-mx"><b>Лучше через бот в <span class="mx">МАХ</span></b> - там связь стабильнее,
-          без блокировок. Бот покажет свободные даты, а если появятся вопросы, менеджер ответит
-          прямо в чате. В боте нажмите <b>«Купить билеты онлайн»</b>.</p>
+          без блокировок. Бот сразу пришлёт ссылку на покупку, а если появятся вопросы, менеджер
+          ответит прямо в чате. Напоминания о празднике тоже придут туда.</p>
         <div class="kp-btns">
-          <a class="zs-btn zs-btn--purple" data-mx-bot href="#" target="_blank" rel="noopener">
+          <!-- data-mx-start="kupit": бот получает метку kupit_<код заявки> и вместо общего
+               приветствия сразу присылает покупку (schedule-app/src/lib/max-bot/metka-rules.ts) -->
+          <a class="zs-btn zs-btn--purple" data-mx-bot data-mx-start="kupit" href="#" target="_blank" rel="noopener">
             <span class="zs-t">Купить в <span class="mx">МАХ</span></span>
             <i class="pd-i mx-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M4.5 12h14M13 6l6 6-6 6"/></svg></i></a>
           <a class="zs-btn zs-btn--ghost" id="zsKupitSayt" href="https://slots.ministrynewyear.ru/bilety/tyumen" target="_blank" rel="noopener">
             <span class="zs-t">Купить на сайте</span></a>
         </div>
-        <p class="kp-fine">Онлайн продаются билеты только в сборную группу: своей семьёй, для детей 4-11 лет.
-          Если страница оплаты не открывается, отключите VPN.</p>
+        <p class="kp-fine">Онлайн продаются билеты только в малую семейную группу: до 15 детей
+          от 4 до 11 лет из разных семей. Если страница оплаты не открывается, отключите VPN.</p>
       </div>
 
     </div>
@@ -20466,7 +20478,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
      (и на касание, и на фокус с клавиатуры) - к загрузке страницы кода ещё нет. */
   function withCode(a){
     var code = window.__zsLead && window.__zsLead.maxCode;
-    a.href = code ? BOT + '?start=' + encodeURIComponent(code) : BOT;
+    /* ТОЛЬКО ТЮМЕНЬ: у кнопки окна «Купите билеты сами» своя метка (data-mx-start="kupit") -
+       бот по ней сразу присылает покупку: kupit_<код>, без заявки - просто kupit */
+    var pre = a.getAttribute('data-mx-start');
+    var start = pre ? (code ? pre + '_' + code : pre) : code;
+    a.href = start ? BOT + '?start=' + encodeURIComponent(start) : BOT;
   }
   function onPress(){ withCode(this); }
 
