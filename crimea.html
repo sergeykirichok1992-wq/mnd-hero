@@ -17364,9 +17364,16 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           })
           .catch(function(){ /* сервер не ответил - кнопки нет, формы работают как раньше */ });
       }
-      /* после загрузки страницы: даты нужны не раньше, чем человек дойдёт до формы */
-      if (document.readyState === 'complete') setTimeout(zagruzit, 300);
-      else window.addEventListener('load', function(){ setTimeout(zagruzit, 300); });
+      /* После загрузки страницы, но не позже 2,5 с: даты нужны не раньше, чем человек дойдёт
+         до формы. Одним «load» нельзя - на боевом он может не наступить вовсе (сторонний
+         счётчик грузится бесконечно, 29.10.2026 так и было), и кнопка не появилась бы */
+      var zapushen = false;
+      function odinRaz(){ if (zapushen) return; zapushen = true; zagruzit(); }
+      if (document.readyState === 'complete') setTimeout(odinRaz, 300);
+      else {
+        window.addEventListener('load', function(){ setTimeout(odinRaz, 300); });
+        setTimeout(odinRaz, 2500);
+      }
     })();
     /* /КУПИТЬ БИЛЕТ ОНЛАЙН: логика */
 
