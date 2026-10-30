@@ -1,0 +1,474 @@
+<!doctype html>
+<!-- ПРЕСС-РЕЛИЗ СТАВРОПОЛЯ (30.10.2026). Статья для пабликов: по ней пишут
+     нативный пост о нас. Шапка и ночное небо - как у promokody.html и
+     shagi-stavropol.html. Цены считает скрипт внизу по московской дате,
+     ступени те же, что в PRAJS на stavropol.html: поменялись там - поменять тут. -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Министерство Новогодних Дел снова в Ставрополе - пресс-релиз сезона 2026/27</title>
+<meta name="theme-color" content="#04070F">
+<meta name="description" content="С 27 ноября по 10 января - новогодняя экскурсия-шоу «Капсула времени» для детей 4-11 лет в настоящей деревянной избе Деда Мороза, Ставрополь, ул. Росгипрозем, 291.">
+<link rel="canonical" href="https://mnd-stavropol.ru/press-stavropol.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Министерство Новогодних Дел">
+<meta property="og:title" content="Министерство Новогодних Дел снова в Ставрополе - с новой программой «Капсула времени»">
+<meta property="og:description" content="С 27 ноября по 10 января, дети 4-11 лет, настоящая деревянная изба Деда Мороза на ул. Росгипрозем, 291.">
+<meta property="og:image" content="https://mnd-stavropol.ru/karus_st/h01.webp">
+<meta property="og:url" content="https://mnd-stavropol.ru/press-stavropol.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500;600;700&display=swap">
+<link rel="preload" as="image" href="karus_st/h01.webp">
+<style>
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+:root{
+  --ink:#04070F; --line:#18223B; --dim:#8695B3; --gold:#E3B34E; --gold-l:#F0C97A;
+  --col:720px;                 /* колонка текста статьи */
+  --wide:1180px;               /* фото и плашки шире текста */
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; background:var(--ink); color:#DCE4F3;
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:#EBD3A0; text-underline-offset:.18em}
+a:hover{color:#fff}
+
+/* ---------- шапка (та же, что на promokody.html) ---------- */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:40;
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(4,7,15,.82);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:#fff; text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026), как на promokody.html. */
+.navbtn{
+  margin-left:auto;
+  border:1px solid var(--gold); color:var(--gold); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none;
+}
+.navbtn:hover,.navbtn:focus-visible{background:var(--gold); color:var(--ink)}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:10.5px; letter-spacing:.06em}
+  .navbtn{padding:8px 12px; font-size:12px}
+  .navbtn .nb-dl{display:none}
+}
+.navbtn .nb-kr{display:none}
+@media(max-width:520px){ .navbtn .nb-kr{display:inline} }
+@media(max-width:400px){ .brand{font-size:9.5px; letter-spacing:.03em} }
+
+/* ---------- ночное небо (рецепт .sh с shagi-stavropol.html) ---------- */
+.pr{
+  position:relative; z-index:1; isolation:isolate; overflow:hidden;
+  padding:clamp(104px,10vw,160px) 0 clamp(80px,8vw,140px);
+  background:
+    radial-gradient(64vw 18vw at 50% 0%, rgba(28,36,116,.85), rgba(28,36,116,0) 100%),
+    linear-gradient(180deg,#0A1046 0%,#080F3E 10%,#060B2E 40%,#050922 76%,#04071A 100%);
+}
+.pr-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.pr-glow i{position:absolute; display:block; border-radius:50%; will-change:transform,opacity}
+.pr-glow i:nth-child(1){left:-18vw; top:0%; width:68vw; height:30%;
+  background:radial-gradient(closest-side, rgba(47,49,146,.5) 0%, rgba(47,49,146,.34) 32%, rgba(47,49,146,.12) 64%, rgba(47,49,146,0) 100%);
+  animation:prDrift1 38s ease-in-out infinite alternate}
+.pr-glow i:nth-child(2){right:-20vw; top:34%; width:70vw; height:32%;
+  background:radial-gradient(closest-side, rgba(108,43,217,.3) 0%, rgba(108,43,217,.18) 32%, rgba(108,43,217,.06) 64%, rgba(108,43,217,0) 100%);
+  animation:prDrift2 45s ease-in-out infinite alternate}
+.pr-glow i:nth-child(3){left:50%; bottom:-4%; width:78vw; height:30%; margin-left:-39vw;
+  background:radial-gradient(closest-side, rgba(227,179,78,.16) 0%, rgba(227,179,78,.1) 32%, rgba(227,179,78,.03) 64%, rgba(227,179,78,0) 100%);
+  animation:prDrift3 33s ease-in-out infinite alternate}
+@keyframes prDrift1{from{transform:translate3d(0,0,0) scale(1);    opacity:.9}
+                    to  {transform:translate3d(4%,3%,0) scale(1.08); opacity:1}}
+@keyframes prDrift2{from{transform:translate3d(0,0,0) scale(1.06); opacity:1}
+                    to  {transform:translate3d(-5%,-3%,0) scale(1); opacity:.86}}
+@keyframes prDrift3{from{transform:translate3d(0,0,0) scale(1);    opacity:.84}
+                    to  {transform:translate3d(5%,-4%,0) scale(1.1); opacity:1}}
+@media (prefers-reduced-motion:reduce){ .pr-glow i{animation:none} }
+
+/* Контейнер широкий, как по всему сайту (ai-clone/feedback/shirokaya-verstka-sayta.md);
+   узкая только колонка текста. */
+.pr-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1720px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,56px);
+}
+@media (max-width:767px){ .pr-cont{width:100%; padding-inline:16px} }
+.pr-cont > *{max-width:var(--col); margin-inline:auto}
+.pr-cont > .w{max-width:var(--wide)}
+
+/* ---------- заголовок статьи ---------- */
+.pr-cont .pr-eyebrow{margin:0 auto clamp(14px,1.3vw,20px); text-align:center;
+  font-size:clamp(11px,.9vw,12.5px); font-weight:600; letter-spacing:.24em;
+  text-transform:uppercase; color:#9FB0DA}
+.pr-eyebrow b{color:var(--gold-l); font-weight:600}
+h1{
+  max-width:980px !important;
+  margin:0 auto clamp(18px,1.6vw,26px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(30px,3.7vw,60px); line-height:1.05; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:#fff;
+}
+h1 span{color:var(--gold-l)}
+.pr-cont .pr-lead{
+  margin-top:0; margin-bottom:0; text-align:center; text-wrap:pretty;
+  font-size:max(17px, clamp(17px,1.3vw,21px)); line-height:1.55; color:#C6D3F2;
+}
+.pr-cont .pr-lead b{color:#fff; font-weight:600}
+
+/* ---------- фото ---------- */
+figure{margin:clamp(34px,3.4vw,56px) auto}
+figure img{display:block; width:100%; height:auto; border-radius:clamp(12px,1vw,18px);
+  box-shadow:0 30px 60px -34px rgba(0,0,0,.9), inset 0 0 0 1px rgba(255,214,150,.1)}
+figcaption{margin-top:10px; font-size:14px; line-height:1.45; color:var(--dim); text-align:center}
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:clamp(10px,1.2vw,18px)}
+.pair img{aspect-ratio:1/1; object-fit:cover}
+@media (max-width:560px){ .pair{gap:8px} }
+.hero-ph img{aspect-ratio:3/2; object-fit:cover}
+
+/* ---------- текст статьи ---------- */
+.pr-cont h2{
+  margin-top:clamp(46px,4.4vw,72px); margin-bottom:clamp(14px,1.2vw,18px);
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(24px,2.1vw,34px); line-height:1.1; letter-spacing:.01em;
+  text-transform:uppercase; color:#fff; text-wrap:balance;
+}
+.pr-cont h2 span{color:var(--gold-l)}
+.pr-cont p{margin-top:0; margin-bottom:1em;
+  font-size:max(17px, clamp(17px,1.15vw,19px)); line-height:1.68; color:#D3DDF1}
+.pr-cont p b{color:#fff; font-weight:600}
+
+/* цитата автора проекта */
+.q{
+  position:relative; margin-top:clamp(26px,2.4vw,36px); margin-bottom:clamp(26px,2.4vw,36px);
+  padding:clamp(20px,2vw,30px) clamp(20px,2.2vw,34px) clamp(20px,2vw,28px) clamp(26px,2.6vw,40px);
+  border-radius:clamp(14px,1.2vw,20px);
+  background:linear-gradient(160deg, rgba(86,60,196,.24) 0%, rgba(38,26,112,.22) 55%, rgba(20,14,70,.36) 100%);
+  box-shadow:inset 3px 0 0 var(--gold), inset 0 0 0 1px rgba(255,214,150,.12);
+}
+.q p{margin:0 !important; font-size:max(18px, clamp(18px,1.3vw,21px)) !important; line-height:1.55 !important; color:#fff !important}
+.ded .q{margin-left:0; margin-right:0}
+.q cite{display:block; margin-top:12px; font-style:normal; font-size:15px; color:var(--gold-l)}
+
+/* ---------- цифры Ставрополя: три плашки разного цвета ---------- */
+.stats{list-style:none; padding:0; margin-top:clamp(24px,2.4vw,36px); margin-bottom:clamp(24px,2.4vw,36px);
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(10px,1.2vw,18px)}
+.stats li{
+  padding:clamp(20px,2vw,30px) clamp(16px,1.6vw,24px); border-radius:clamp(14px,1.2vw,20px);
+  text-align:center;
+}
+.stats li:nth-child(1){background:linear-gradient(160deg,#F7D27A 0%,#E3A93A 100%); color:#3A2402}
+.stats li:nth-child(2){background:linear-gradient(160deg,#6E47E0 0%,#3B1FA0 100%); color:#fff}
+.stats li:nth-child(3){background:linear-gradient(160deg,#2C5BD8 0%,#162E8C 100%); color:#fff}
+.stats b{display:block; margin-bottom:6px;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(36px,3.6vw,58px); line-height:1}
+.stats span{display:block; font-size:max(15px,clamp(15px,1vw,17px)); line-height:1.35}
+@media (max-width:640px){
+  .stats{grid-template-columns:1fr}
+  .stats li{display:flex; align-items:center; gap:16px; text-align:left; padding:16px 20px}
+  .stats b{flex:none; min-width:3.6em; margin:0; font-size:38px}
+}
+
+/* ---------- Дед Мороз: фото рядом с текстом ---------- */
+.ded{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:clamp(22px,3vw,52px); align-items:center;
+  margin-top:clamp(30px,3vw,46px); margin-bottom:clamp(10px,1vw,16px)}
+.ded figure{margin:0}
+.ded img{aspect-ratio:906/860; object-fit:cover}
+.ded p:last-child{margin-bottom:0}
+@media (max-width:820px){ .ded{grid-template-columns:1fr} .ded figure{order:-1} }
+
+/* ---------- цены: три карточки ---------- */
+.ceny{list-style:none; padding:0; margin-top:clamp(24px,2.4vw,34px); margin-bottom:clamp(20px,2vw,28px);
+  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(10px,1.2vw,18px)}
+.ceny li{
+  padding:clamp(20px,1.9vw,28px) clamp(18px,1.6vw,24px); border-radius:clamp(14px,1.2vw,20px);
+  background:linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.025));
+  box-shadow:inset 0 0 0 1px rgba(255,214,150,.16);
+}
+.ceny li.gl{background:linear-gradient(160deg, rgba(227,179,78,.24), rgba(227,179,78,.07));
+  box-shadow:inset 0 0 0 1px rgba(240,201,122,.55)}
+.ceny h3{margin:0 0 10px; font-size:15px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:#AFC0E6}
+.ceny .s{display:block; font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(26px,2.2vw,34px); line-height:1.05; color:#fff; white-space:nowrap}
+.ceny li.gl .s{color:var(--gold-l)}
+.ceny small{display:block; margin-top:10px; font-size:15px; line-height:1.45; color:#B9C6E2}
+@media (max-width:760px){ .ceny{grid-template-columns:1fr} }
+
+/* ---------- «Коротко»: тёплое стекло с золотой кромкой ---------- */
+.kr{
+  margin-top:clamp(46px,4.4vw,72px); margin-bottom:0;
+  padding:clamp(24px,2.6vw,42px) clamp(20px,3vw,48px);
+  border-radius:clamp(18px,1.6vw,26px);
+  background:linear-gradient(160deg, rgba(122,84,36,.30) 0%, rgba(60,36,90,.30) 55%, rgba(20,14,60,.45) 100%);
+  box-shadow:inset 0 0 0 1px rgba(240,201,122,.5), inset 0 1px 0 rgba(255,255,255,.08), 0 30px 60px -34px rgba(0,0,0,.9);
+}
+.kr h2{margin-top:0 !important}
+.kr dl{margin:0; display:grid; grid-template-columns:max-content 1fr; gap:12px clamp(18px,2.4vw,40px)}
+.kr dt{font-size:15px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--gold-l); padding-top:3px}
+.kr dd{margin:0; font-size:max(17px,clamp(17px,1.1vw,18.5px)); line-height:1.5; color:#fff}
+@media (max-width:620px){
+  .kr dl{grid-template-columns:1fr; gap:4px}
+  .kr dd{margin-bottom:12px}
+}
+
+.pr-end{margin-top:clamp(30px,3vw,44px) !important; text-align:center; font-size:15px !important; color:var(--dim) !important}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="https://mnd-stavropol.ru/">Министерство<span> · </span>Новогодних Дел</a>
+  <a class="navbtn" href="https://mnd-stavropol.ru/"><span class="nb-dl">Сайт Ставрополя</span><span class="nb-kr">На сайт</span></a>
+</header>
+
+<main class="pr">
+  <div class="pr-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <article class="pr-cont">
+    <p class="pr-eyebrow">Пресс-релиз · <b>Ставрополь</b> · 30 октября 2026</p>
+    <h1>Министерство Новогодних Дел снова в Ставрополе - <span>с новой программой «Капсула времени»</span></h1>
+    <p class="pr-lead">С <b>27 ноября по 10 января</b> в Ставрополе пройдёт второй сезон нашей новогодней
+      экскурсии-шоу для детей от 4 до 11 лет. Праздник проходит в настоящей деревянной избе
+      Деда Мороза на ул. Росгипрозем, 291. В прошлом году у нас побывали <b>11&nbsp;тысяч детей</b>,
+      а в этом сезоне программа полностью новая.</p>
+
+    <figure class="w hero-ph">
+      <img src="karus_st/h01.webp" width="1400" height="933" alt="Деревянная изба Деда Мороза в Ставрополе зимой, во дворе ёлки в снегу" fetchpriority="high">
+      <figcaption>Изба Деда Мороза в Ставрополе, ул. Росгипрозем, 291</figcaption>
+    </figure>
+
+    <h2>Кто <span>мы такие</span></h2>
+    <p>Министерство Новогодних Дел проводит новогодние мероприятия для школьников с 2018 года,
+      в этом сезоне - в семи городах России. Прошлой зимой к нам пришли 52&nbsp;000 детей
+      в пяти городах, а всего за семь лет - почти 300&nbsp;000. Каждый год над проектом работают
+      больше 150 человек: актёры, карамельщики, декораторы, хостес, менеджеры.</p>
+    <p>В Ставрополь мы впервые приехали в 2025 году. Вот чем закончился первый сезон:</p>
+
+    <ul class="stats w">
+      <li><b>11&nbsp;000</b><span>детей побывали у нас за сезон</span></li>
+      <li><b>5,0</b><span>звёзд - оценка на Яндекс Картах</span></li>
+      <li><b>~300</b><span>видеоотзывов от родительских комитетов</span></li>
+    </ul>
+
+    <p>Видеоотзывы мы снимали прямо на площадке: родительские комитеты рассказывали
+      о празднике сразу после программы. Все ролики выложены в нашей
+      <a href="https://vkvideo.ru/playlist/-232716559_2" target="_blank" rel="noopener">группе ВКонтакте</a>.
+      Можно открыть любой и послушать, что говорят родители.</p>
+
+    <h2>Изба, <span>а не торговый центр</span></h2>
+    <p>Мы не проводим праздник на базах отдыха, в торговых центрах, игровых комнатах
+      и студиях аниматоров. Под мероприятие мы берём отдельно стоящий деревянный дом
+      на 300 квадратных метров со своей закрытой территорией и оборудуем его целиком:
+      двор с огнями и снежными дорожками, два этажа, тёплые полы, отдельная проводка
+      и пожарная сигнализация.</p>
+    <p>Дети снимают обувь на входе и ходят по избе в носочках. Внутри столько деталей,
+      будто Дед Мороз обживал этот дом тысячу лет. Каждый угол - готовая фотозона,
+      и родители обычно снимают больше, чем собирались.</p>
+
+    <blockquote class="q">
+      <p>«Ребёнок сразу видит, где фанера и ёлка из коробки. А в настоящей избе, где продумана
+        каждая мелочь, даже десятилетний начинает сомневаться: а вдруг тут правда живёт
+        Дед Мороз? Ради этой минуты мы всё и делаем».</p>
+      <cite>Сергей Киричок, автор проекта</cite>
+    </blockquote>
+
+    <h2>Новая программа: <span>всё с нуля</span></h2>
+    <p>Кто был у нас в прошлом году, знакомого не увидит. Сюжет, декорации, герои, костюмы
+      и актёры - всё новое. В Ставрополе эта программа идёт впервые.</p>
+    <p>Сюжет такой. В Министерстве стоит машина времени Деда Мороза, к ней подключены капсулы
+      с событиями, после которых Новый год стал таким, каким мы его знаем. В одной из них указ
+      Петра I от 1699 года: с него год в России начинается 1 января. И вот капсулы пропали.
+      Если их не вернуть, Новый год может просто не наступить, да и леденцы готовить
+      станет незачем.</p>
+    <p>Дети берутся за расследование. Они попадут в тайный архив Деда Мороза, где лежат
+      настоящие старинные книги, газеты царских времён и вещи, которые мы собирали
+      специально под эту программу. Портреты Петра Первого и Екатерины Великой оживают
+      на стене и разговаривают с детьми. А машина времени примет от каждого записку
+      самому себе в будущее.</p>
+
+    <figure class="w">
+      <div class="pair">
+        <img src="karta/st-k5/03.webp" width="640" height="640" loading="lazy" alt="Дети смотрят на ожившие портреты Екатерины Великой и Петра Первого">
+        <img src="karta/st-k4/02.webp" width="640" height="640" loading="lazy" alt="Стол в тайном архиве Деда Мороза: печатная машинка, свечи, старые бумаги">
+      </div>
+      <figcaption>Ожившие портреты и тайный архив Деда Мороза</figcaption>
+    </figure>
+
+    <p>Ещё в программе велком-шоу во дворе, шоу рисования светом, пульт управления делами
+      Деда Мороза (на его экране дети увидят себя), снег, который пойдёт по детскому
+      заклинанию, и чаепитие в конце. Пока дети на программе, родителей угощают игристым
+      или чаем и развлекают отдельно.</p>
+
+    <h2>Карамель <span>на фабричном оборудовании</span></h2>
+    <p>Главная и самая длинная часть программы - карамельный мастер-класс. В этом году
+      он тоже новый: другие формы, вкусы и техники. Дети работают на профессиональном
+      оборудовании, таком же, как на кондитерских фабриках, и под присмотром сказочных
+      карамельщиков делают леденцы, которые не отличить от тех, что продают на новогодних
+      ярмарках. Получается у всех, даже у самых маленьких. Леденцы дети забирают домой.</p>
+    <p>Карамель настоящая, а не изомальт (сахарозаменитель), как это часто бывает.
+      Заготовки мы варим сами, в своём цехе в Нижнем Новгороде, по ГОСТу и без эмульгаторов.
+      За сезон это <b>около 4 тонн карамели</b>.</p>
+
+    <figure class="w">
+      <div class="pair">
+        <img src="karta/st-k3/03.webp" width="640" height="640" loading="lazy" alt="Дети с карамельщиками раскатывают красно-белую карамель">
+        <img src="karta/st-k3/05.webp" width="640" height="640" loading="lazy" alt="Девочки в колпаках показывают свои леденцы">
+      </div>
+      <figcaption>Карамельный мастер-класс</figcaption>
+    </figure>
+
+    <div class="ded w">
+      <div>
+        <h2 style="margin-top:0">Дед Мороз, <span>которому верят</span></h2>
+        <p>Наши Деды Морозы - взрослые мужчины 50-60 лет. Высокие, статные, с настоящими
+          морщинами и взрослым взглядом. Без грима. Шикарный костюм и борода длиной
+          70&nbsp;сантиметров из натурального волоса. После встречи дети часто говорят:
+          «А этот, видимо, настоящий».</p>
+        <blockquote class="q">
+          <p>«Студент в бороде с маркетплейса и взрослый мужчина с живыми морщинами - это два
+            разных праздника. Дети разницу видят за секунду, поэтому на Дедах Морозах
+            мы не экономим».</p>
+          <cite>Сергей Киричок, автор проекта</cite>
+        </blockquote>
+      </div>
+      <figure>
+        <img src="ded/f03.webp" width="906" height="860" loading="lazy" alt="Дед Мороз Министерства Новогодних Дел: седая борода, бело-синий костюм">
+      </figure>
+    </div>
+
+    <h2>Цены <span>и как попасть</span></h2>
+    <p>Чаще всего к нам приходят организованные группы: класс, школа, детский сад, от 20
+      до 40 детей. Цена зависит только от даты: будни в начале сезона дешевле,
+      предновогодняя неделя дороже. Программа на всех датах одна. Организатору группы
+      мы дарим детский и взрослый билет, четверо сопровождающих взрослых проходят бесплатно.</p>
+    <p>Если класс не собирается, можно прийти в сборной группе: мы соберём её из нескольких
+      семей на одну дату. Билеты в сборную группу продаются и онлайн, на
+      <a href="https://mnd-stavropol.ru/">сайте</a>.</p>
+
+    <ul class="ceny w" id="ceny">
+      <li class="gl">
+        <h3>Организованная группа</h3>
+        <span class="s">от <b data-c="org0">1290</b> до <b data-c="org1">1690</b>&nbsp;₽</span>
+        <small>детский билет, от 20 детей</small>
+      </li>
+      <li>
+        <h3>Сборная группа</h3>
+        <span class="s">от <b data-c="sb0">1590</b> до <b data-c="sb1">1990</b>&nbsp;₽</span>
+        <small>детский билет, на 300&nbsp;₽ дороже, чем в организованной группе</small>
+      </li>
+      <li>
+        <h3>Взрослый билет</h3>
+        <span class="s">от <b data-c="vz">600</b>&nbsp;₽</span>
+        <small>взрослые идут по желанию, цена одна для любой группы</small>
+      </li>
+    </ul>
+    <p id="rost">Цены растут на 100&nbsp;₽ 1 ноября и 1 декабря. Дата закрепляется по цене того дня,
+      когда вы её забронировали.</p>
+
+    <section class="kr w" aria-labelledby="krT">
+      <h2 id="krT">Коротко</h2>
+      <dl>
+        <dt>Что</dt><dd>Новогодняя экскурсия-шоу «Капсула времени» с карамельным мастер-классом</dd>
+        <dt>Для кого</dt><dd>Дети от 4 до 11 лет, взрослые - по желанию</dd>
+        <dt>Где</dt><dd>Ставрополь, ул. Росгипрозем, 291, рядом с METRO. Есть парковка для автобусов и машин</dd>
+        <dt>Когда</dt><dd>С 27 ноября 2026 по 10 января 2027, каждый день, кроме 31 декабря, 1 и 2 января</dd>
+        <dt>Сеансы</dt><dd>С 9:00 до 21:30</dd>
+        <dt>Длительность</dt><dd>1 час 20 минут</dd>
+        <dt>Группы</dt><dd>Организованные - от 20 до 40 детей; сборные - для семей и небольших компаний</dd>
+        <dt>Цена</dt><dd>Детский билет от <span data-c="org0">1290</span>&nbsp;₽, взрослый от <span data-c="vz">600</span>&nbsp;₽</dd>
+        <dt>Сайт</dt><dd><a href="https://mnd-stavropol.ru/">mnd-stavropol.ru</a></dd>
+        <dt>Телефоны</dt><dd><a href="tel:+79873962000">+7 (987) 396-20-00</a>, <a href="tel:+79994447569">+7 (999) 444-75-69</a></dd>
+        <dt>ВКонтакте</dt><dd><a href="https://vk.com/ministrystavropol" target="_blank" rel="noopener">vk.com/ministrystavropol</a>, видеоотзывы - <a href="https://vkvideo.ru/playlist/-232716559_2" target="_blank" rel="noopener">здесь</a></dd>
+      </dl>
+    </section>
+
+    <p class="pr-end">Фото - с наших мероприятий. Министерство Новогодних Дел, 2026.</p>
+  </article>
+</main>
+
+<script>
+/* ==================== ШАПКА (как на promokody.html) ==================== */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){
+    if (window.scrollY > 24) nav.classList.add('solid');
+    else nav.classList.remove('solid');
+  }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* ==================== ЦЕНЫ ПО ДАТЕ ====================
+   Ступени те же, что в PRAJS на stavropol.html: детский билет организованной
+   группы «от» и «до», взрослый. Сборная группа - детский плюс 300 ₽.
+   Сначала по часам браузера, потом сверяемся с датой сервера (заголовок Date),
+   как на странице города: часы у посетителя бывают сбиты.
+   Без JS в разметке остаются цены с 15 октября. */
+(function(){
+  'use strict';
+  var STUPENI = [
+    ['2026-09-01', 1190, 1590, 600, ''],
+    ['2026-10-15', 1290, 1690, 600, '15 октября'],
+    ['2026-11-01', 1390, 1790, 700, '1 ноября'],
+    ['2026-12-01', 1490, 1890, 800, '1 декабря']
+  ];
+  function msk(s){ return new Date(s + 'T00:00:00+03:00'); }
+
+  function postavit(d){
+    if (!d || isNaN(d.getTime())) return;
+    var k = 0;
+    for (var i = 0; i < STUPENI.length; i++){ if (d >= msk(STUPENI[i][0])) k = i; }
+    var p = STUPENI[k];
+    var znach = { org0:p[1], org1:p[2], sb0:p[1] + 300, sb1:p[2] + 300, vz:p[3] };
+    var uzly = document.querySelectorAll('[data-c]');
+    for (var j = 0; j < uzly.length; j++){
+      var v = znach[uzly[j].getAttribute('data-c')];
+      if (v) uzly[j].textContent = v;
+    }
+    /* какие повышения ещё впереди */
+    var vperedi = [];
+    for (var n = k + 1; n < STUPENI.length; n++) vperedi.push(STUPENI[n][4]);
+    var rost = document.getElementById('rost');
+    if (!rost) return;
+    rost.textContent = vperedi.length
+      ? 'Цены растут на 100 ₽ ' + vperedi.join(' и ') + '. Дата закрепляется по цене того дня, когда вы её забронировали.'
+      : 'Это финальные цены сезона, больше они не вырастут.';
+  }
+
+  postavit(new Date());
+  try {
+    fetch(location.href, {method:'HEAD', cache:'no-store'}).then(function(r){
+      var h = r.headers.get('Date');
+      if (h) postavit(new Date(h));
+    }).catch(function(){});
+  } catch(_){}
+})();
+</script>
+</body>
+</html>
