@@ -1,0 +1,639 @@
+<!doctype html>
+<!-- ОТВЕТ КЛИЕНТУ: проверки Гермеса, Нижний Новгород, 30 октября 2026. Собрано скриптом
+     predlozhenie/stranica.py (Гермес / hermes-mnd) из письма с метками: цены - из договора,
+     свободные сеансы - снимок на 30 октября, 16:57 по Москве, сами не обновляются (рядом ссылка на
+     расписание в реальном времени). Не в меню и не в sitemap. Руками не править - пересобрать. -->
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2304070F'/%3E%3Cpath d='M16 5l2.6 7.9H27l-6.8 4.9 2.6 8-6.8-4.9-6.8 4.9 2.6-8L5 12.9h8.4z' fill='%23E3B34E'/%3E%3C/svg%3E">
+<title>Ответ для проверки Гермеса - Министерство Новогодних Дел, Нижний Новгород</title>
+<meta name="theme-color" content="#FFFFFF">
+<meta name="description" content="Цены, расчёт для групп, свободные даты и условия для школьных групп в Нижнем Новгороде, сезон 2026-2027.">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Министерство Новогодних Дел">
+<meta property="og:title" content="Специальный ответ для проверки Гермеса">
+<meta property="og:description" content="Министерство Новогодних Дел, Нижний Новгород: цены, расчёт для групп, свободные даты и условия, сезон 2026-2027.">
+<meta property="og:image" content="https://mnd-nn.ru/og.jpg">
+<meta property="og:url" content="https://mnd-nn.ru/otvet-proba-germesa.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Golos+Text:wght@400;500;600&display=swap">
+<style>
+/* Стили страницы «Специальный ответ для ...» - из mnd-hero/otvet-otkroy-mir.html (30.10.2026).
+   stranica.py вставляет их в страницу целиком: страница не зависит от других файлов сайта. */
+/* СВЕТЛАЯ СТРАНИЦА: палитра и раскладка - как у dogovor.html (просьба Серёги
+   «на светлом фоне»). Синий #001B71 - заголовки, золото на два тона гуще
+   сайтового (#E3B34E на белом не читается), голубой бланк #ECF2FE → #DCE7F9. */
+:root{
+  --navy:#001B71; --text:#22305A; --dim:#5A6A93; --faint:#7A88AB;
+  --gold:#C9861F; --gold-t:#8A6111; --line:rgba(0,27,113,.12);
+  /* категории дат - свой цвет у каждой, в таблице, расчёте и календаре одинаковый */
+  --k-spec:#1E7A55; --k-std:#1F5FBF; --k-prem:#6B3FA0; --k-vip:#A96D0D;
+  color-scheme:light;
+}
+@font-face{
+  font-family:"Blogger Sans"; font-style:normal; font-weight:700; font-display:swap;
+  src:local("Blogger Sans Bold"), url(blogger-sans-bold.woff) format("woff");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+body{
+  margin:0; background:#fff; color:var(--text);
+  font-family:"Golos Text","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- шапка: как на dogovor.html ---------- */
+.nav{
+  position:fixed; inset:0 0 auto 0; z-index:30;
+  display:flex; align-items:center; gap:26px; padding:16px 30px;
+  transition:background .35s ease, border-color .35s ease, padding .35s ease;
+  border-bottom:1px solid transparent;
+}
+.nav.solid{
+  background:rgba(255,255,255,.86);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:var(--line); padding:11px 30px;
+}
+.brand{
+  font-family:"Unbounded",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.12em; color:var(--navy); text-transform:uppercase; white-space:nowrap;
+  text-decoration:none;
+}
+.brand span{color:var(--gold)}
+/* Кнопка шапки под стандарт кнопок не идёт - это часть шапки, а не кнопка
+   экрана (решение Серёги 05.09.2026). Здесь она ссылка «На главную». */
+.navbtn{
+  border:1px solid #A96D0D; color:var(--gold-t); background:transparent;
+  border-radius:2px; padding:9px 18px; font:500 13.5px/1 "Golos Text",sans-serif;
+  cursor:pointer; transition:background .2s,color .2s; white-space:nowrap;
+  display:inline-flex; align-items:center; text-decoration:none; margin-left:auto;
+}
+.navbtn:hover,.navbtn:focus-visible{background:#A96D0D; color:#fff}
+@media(max-width:520px){
+  .nav{gap:12px; padding:14px 16px}
+  .nav.solid{padding:10px 16px}
+  .brand{font-size:11px; letter-spacing:.07em}
+  .navbtn{padding:8px 12px; font-size:12px}
+}
+
+/* ---------- поле страницы: белое, с еле заметными отблесками ---------- */
+.oz{
+  position:relative; isolation:isolate; min-height:100vh; background:#fff;
+  padding:clamp(96px,10vw,168px) 0 clamp(64px,7vw,116px);
+}
+.oz-glow{position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden}
+.oz-glow i{position:absolute; display:block; border-radius:50%}
+.oz-glow i:nth-child(1){left:-16vw; top:-6%; width:62vw; height:40%;
+  background:radial-gradient(closest-side, rgba(198,219,255,.5) 0%, rgba(198,219,255,.26) 40%, rgba(198,219,255,0) 100%)}
+.oz-glow i:nth-child(2){right:-18vw; top:22%; width:58vw; height:44%;
+  background:radial-gradient(closest-side, rgba(214,224,255,.42) 0%, rgba(214,224,255,.2) 40%, rgba(214,224,255,0) 100%)}
+.oz-glow i:nth-child(3){left:50%; bottom:-14%; width:74vw; height:36%; margin-left:-37vw;
+  background:radial-gradient(closest-side, rgba(255,232,186,.4) 0%, rgba(255,232,186,.18) 40%, rgba(255,232,186,0) 100%)}
+
+/* Контейнер - по общему правилу сайта: широкий, почти во весь экран
+   → ai-clone/feedback/shirokaya-verstka-sayta.md. */
+.oz-cont{
+  position:relative; z-index:2;
+  width:min(94vw,1720px); margin:0 auto;
+  padding-inline:clamp(16px,3vw,56px);
+}
+@media (max-width:767px){ .oz-cont{width:100%; padding-inline:16px} }
+
+/* ---------- заголовок ---------- */
+.oz-t{
+  margin:0 auto clamp(12px,1.2vw,20px); text-align:center;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(23px,3.1vw,48px); line-height:1.1; letter-spacing:.005em;
+  text-transform:uppercase; text-wrap:balance; color:var(--navy);
+}
+.oz-q{color:#A96D0D}
+@supports ((-webkit-background-clip:text) or (background-clip:text)){
+  .oz-q{background:linear-gradient(180deg,#B0700F 0%,#9E650B 45%,#8A5607 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent}
+}
+.pl-meta{
+  margin:0 auto; text-align:center; text-wrap:balance;
+  font-size:max(14px, clamp(14px,1.05vw,17px)); line-height:1.5; color:#3F4F76;
+}
+.pl-meta span{color:var(--dim)}
+
+/* ---------- три колонки: оглавление | ответ | коротко ----------
+   До 1280 px «коротко» встаёт над ответом, до 1024 px оглавление убирается. */
+.pl-grid{
+  display:grid; align-items:start;
+  grid-template-columns:minmax(200px,260px) minmax(0,1fr) minmax(250px,330px);
+  grid-template-areas:"toc doc sum";
+  gap:clamp(22px,2.6vw,52px); margin-top:clamp(28px,3.4vw,56px);
+}
+.pl-toc{grid-area:toc; position:sticky; top:84px; max-height:calc(100vh - 104px); overflow:auto}
+.pl-doc{grid-area:doc; min-width:0}
+.pl-sum{grid-area:sum; position:sticky; top:84px}
+@media (max-width:1279px){
+  .pl-grid{grid-template-columns:minmax(190px,240px) minmax(0,1fr);
+    grid-template-areas:"toc sum" "toc doc"}
+  .pl-sum{position:static}
+}
+@media (max-width:1023px){
+  .pl-grid{grid-template-columns:minmax(0,1fr); grid-template-areas:"sum" "doc"}
+  .pl-toc{display:none}
+}
+
+/* оглавление */
+.pl-toc-h, .pl-sum-h{
+  margin:0 0 12px; font:600 12px/1.2 "Golos Text",sans-serif;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--gold-t);
+}
+.pl-toc ol{margin:0; padding:0; list-style:none; border-left:1px solid var(--line)}
+.pl-toc a{
+  display:block; padding:7px 0 7px 14px; margin-left:-1px; border-left:2px solid transparent;
+  font-size:14px; line-height:1.35; color:var(--dim); text-decoration:none;
+  transition:color .2s, border-color .2s;
+}
+.pl-toc a:hover, .pl-toc a:focus-visible{color:var(--navy)}
+.pl-toc a.on{color:var(--gold-t); border-left-color:var(--gold)}
+
+/* ответ - белый лист, «коротко» - голубой бланк */
+.pl-card{
+  position:relative; padding:clamp(20px,2.4vw,40px) clamp(18px,2.6vw,44px);
+  border-radius:clamp(18px,1.6vw,26px); background:#fff;
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.12),
+    0 30px 60px -38px rgba(0,27,113,.32),
+    0 4px 14px -8px rgba(0,27,113,.12);
+}
+.pl-sum .pl-card{
+  background:linear-gradient(180deg,#ECF2FE 0%,#DCE7F9 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0,27,113,.16),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    0 30px 60px -34px rgba(0,27,113,.42),
+    0 4px 14px -6px rgba(0,27,113,.16);
+}
+.pl-sum dl{margin:0}
+.pl-sum dt{margin:0; font-size:13px; line-height:1.3; color:var(--dim)}
+.pl-sum dd{margin:3px 0 0; font-size:15px; line-height:1.4; color:#0B1B3F; overflow-wrap:anywhere}
+.pl-sum dd + dt{margin-top:14px}
+.pl-sum-link{margin:18px 0 0; font-size:15px; line-height:1.4}
+.pl-sum a, .pl-foot a{color:var(--gold-t)}
+.pl-sum a:hover, .pl-foot a:hover{color:#A96D0D}
+
+/* сам ответ */
+.pl-doc{font-size:max(15px, clamp(15px,1.05vw,17px)); line-height:1.6; color:var(--text)}
+.pl-doc p, .pl-doc li{max-width:68ch}
+.pl-doc p{margin:0}
+.pl-doc p + p, .pl-doc ul + p, .pl-doc p + ul, .pl-doc .pl-cel + p, .pl-doc p + .pl-cel,
+.pl-doc .tb-wrap + p, .pl-doc p + .tb-wrap, .pl-doc .gr + p, .pl-doc ul + .pl-cel{margin-top:.8em}
+.pl-doc b{color:var(--navy); font-weight:600}
+.pl-doc a{color:var(--gold-t); overflow-wrap:anywhere}
+.pl-doc a:hover{color:#A96D0D}
+.nw, a[href^="tel:"]{white-space:nowrap}
+.pl-hi{margin-bottom:.4em !important; font-size:1.12em; font-weight:600; color:var(--navy)}
+.pl-sec{scroll-margin-top:88px}
+.pl-sec + .pl-sec{margin-top:2em; padding-top:1.8em; border-top:1px solid var(--line)}
+.pl-intro + .pl-sec{margin-top:1.8em; padding-top:1.7em; border-top:1px solid var(--line)}
+.pl-sec h2{
+  margin:0 0 .8em;
+  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:clamp(18px,1.45vw,24px); line-height:1.2; text-transform:uppercase; color:var(--navy);
+}
+.pl-sec h2 small{
+  display:block; margin-top:.35em; font:400 .62em/1.3 "Golos Text",sans-serif;
+  text-transform:none; letter-spacing:0; color:var(--dim);
+}
+.pl-sec h3{
+  margin:1.5em 0 .6em; font:600 13px/1.3 "Golos Text",sans-serif;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--gold-t);
+}
+.pl-doc ul{margin:0; padding:0; list-style:none}
+.pl-doc li{position:relative; padding-left:1.35em}
+.pl-doc li + li{margin-top:.5em}
+.pl-doc li::before{
+  content:''; position:absolute; left:.2em; top:.66em; width:.42em; height:.42em;
+  border-radius:50%; background:var(--gold);
+}
+/* выноска: золотая кромка слева, голубой фон */
+.pl-cel{
+  padding:.95em 1.15em 1.05em; max-width:68ch;
+  border-left:2px solid var(--gold); border-radius:0 12px 12px 0;
+  background:#F3F7FE;
+}
+.pl-cel p + p{margin-top:.55em}
+.pl-cel-big{font-size:1.06em}
+
+/* ---------- цена по категориям: таблица ---------- */
+.tb-wrap{max-width:100%; overflow-x:auto}
+.tb{width:100%; max-width:720px; border-collapse:collapse; font-variant-numeric:tabular-nums}
+.tb caption{
+  caption-side:top; text-align:left; padding-bottom:.6em;
+  font-weight:600; color:var(--navy);
+}
+.tb caption span{font-weight:400; color:var(--dim)}
+.tb th, .tb td{padding:.62em .7em; text-align:right; border-bottom:1px solid var(--line); white-space:nowrap}
+.tb th:first-child, .tb td:first-child{text-align:left; padding-left:0}
+.tb thead th{font-size:.84em; font-weight:500; line-height:1.3; color:var(--dim); vertical-align:bottom; white-space:normal}
+.tb tbody td{color:#0B1B3F}
+.tb .kat{display:inline-flex; align-items:center; gap:.5em; font-weight:500}
+.tb .vz td{color:var(--text); border-bottom:none; padding-top:.9em}
+.tb .vz td:first-child{color:var(--dim)}
+/* на телефоне таблица должна влезть без прокрутки вбок: первая колонка
+   переносится, в шапке остаются только даты */
+.tb td:first-child{white-space:normal}
+@media (max-width:560px){
+  .tb th, .tb td{padding:.55em .35em}
+  .tb thead th{font-size:.8em}
+  .tb-dl{display:none}
+  .pl-doc .kd-list b{min-width:0}   /* правило .kd-list b стоит ниже - без .pl-doc оно бы победило */
+}
+
+/* метка категории: цветная точка */
+.kd{display:inline-block; flex:none; width:.62em; height:.62em; border-radius:50%; background:currentColor}
+.k-spec{color:var(--k-spec)} .k-std{color:var(--k-std)} .k-prem{color:var(--k-prem)} .k-vip{color:var(--k-vip)}
+.kat-l{color:#0B1B3F}
+
+/* даты по категориям */
+.kd-list li{padding-left:0}
+.kd-list li::before{display:none}
+.kd-list b{display:inline-flex; align-items:center; gap:.5em; min-width:8.2em}
+
+/* ---------- расчёт: три карточки одна под другой ----------
+   Сверху состав группы, под ним четыре суммы в ряд (на телефоне 2 x 2):
+   три карточки в ряд не помещают «Специальные» рядом с суммой. */
+.gr{display:grid; grid-template-columns:minmax(0,1fr); gap:12px; margin-top:1.1em}
+.gr-c{
+  padding:1em 1.2em 1.1em; border-radius:16px;
+  background:linear-gradient(180deg,#FFFBF2 0%,#FFF4DE 100%);
+  box-shadow:inset 0 0 0 1px rgba(169,109,13,.22), 0 18px 36px -28px rgba(138,97,17,.5);
+}
+.gr-top{display:flex; flex-wrap:wrap; align-items:baseline; gap:.2em 1em}
+.gr-h{margin:0 !important; font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
+  font-size:1.2em; line-height:1.15; text-transform:uppercase; color:var(--navy)}
+.gr-p{margin:0 !important; font-size:.9em; line-height:1.4; color:var(--dim)}
+.gr-c dl{margin:.75em 0 0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.6em 1em;
+  font-variant-numeric:tabular-nums}
+.gr-c dl div{min-width:0}
+.gr-c dt{display:flex; align-items:center; gap:.45em; font-size:.88em; line-height:1.3; color:var(--dim)}
+.gr-c dd{margin:.15em 0 0; font-size:1.12em; font-weight:600; color:#0B1B3F; white-space:nowrap}
+@media (max-width:600px){ .gr-c dl{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+/* ---------- календарь свободных сеансов ---------- */
+.kl-leg{display:flex; flex-wrap:wrap; gap:.4em 1.2em; margin:1em 0 0; padding:0; list-style:none; font-size:.92em}
+.pl-doc .kl-leg li{padding:0; margin:0; display:inline-flex; align-items:center; gap:.45em; color:var(--text)}
+.pl-doc .kl-leg li::before{display:none}
+.kl-m{margin:1.4em 0 .6em; font:600 13px/1.3 "Golos Text",sans-serif; letter-spacing:.12em; text-transform:uppercase; color:var(--gold-t)}
+.kl{display:grid; grid-template-columns:repeat(auto-fill,minmax(176px,1fr)); gap:10px; margin:0; padding:0; list-style:none}
+.pl-doc .kl li{max-width:none; padding:.7em .8em .8em; margin:0; border-radius:12px; background:#fff;
+  box-shadow:inset 0 0 0 1px rgba(0,27,113,.13); border-top:3px solid currentColor}
+.pl-doc .kl li::before{display:none}
+.kl-d{margin:0 !important; display:flex; align-items:baseline; gap:.4em; color:#0B1B3F; line-height:1.2}
+.kl-d b{font-size:1.25em; font-weight:600; color:#0B1B3F}
+.kl-d span{color:var(--dim); font-size:.9em}
+.kl-k{margin:.15em 0 .5em !important; font-size:.8em; font-weight:600; letter-spacing:.04em}
+.kl-t{margin:0 !important; display:flex; flex-wrap:wrap; gap:4px; font-size:14px; line-height:1.2;
+  font-variant-numeric:tabular-nums; color:#0B1B3F}
+.kl-t span{padding:.28em .45em; border-radius:6px; background:#EEF3FC}
+.kl-t em{font-style:normal; color:#0B1B3F; font-weight:500}
+.pl-doc .kl li.net{background:#F6F7FA; box-shadow:inset 0 0 0 1px rgba(0,27,113,.08)}
+.kl li.net .kl-d b, .kl li.net .kl-d{color:#8D97B0}
+.kl li.net .kl-t{color:#8D97B0}
+@media (max-width:420px){ .kl{grid-template-columns:repeat(2,minmax(0,1fr))} }
+
+/* ---------- программа: два столбика на широком ---------- */
+.pr-list{columns:2 300px; column-gap:2.2em}
+.pl-doc .pr-list li{break-inside:avoid; margin-top:0; margin-bottom:.5em}
+
+/* ---------- контакты ---------- */
+.ct{display:grid; grid-template-columns:minmax(140px,15em) minmax(0,1fr); gap:.55em 1.4em; margin:0; max-width:68ch}
+.ct dt{color:var(--dim)}
+.ct dd{margin:0; color:#0B1B3F}
+@media (max-width:560px){ .ct{grid-template-columns:minmax(0,1fr); gap:.1em} .ct dd + dt{margin-top:.6em} }
+
+.pl-doc .ct-next{margin-top:1.3em}
+
+/* день без свободных сеансов - серый, кромка тоже */
+.pl-doc .kl li.net{border-top-color:#C9CFDD}
+.kl li.net .kl-k{color:#8D97B0}
+
+/* подпись */
+.sign{margin-top:1.8em !important}
+.sign b{display:block; margin-top:.2em}
+.sign span{color:var(--dim)}
+
+/* подвал страницы */
+.pl-foot{
+  margin:clamp(28px,3vw,48px) auto 0; text-align:center;
+  font-size:14px; line-height:1.6; color:var(--faint);
+}
+.pl-foot p{margin:0}
+.pl-foot p + p{margin-top:6px}
+.pl-foot .dot{padding:0 .45em; color:#B4BED6}
+
+/* печать: чёрный текст на белом, без шапки и колонок */
+@media print{
+  .nav, .oz-glow, .pl-toc, .pl-sum, .pl-foot{display:none !important}
+  .oz{padding:0; min-height:0}
+  .oz-cont{width:100%; padding:0}
+  .oz-t, .pl-meta, .pl-meta span{color:#000}
+  .oz-q{background:none; color:#000; -webkit-text-fill-color:#000}
+  .pl-grid{display:block; margin-top:12px}
+  .pl-card{box-shadow:none; padding:0}
+  .pl-doc p, .pl-doc li{max-width:none}
+  .gr-c, .pl-cel{background:none; box-shadow:inset 0 0 0 1px #bbb}
+  .pl-doc .kl li{box-shadow:inset 0 0 0 1px #bbb; break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <a class="brand" href="https://mnd-nn.ru/">МНД<span>·</span>Нижний Новгород</a>
+  <a class="navbtn" href="https://mnd-nn.ru/">На главную</a>
+</header>
+
+<main class="oz">
+  <div class="oz-glow" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <div class="oz-cont">
+    <h1 class="oz-t">Специальный ответ<br><span class="oz-q">для проверки Гермеса</span></h1>
+    <p class="pl-meta">Министерство Новогодних Дел · Нижний Новгород · сезон 2026-2027<br><span>ответ от 30 октября 2026 г.</span></p>
+
+    <div class="pl-grid">
+      <nav class="pl-toc" aria-label="Содержание">
+        <p class="pl-toc-h">Содержание</p>
+        <ol>
+          <li><a href="#prays">1. Единый прайс</a></li>
+          <li><a href="#raschet">2. Расчёт для ваших групп</a></li>
+          <li><a href="#daty">3. Даты, часы и вместимость</a></li>
+          <li><a href="#bron">4. Бронь и оплата</a></li>
+          <li><a href="#usloviya">5. Состав группы, перенос, опоздание, отмена</a></li>
+          <li><a href="#programma">6. Что входит в билет</a></li>
+          <li><a href="#vzroslye">7. Взрослые и организатор</a></li>
+          <li><a href="#kontakty">8. Контакты</a></li>
+        </ol>
+      </nav>
+
+      <aside class="pl-sum" aria-label="Коротко">
+        <div class="pl-card">
+          <p class="pl-sum-h">Коротко</p>
+          <dl>
+            <dt>Площадка</dt><dd>Нижний Новгород, дер. Ольгино, 62</dd>
+            <dt>Сезон</dt><dd>27 ноября 2026 - 10 января 2027, кроме 31 декабря, 1 и 2 января</dd>
+            <dt>Дети</dt><dd>4-11 лет, группа от 20 детей, в один сеанс до 35-36</dd>
+            <dt>Длительность</dt><dd>1 час 20 минут</dd>
+            <dt>Детский билет</dt><dd>1 490-1 890 ₽ при предоплате до 31 октября, 1 590-1 990 ₽ в ноябре</dd>
+            <dt>Бесплатно</dt><dd>4 сопровождающих взрослых, организатору 1 взрослый и 1 детский билет</dd>
+            <dt>Бронь</dt><dd>предоплата 5 000 ₽ держит дату, время и цену 14 дней</dd>
+            <dt>Телефон</dt><dd><a href="tel:+79101053000">+7 (910) 105-30-00</a></dd>
+          </dl>
+          <p class="pl-sum-link"><a href="https://slots.ministrynewyear.ru/public?city=nn">Свободные даты в реальном времени</a></p>
+        </div>
+      </aside>
+
+      <article class="pl-doc pl-card">
+        <div class="pl-intro">
+          <p class="pl-hi">Добрый день!</p>
+          <p>Спасибо за запрос. Отвечаем по всем пунктам - для Нижнего Новгорода.</p>
+          <p>Группы принимаем сами: площадка, программа и договор наши, посредников нет. Цены для агентства такие же, как на сайте, агентской комиссии нет.</p>
+        </div>
+        <section class="pl-sec" id="prays">
+          <h2>1. Единый прайс</h2>
+          <p>1 390-1 790 ₽ - цены сентября, они уже не действуют. Сейчас, до 31 октября включительно, действуют 1 490-1 890 ₽. Дальше детский билет дорожает на 100 ₽ два раза: 1 ноября и 1 декабря. После 1 декабря цена до конца сезона не меняется.</p>
+          <p>Цена фиксируется в день предоплаты и дальше не меняется - и для оплаченных билетов, и для детей, которых вы добавите не позже чем за 3 дня до мероприятия.</p>
+          <div class="tb-wrap">
+            <table class="tb">
+              <caption>Детский билет, группа от 20 детей <span>· ₽</span></caption>
+              <thead>
+                <tr><th>Категория дат</th><th><span class="tb-dl">Предоплата </span>до 31 октября</th><th><span class="tb-dl">Предоплата </span>в ноябре</th><th><span class="tb-dl">Предоплата </span>с 1 декабря</th></tr>
+              </thead>
+              <tbody>
+                <tr><td><span class="kat"><i class="kd k-spec"></i><span class="kat-l">Специальные</span></span></td><td>1 490</td><td>1 590</td><td>1 690</td></tr>
+                <tr><td><span class="kat"><i class="kd k-std"></i><span class="kat-l">Стандарт</span></span></td><td>1 690</td><td>1 790</td><td>1 890</td></tr>
+                <tr><td><span class="kat"><i class="kd k-prem"></i><span class="kat-l">Премиум</span></span></td><td>1 790</td><td>1 890</td><td>1 990</td></tr>
+                <tr><td><span class="kat"><i class="kd k-vip"></i><span class="kat-l">VIP</span></span></td><td>1 890</td><td>1 990</td><td>2 090</td></tr>
+                <tr class="vz"><td>Дополнительный взрослый</td><td>700</td><td>800</td><td>900</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <h3>Категории дат</h3>
+          <ul class="kd-list">
+            <li><b><i class="kd k-spec"></i>Специальные:</b> 27, 30 ноября; 1-4 декабря</li>
+            <li><b><i class="kd k-std"></i>Стандарт:</b> 28, 29 ноября; 7-10, 14 декабря; 6-8 января</li>
+            <li><b><i class="kd k-prem"></i>Премиум:</b> 5, 6, 11, 15-17, 21-23, 30 декабря; 9, 10 января</li>
+            <li><b><i class="kd k-vip"></i>VIP:</b> 12, 13, 18-20, 24-29 декабря; 3-5 января</li>
+          </ul>
+          <p>31 декабря, 1 и 2 января не работаем.</p>
+          <p><b>Взрослые:</b> 4 сопровождающих бесплатно, плюс 1 взрослый билет в подарок организатору группы.</p>
+        </section>
+        <section class="pl-sec" id="raschet">
+          <h2>2. Расчёт для ваших групп<small>предоплата в ноябре</small></h2>
+          <p>Группе в подарок 1 детский билет (21-й). Поэтому при 20 детях платных детских билетов 20 (21-го ребёнка можно взять бесплатно), при 30 детях - 29. Взрослые во всех вариантах бесплатные.</p>
+          <div class="gr">
+            <div class="gr-c">
+              <div class="gr-top"><p class="gr-h">20 детей + 2 взрослых</p>
+              <p class="gr-p">платных детских билетов 20, взрослые бесплатно</p></div>
+              <dl>
+                <div><dt><i class="kd k-spec"></i>Специальные</dt><dd>31 800 ₽</dd></div>
+                <div><dt><i class="kd k-std"></i>Стандарт</dt><dd>35 800 ₽</dd></div>
+                <div><dt><i class="kd k-prem"></i>Премиум</dt><dd>37 800 ₽</dd></div>
+                <div><dt><i class="kd k-vip"></i>VIP</dt><dd>39 800 ₽</dd></div>
+              </dl>
+            </div>
+            <div class="gr-c">
+              <div class="gr-top"><p class="gr-h">30 детей + 3 взрослых</p>
+              <p class="gr-p">платных детских билетов 29, взрослые бесплатно</p></div>
+              <dl>
+                <div><dt><i class="kd k-spec"></i>Специальные</dt><dd>46 110 ₽</dd></div>
+                <div><dt><i class="kd k-std"></i>Стандарт</dt><dd>51 910 ₽</dd></div>
+                <div><dt><i class="kd k-prem"></i>Премиум</dt><dd>54 810 ₽</dd></div>
+                <div><dt><i class="kd k-vip"></i>VIP</dt><dd>57 710 ₽</dd></div>
+              </dl>
+            </div>
+            <div class="gr-c">
+              <div class="gr-top"><p class="gr-h">40 детей + 4 взрослых</p>
+              <p class="gr-p">две группы по 20 + 2 на два сеанса подряд, платных детских билетов 40, взрослые бесплатно</p></div>
+              <dl>
+                <div><dt><i class="kd k-spec"></i>Специальные</dt><dd>63 600 ₽</dd></div>
+                <div><dt><i class="kd k-std"></i>Стандарт</dt><dd>71 600 ₽</dd></div>
+                <div><dt><i class="kd k-prem"></i>Премиум</dt><dd>75 600 ₽</dd></div>
+                <div><dt><i class="kd k-vip"></i>VIP</dt><dd>79 600 ₽</dd></div>
+              </dl>
+            </div>
+          </div>
+          <p>40 детей + 4 взрослых. В один сеанс помещается до 35-36 детей, поэтому такую группу проводим двумя группами по 20 + 2 на два сеанса подряд. Платных детских билетов 40 (в каждую из двух групп можно бесплатно взять ещё по 21-му ребёнку).</p>
+          <p>При предоплате до 31 октября каждая сумма меньше на 100 ₽ с платного детского билета (на 2 000 / 2 900 / 4 000 ₽), с 1 декабря - на столько же больше.</p>
+        </section>
+        <section class="pl-sec" id="daty">
+          <h2>3. Даты, часы и вместимость</h2>
+          <p><b>Площадка:</b> Нижний Новгород, дер. Ольгино, 62 (Приокский район, в черте города). От центра 20 минут без пробок.</p>
+          <p><b>Сезон:</b> 27 ноября 2026 - 10 января 2027, каждый день, кроме 31 декабря, 1 и 2 января. Сеансы каждый час с 9:00 до 20:00, 3 и 5 января - каждые полтора часа.</p>
+          <p><b>Подтверждаем:</b> «Звёздная смена», дети от 4 до 11 лет, 1 час 20 минут, группа от 20 детей.</p>
+          <p><b>Один сеанс:</b> до 35-36 детей. Взрослых вместе с бесплатными: при 21 ребёнке до 12, при 30 детях до 10, при 35 и больше - 7-8.</p>
+          <div class="pl-cel pl-cel-big">
+            <p>Ниже - свободные сеансы для групп на 30 октября, 16:57 по Москве, цветом отмечена категория даты. Это картина на текущую минуту: группы бронируют даты постоянно, и уже через несколько минут свободных сеансов может стать меньше. Ситуация меняется ежеминутно.</p>
+            <p><b>Актуальные свободные даты в реальном времени:</b> <a href="https://slots.ministrynewyear.ru/public?city=nn">slots.ministrynewyear.ru/public?city=nn</a></p>
+            <p>Бронь на выбранный сеанс подтверждает менеджер.</p>
+          </div>
+
+          <ul class="kl-leg" aria-label="Категории дат">
+            <li><i class="kd k-spec"></i>Специальная</li>
+            <li><i class="kd k-std"></i>Стандарт</li>
+            <li><i class="kd k-prem"></i>Премиум</li>
+            <li><i class="kd k-vip"></i>VIP</li>
+          </ul>
+
+          <p class="kl-m">Ноябрь</p>
+          <ul class="kl">
+            <li class="k-spec"><p class="kl-d"><b>27</b> ноября <span>пт</span></p><p class="kl-k">Специальная</p><p class="kl-t"><span>9:00</span><span>10:00</span><span>12:00</span><span>13:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>28</b> ноября <span>сб</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>9:00</span><span>14:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>29</b> ноября <span>вс</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>9:00</span><span>12:00</span><span>13:00</span><span>14:00</span><span>15:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-spec"><p class="kl-d"><b>30</b> ноября <span>пн</span></p><p class="kl-k">Специальная</p><p class="kl-t"><span>9:00</span><span>10:00</span><span>11:00</span><span>12:00</span><span>14:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+          </ul>
+          <p class="kl-m">Декабрь</p>
+          <ul class="kl">
+            <li class="k-spec"><p class="kl-d"><b>1</b> декабря <span>вт</span></p><p class="kl-k">Специальная</p><p class="kl-t"><em>весь день<br>9:00-20:00</em></p></li>
+            <li class="k-spec"><p class="kl-d"><b>2</b> декабря <span>ср</span></p><p class="kl-k">Специальная</p><p class="kl-t"><em>весь день<br>9:00-20:00</em></p></li>
+            <li class="k-spec"><p class="kl-d"><b>3</b> декабря <span>чт</span></p><p class="kl-k">Специальная</p><p class="kl-t"><span>13:00</span><span>14:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-spec"><p class="kl-d"><b>4</b> декабря <span>пт</span></p><p class="kl-k">Специальная</p><p class="kl-t"><span>12:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>5</b> декабря <span>сб</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>9:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>6</b> декабря <span>вс</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>9:00</span><span>14:00</span><span>15:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>7</b> декабря <span>пн</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>9:00</span><span>10:00</span><span>11:00</span><span>12:00</span><span>13:00</span><span>15:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>8</b> декабря <span>вт</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>12:00</span><span>13:00</span><span>14:00</span><span>15:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>9</b> декабря <span>ср</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>14:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>10</b> декабря <span>чт</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>15:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>11</b> декабря <span>пт</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>13:00</span><span>20:00</span></p></li>
+            <li class="k-vip net"><p class="kl-d"><b>12</b> декабря <span>сб</span></p><p class="kl-k">VIP</p><p class="kl-t">мест нет</p></li>
+            <li class="k-vip"><p class="kl-d"><b>13</b> декабря <span>вс</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>14</b> декабря <span>пн</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>15</b> декабря <span>вт</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>16</b> декабря <span>ср</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>17</b> декабря <span>чт</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-vip net"><p class="kl-d"><b>18</b> декабря <span>пт</span></p><p class="kl-k">VIP</p><p class="kl-t">мест нет</p></li>
+            <li class="k-vip"><p class="kl-d"><b>19</b> декабря <span>сб</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>19:00</span></p></li>
+            <li class="k-vip net"><p class="kl-d"><b>20</b> декабря <span>вс</span></p><p class="kl-k">VIP</p><p class="kl-t">мест нет</p></li>
+            <li class="k-prem"><p class="kl-d"><b>21</b> декабря <span>пн</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>22</b> декабря <span>вт</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>23</b> декабря <span>ср</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>20:00</span></p></li>
+            <li class="k-vip"><p class="kl-d"><b>24</b> декабря <span>чт</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>20:00</span></p></li>
+            <li class="k-vip net"><p class="kl-d"><b>25</b> декабря <span>пт</span></p><p class="kl-k">VIP</p><p class="kl-t">мест нет</p></li>
+            <li class="k-vip net"><p class="kl-d"><b>26</b> декабря <span>сб</span></p><p class="kl-k">VIP</p><p class="kl-t">мест нет</p></li>
+            <li class="k-vip"><p class="kl-d"><b>27</b> декабря <span>вс</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>20:00</span></p></li>
+            <li class="k-vip"><p class="kl-d"><b>28</b> декабря <span>пн</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-vip"><p class="kl-d"><b>29</b> декабря <span>вт</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>30</b> декабря <span>ср</span></p><p class="kl-k">Премиум</p><p class="kl-t"><span>19:00</span><span>20:00</span></p></li>
+          </ul>
+          <p class="kl-m">Январь</p>
+          <ul class="kl">
+            <li class="k-vip"><p class="kl-d"><b>3</b> января <span>вс</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>9:00</span><span>10:30</span><span>12:00</span><span>13:30</span><span>15:00</span><span>16:30</span><span>18:00</span><span>19:30</span></p></li>
+            <li class="k-vip"><p class="kl-d"><b>4</b> января <span>пн</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>9:00</span><span>10:00</span><span>11:00</span><span>12:00</span><span>13:00</span><span>14:00</span><span>15:00</span><span>16:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-vip"><p class="kl-d"><b>5</b> января <span>вт</span></p><p class="kl-k">VIP</p><p class="kl-t"><span>9:00</span><span>10:30</span><span>12:00</span><span>13:30</span><span>15:00</span><span>16:30</span><span>18:00</span><span>19:30</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>6</b> января <span>ср</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>9:00</span><span>12:00</span><span>13:00</span><span>14:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>7</b> января <span>чт</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>9:00</span><span>10:00</span><span>11:00</span><span>12:00</span><span>14:00</span><span>15:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-std"><p class="kl-d"><b>8</b> января <span>пт</span></p><p class="kl-k">Стандарт</p><p class="kl-t"><span>9:00</span><span>10:00</span><span>14:00</span><span>16:00</span><span>17:00</span><span>18:00</span><span>19:00</span><span>20:00</span></p></li>
+            <li class="k-prem"><p class="kl-d"><b>9</b> января <span>сб</span></p><p class="kl-k">Премиум</p><p class="kl-t"><em>весь день<br>9:00-20:00</em></p></li>
+            <li class="k-prem"><p class="kl-d"><b>10</b> января <span>вс</span></p><p class="kl-k">Премиум</p><p class="kl-t"><em>весь день<br>9:00-20:00</em></p></li>
+          </ul>
+        </section>
+        <section class="pl-sec" id="bron">
+          <h2>4. Бронь и оплата</h2>
+          <ul>
+            <li><b>Бронь без оплаты:</b> менеджер держит дату и время 1 сутки.</li>
+            <li>Предоплата 5 000 ₽ за группу закрепляет дату, время и цену на 14 дней. В первые 5 дней после оплаты её можно вернуть полностью. Несколько групп - по 5 000 ₽ за каждую.</li>
+            <li>Окончательный расчёт - в эти 14 дней, но не позже чем за 3 дня до мероприятия. Счёт оплачивается в течение суток. Если до мероприятия меньше 3 дней, оплата сразу полная.</li>
+            <li>Не оплатили остаток за 14 дней - бронь снимается, предоплата не возвращается.</li>
+            <li><b>Документы:</b> договор, счёт, кассовый чек на каждый платёж. Оплата безналом на расчётный счёт ИП Киричок С. В. Договор можно подписать обменом сканами.</li>
+          </ul>
+        </section>
+        <section class="pl-sec" id="usloviya">
+          <h2>5. Состав группы, перенос, опоздание, отмена</h2>
+          <ul>
+            <li><b>Добавить участников:</b> не позже чем за 3 дня до мероприятия - по цене брони. Позже - только если есть места и по текущей цене. В день мероприятия детей не добавляем: заготовки для мастер-класса готовим заранее по числу детей.</li>
+            <li>Если детей придёт меньше, стоимость не пересчитывается: групповая цена рассчитана на гарантированное посещение. Чтобы не платить заранее за тех, кто может не поехать, оставьте до 4 резервных билетов сверх оплаченных (не меньше 20). Цена у них закреплена на день брони, оплачиваются они за 3 дня до мероприятия.</li>
+            <li><b>Болезнь ребёнка:</b> возврата за непосещение нет, но заболевшего ребёнка переносим в сборную группу на январь - для этого у нас выделены места. А чтобы не платить заранее за тех, кто может не поехать, есть резервные билеты (пункт выше).</li>
+            <li><b>Перенос:</b> до окончательного расчёта - на любую свободную дату по цене новой даты на день переноса, либо бронь можно передать другой группе. После полной оплаты - по согласованию, если есть свободный сеанс.</li>
+            <li><b>Отмена с вашей стороны:</b> в первые 5 дней после предоплаты возвращаем 5 000 ₽ полностью, позже предоплата не возвращается. После полной оплаты деньги не возвращаются.</li>
+            <li><b>Отмена или перенос с нашей стороны:</b> полный возврат в течение 10 дней или другая дата с сохранением цены. При нашем переносе можно уменьшить состав и получить деньги за выбывших.</li>
+            <li><b>Опоздание 5-30 минут:</b> группа подключается к программе с того этапа, который идёт по расписанию. Больше 30 минут: вправе не проводить, потому что после вас ждут другие группы, стоимость не возвращается. Если позволяет расписание, проведём часть программы, например мастер-класс.</li>
+          </ul>
+        </section>
+        <section class="pl-sec" id="programma">
+          <h2>6. Что входит в билет</h2>
+          <p>Вся программа входит в цену, доплат на площадке нет:</p>
+          <ul class="pr-list">
+            <li>велком-шоу во дворе</li>
+            <li>квест по сюжету «Звёздной смены»</li>
+            <li>карамельный мастер-класс - главная и самая длинная часть программы; каждый ребёнок уносит домой 2 леденца своей работы (около 60-70 г)</li>
+            <li>кабинет-обсерватория Деда Мороза и настоящие метеориты Лунознайки</li>
+            <li>Космофон, терменвокс-шоу, интерактив с 3D-принтером, пульт управления делами Деда Мороза</li>
+            <li>выставка карамельного искусства</li>
+            <li>чаепитие</li>
+            <li>групповые фото с героями, колпаки и бейджи для фото</li>
+            <li>газета МинНовДел с фото группы и статьёй о ней - одна на группу</li>
+          </ul>
+          <p><b>Программа подробно, с фото:</b> <a href="https://mnd-nn.ru/#whatawaits">mnd-nn.ru</a></p>
+          <p><b>Отдельного подарка нет:</b> с собой дети уносят свои леденцы, а группа - газету. Свои подарки можно привезти: предупредите за день, поставим их под ёлку, и Дед Мороз направит к ним детей.</p>
+          <div class="pl-cel">
+            <p><b>Еда:</b> чаепитие в конце программы - чай и «Чокопай» (фабричное пирожное, состав на упаковке). Это угощение от Деда Мороза, а не обед. Карамель на мастер-классе настоящая, не изомальт: сырьё с сертификатами по ГОСТ, без эмульгаторов. Леденцы на мероприятии не едят, дети забирают их домой. О детях с пищевой аллергией сообщите менеджеру заранее.</p>
+          </div>
+        </section>
+        <section class="pl-sec" id="vzroslye">
+          <h2>7. Взрослые и организатор</h2>
+          <ul>
+            <li><b>Бесплатно:</b> 4 сопровождающих взрослых. Организатору группы в подарок 1 взрослый и 1 детский билет.</li>
+            <li>Взрослые могут посмотреть самые яркие моменты детской программы, а основное время у них своя: новогодний зал с камином, игристое или чай, Дед Мороз, хороводы, фото. Можно подняться в кабинет Деда Мороза, посмотреть мастер-класс и выставку карамели. Леденцы делают только дети: заготовки готовим по их числу.</li>
+            <li>За детей на площадке, в том числе в раздевалке, отвечают сопровождающие взрослые группы.</li>
+          </ul>
+        </section>
+        <section class="pl-sec" id="kontakty">
+          <h2>8. Контакты</h2>
+          <dl class="ct">
+            <dt>Телефон</dt><dd><a href="tel:+79101053000">+7 (910) 105-30-00</a>, <a href="tel:+79994447569">+7 (999) 444-75-69</a></dd>
+            <dt>Почта</dt><dd><a href="mailto:ministry.newyear@yandex.ru">ministry.newyear@yandex.ru</a></dd>
+            <dt>Сайт</dt><dd><a href="https://mnd-nn.ru/">mnd-nn.ru</a></dd>
+            <dt>Свободные даты в реальном времени</dt><dd><a href="https://slots.ministrynewyear.ru/public?city=nn">slots.ministrynewyear.ru/public?city=nn</a></dd>
+            <dt>Фото, видео и афиши для вашей рекламы</dt><dd><a href="https://disk.yandex.ru/d/Dbb-6uCdq2kk2g">Яндекс Диск</a></dd>
+          </dl>
+          <p>Напишите, на какие даты планируете группы: поставим бронь и пришлём договор.</p>
+          <p class="sign">С уважением,<b>Сергей Киричок</b><span>автор и руководитель проекта «Министерство Новогодних Дел»</span></p>
+        </section>
+      </article>
+    </div>
+
+    <footer class="pl-foot">
+      <p><a href="https://mnd-nn.ru/oferta-nn.html">Публичная оферта</a><span class="dot">·</span><a href="https://mnd-nn.ru/politika-nn.html">Политика конфиденциальности</a></p>
+      <p>© 2019-2026 Министерство новогодних дел<span class="dot">·</span>ИП Киричок Сергей Васильевич<span class="dot">·</span>ИНН 910314959705</p>
+    </footer>
+  </div>
+</main>
+
+<script>
+/* шапка становится стеклянной при прокрутке */
+(function(){
+  var nav = document.getElementById('nav');
+  if (!nav) return;
+  function kadr(){ nav.classList.toggle('solid', window.scrollY > 24); }
+  kadr();
+  window.addEventListener('scroll', kadr, {passive:true});
+})();
+
+/* оглавление подсвечивает раздел, который сейчас читают */
+(function(){
+  var links = document.querySelectorAll('.pl-toc a');
+  if (!links.length || !('IntersectionObserver' in window)) return;
+  var byId = {};
+  for (var i = 0; i < links.length; i++) byId[links[i].getAttribute('href').slice(1)] = links[i];
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (!e.isIntersecting) return;
+      for (var k in byId) byId[k].classList.remove('on');
+      var a = byId[e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, {rootMargin:'-20% 0px -70% 0px'});
+  for (var id in byId){ var s = document.getElementById(id); if (s) io.observe(s); }
+})();
+</script>
+</body>
+</html>
