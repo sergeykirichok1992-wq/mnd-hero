@@ -14166,8 +14166,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
            окна). Ссылку на бота с меткой kupit_<код заявки> ставит общий скрипт
            «ССЫЛКА НА БОТА В МАХ» (data-mx-bot + data-mx-start): бот узнаёт заявку
            и сразу присылает покупку. Адрес «Купить на сайте» скрипт меняет на
-           город из заявки, цену города, если она не обычная, - тоже (KUPIT_CENA).
-           Цена малой семейной группы - из schedule-app/src/lib/sbor/ceny.ts. -->
+           город из заявки. Цена малой семейной группы - из
+           schedule-app/src/lib/sbor/ceny.ts (SEMEYNYY_FORMAT). -->
       <div class="zs-step kp" data-step="3" id="zsStep3" hidden>
         <div class="zs-seal" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 6h13a1.5 1.5 0 0 1 1.5 1.5v2a2.5 2.5 0 0 0 0 5v2a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5v-2a2.5 2.5 0 0 0 0-5v-2A1.5 1.5 0 0 1 5.5 6Z"/><path d="M15.2 8.2v7.6" stroke-dasharray="1.3 1.9"/><path d="M7.4 10.4h4.4M7.4 13.6h2.8"/></svg>
@@ -14175,7 +14175,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <h2 class="zs-h" id="zsH3">Купите билеты сами&nbsp;- без менеджера</h2>
         <p class="zs-sub">Заявка принята, менеджер перезвонит. Но ждать не обязательно:
           билеты в малую семейную группу можно купить самим онлайн за&nbsp;пару&nbsp;минут</p>
-        <p class="kp-cena" id="zsKupitCena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
+        <p class="kp-cena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
         <ol class="kp-steps">
           <li><b>1</b><span>Выберите дату и время</span></li>
           <li><b>2</b><span>Оплатите онлайн</span></li>
@@ -16936,8 +16936,12 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         }
         var skLine = document.getElementById('onlSk');
         if (sk.length && !vse){
-          skLine.innerHTML = '<span class="onl-tm sk">Время</span> со скидкой: детский от <b>' + rub(kidMin) +
-            '</b>, взрослый от <b>' + rub(adMin) + '</b>';
+          /* взрослый без скидки (Нижний, вечера января) - называем только детский */
+          var bezVzr = adMin >= +obych.adult;
+          var kidRazny = sk.some(function(s){ return +s.kidPrice !== kidMin; });
+          skLine.innerHTML = '<span class="onl-tm sk">Время</span> со скидкой: ' + (bezVzr
+            ? 'детский ' + (kidRazny ? 'от ' : '') + '<b>' + rub(kidMin) + '</b>'
+            : 'детский от <b>' + rub(kidMin) + '</b>, взрослый от <b>' + rub(adMin) + '</b>');
           skLine.hidden = false;
         } else skLine.hidden = true;
         if (d.gorod && d.gorod.vGorode) document.getElementById('onlDh').textContent = 'Даты онлайн-продажи ' + d.gorod.vGorode;
@@ -17027,13 +17031,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
        Город - из заявки, а не со страницы: можно выбрать и другой. */
     var step3 = document.getElementById('zsStep3');
     var kupitSayt = document.getElementById('zsKupitSayt');
-    var kupitCena = document.getElementById('zsKupitCena');
     var KUPIT = {'Нижний Новгород':'nn', 'Тюмень':'tyumen', 'Казань':'kazan', 'Крым':'crimea', 'Ставрополь':'stavropol'};
     var BILETY = 'https://slots.ministrynewyear.ru/bilety/';
-    /* Своя цена города (CENA_GORODA в schedule-app/src/lib/sbor/ceny.ts), остальным - обычная
-       из разметки шага. Нижний - Серёга, 05.11.2026: «от 2200 руб и взрослый 1000 руб» */
-    var KUPIT_CENA = {nn: '<span class="kp-nw">Детский билет - <b>от&nbsp;2&nbsp;200&nbsp;₽</b>,</span> <span class="kp-nw">взрослый - <b>1&nbsp;000&nbsp;₽</b></span>'};
-    var kupitObych = kupitCena ? kupitCena.innerHTML : '';
 
     function showKupit(){
       step1.hidden = true; step2.hidden = true; step3.hidden = false;
@@ -17051,7 +17050,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                 Object.prototype.hasOwnProperty.call(KUPIT, lead.city) && KUPIT[lead.city];
       if (!kod) return;
       kupitSayt.href = BILETY + kod;
-      if (kupitCena) kupitCena.innerHTML = KUPIT_CENA[kod] || kupitObych;
       /* окно открыто и не закрывается прямо сейчас - переключаем шаг; закрывается
          (закрыли, пока заявка летела) - откроем заново через те же полсекунды */
       if (!ov.hidden && !closeTimer){ showKupit(); return; }
