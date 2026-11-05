@@ -2857,7 +2857,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
   font-size:clamp(18px,1.5vw,22px); line-height:1.25; letter-spacing:.01em; color:#B7C6E2}
 .onl-cena b{font-weight:400; color:#FF7A6E; white-space:nowrap}
-/* с «от» строка длиннее и на телефоне не влезает: рвём только между детским и взрослым */
+/* с «от» строка длиннее и на телефоне может не влезть: рвём только между детским и взрослым */
 .onl-nw{white-space:nowrap}
 .onl-sk{margin:6px auto 0; font-family:"Golos Text",Arial,sans-serif; font-size:14.5px; line-height:1.4; color:#A9B9D8}
 .onl-sk b{color:#fff; font-weight:600; white-space:nowrap}
@@ -16925,11 +16925,11 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         if (!obych && sk.length) obych = sk[0].bezSkidki;
         var kidMin = Math.min.apply(null, sk.map(function(s){ return +s.kidPrice; }));
         var adMin = Math.min.apply(null, sk.map(function(s){ return +s.adultPrice; }));
-        /* скидка на всех сеансах: цена сразу «от» самой низкой, выделять скидку не из чего */
+        /* скидка на всех сеансах: цена сразу самая низкая, «от» только у детского, выделять скидку не из чего */
         var vse = sk.length === ss.length;
         if (vse){
           document.getElementById('onlCena').innerHTML = '<span class="onl-nw">Детский билет - <b>от ' + rub(kidMin) +
-            '</b>,</span> <span class="onl-nw">взрослый - <b>от ' + rub(adMin) + '</b></span>';
+            '</b>,</span> <span class="onl-nw">взрослый - <b>' + rub(adMin) + '</b></span>';
         } else if (obych && obych.kid > 0){
           document.getElementById('onlCena').innerHTML = 'Детский билет - <b>' + rub(+obych.kid) +
             '</b>, взрослый - <b>' + rub(+obych.adult) + '</b>';
@@ -17031,8 +17031,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var KUPIT = {'Нижний Новгород':'nn', 'Тюмень':'tyumen', 'Казань':'kazan', 'Крым':'crimea', 'Ставрополь':'stavropol'};
     var BILETY = 'https://slots.ministrynewyear.ru/bilety/';
     /* Своя цена города (CENA_GORODA в schedule-app/src/lib/sbor/ceny.ts), остальным - обычная
-       из разметки шага. Нижний - Серёга, 05.11.2026: «цену сделай от 1900» */
-    var KUPIT_CENA = {nn: '<span class="kp-nw">Детский билет - <b>от&nbsp;1&nbsp;900&nbsp;₽</b>,</span> <span class="kp-nw">взрослый - <b>от&nbsp;800&nbsp;₽</b></span>'};
+       из разметки шага. Нижний - Серёга, 05.11.2026: «от 2200 руб и взрослый 1000 руб» */
+    var KUPIT_CENA = {nn: '<span class="kp-nw">Детский билет - <b>от&nbsp;2&nbsp;200&nbsp;₽</b>,</span> <span class="kp-nw">взрослый - <b>1&nbsp;000&nbsp;₽</b></span>'};
     var kupitObych = kupitCena ? kupitCena.innerHTML : '';
 
     function showKupit(){
