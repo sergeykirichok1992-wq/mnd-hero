@@ -3548,6 +3548,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
   font-size:clamp(18px,1.5vw,22px); line-height:1.25; letter-spacing:.01em; color:#B7C6E2}
 .onl-cena b{font-weight:400; color:#FF7A6E; white-space:nowrap}
+/* с «от» строка длиннее и на телефоне не влезает: рвём только между детским и взрослым */
+.onl-nw{white-space:nowrap}
 .onl-sk{margin:6px auto 0; font-family:"Golos Text",Arial,sans-serif; font-size:14.5px; line-height:1.4; color:#A9B9D8}
 .onl-sk b{color:#fff; font-weight:600; white-space:nowrap}
 .onl-dh{margin:clamp(16px,1.8vw,20px) 0 0; font-family:"Golos Text",Arial,sans-serif;
@@ -3586,7 +3588,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
    window.zsKupit в конце скрипта окна. Кнопки по стандарту, вид выбрал Серёга:
    «Купить в МАХ» - обычная фиолетовая, «Купить на сайте» - прозрачная.
    Окно тёмное, поэтому прозрачная остаётся светлым золотом.
-   КУСОК ОБЩИЙ НА ЧЕТЫРЕ ГОРОДА, руками не править: ставит
+   КУСОК ОБЩИЙ НА ПЯТЬ ГОРОДОВ, руками не править: ставит
    sayt-nn/instrumenty/kupit_okno.py. */
 .zs-step[data-step="3"]:not([hidden]) .zs-seal{animation:zsSeal .7s cubic-bezier(.2,.8,.2,1) both}
 .kp .zs-seal{width:clamp(60px,5.4vw,72px); height:clamp(60px,5.4vw,72px); margin-bottom:clamp(12px,1.3vw,16px)}
@@ -16719,15 +16721,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <!-- /КУПИТЬ БИЛЕТ ОНЛАЙН: окно -->
 
       <!-- КУПИТЕ БИЛЕТЫ САМИ: шаг 3 -->
-      <!-- Шаг 3 «Купите билеты сами» (Серёга, 08.10.2026). КУСОК ОБЩИЙ НА ЧЕТЫРЕ
-           ГОРОДА, руками не править: ставит sayt-nn/instrumenty/kupit_okno.py.
+      <!-- Шаг 3 «Купите билеты сами» (Серёга, 08.10.2026). КУСОК ОБЩИЙ НА ПЯТЬ
+           ГОРОДОВ, руками не править: ставит sayt-nn/instrumenty/kupit_okno.py.
            Видят те, кто в любой форме с выбором формата (экраны 5, 11А, 11 и это
            окно) выбрал «Индивидуально». Открывает window.zsKupit (конец скрипта
            окна). Ссылку на бота с меткой kupit_<код заявки> ставит общий скрипт
            «ССЫЛКА НА БОТА В МАХ» (data-mx-bot + data-mx-start): бот узнаёт заявку
            и сразу присылает покупку. Адрес «Купить на сайте» скрипт меняет на
-           город из заявки. Цена малой семейной группы - из
-           schedule-app/src/lib/sbor/ceny.ts (SEMEYNYY_FORMAT). -->
+           город из заявки, цену города, если она не обычная, - тоже (KUPIT_CENA).
+           Цена малой семейной группы - из schedule-app/src/lib/sbor/ceny.ts. -->
       <div class="zs-step kp" data-step="3" id="zsStep3" hidden>
         <div class="zs-seal" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 6h13a1.5 1.5 0 0 1 1.5 1.5v2a2.5 2.5 0 0 0 0 5v2a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 16.5v-2a2.5 2.5 0 0 0 0-5v-2A1.5 1.5 0 0 1 5.5 6Z"/><path d="M15.2 8.2v7.6" stroke-dasharray="1.3 1.9"/><path d="M7.4 10.4h4.4M7.4 13.6h2.8"/></svg>
@@ -16735,7 +16737,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <h2 class="zs-h" id="zsH3">Купите билеты сами&nbsp;- без менеджера</h2>
         <p class="zs-sub">Заявка принята, менеджер перезвонит. Но ждать не обязательно:
           билеты в малую семейную группу можно купить самим онлайн за&nbsp;пару&nbsp;минут</p>
-        <p class="kp-cena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
+        <p class="kp-cena" id="zsKupitCena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
         <ol class="kp-steps">
           <li><b>1</b><span>Выберите дату и время</span></li>
           <li><b>2</b><span>Оплатите онлайн</span></li>
@@ -19688,14 +19690,19 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
           else if (!obych) obych = {kid: ss[i].kidPrice, adult: ss[i].adultPrice};
         }
         if (!obych && sk.length) obych = sk[0].bezSkidki;
-        if (obych && obych.kid > 0){
+        var kidMin = Math.min.apply(null, sk.map(function(s){ return +s.kidPrice; }));
+        var adMin = Math.min.apply(null, sk.map(function(s){ return +s.adultPrice; }));
+        /* скидка на всех сеансах: цена сразу «от» самой низкой, выделять скидку не из чего */
+        var vse = sk.length === ss.length;
+        if (vse){
+          document.getElementById('onlCena').innerHTML = '<span class="onl-nw">Детский билет - <b>от ' + rub(kidMin) +
+            '</b>,</span> <span class="onl-nw">взрослый - <b>от ' + rub(adMin) + '</b></span>';
+        } else if (obych && obych.kid > 0){
           document.getElementById('onlCena').innerHTML = 'Детский билет - <b>' + rub(+obych.kid) +
             '</b>, взрослый - <b>' + rub(+obych.adult) + '</b>';
         }
         var skLine = document.getElementById('onlSk');
-        if (sk.length){
-          var kidMin = Math.min.apply(null, sk.map(function(s){ return +s.kidPrice; }));
-          var adMin = Math.min.apply(null, sk.map(function(s){ return +s.adultPrice; }));
+        if (sk.length && !vse){
           skLine.innerHTML = '<span class="onl-tm sk">Время</span> со скидкой: детский от <b>' + rub(kidMin) +
             '</b>, взрослый от <b>' + rub(adMin) + '</b>';
           skLine.hidden = false;
@@ -19718,8 +19725,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             li.appendChild(tms);
             ul.appendChild(li);
           }
-          var t = el('span', 'onl-tm' + (s.bezSkidki ? ' sk' : ''), s.time);
-          if (s.bezSkidki) t.title = 'Со скидкой';
+          var t = el('span', 'onl-tm' + (s.bezSkidki && !vse ? ' sk' : ''), s.time);
+          if (s.bezSkidki && !vse) t.title = 'Со скидкой';
           tms.appendChild(t);
         }
         return true;
@@ -19777,21 +19784,23 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     /* КУПИТЕ БИЛЕТЫ САМИ: логика */
     /* ---------- окно «Купите билеты сами» (Серёга, 08.10.2026) ----------
-       КУСОК ОБЩИЙ НА ЧЕТЫРЕ ГОРОДА, руками не править: ставит
+       КУСОК ОБЩИЙ НА ПЯТЬ ГОРОДОВ, руками не править: ставит
        sayt-nn/instrumenty/kupit_okno.py. Тем, кто в заявке выбрал «Индивидуально»,
        показать, что билеты можно купить самим, без менеджера, с акцентом на МАХ.
        Зовёт zsBind сразу после отправки любой формы. Отправили из этого окна - оно
        переключается с «заявка принята» на шаг 3. Из формы на странице - окно
        открывается поверх её «заявка принята» через 0,6 с: человек успевает увидеть,
        что заявка ушла, а закроет окно - увидит её снова.
-       Город - из заявки, а не со страницы: можно выбрать и другой. Онлайн-сеансы
-       на 08.10.2026 открыты в этих четырёх городах, в Нижнем их нет - для него окна
-       нет, человек видит обычное «заявка принята». Откроются сеансы в Нижнем -
-       дописать 'Нижний Новгород': 'nn' в kupit_okno.py и перезапустить его. */
+       Город - из заявки, а не со страницы: можно выбрать и другой. */
     var step3 = document.getElementById('zsStep3');
     var kupitSayt = document.getElementById('zsKupitSayt');
-    var KUPIT = {'Тюмень':'tyumen', 'Казань':'kazan', 'Крым':'crimea', 'Ставрополь':'stavropol'};
+    var kupitCena = document.getElementById('zsKupitCena');
+    var KUPIT = {'Нижний Новгород':'nn', 'Тюмень':'tyumen', 'Казань':'kazan', 'Крым':'crimea', 'Ставрополь':'stavropol'};
     var BILETY = 'https://slots.ministrynewyear.ru/bilety/';
+    /* Своя цена города (CENA_GORODA в schedule-app/src/lib/sbor/ceny.ts), остальным - обычная
+       из разметки шага. Нижний - Серёга, 05.11.2026: «цену сделай от 1900» */
+    var KUPIT_CENA = {nn: '<span class="kp-nw">Детский билет - <b>от&nbsp;1&nbsp;900&nbsp;₽</b>,</span> <span class="kp-nw">взрослый - <b>от&nbsp;800&nbsp;₽</b></span>'};
+    var kupitObych = kupitCena ? kupitCena.innerHTML : '';
 
     function showKupit(){
       step1.hidden = true; step2.hidden = true; step3.hidden = false;
@@ -19809,6 +19818,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
                 Object.prototype.hasOwnProperty.call(KUPIT, lead.city) && KUPIT[lead.city];
       if (!kod) return;
       kupitSayt.href = BILETY + kod;
+      if (kupitCena) kupitCena.innerHTML = KUPIT_CENA[kod] || kupitObych;
       /* окно открыто и не закрывается прямо сейчас - переключаем шаг; закрывается
          (закрыли, пока заявка летела) - откроем заново через те же полсекунды */
       if (!ov.hidden && !closeTimer){ showKupit(); return; }
