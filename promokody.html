@@ -212,6 +212,7 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
 }
 .pk-note{margin-top:clamp(12px,1.2vw,18px) !important; color:var(--dim) !important}
 /* акция 5-10 ноября: условия крупно, на телефоне столбиком */
+.pk-bez-akcii [data-akciya]{display:none}
 .pk-stats{
   display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
   gap:clamp(16px,2.4vw,40px); margin:clamp(14px,1.4vw,22px) 0;
@@ -222,6 +223,11 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
 .pk-back{margin:clamp(28px,3vw,48px) auto 0; text-align:center}
 .pk-back a{color:#EBD3A0; font-size:max(15px, clamp(15px,1.1vw,18px))}
 </style>
+<script>
+/* Тюмень в акции 5-10 ноября не участвует (Серёга, 07.11.2026). Страница одна на все домены,
+   поэтому на домене Тюмени блоки акции прячем ещё до показа. */
+if (/(^|\.)mnd-tumen\.ru$/.test(location.hostname)) document.documentElement.classList.add('pk-bez-akcii');
+</script>
 </head>
 <body>
 
@@ -242,7 +248,7 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
 
     <div class="pk-grid">
 
-      <section class="pk-card pk-card--gold pk-card--wide">
+      <section class="pk-card pk-card--gold pk-card--wide" data-akciya>
         <h2 class="pk-h">Акция: <b>промокоды, выданные с 5 по 10 ноября 2026 года</b></h2>
         <div class="pk-stats">
           <div>
@@ -262,7 +268,7 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
           </div>
         </div>
         <p>Группа, пришедшая по такому промокоду, получает скидку 5%. Остальные правила те же.
-          Промокоды, выданные раньше, действуют на обычных условиях.</p>
+          Промокоды, выданные раньше, и промокоды, выданные в Тюмени, действуют на обычных условиях.</p>
       </section>
 
       <section class="pk-card">
@@ -272,7 +278,7 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
           <li>Если Вы общаетесь с менеджером по телефону, он продиктует Вам промокод.</li>
         </ul>
         <p class="pk-note">Один номер телефона - один промокод. Он выдаётся один раз и действует
-          весь сезон, кроме промокодов, выданных с 5 по 10 ноября 2026 года (условия выше).
+          весь сезон<span data-akciya>, кроме промокодов, выданных с 5 по 10 ноября 2026 года (условия выше)</span>.
           Прошлогодние промокоды не действуют.</p>
       </section>
 
@@ -305,7 +311,7 @@ html.oz-lock body{padding-right:var(--oz-sbw,0px)}
             выплаты необходимо обратиться к своему менеджеру.</li>
           <li>По одному промокоду может прийти сколько угодно групп.</li>
         </ul>
-        <p class="pk-note">По промокоду, выданному с 5 по 10 ноября 2026 года, - скидка 10% и 2000&nbsp;₽
+        <p class="pk-note" data-akciya>По промокоду, выданному с 5 по 10 ноября 2026 года, - скидка 10% и 2000&nbsp;₽
           за группу (условия акции вверху страницы).</p>
       </section>
 
