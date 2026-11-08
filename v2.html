@@ -2861,6 +2861,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .onl-nw{white-space:nowrap}
 .onl-sk{margin:6px auto 0; font-family:"Golos Text",Arial,sans-serif; font-size:14.5px; line-height:1.4; color:#A9B9D8}
 .onl-sk b{color:#fff; font-weight:600; white-space:nowrap}
+/* повышение цены 1.12 и 1.01 (Серёга, 08.11.2026) - строка с сервера (поле povyshenie), впереди ничего - спрятана */
+.onl-pov{margin:8px auto 0; max-width:46ch; font-family:"Golos Text",Arial,sans-serif; font-size:14.5px; line-height:1.4; color:#A9B9D8; text-wrap:pretty}
+.onl-pov b{color:#FFD189; font-weight:700}
 .onl-dh{margin:clamp(16px,1.8vw,20px) 0 0; font-family:"Golos Text",Arial,sans-serif;
   font-size:13px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#E3B34E}
 /* даты: карточки тёплого стекла с золотой кромкой, время - пилюлями; со скидкой - коралловые */
@@ -2910,6 +2913,9 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   font-family:"CR Blogger",Arial,sans-serif; font-weight:400;
   font-size:clamp(17px,1.45vw,21px); line-height:1.25; letter-spacing:.01em; color:#B7C6E2}
 .kp-cena b{font-weight:400; color:#FF7A6E; white-space:nowrap}
+/* повышение цены 1.12 и 1.01 (Серёга, 08.11.2026) - строку и цену выше ставит логика окна по дате */
+.kp-pov{margin:8px auto 0; max-width:44ch; font-family:"Golos Text",Arial,sans-serif; font-size:14.5px; line-height:1.4; color:#A9B9D8; text-wrap:pretty}
+.kp-pov b{color:#FFD189; font-weight:700}
 /* три шага покупки: карточки тёплого стекла с золотой кромкой, номер - золотой пилюлей */
 .kp-steps{list-style:none; margin:clamp(16px,1.8vw,22px) 0 0; padding:0;
   display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
@@ -14145,6 +14151,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <p class="onl-cena" id="onlCena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
         <p class="onl-sk" id="onlSk" hidden></p>
+        <p class="onl-pov" id="onlPov" hidden></p>
         <p class="onl-dh" id="onlDh">Даты онлайн-продажи</p>
         <ul class="onl-dates" id="onlDates"></ul>
         <p class="onl-go">Кнопка ниже откроет <b>сайт онлайн-бронирования</b> Министерства Новогодних Дел.
@@ -14175,7 +14182,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         <h2 class="zs-h" id="zsH3">Купите билеты сами&nbsp;- без менеджера</h2>
         <p class="zs-sub">Заявка принята, менеджер перезвонит. Но ждать не обязательно:
           билеты в малую семейную группу можно купить самим онлайн за&nbsp;пару&nbsp;минут</p>
-        <p class="kp-cena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
+        <p class="kp-cena" id="kpCena">Детский билет - <b>2&nbsp;500&nbsp;₽</b>, взрослый - <b>1&nbsp;000&nbsp;₽</b></p>
+        <p class="kp-pov" id="kpPov" hidden></p>
         <ol class="kp-steps">
           <li><b>1</b><span>Выберите дату и время</span></li>
           <li><b>2</b><span>Оплатите онлайн</span></li>
@@ -16944,6 +16952,15 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             : 'детский от <b>' + rub(kidMin) + '</b>, взрослый от <b>' + rub(adMin) + '</b>');
           skLine.hidden = false;
         } else skLine.hidden = true;
+        /* повышение цены впереди (1.12 и 1.01, Серёга 08.11.2026): текст считает сервер, schedule-app/src/lib/sbor/ceny.ts */
+        var pov = document.getElementById('onlPov');
+        if (pov && typeof d.povyshenie === 'string' && d.povyshenie){
+          var pt = d.povyshenie;
+          pov.textContent = '';
+          pov.appendChild(el('b', '', 'Цена растёт:'));
+          pov.appendChild(document.createTextNode(' ' + pt.charAt(0).toLowerCase() + pt.slice(1) + '.'));
+          pov.hidden = false;
+        } else if (pov) pov.hidden = true;
         if (d.gorod && d.gorod.vGorode) document.getElementById('onlDh').textContent = 'Даты онлайн-продажи ' + d.gorod.vGorode;
 
         /* даты по дням: «27 декабря» / «воскресенье» / время пилюлями */
@@ -17034,7 +17051,32 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
     var KUPIT = {'Нижний Новгород':'nn', 'Тюмень':'tyumen', 'Казань':'kazan', 'Крым':'crimea', 'Ставрополь':'stavropol'};
     var BILETY = 'https://slots.ministrynewyear.ru/bilety/';
 
+    /* Цена малой семейной группы по дню покупки - то же правило, что в
+       schedule-app/src/lib/sbor/ceny.ts (SEMEYNYY_FORMAT и SEMEYNYY_POVYSHENIE, Серёга 08.11.2026):
+       детский 2 500, с 1 декабря 2 700, с 1 января 2 900 (полночь по Москве), взрослый 1 000.
+       Поменялось там - поменять здесь. Скидки отдельных сеансов окно не показывает. */
+    var KP_DET = 2500, KP_VZR = 1000;
+    var KP_SHAGI = [[Date.UTC(2026, 10, 30, 21), 200, '1 декабря'], [Date.UTC(2026, 11, 31, 21), 400, '1 января']];
+    function kpRub(n){ var nb = String.fromCharCode(160); return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, nb) + nb + '₽'; }
+    function kpCena(){
+      var cenaEl = document.getElementById('kpCena'), povEl = document.getElementById('kpPov');
+      if (!cenaEl || !povEl) return;
+      var t = Date.now(), nad = 0, vperedi = [];
+      for (var i = 0; i < KP_SHAGI.length; i++){ if (t >= KP_SHAGI[i][0]) nad = KP_SHAGI[i][1]; else vperedi.push(KP_SHAGI[i]); }
+      cenaEl.innerHTML = 'Детский билет - <b>' + kpRub(KP_DET + nad) + '</b>, взрослый - <b>' + kpRub(KP_VZR) + '</b>';
+      if (!vperedi.length){ povEl.hidden = true; return; }
+      var nb = String.fromCharCode(160), bylo = nad;
+      var chasti = vperedi.map(function(s, j){
+        var plus = s[1] - bylo; bylo = s[1];
+        var den = s[2].replace(' ', nb);
+        return j === 0 ? 'с ' + den + ' детский билет подорожает на ' + plus + nb + '₽' : 'с ' + den + ' - ещё на ' + plus + nb + '₽';
+      });
+      povEl.innerHTML = '<b>Цена растёт:</b> ' + chasti.join(', ') + '.';
+      povEl.hidden = false;
+    }
+
     function showKupit(){
+      kpCena();
       step1.hidden = true; step2.hidden = true; step3.hidden = false;
       win.setAttribute('aria-labelledby', 'zsH3');
       win.scrollTop = 0;
