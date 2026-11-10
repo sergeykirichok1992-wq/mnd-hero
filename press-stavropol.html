@@ -378,13 +378,13 @@ figcaption{margin-top:10px; font-size:14px; line-height:1.45; color:var(--dim); 
       </li>
       <li>
         <h3>Сборная группа</h3>
-        <span class="s">от <b data-c="sb0">1590</b> до <b data-c="sb1">1990</b>&nbsp;₽</span>
-        <small>детский билет, на 300&nbsp;₽ дороже, чем в организованной группе</small>
+        <span class="s"><b>2500</b>&nbsp;₽</span>
+        <small>детский билет, одна цена на все даты; взрослый в сборной группе - 1000&nbsp;₽</small>
       </li>
       <li>
         <h3>Взрослый билет</h3>
         <span class="s">от <b data-c="vz">600</b>&nbsp;₽</span>
-        <small>взрослые идут по желанию, цена одна для любой группы</small>
+        <small>взрослые идут по желанию, цена для организованной группы</small>
       </li>
     </ul>
     <p id="rost">Цены растут на 100&nbsp;₽ 1 ноября и 1 декабря. Дата закрепляется по цене того дня,
@@ -426,7 +426,8 @@ figcaption{margin-top:10px; font-size:14px; line-height:1.45; color:var(--dim); 
 
 /* ==================== ЦЕНЫ ПО ДАТЕ ====================
    Ступени те же, что в PRAJS на stavropol.html: детский билет организованной
-   группы «от» и «до», взрослый. Сборная группа - детский плюс 300 ₽.
+   группы «от» и «до», взрослый. У сборной группы своя цена (2500 детский, 1000 взрослый),
+   она не зависит от даты и вписана в разметку.
    Сначала по часам браузера, потом сверяемся с датой сервера (заголовок Date),
    как на странице города: часы у посетителя бывают сбиты.
    Без JS в разметке остаются цены с 15 октября. */
@@ -445,7 +446,7 @@ figcaption{margin-top:10px; font-size:14px; line-height:1.45; color:var(--dim); 
     var k = 0;
     for (var i = 0; i < STUPENI.length; i++){ if (d >= msk(STUPENI[i][0])) k = i; }
     var p = STUPENI[k];
-    var znach = { org0:p[1], org1:p[2], sb0:p[1] + 300, sb1:p[2] + 300, vz:p[3] };
+    var znach = { org0:p[1], org1:p[2], vz:p[3] };
     var uzly = document.querySelectorAll('[data-c]');
     for (var j = 0; j < uzly.length; j++){
       var v = znach[uzly[j].getAttribute('data-c')];
