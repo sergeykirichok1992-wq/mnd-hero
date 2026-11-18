@@ -514,7 +514,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
    M PLUS Rounded - на экране должен звучать один голос с заголовком над ним. */
 .fg{position:relative; z-index:3; width:min(94vw,1720px);
   margin:clamp(40px,5.2vw,88px) auto 0; padding:0 clamp(16px,3vw,56px)}
-.fg-stats{display:grid; grid-template-columns:repeat(4,1fr);
+.fg-stats{display:grid; grid-template-columns:repeat(3,1fr);
   gap:clamp(20px,2.8vw,44px) clamp(16px,2.4vw,36px)}
 .fg-stat{min-width:0; text-align:center}
 /* обёртка облегает цифру (inline-block), поэтому лужица света считается от ширины
@@ -556,6 +556,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
 .fg-cta{margin:clamp(30px,4vw,66px) auto 0; text-align:center}
 @media (max-width:820px){
   .fg-stats{grid-template-columns:repeat(2,1fr); gap:clamp(22px,6vw,34px) clamp(12px,4vw,24px)}
+  .fg-stat:last-child{grid-column:1/-1}
   .fg-num{font-size:clamp(34px,10vw,58px)}
   .fg-cap{font-size:clamp(12px,3.4vw,15px); max-width:14em}
 }
@@ -1772,7 +1773,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
     </div>
   </div>
 
-  <!-- цифры прошлого сезона: те же четыре, что стояли на белом поле до пересборки экрана -->
+  <!-- цифры прошлого сезона -->
   <div class="fg">
     <div class="fg-stats" id="fgStats">
       <div class="fg-stat rv">
@@ -1782,10 +1783,6 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
       <div class="fg-stat rv">
         <span class="fg-numbox"><span class="fg-num" data-to="6">6</span></span>
         <p class="fg-cap">год мы создаем сказку для детей и&nbsp;родителей. До&nbsp;250&nbsp;000 детей побывали у&nbsp;нас с&nbsp;2018 года</p>
-      </div>
-      <div class="fg-stat rv">
-        <span class="fg-numbox"><span class="fg-num" data-to="3000">3&nbsp;000</span></span>
-        <p class="fg-cap">килограмм карамели мы&nbsp;произвели в&nbsp;своем цеху прошлой осенью</p>
       </div>
       <div class="fg-stat rv">
         <span class="fg-numbox"><span class="fg-num" data-to="150">150</span></span>
@@ -1956,7 +1953,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
         </div>
         <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button><button class="pg-dot" type="button" aria-label="Фото 2"></button><button class="pg-dot" type="button" aria-label="Фото 3"></button></div>
         <h3 class="pg-h">Обновлённый карамельный мастер-класс</h3>
-        <p class="pg-p">Главная часть программы! Каждый ребёнок сделает красивые разноцветные леденцы, прям как в магазине. Мы сами производим натуральную вкуснейшую карамель по ГОСТу для своих мастер-классов.</p>
+        <p class="pg-p">Главная часть программы! Каждый ребёнок сделает красивые разноцветные леденцы, прям как в магазине.</p>
       </article>
       <article class="pg-card rv">
         <div class="pg-slider" data-pg-slider data-autoplay="5000">
@@ -1978,7 +1975,7 @@ body.vcanvas #v{inset:auto; left:0; top:0; width:1px; height:1px; opacity:0}
         </div>
         <div class="pg-dots"><button class="pg-dot on" type="button" aria-label="Фото 1"></button></div>
         <h3 class="pg-h">Выставка карамельного искусства</h3>
-        <p class="pg-p">Впервые наш цех готовит большую авторскую экспозицию уникальных леденцов самых разных размеров, которые удивят даже взрослых!</p>
+        <p class="pg-p">На выставке можно будет увидеть леденцы самых разных размеров.</p>
       </article>
       <article class="pg-card rv">
         <div class="pg-slider" data-pg-slider data-autoplay="5000">

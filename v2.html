@@ -5638,65 +5638,6 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 .mk-dot.is-on{width:calc(34 * var(--u)); background:#E7362B}
 .mk-dot:focus-visible{outline:2px solid #8C1B12; outline-offset:3px}
 
-/* ---------- ВОЛОСЯНАЯ ЛИНИЯ ПОД СЛАЙДЕРОМ ----------
-   Просьба Серёги 11.09.2026, ТОЛЬКО ДЛЯ ТЕЛЕФОНА: там слайдер и блок про цех
-   идут одной лентой сверху вниз, и без черты второй читается продолжением
-   первого. На компьютере пункты стоят сбоку от снимков, граница видна и так,
-   поэтому линия спрятана.
-
-   Устроена как разделитель на стыке экранов цен и бонусов (`.gb-rule`):
-   ЛИНИЯ ЗАДАНА ГРАДИЕНТОМ, а не border - у border концы не гаснут и он
-   упирается в края экрана. Толщина 1 px, а не полпикселя: полпикселя браузер
-   местами округляет до нуля и волосок рвётся; за лёгкость отвечает
-   прозрачность. Поля по краям те же 10 px, что у заголовка и пунктов ниже,
-   - линия обязана начинаться там же, где текст под ней. */
-.mk-rule{display:none; height:1px; margin:26px 10px 0;
-  background:linear-gradient(90deg,
-    rgba(76,42,49,0), rgba(76,42,49,.22) 20%, rgba(76,42,49,.22) 80%, rgba(76,42,49,0));}
-
-/* ---------- Блок про карамельный цех ----------
-   Заголовок, подпись, шесть пунктов с карамельными галочками и коллаж цеха.
-   Текст и обе картинки перенесены с боевого `ministrynn.ru` дословно
-   (просьба Серёги 10.09.2026: «возьми оттуда картинку и текст в точности»).
-   Живёт внутри тринадцатого экрана, ниже слайдера, поэтому фон общий.
-   Числа - через тот же `--u`, что у остальных светлых экранов. */
-.mk-ceh{margin-top:calc(76 * var(--u))}
-/* Заголовок ЧЁРНЫЙ, а не синий: так на макете Серёги 10.09.2026. Синий он
-   на этом экране только у первого заголовка, над слайдером. */
-.mk-ceh-t{
-  text-align:center; font-family:"CR Blogger",Arial,sans-serif; font-weight:700;
-  color:#17171B; font-size:calc(32 * var(--u)); line-height:1.2;
-  max-width:calc(1000 * var(--u)); margin:0 auto;
-  /* Капслок рисует CSS, а не разметка (просьба Серёги 10.09.2026): в тексте
-     страницы заголовок остаётся в обычном регистре — так его читают
-     поисковик и голосовая читалка, которая капс произносит по буквам. */
-  text-transform:uppercase;
-}
-/* «Производим сами» - главные два слова заголовка: этим экран и отличается
-   от конкурентов, которые заготовки покупают. Выделены красным по просьбе
-   Серёги 11.09.2026. Красный взят ТОТ ЖЕ, что у второй строки заголовка над
-   слайдером (`.mk-red`): на экране должен быть один красный, а не два похожих. */
-.mk-ceh-red{color:#8C1B12}
-/* Раскладка с макета: слева сетка снимков цеха, справа четыре пункта,
-   выровненные по её середине. Обе сетки нарисованы Серёгой одной картинкой
-   (`ceh.webp` семь кадров для компьютера, `ceh-mob.webp` четыре для телефона) —
-   скруглённые углы и мягкие тени вшиты в файл, кодом тут ничего не собирается.
-   Переключает `<picture>` по границе 768 px.
-   Пропорция колонок снята с макета: снимки занимают 44,5 % его ширины,
-   текст 32,5 %, между ними 3,5 %. */
-.mk-ceh-grid{
-  display:grid; grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);
-  gap:calc(56 * var(--u)); align-items:center; margin-top:calc(50 * var(--u));
-}
-.mk-ceh-shot{margin:0}
-.mk-ceh-shot img{width:100%; height:auto; display:block}
-.mk-ceh-list{list-style:none; margin:0; padding:0; display:grid; gap:calc(26 * var(--u))}
-.mk-li{
-  display:grid; grid-template-columns:calc(20 * var(--u)) 1fr; gap:calc(14 * var(--u));
-  align-items:start; font-family:"CR Blogger",Arial,sans-serif;
-  font-size:calc(15 * var(--u)); line-height:1.45; color:#2C2A2E;
-}
-.mk-li img{width:100%; height:auto; margin-top:calc(2 * var(--u))}
 .mk-cta{display:flex; justify-content:center; margin-top:calc(52 * var(--u))}
 
 @media (max-width:767px){
@@ -5732,42 +5673,8 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
   .mk-gap1{height:12px}
   .mk-gap2{height:24px}
   .mk-br{display:none}
-  /* Полей по краям вдвое больше (8 -> 16), а тексту блока про цех - ещё
-     по 10 px сверх того: на телефоне строки упирались в кромку экрана.
-     Просьба Серёги 10.09.2026. */
-  .mk .cr-cont{padding-inline:16px}
-  .mk-ceh-t, .mk-ceh-list{padding-inline:10px}
   .mk-arw--prev{left:1.4%}
   .mk-arw--next{right:1.4%}
-  /* Волосяная линия между слайдером и блоком про цех - только на телефоне */
-  .mk-rule{display:block}
-  /* Заголовок про цех опущен: над ним встала линия (26 px воздуха + волосок),
-     от неё до заголовка ещё 36. От точек слайдера выходит 63 px вместо
-     прежних 51 - «чуть-чуть ниже», просьба Серёги 11.09.2026. */
-  .mk-ceh{margin-top:36px}
-  .mk-ceh-t{font-size:21px}
-  .mk-ceh-grid{grid-template-columns:1fr; gap:20px; margin-top:22px}
-  .mk-ceh-list{gap:14px}
-  /* Пункты набраны ШРИФТОМ КАРТОЧЕК ЦЕН (Golos Text) - просьба Серёги
-     11.09.2026. "CR Blogger" снят со старого сайта, у него узкие буквы:
-     четыре длинных пункта подряд им читались тяжело.
-
-     ОТ СМЕНЫ ШРИФТА БЛОК СТАЛ ДЛИННЕЕ, и меньшим кеглем это не отыграть.
-     Golos шире в пересчёте на кегль: замер на 390 px - строка «Наша карамель
-     НАСТОЯЩАЯ» на Golos 15,5 занимает 223 px, на прежнем CR Blogger 16,5 -
-     196, при том что буквы у Golos даже чуть ниже (рост строчной 11,0
-     против 11,8). Поэтому строк в списке стало 15 вместо 13, а сам список
-     вырос с 353 до 391 px. Так и оставлено: шрифт тут важнее двух строк.
-
-     КЕГЛЬ 15,5 - середина между 14,5 карточек цен, на которые Серёга
-     показал, и прежними 16,5. На 14,5 список вернулся бы к прежней высоте
-     (347 px), но буквы стали бы заметно мельче прежних; на 16,5 строк
-     было бы уже 16, а список 438 px.
-
-     ТОЛЬКО НА ТЕЛЕФОНЕ: на компьютере пункты стоят узкой колонкой справа
-     от снимков, там прежний шрифт держит раскладку с макета. */
-  .mk-li{font-family:"Golos Text",Arial,sans-serif; font-size:15.5px;
-    line-height:1.5; grid-template-columns:26px 1fr; gap:10px}
   .mk-cta{margin-top:39px}
   .mk-hint{font-size:12.5px; margin-bottom:10px}
   .mk-dots{gap:7px; margin-top:16px}
@@ -10502,7 +10409,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-panel">
           <h3 class="pg-t">Главное — карамельный мастер-класс</h3>
-          <p class="pg-p">Главная часть программы, вокруг которой строится весь сценарий! Каждый ребенок сделает красивые новогодние леденцы, прям как с прилавка. Мы сами производим натуральную вкуснейшую карамель по ГОСТу для наших МК.</p>
+          <p class="pg-p">Главная часть программы, вокруг которой строится весь сценарий! Каждый ребенок сделает красивые новогодние леденцы, прям как с прилавка.</p>
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
@@ -10682,7 +10589,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
         </div>
         <div class="pg-panel">
           <h3 class="pg-t">Выставка карамельного искусства</h3>
-          <p class="pg-p">Это уже традиция! В главном зале наш карамельный цех представит новую экспозицию больших авторских леденцов ручной работы в новогодней и космической тематике. На фото леденцы прошлого сезона.</p>
+          <p class="pg-p">Это уже традиция! В главном зале дети увидят новую выставку больших леденцов ручной работы на новогоднюю и космическую темы. На фото леденцы прошлого сезона.</p>
         </div>
         <div class="pg-tag">Входит в программу</div>
       </article>
@@ -11397,7 +11304,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
             <div class="mk-slide"><img src="mk/f12.webp?v=2" width="1440" height="857" alt="Руки в перчатках раскатывают полосатую карамельную трость" loading="lazy" decoding="async" draggable="false"></div>
             <div class="mk-slide"><img src="mk/f13.webp?v=2" width="1440" height="857" alt="Ребёнок держит красно-белый леденец-завитушку" loading="lazy" decoding="async" draggable="false"></div>
             <div class="mk-slide"><img src="mk/f14.webp?v=2" width="1440" height="857" alt="Карамельщица помогает ребёнку свернуть леденец" loading="lazy" decoding="async" draggable="false"></div>
-            <div class="mk-slide"><img src="mk/f15.webp?v=2" width="1440" height="857" alt="Общий вид карамельного цеха: дети за столами под гирляндами" loading="lazy" decoding="async" draggable="false"></div>
+            <div class="mk-slide"><img src="mk/f15.webp?v=2" width="1440" height="857" alt="Дети за столами под гирляндами на карамельном мастер-классе" loading="lazy" decoding="async" draggable="false"></div>
             <div class="mk-slide"><img src="mk/f16.webp?v=2" width="1440" height="857" alt="Разноцветный леденец-цветок в руке ребёнка" loading="lazy" decoding="async" draggable="false"></div>
             <div class="mk-slide"><img src="mk/f17.webp?v=2" width="1440" height="857" alt="Карамельщица показывает детям инструмент для работы с карамелью" loading="lazy" decoding="async" draggable="false"></div>
             <div class="mk-slide"><img src="mk/f18.webp?v=2" width="1440" height="857" alt="Готовые леденцы и карамельная трость на рабочем столе" loading="lazy" decoding="async" draggable="false"></div>
@@ -11419,34 +11326,10 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
       <div class="mk-dots" role="tablist" aria-label="Выбор фотографии"></div>
     </div>
 
-    <div class="mk-rule" role="presentation"></div>
-
-      <div class="mk-ceh">
-        <h3 class="mk-ceh-t">Заготовки для карамельного МК мы <span class="mk-ceh-red">производим сами</span> в своем цеху согласно ГОСТу</h3>
-
-        <div class="mk-ceh-grid">
-          <figure class="mk-ceh-shot">
-            <picture>
-              <source media="(max-width:767px)" srcset="mk/ceh-mob.webp?v=2" width="972" height="1299">
-              <img src="mk/ceh.webp?v=2" width="1086" height="696" loading="lazy" decoding="async"
-                   alt="Карамельный цех: мастера готовят заготовки на стальных столах, варят карамель и раскладывают её по коробкам">
-            </picture>
-          </figure>
-
-          <ul class="mk-ceh-list">
-            <li class="mk-li"><img src="mk/check.webp?v=2" width="56" height="53" alt="" aria-hidden="true" loading="lazy" decoding="async"><span>Наша карамель НАСТОЯЩАЯ и очень вкусная! Это не изомальт (сахарозаменитель), как это часто бывает</span></li>
-            <li class="mk-li"><img src="mk/check.webp?v=2" width="56" height="53" alt="" aria-hidden="true" loading="lazy" decoding="async"><span>Все наше сырье и готовый продукт имеет сертификаты качества по ГОСТу (предоставим по запросу)</span></li>
-            <li class="mk-li"><img src="mk/check.webp?v=2" width="56" height="53" alt="" aria-hidden="true" loading="lazy" decoding="async"><span>Наша карамель имеет качество ручной работы! Натуральная, без эмульгаторов, которые используются на массовых производствах!</span></li>
-            <li class="mk-li"><img src="mk/check.webp?v=2" width="56" height="53" alt="" aria-hidden="true" loading="lazy" decoding="async"><span>Дети делают леденцы на новом профессиональном оборудовании, с которым работают на реальных фабриках</span></li>
-          </ul>
-        </div>
-
-        <div class="mk-cta">
-          <button class="zs-btn" type="button" data-zs="цех - предложение в МАХ">
-            <span class="zs-t">Получить предложение в <span class="mx">МАХ</span></span></button>
-        </div>
-      </div>
-
+    <div class="mk-cta">
+      <button class="zs-btn" type="button" data-zs="мастер-класс - предложение в МАХ">
+        <span class="zs-t">Получить предложение в <span class="mx">МАХ</span></span></button>
+    </div>
   </div>
 </section>
 
@@ -12229,7 +12112,7 @@ html.zs-lock .nav{margin-right:var(--zs-sbw,0px)}
 
     <!-- Обычная золотая кнопка (вид 1 стандарта) - выбор Серёги 10.09.2026.
          Надпись и повадки те же, что у кнопок «Получить предложение в МАХ»
-         на экранах цен и карамельного цеха: ссылки на МАХ у нас пока нет,
+         на экранах цен и карамельного мастер-класса: ссылки на МАХ у нас пока нет,
          поэтому кнопка открывает общее окно заявки с меткой места.
          Появится ссылка - меняется только обработчик. -->
     <div class="gz-cta">
