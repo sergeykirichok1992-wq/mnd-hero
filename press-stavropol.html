@@ -174,26 +174,6 @@ figcaption{margin-top:10px; font-size:14px; line-height:1.45; color:var(--dim); 
 .ded .q{margin-left:0; margin-right:0}
 .q cite{display:block; margin-top:12px; font-style:normal; font-size:15px; color:var(--gold-l)}
 
-/* ---------- цифры Ставрополя: три плашки разного цвета ---------- */
-.stats{list-style:none; padding:0; margin-top:clamp(24px,2.4vw,36px); margin-bottom:clamp(24px,2.4vw,36px);
-  display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(10px,1.2vw,18px)}
-.stats li{
-  padding:clamp(20px,2vw,30px) clamp(16px,1.6vw,24px); border-radius:clamp(14px,1.2vw,20px);
-  text-align:center;
-}
-.stats li:nth-child(1){background:linear-gradient(160deg,#F7D27A 0%,#E3A93A 100%); color:#3A2402}
-.stats li:nth-child(2){background:linear-gradient(160deg,#6E47E0 0%,#3B1FA0 100%); color:#fff}
-.stats li:nth-child(3){background:linear-gradient(160deg,#2C5BD8 0%,#162E8C 100%); color:#fff}
-.stats b{display:block; margin-bottom:6px;
-  font-family:"Blogger Sans","Golos Text",Arial,sans-serif; font-weight:700;
-  font-size:clamp(36px,3.6vw,58px); line-height:1}
-.stats span{display:block; font-size:max(15px,clamp(15px,1vw,17px)); line-height:1.35}
-@media (max-width:640px){
-  .stats{grid-template-columns:1fr}
-  .stats li{display:flex; align-items:center; gap:16px; text-align:left; padding:16px 20px}
-  .stats b{flex:none; min-width:3.6em; margin:0; font-size:38px}
-}
-
 /* ---------- Дед Мороз: фото рядом с текстом ---------- */
 .ded{display:grid; grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); gap:clamp(22px,3vw,52px); align-items:center;
   margin-top:clamp(30px,3vw,46px); margin-bottom:clamp(10px,1vw,16px)}
@@ -267,13 +247,7 @@ figcaption{margin-top:10px; font-size:14px; line-height:1.45; color:var(--dim); 
       в этом сезоне - в семи городах России. Прошлой зимой к нам пришли 52&nbsp;000 детей
       в пяти городах, а всего за семь лет - почти 300&nbsp;000. Каждый год над проектом работают
       больше 150 человек: актёры, карамельщики, декораторы, хостес, менеджеры.</p>
-    <p>В Ставрополь мы впервые приехали в 2025 году. Вот чем закончился первый сезон:</p>
-
-    <ul class="stats w">
-      <li><b>11&nbsp;000</b><span>детей побывали у нас за сезон</span></li>
-      <li><b>5,0</b><span>звёзд - оценка на Яндекс Картах</span></li>
-      <li><b>~300</b><span>видеоотзывов от родительских комитетов</span></li>
-    </ul>
+    <p>В Ставрополь мы впервые приехали в 2025 году.</p>
 
     <p>Видеоотзывы мы снимали прямо на площадке: родительские комитеты рассказывали
       о празднике сразу после программы. Все ролики выложены в нашей
